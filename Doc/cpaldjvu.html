@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">cpaldjvu</A></H2>
+<BLOCKQUOTE>Simple encoder for low resolution, low color images. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        cpaldjvu [options] &lt;inputppmfile&gt; &lt;outputdjvufile&gt;
+    </PRE><P><B>Description</B><P>File <TT>&quot;cpaldjvu.cpp&quot;</TT> demonstrates a simple quasi-lossless compressor for
+low resolution, low color, images with a reduced number of colors (e.g
+screendumps).  It simply quantizes the image on a limited number of
+colors, uses the dominant color to construct a uniform background, then
+performs lossless jb2 compression for all remaining objects.  <P>Options
+<DL>
+<DT><B>-colors n</B><DD>  Maximum number of colors during quantization (default 256)
+<DT><B>-dpi n</B><DD>     Resolution written into the output file (default 100).
+<DT><B>-verbose</B><DD>   Displays additional messages.
+</DL><P><B>Remarks</B><P>This is an interesting alternative to GIF. It performs especially well on
+screendumps.  Compression ratios can get hurt when there are continuous
+tone segment in the image.  Demoting such segments from foreground to
+background is a pretty interesting project.  Dithered segments behave
+surprisingly well.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: cpaldjvu.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

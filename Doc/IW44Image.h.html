@@ -1,0 +1,103 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">IW44Image.h</A></H2>
+<BLOCKQUOTE>Wavelet encoded images. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="IWEncoderParms"></A>
+<B>class  GRectclass  IFFByteStreamclass  ByteStreamclass  GBitmapclass  GPixmapstruct  </B><A HREF=IWEncoderParms.html><B>IWEncoderParms</B></A><B></B><DD><I>IW44 encoding parameters.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="IW44Image"></A>
+<B>class  </B><A HREF=IW44Image.html><B>IW44Image</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></B><DD><I>IW44 encoded gray-level and color images.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;IW44Image.h&quot;</TT> and <TT>&quot;IW44Image.cpp&quot;</TT> implement the DjVu IW44 wavelet
+scheme for the compression of gray-level images (see class IWBitmap)
+and color images (see class IWPixmap).  Programs <!1><A HREF="c44.html">c44</A> and
+<!1><A HREF="d44.html">d44</A> demonstrate how to encode and decode IW44 files.<P><B>IW44 File Structure</B> --- The IW44 files are structured according to
+the EA IFF85 specifications (see <!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A>).  Gray level IW44
+Images consist of a single <TT>&quot;FORM:BM44&quot;</TT> chunk composed of an arbitrary
+number of <TT>&quot;BM44&quot;</TT> data chunks.  Color IW44 Images consist of a single
+<TT>&quot;FORM:PM44&quot;</TT> chunk composed of an arbitrary number of <TT>&quot;PM44&quot;</TT> data
+chunks.  The successive <TT>&quot;PM44&quot;</TT> or <TT>&quot;BM44&quot;</TT> data chunks contain
+successive refinements of the encoded image.  Each chunk contains a
+certain number of ``data slices''.  The first chunk also contains a small
+image header.  You can use program <!1><A HREF="djvuinfo.2.html">djvuinfo</A> to display all this
+structural information:
+<PRE>
+    % djvuinfo lag.iw4
+    lag.iw4:
+      FORM:PM44 [62598] 
+        PM44 [10807]              #1 - 74 slices - v1.2 (color) - 684x510
+        PM44 [23583]              #2 - 13 slices 
+        PM44 [28178]              #3 - 10 slices 
+    </PRE><P><B>Embedded IW44 Images</B> --- These IW44 data chunks can also appear within
+other contexts.  Files representing a DjVu page, for instance, consist of
+a single <TT>&quot;FORM:DJVU&quot;</TT> composite chunk.  This composite chunk may contain
+<TT>&quot;BG44&quot;</TT> chunks encoding the background layer and <TT>&quot;FG44&quot;</TT> chunks encoding
+the foreground color layer.  These <TT>&quot;BG44&quot;</TT> and <TT>&quot;FG44&quot;</TT> chunks are
+actually regular IW44 data chunks with a different chunk identifier.  This
+information too can be displayed using program <!1><A HREF="djvuinfo.2.html">djvuinfo</A>.
+<PRE>
+    % djvuinfo graham1.djvu 
+    graham1.djvu:
+      FORM:DJVU [32553] 
+        INFO [5]            3156x2325, version 17
+        Sjbz [17692] 
+        BG44 [2570]         #1 - 74 slices - v1.2 (color) - 1052x775
+        FG44 [1035]         #1 - 100 slices - v1.2 (color) - 263x194
+        BG44 [3048]         #2 - 10 slices 
+        BG44 [894]          #3 - 4 slices 
+        BG44 [7247]         #4 - 9 slices 
+    </PRE><P><B>Performance</B> --- The main design objective for the DjVu wavelets
+consisted of allowing progressive rendering and smooth scrolling of large
+images with limited memory requirements.  Decoding functions process the
+compressed data and update a memory efficient representation of the
+wavelet coefficients.  Imaging function then can quickly render an
+arbitrary segment of the image using the available data.  Both process can
+be carried out in two threads of execution.  This design plays an
+important role in the DjVu system.  We have investigated various
+state-of-the-art wavelet compression schemes: although these schemes may
+achieve slightly smaller file sizes, the decoding functions did not even
+approach our requirements.  <P>The IW44 wavelets satisfy these requirements today. It performs very well
+for quality settings resulting in high compression ratios.  It should not
+be used for quasi-lossless compression because certain design choices
+deliberately sacrifice the IW44 quasi-lossless performance in order to
+improve the image quality at high compression ratios.<P>Little care however has been taken to make the IW44 encoder memory
+efficient.  This code uses two copies of the wavelet coefficient data
+structure (one for the raw coefficients, one for the quantized
+coefficients).  A more sophisticated implementation should considerably
+reduce the memory requirements.<P><B>Masking</B> --- When we create a DjVu image, we often know that certain
+pixels of the background image are going to be covered by foreground
+objects like text or drawings.  The DjVu IW44 wavelet decomposition
+routine can use an optional bilevel image named the mask.  Every non zero
+pixel in the mask means the value of the corresponding pixel in the
+background image is irrelevant.  The wavelet decomposition code will
+replace these masked pixels by a color value whose coding cost is minimal
+(see <A HREF=http://www.research.att.com/~leonb/DJVU/mask>http://www.research.att.com/~leonb/DJVU/mask</A>).<P><B>ToDo</B> --- There are many improvements to be made.  Besides better
+quantization algorithms (such as trellis quantization and bitrate
+allocation), we should allow for more wavelet transforms.  These
+improvements may be implemented in future version, if (and only if) they
+can meet our decoding constraints.  Future versions will probably split
+file <TT>&quot;IW44Image.cpp&quot;</TT> which currently contains everything.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: IW44Image.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

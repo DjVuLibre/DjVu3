@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">BSByteStream.h</A></H2>
+<BLOCKQUOTE>Simple Burrows-Wheeler general purpose compressor. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="BSByteStream"></A>
+<B>class  </B><A HREF=BSByteStream.html><B>BSByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>Performs bzz compression/decompression.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;BSByteStream.h&quot;</TT> and <TT>&quot;BSByteStream.cpp&quot;</TT> implement a very compact
+general purpose compressor based on the Burrows-Wheeler transform.  The
+utility program <!1><A HREF="bzz.html">bzz</A> provides a front-end for this class. Although
+this compression model is not currently used in DjVu files, it may be used
+in the future for encoding textual data chunks.<P><B>Algorithms</B> --- The Burrows-Wheeler transform (also named Block-Sorting)
+is performed using a combination of the Karp-Miller-Rosenberg and the
+Bentley-Sedgewick algorithms. This is comparable to (Sadakane, DCC 98)
+with a slightly more flexible ranking scheme. Symbols are then ordered
+according to a running estimate of their occurrence frequencies.  The
+symbol ranks are then coded using a simple fixed tree and the
+<!1><A HREF="ZPCodec.html">ZPCodec</A> binary adaptive coder.<P><B>Performances</B> --- The basic algorithm is mostly similar to those
+implemented in well known compressors like <TT>bzip</TT> or <TT>bzip2</TT>
+(<A HREF=http://www.muraroa.demon.co.uk>http://www.muraroa.demon.co.uk</A>).  The adaptive binary coder however
+generates small differences. The adaptation noise may cost up to 5% in
+file size, but this penalty is usually offset by the benefits of
+adaptation.  This is good when processing large and highly structured
+files like spreadsheet files.  Compression and decompression speed is
+about twice slower than <TT>bzip2</TT> but the sorting algorithms is more
+robust. Unlike <TT>bzip2</TT> (as of August 1998), this code can compress half a
+megabyte of "abababab...." in bounded time.<P>Here are some comparative results (in bits per character) obtained on the
+Canterbury Corpus (<A HREF=http://corpus.canterbury.ac.nz>http://corpus.canterbury.ac.nz</A>) as of August
+1998. The BSByteStream performance on the single spreadsheet file <TT>Excl</TT>
+moves <TT>bzz</TT>'s weighted average ahead of much more sophisticated methods,
+like Suzanne Bunton's <TT>fsmxBest</TT> system
+<A HREF=http://corpus.canterbury.ac.nz/methodinfo/fsmx.html>http://corpus.canterbury.ac.nz/methodinfo/fsmx.html</A>.  This result
+will not last very long.<P><FONT SIZE="-2">
+<TABLE BORDER>
+<TR><TD>
+</TD><TD> text </TD><TD> fax </TD><TD> Csrc </TD><TD> Excl </TD><TD> SPRC </TD><TD> tech 
+</TD><TD> poem </TD><TD> html </TD><TD> lisp </TD><TD> man </TD><TD> play </TD><TD> Weighted </TD><TD> Average </TD></TR><TR><TD>
+compress 
+</TD><TD> 3.27 </TD><TD> 0.97 </TD><TD> 3.56 </TD><TD> 2.41 </TD><TD> 4.21 </TD><TD> 3.06 
+</TD><TD> 3.38 </TD><TD> 3.68 </TD><TD> 3.90 </TD><TD> 4.43 </TD><TD> 3.51 
+</TD><TD> 2.55 </TD><TD> 3.31 </TD></TR><TR><TD>
+gzip -9
+</TD><TD> 2.85 </TD><TD> 0.82 </TD><TD> 2.24 </TD><TD> 1.63 </TD><TD> 2.67 </TD><TD> 2.71 
+</TD><TD> 3.23 </TD><TD> 2.59 </TD><TD> 2.65 </TD><TD> 3.31 </TD><TD> 3.12 
+</TD><TD> 2.08 </TD><TD> 2.53 </TD></TR><TR><TD>  
+bzip2 -9
+</TD><TD> 2.27 </TD><TD> 0.78 </TD><TD> 2.18 </TD><TD> 1.01 </TD><TD> 2.70 </TD><TD> 2.02 
+</TD><TD> 2.42 </TD><TD> 2.48 </TD><TD> 2.79 </TD><TD> 3.33 </TD><TD> 2.53 
+</TD><TD> 1.54 </TD><TD> 2.23 </TD></TR><TR><TD>
+ppmd
+</TD><TD> 2.31 </TD><TD> 0.99 </TD><TD> 2.11 </TD><TD> 1.08 </TD><TD> 2.68 </TD><TD> 2.19 
+</TD><TD> 2.48 </TD><TD> 2.38 </TD><TD> 2.43 </TD><TD> 3.00 </TD><TD> 2.53 
+</TD><TD> 1.65 </TD><TD> 2.20 </TD></TR><TR><TD>
+fsmx
+</TD><TD> <B>2.10</B> </TD><TD> 0.79 </TD><TD> <B>1.89</B> </TD><TD> 1.48 </TD><TD> <B>2.52</B> </TD><TD> <B>1.84</B> 
+</TD><TD> <B>2.21</B> </TD><TD> <B>2.24</B> </TD><TD> <B>2.29</B> </TD><TD> <B>2.91</B> </TD><TD> <B>2.35</B> 
+</TD><TD> 1.63 </TD><TD> <B>2.06</B> </TD></TR><TR><TD>
+<B>bzz</B>
+</TD><TD> 2.25 </TD><TD> <B>0.76</B> </TD><TD> 2.13 </TD><TD> <B>0.78</B> </TD><TD> 2.67 </TD><TD> 2.00
+</TD><TD> 2.40 </TD><TD> 2.52 </TD><TD> 2.60 </TD><TD> 3.19 </TD><TD> 2.52 
+</TD><TD> <B>1.44</B> </TD><TD> 2.16
+</TR></TABLE>
+</FONT><P>Note that the DjVu people have several entries in this table.  Program
+<TT>compress</TT> was written some time ago by Joe Orost
+(<A HREF=http://www.research.att.com/info/orost>http://www.research.att.com/info/orost</A>). The <TT>ppmc</TT> method, (a
+precursor of <TT>ppmd</TT>) was created by Paul Howard
+(<A HREF=http://www.research.att.com/info/pgh>http://www.research.att.com/info/pgh</A>). The <TT>bzz</TT> program is just
+below your eyes.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- Initial implementation<BR>
+Andrei Erofeev &lt;eaf@geocities.com&gt; -- Improved Block Sorting algorithm.
+
+<DT><B>Version:</B><DD><TT>$Id: BSByteStream.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

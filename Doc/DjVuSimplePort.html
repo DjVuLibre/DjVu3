@@ -1,0 +1,148 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVuSimplePort</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuSimplePort</A>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></H2>
+<BLOCKQUOTE>Simple port.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVuPort,MDjVuPort.html,CDjVuSimplePort,MDjVuSimplePort.html">
+<param name=before value="M,M,M">
+<param name=after value="Md_SP,Md_,M">
+<param name=indent value="0,1,2">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.27.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>inherits</B>(const char * class_name) const 
+<DD><I>Returns 1 if <TT>class_name</TT> is <TT>&quot;DjVuPort&quot;</TT> or <TT>&quot;DjVuSimplePort&quot;</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.27.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<DD><I>If <TT>url</TT> is local, it created a <!1><A HREF="DataPool.html">DataPool</A>, connects it to the file with the given name and returns.</I>
+<DT>
+<A HREF="#DOC.1.5.27.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>Displays error on <TT>stderr</TT>. Always returns 1.</I>
+<DT>
+<A HREF="#DOC.1.5.27.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>Displays status on <TT>stderr</TT>. Always returns 1.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="DjVuPort.html">DjVuPort</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>* <B>get_portcaster</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> &amp; port)
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<P> <B>Notifications. </B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is used to get a file corresponding to the given ID.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<DD><I>This request is issued when decoder needs additional data for decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent to update the decoding status.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by <!1><A HREF="DjVuImage.html">DjVuImage</A> when it should be redrawn.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * name)
+<DD><I>This notification is sent when a new chunk has been decoded.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuFile.html">DjVuFile</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuDocument.html">DjVuDocument</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, float done)
+<DD><I>This notification is sent from time to time while decoding is in progress.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
+<DD><I>This is the standard types for defining what to do in case of errors.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Simple port.  
+An instance of <TT>DjVuSimplePort</TT> is automatically created when you create a
+<!1><A HREF="DjVuFile.html">DjVuFile</A> or a <!1><A HREF="DjVuDocument.html">DjVuDocument</A> without specifying a port.  This
+simple port can retrieve data for local urls (i.e. urls referring to local
+files) and display error messages on <TT>stderr</TT>.  All other notifications
+are ignored. </BLOCKQUOTE>
+<DL>
+
+<A NAME="inherits">
+<A NAME="DOC.1.5.27.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool inherits(const char * class_name) const </B></TT>
+<DD>Returns 1 if <TT>class_name</TT> is <TT>&quot;DjVuPort&quot;</TT> or <TT>&quot;DjVuSimplePort&quot;</TT>.
+<DL><DT><DD></DL><P>
+<A NAME="request_data">
+<A NAME="DOC.1.5.27.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  request_data(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)</B></TT>
+<DD>If <TT>url</TT> is local, it created a <!1><A HREF="DataPool.html">DataPool</A>, connects it to the
+file with the given name and returns.  Otherwise returns <TT>0</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="notify_error">
+<A NAME="DOC.1.5.27.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_error(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)</B></TT>
+<DD>Displays error on <TT>stderr</TT>. Always returns 1.
+<DL><DT><DD></DL><P>
+<A NAME="notify_status">
+<A NAME="DOC.1.5.27.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   bool notify_status(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)</B></TT>
+<DD>Displays status on <TT>stderr</TT>. Always returns 1.
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

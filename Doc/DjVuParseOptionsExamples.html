@@ -1,0 +1,147 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVuTokenList</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuParseOptions Examples</A></H2>
+<BLOCKQUOTE>Examples using the <!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> class</BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>The following <TT>DjVuParseOptions examples</TT> demonstrates how to use the
+<!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> class in your code.<P><PRE>                                        
+        // First we define the command line arguments with the
+        // normal option structure defined by getopt(3)
+        // Only I didn't add support for any feature that requires
+        // a non-constant structure.  So we can use a compile time
+        // constant.
+        static const char favorite_color_string[]=&quot;favorite-color&quot;;
+        static const char pizza_topping_string[]=&quot;pizza-topping&quot;;
+        static const char bignumber_string[]=&quot;bignumber&quot;;
+        static const char redo_string[]=&quot;redo&quot;;
+        static const char profile_string[]=&quot;profile&quot;;
+
+   	static const djvu_option long_options[] = {
+   	  {favorite_color_string,1,0,'f'},
+   	  {pizza_topping_string,1,0,'P'},
+   	  {bignumber_string,1,0,'n'},
+   	  {redo_string,0,0,'r'},
+   	  {profile_string,0,0,'p'},
+   	  {0,0,0,0}
+   	};
+  
+   	int
+    	main(int argc,const char **argv,char **env)
+        {
+   	  char *profile,*topping,*color;
+          int redo,bignumber;
+   		// This will read in the default configuration file
+   		// which is either ~/.DjVu/global.conf if it exists,
+   		// otherwise /etc/DjVu/global.conf.
+   		// Next the file MyConfigFile.conf will be read from
+   		// either ~/.DjVu or /etc/DjVu
+          DjVuParseOptions MyOptions(&quot;MyConfigFile&quot;);
+   		// This parses the command line arguments.
+          MyOptions.ParseArguments(argc,argv,long_options);
+   		// We could for example, check the value of a profile
+   		// option, and switch which profile we are using.
+   	  profile=MyOptions.GetValue(profile_string);
+          if(profile) MyOptions.ChangeProfile(profile);
+   		// Now we can read in the variables.
+   		// I find it is a good idea to only list the variable
+   		// strings once, so I use constant strings.  But this
+                // isn't required.
+   	  topping=MyOptions.GetValue(pizza_topping_string);
+   	  color=MyOptions.GetValue(favorite_color_string);
+   		// We can also read in integers, and specify a default value
+   		// to return in case the value is not an integer.  In this
+   		// case I specified -1.
+   	  bignumber=MyOptions.GetNumber(bignumber_string,-1);
+   		// We can also check true/false type values.
+   	  redo=MyOptions.GetInteger(redo_string,0);
+   		// Now before we do anything with these values we might
+   		// want to check for errors.
+   	  if(MyOptions.HasError())
+   	  {
+   	     MyOptions.perror();
+   	     usage();
+   	  }
+  
+   	  ... Now we can do the real work of this program...
+   	  exit(0);
+   	}
+</PRE><P>Now the more complicated issue is using the same object for libraries
+with a minimal amount of changes.  The first issue to note is we don't
+want a library function to re-read the configuration file each time it
+is called.  And we don't want to use static variables, since that could
+causing threading problems.  So, I took the simplest solution, which
+is to assume a copy of the class object will always get once created
+in the first function.<P>So, then the problem is if we pass by value, then if a function reads
+in it's own profile, each time it is recalled, it will have lost that
+information and need to read in the same profile again.  If we pass by
+references we run into problems that multiple functions can not parse
+argv[] arrays.<P>The compromise I reached is the profiles, are stored in the class as
+references.  So when you pass by "value", the profile information is
+still passed by reference.  Consequently if you do something like:
+<PRE>                                        
+   	int foo(DjVuParseOptions);
+   	DjVuParseOptions Opts(&quot;Config&quot;);
+   	Opts.ParseArguments(argc,argv,long_opts,long_only);
+   	foo(Opts);
+</PRE>
+the copy of Opts passed to foo will not contain any information from
+the argv[] array.  But it will contain the profile information.
+If you do a ChangeProfile() it will only effect the original to
+the extent if it does the same ChangeProfile() the configuration
+file will have already been parsed.<P>
+The core functionality is also available via C wrappers.<P>The configuration files themselves are fairly simple.  They simple
+listings  of the form:
+<PRE>                                        
+   	&lt;varable&gt;=&lt;value&gt;
+</PRE><P>e.g.
+<PRE>                                        
+   	foo=&quot;689234 ksdf&quot;
+   	fi=bar
+   	test=TRUE
+</PRE><P>The one unique implementation detail, is alternate profiles may be
+specified  within a configuration file.  The rules is simple.  The
+default profile name is the file name.  To end the current profile
+and begin a new one, simply list the new profile name followed by
+a ':'.  e.g.<P><PRE>                                        
+   	name=fido
+   	species=dog
+   	birthday=today
+   	
+   	# Lets begin an alternate profile for mycat
+  
+   	cats:
+   	name=fluffy
+   	species=cat
+   	birthday=tomorrow
+   	favorite-food=mice
+   	mice-eaten-this-week=5
+</PRE><P>You can use quotes the same as in a shell script.  If you don't use
+quotes, extra white spaces are stripped, and escape characters are used.
+All of the following are equivalent.
+e.g.
+<PRE>                                        
+   	test=&quot;This is a simple test.\nThis is only a test.\\&quot;
+  
+   	test=&quot;This is a simple test.
+   	This is only a test.\\&quot;
+  
+   	test= This is a simple test.\ 
+   	\nThis 		is only		a test.\\ 
+  
+   	test='This is a simple test.
+   	This is only a test.\'
+</PRE><P>Be very careful of missing quotes...
+</BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

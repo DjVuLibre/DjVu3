@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">ddjvu</A></H2>
+<BLOCKQUOTE>Decodes and renders a DjVu file. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        ddjvu [options] djvufilename [pnmfilename]
+    </PRE><P><B>Description</B> --- File <TT>&quot;ddjvu.cpp&quot;</TT> illustrates how to decode and
+render a DjVu file using class <TT>DjVuImage</TT>.  This program decodes all
+variants of DjVu files, including the wavelet files produced by <!1><A HREF="c44.html">c44</A>,
+and produces PNM files (see <!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A>).<P><B>Arguments</B> --- Argument <TT>djvufilename</TT> is the name of the input DjVu
+file.  A single dash <TT>&quot;-&quot;</TT> represents the standard input.  Argument
+<TT>pnmfilename</TT> is the name of the output PNM file.  Omitting this argument
+or specifying a single dash <TT>&quot;-&quot;</TT> represents the standard output.<P><B>Output Resolution</B> --- Three options control the resolution of the 
+output PNM image.  At most one of these three options can be specified.
+The default resolution, used when no other option is specified, is equivalent
+to specifying <TT>-scale 100</TT>.
+<DL>
+<DT><B>-N</B><DD> This option (e.g <TT>&quot;-3&quot;</TT> or <TT>&quot;-19&quot;</TT>) specifies a subsampling
+factor <TT>N</TT>.  Rendering the full DjVu image would create an image whose
+dimensions are <TT>N</TT> times smaller than the DjVu image size.
+<DT><B>-scale N</B><DD> This option takes advantage of the <TT>dpi</TT> field stored in
+the <TT>&quot;INFO&quot;</TT> chunk of the DjVu image (cf. <!1><A HREF="DjVuInfo.html">DjVuInfo</A>).  Argument
+<TT>N</TT> is a magnification percentage relative to the adequate resolution
+for a 100dpi device such as a screen.
+<DT><B>-size WxH</B><DD> This option provides total control on the resolution and
+the aspect ratio of the image.  The vertical and horizontal resolutions
+will be separately adjusted in such a way that the complete DjVu image
+is rendered into a PNM file of width <TT>W</TT> and height <TT>H</TT>.
+</DL><P><B>Rendering Mode Selection</B> --- The default rendering mode merges all
+the layers of the DjVu image and outputs an adequate PNM file. IW44 files
+Compound djVu files and Photo DjVu files are always rendered as PPM
+files. Bilevel DjVu files are rendered as PBM files if the
+subsampling factor is 1.  Otherwise, they are rendered as PGM files
+because the resolution change gives better results with anti-aliasing.
+Three options alter this default behavior.
+<DL>
+<DT><B>-black</B><DD> Renders only the foreground layer mask.  This mode does not
+work with IW44 files because these files have no foreground layer mask.
+The output file will be a PBM file if the subsampling factor is 1.
+Otherwise the output file will be an anti-aliased PGM file.
+<DT><B>-foreground</B><DD> Renders only the foreground layer on a white
+background.  This mode works only with Compound DjVu files. The output
+file always is a PPM file.
+<DT><B>-background</B><DD> Renders only the background layer. This mode works only
+with Compound DjVu files and IW44 files. The output file always is a PPM
+file.
+</DL><P><B>Other Options</B> --- The following two options are less commonly used:
+<DL>
+<DT><B>-segment WxH+X+Y</B><DD> Selects an image segment to render. Conceptually,
+<TT>ddjvu</TT> renders the full page using the specified resolution, and
+then extracts a subimage of width <TT>W</TT> and height <TT>H</TT>, starting at
+position (<TT>X</TT>,<TT>Y</TT>) relative to the bottom left corner of the page.
+Both operations of course happen simultaneously.  Rendering a small
+subimage is much faster than rendering the complete image.  Note that
+the output PNM file will always have size <TT>WxH</TT>.
+<DT><B>-v</B><DD> Causes <TT>ddjvu</TT> to print abundant information about the
+structure of the DjVu file, the compression ratios, the memory usage,
+and the decoding and rendering times.
+<DT><B>-page N</B><DD> This can be used to decode a specific page of a multipage
+document. Page numbers start from <TT>1</TT>. If this option is omitted,
+<TT>1</TT> is assumed.
+</DL><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Yann Le Cun &lt;yann@research.att.com&gt;<BR>
+L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: ddjvu.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Multipage DjVu documents.</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+The DjVu3 system supports two models for multi-page documents:
+<EM>bundled</EM> multi-page documents and <EM>indirect</EM> multi-page documents.
+The multi-page API allows you to assemble already compressed pages and to
+create multipage DjVu documents using either model.<P><B>Bundled multi-page documents</B> --- A <EM>bundled</EM> multi-page DjVu
+document uses a single file to represent the entire document.  This single
+file contains all the pages as well as ancillary information (e.g. the
+page directory, data shared by several pages, thumbnails, etc.).  Using a
+single file format is very convenient for storing documents or for sending
+email attachments.<P>A bundled multi-page document is composed of a single <TT>&quot;FORM:DJVM&quot;</TT>
+composite chunk.  This composite chunk always begins with a <TT>&quot;DIRM&quot;</TT> chunk
+containing the document directory (see. <!1><A HREF="DjVmDir.h.html">DjVmDir.h</A>) which represents
+the list of the <EM>component files</EM> that compose the document.  The
+component files themselves are then encoded as IFF85 composite chunks
+following the <TT>&quot;DIRM&quot;</TT> chunk.
+<UL>
+<LI>  
+Component files may be any valid DjVu image (see <!1><A HREF="DjVuImageFiles.html">DjVu Image Files</A>)
+or IW44 image (see <!1><A HREF="IW44ImageFiles.html">IW44 Image Files</A>.)  These component files 
+always represent a page of a document.  The corresponding IFF85 chunk ids are 
+<TT>&quot;FORM:DJVU&quot;</TT>, <TT>&quot;FORM:PM44&quot;</TT>, or <TT>&quot;FORM:BM44&quot;</TT>.
+<LI> 
+Component files may contain shared information indirectly referenced by
+some document pages.  These <EM>shared component files</EM> are always composed
+of a single <TT>&quot;FORM:DJVI&quot;</TT> chunk containing an arbitrary collection of
+chunks. 
+<LI>
+Thumbnail files contain optional thumbnail images for a few consecutive
+pages of the document.  Thumbnail files consist of a single
+<TT>&quot;FORM:THUM&quot;</TT> composite chunk containing several <TT>&quot;TH44&quot;</TT> chunks
+containing IW44 encoded thumbnail images (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  These
+thumbnails always pertain the first few page files following the
+thumbnail file in the document directory.
+</UL><P><B>Including shared information</B> --- Any DjVu image file contained in a
+multipage file may contain an <TT>&quot;INCL&quot;</TT> chunk containing the ID of a shared
+component file.  The decoder should then process the chunks contained in
+the shared component file as if they were contained by the DjVu image
+file.  The shared component file may potentially containing any
+information otherwise allowed in a DjVu image file (except for the
+<TT>&quot;INFO&quot;</TT> chunk of course). There are many benefits associated with storing
+such shared information in separate files.  A well designed browser may
+keep pre-decoded copies of these files in a cache.  This procedure would
+reduce the size of the data transferred over the Internet and also
+increase the display speed.  The multipage DjVu compressor, for instance,
+identifies similar object shapes occuring in several pages.  These shapes
+are encoded in a shape dictionary (chunk <TT>&quot;Djbz&quot;</TT>) placed in a shared
+component file.  All relevant pages include this shared component file.
+Although they appear in several pages, these shared shapes are encoded
+only once in the document.<P><B>Browsing a multi-page document</B> --- You can view the pages using the
+DjVu plugin and a web browser.  When you type the URL of a multi-page
+document, the browser starts downloading the whole file, but displays the
+first page as soon as it is available.  You can immediately navigate to
+other pages using the DjVu toolbar.  Suppose however that the document is
+stored on a remote web server.  You can easily access the first page and
+see that this is not the document you wanted.  Although you will never
+display the other pages the browser is transferring data for these pages
+and is wasting the bandwith of your server (and the bandwith of the
+Internet too).  You could also see the summary of the document on the
+first page and jump to page 100.  But page 100 cannot be displayed until
+data for pages 1 to 99 has been received.  You may have to wait for the
+transmission of unnecessary page data.  This second problem (the
+unnecessary wait) can be solved using the ``byte serving'' options of the
+HTTP/1.1 protocol.  This option has to be supported by the web server, the
+proxies, the caches and the browser.  We are coming there but not quite
+yet.  Byte serving however does not solve the first problem (the waste of
+bandwith).<P><B>Indirect multi-page documents</B> --- DjVu solves both problem using a
+special multi-page format named the <EM>indirect</EM> model.  An indirect
+multi-page DjVu document is composed of several files.  The main file is
+named the <EM>index file</EM>.  You can browse a document using the URL of
+the index file, just like you do with a bundled multi-page document.  The
+index file however is very small.  It simply contains the document
+directory and the URLs of secondary files containing the page data.  When
+you browse an indirect multi-page document, the browser only accesses data
+for the pages you are viewing.  This can be done at a reasonable speed
+because the browser maintains a cache of pages and sometimes pre-fetches a
+few pages ahead of the current page.  This model uses the web serving
+bandwith much more effectively.  It also eliminates unnecessary delays
+when jumping ahead to pages located anywhere in a long document.<P><B>Obsolete Formats</B> --- The library also supports two other multipage
+formats which are now obsolete.  These formats are technologically
+inferior and should no longer be used. </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

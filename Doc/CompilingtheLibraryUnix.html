@@ -1,0 +1,102 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Compiling the Library (Unix)</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE><P><B>Directories</B> --- The structure of the distribution is essentially
+flat.  All the source code files, for both the library and the utility
+programs, are found in the main directory <TT>&quot;libdjvu++&quot;</TT>.  A few
+subdirectories contain accessory material.  Directory <TT>&quot;Doc&quot;</TT> contains
+the HTML documentation generated from the source files.  Directory
+<TT>&quot;Samples&quot;</TT> contains sample DjVu files for testing purposes.  Directory
+<TT>&quot;Test&quot;</TT> contains a few test programs for the library basic features.<P><B>Prerequisites</B> --- The DjVu Reference Library should compile and run
+on any well behaved Unix system, <EM>provided that you use a good C++
+compiler</EM> supporting templates, exceptions and possibly multithreading.
+Workstation makers usually provide good compilers.  You can certainly
+compile and run the library with these compilers if you find out which
+options apply to your system and your particular version of the compiler.
+We find that there are just too many different compilers around.  This is
+why we recommend using <TT>gcc</TT> or<P>You can safely proceed to the compilation if you have <TT>gcc-2.8.x</TT> or any
+version
+out what is installed on your system.  If you have an earlier version of
+<TT>g++</TT> such as <TT>gcc-2.7.23</TT>, you must upgrade because it is not going to
+work.  We strongly recommend upgrading directly to
+The easiest way consists of picking a binary distribution somewhere on the
+Internet.  Linux users may have a look at <A HREF=http://www.gcc.ml.org>http://www.gcc.ml.org</A> or
+<A HREF=http://rufus.w3.org/linux/RPM>http://rufus.w3.org/linux/RPM</A>.<P><B>Building your compiler (advanced)</B> --- You should really skip this
+section if you can avoid reading it.  You should only read it if (a) you
+cannot find a suitable binary distribution of
+experiment with the multi-threading features of the library.<P>Building the
+systems uses GNU Make by default.  Many Unix systems provide GNU Make
+under the name <TT>gmake</TT>.  You must otherwise download the source code at
+<A HREF=ftp://gatekeeper.dec.com/pub/GNU/make>ftp://gatekeeper.dec.com/pub/GNU/make</A> or
+<A HREF=ftp://prep.ai.mit.edu/pub/gnu>ftp://prep.ai.mit.edu/pub/gnu</A>, unpack it, read the instructions,
+compile and install.<P>You must then download the source distribution of the latest release of<P><TT>&quot;egcs/gcc/libgcc2.c&quot;</TT> which is required by our multi-threading code.
+You can apply the patch using command <TT>patch</TT>. 
+<PRE>
+      % cd egcs/gcc
+      % patch &lt; $HOME/libdjvu++/@Tools/libgcc2.c.diff
+      Patching file libgcc2.c using Plan A...
+      Hunk #1 succeeded at 3063.
+      Hunk #2 succeeded at 3118.
+      done
+    </PRE>
+This patch has been tested with
+We hope that the EGCS people will either include the patch in their future
+releases, or provide a similar capability.  If anything suspicious happens
+during the patching process, we suggest that you restore the original
+version of <TT>&quot;libgcc2.c&quot;</TT> which is automatically saved as
+<TT>&quot;libgcc2.c.orig&quot;</TT>.<P>You must then configure and compile
+described at <A HREF=http://egcs.cygnus.com>http://egcs.cygnus.com</A>.  I could use for instance the
+following commands on my SGI workstation running Irix-6.5:
+<PRE>
+      % cd egcs
+      % configure --prefix=$HOME/egcs  mips-sgi-irix-5.3
+      % gnu-make
+      % gnu-make install
+    </PRE>
+You are reading correctly: We are pretending that the workstation has
+Irix-5.3 because we want to create backward compatible binaries.  Welcome
+to the wonderful world of compilers.<P><B>Compiling the DjVu Reference Library</B> --- Compiling the DjVu
+Reference Library is a two step process.  You must first invoke the script
+<TT>configure</TT> which searches the compiler, selects the compilation options
+and creates the makefiles.
+<PRE>
+       % configure --prefix=$HOME/djvu
+    </PRE><P>You can specify a particular compiler by setting environment variable
+<TT>CXX</TT> before invoking the configuration script. This script also 
+supports the following options:
+<DL>
+<DT><B>--prefix=PREFIXDIR</B><DD> indicates where the binary files will be installed.
+<DT><B>--with-debug</B><DD> enables the debugging options of the compiler.
+<DT><B>--with-cxxflag=FLAG</B><DD> passes a particular option to the compiler.
+<DT><B>--without-threads</B><DD> disables multi-threading (the default).
+<DT><B>--with-threads=(cothreads,posix,dce)</B><DD> enables multithreading and
+selects a multithreading implementation (see <!1><A HREF="GThreads.h.html">GThreads.h</A>). You
+must make sure that your C++ compiler is compatible with the chosen
+thread implementation.  The safest option consists of using the
+patched version of
+implementation.
+</DL><P>You are now ready to compile and install everything by typing:
+<PRE>
+       % make all
+       % make install
+    </PRE><P><B>Using the DjVu Reference Library</B> --- At this point, you have
+generated a collection of small executables documented in section
+<!1><A HREF="UtilityPrograms.html">Utility Programs</A>.  This is not very exciting.  It is now time to
+remember that the DjVu Reference Library is a source code library.  Almost
+everything you can use safely is documented in section 
+<!1><A HREF="LibraryReference.html">Library Reference</A>.  You may want however to start with 
+section <!1><A HREF="DecodingDjVuContent.html">Decoding DjVu Content</A>.  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

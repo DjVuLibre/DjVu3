@@ -1,0 +1,112 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">DjVu Image Files</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Photo DjVu Image</B> --- Photo DjVu Image files are best used for
+encoding photographic images in colors or in shades of gray.  The data
+compression model relies on the IW44 wavelet representation.  This format
+is designed such that the IW44 decoder is able to quickly perform
+progressive rendering of any image segment using only a small amount of
+memory.  Photo DjVu files are composed of a single <TT>&quot;FORM:DJVU&quot;</TT> composite
+chunk.  This composite chunk always begins with one <TT>&quot;INFO&quot;</TT> chunk
+describing the image size and resolution (see <!1><A HREF="DjVuInfo.h.html">DjVuInfo.h</A>).  One or
+more additional <TT>&quot;BG44&quot;</TT> chunks contains the image data encoded with the
+IW44 representation (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  The image size specified in
+the <TT>&quot;INFO&quot;</TT> chunk and the image size specified in the IW44 data must be
+equal.<P><B>Bilevel DjVu Image</B> --- Bilevel DjVu Image files are used to compress
+black and white images representing text and simple drawings.   The
+JB2 data compression model uses the soft pattern matching technique, which
+essentially consists of encoding each character by describing how it
+differs from a well chosen already encoded character.  Bilevel DjVu Files
+are composed of a single <TT>&quot;FORM:DJVU&quot;</TT> composite chunk.  This composite
+chunk always begins with one <TT>&quot;INFO&quot;</TT> chunk describing the image size and
+resolution (see <!1><A HREF="DjVuInfo.h.html">DjVuInfo.h</A>).  An additional <TT>&quot;Sjbz&quot;</TT> chunk contains
+the bilevel data encoded with the JB2 representation (see
+<!1><A HREF="JB2Image.h.html">JB2Image.h</A>).  The image size specified in the <TT>&quot;INFO&quot;</TT> chunk and the
+image size specified in the JB2 data must be equal.<P><B>Compound DjVu Image</B> --- Compound DjVu Files are an extremely
+efficient way to compress high resolution Compound document images
+containing both pictures and text, such as a page of a magazine.  Compound
+DjVu Files represent the document images using two layers.  The <EM>
+background layer</EM> is used for encoding the pictures and the paper texture.
+The <EM>foreground layer</EM> is used for encoding the text and the drawings.
+Compound DjVu Files are composed of a single <TT>&quot;FORM:DJVU&quot;</TT> composite
+chunk.  This composite chunk always begins with one <TT>&quot;INFO&quot;</TT> chunk
+describing the size and the resolution of the image (see <!1><A HREF="DjVuInfo.html">DjVuInfo</A>).
+Additional chunks hold the components of either the foreground or the
+background layers.<P>The main component of the foreground layer is a bilevel image named the
+<EM>foreground mask</EM>. The pixel size of the foreground mask is equal to
+the size of the DjVu image.  It contains a black-on-white representation
+of the text and the drawings.  This image is encoded by a <TT>&quot;Sjbz&quot;</TT> chunk
+using the JB2 representation.  There may also be a companion chunk
+<TT>&quot;Djbz&quot;</TT> containing a <EM>shape dictionary</EM> that defines bilevel shapes
+referenced by the <TT>&quot;Sjbz&quot;</TT> chunk.<P>The <EM>foreground colors</EM> can be encoded according to two models:
+<UL>
+<LI> 
+The foreground colors may be encoded using a small color image, the <EM>
+foreground color image</EM>, encoded as a single <TT>&quot;FG44&quot;</TT> chunk using the
+IW44 representation (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  Such compound DjVu images
+are rendered by painting the foreground color image on top of the
+background color image using the foreground mask as a stencil.  The
+pixel size of the foreground color image is computed by rounding up the
+quotient of the mask size by an integer sub-sampling factor ranging from
+1 to 12.  Most Compound DjVu Images use a foreground color sub-sampling
+factor of 12.  Smaller sub-sampling factors produce very slightly better
+images.
+<LI> 
+The foreground colors may be encoded by specifying one solid color per
+object described by the JB2 encoded mask. These <EM>JB2 colors</EM> are
+color-quantized and stored in a single <TT>&quot;FGbz&quot;</TT> chunk (see.
+DjVuPalette.h).  Such compound DjVu images are rendered by
+painting each foreground object on top of the background color image
+using the solid color specified by the <TT>&quot;FGbz&quot;</TT> chunk.
+</UL><P>The background layer is a color image, the background color image
+ncoded by an arbitrary number of <TT>&quot;BG44&quot;</TT> chunks containing successive
+IW44 refinements (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).  The size of this image is
+computed by rounding up the quotient of the mask size by an integer
+sub-sampling factor ranging from 1 to 12.  Most Compound DjVu Images use a
+background sub-sampling factor equal to 3.  Smaller sub-sampling factors
+are adequate for images with a very rich paper texture.  Larger
+sub-sampling factors are adequate for images containing no pictures.<P>There are no ordering or interleaving constraints on these chunks except
+that (a) the <TT>&quot;INFO&quot;</TT> chunk must appear first, and (b) the successive
+<TT>&quot;BG44&quot;</TT> refinements must appear with their natural order.  The chunk
+order simply affects the progressive rendering of DjVu images on a web
+browser.  <P><B>Alternative encodings</B> --- Besides the JB2 and IW44 encoding schemes,
+the DjVu format supports alternative encoding methods for its components.  
+<UL>
+<LI>
+The foreground mask may be represented by a single <TT>&quot;Smmr&quot;</TT> chunk
+instead of <TT>&quot;Sjbz&quot;</TT>.  The <TT>&quot;Smmr&quot;</TT> chunk contains a bilevel image
+encoded with the Fax-G4/MMR method.  Although the resulting files
+are typically six times larger, this capability can be useful when
+DjVu is used as a front-end for fax machines and scanners with 
+embedded Fax-G4/MMR capabilities. 
+<LI>
+The background color image may be represented by a single <TT>&quot;BGjp&quot;</TT>
+chunk instead of several <TT>&quot;BG44&quot;</TT> chunks.  The <TT>&quot;BGjp&quot;</TT> chunk contains
+a JPEG encoded color image.  The resulting files are significantly
+larger and lack the progressivity of the usual DjVu files.  
+This is useful because some scanners have embedded JPEG capabilities.
+<LI>
+The foreground color image may be represented by a single <TT>&quot;FGjp&quot;</TT>
+chunk instead of a single <TT>&quot;FG44&quot;</TT> chunk.  This is useful because 
+some scanners have embedded JPEG capabilities.
+</UL>
+In addition, the chunk names <TT>&quot;BG2k&quot;</TT> and <TT>&quot;FG2k&quot;</TT> have been reserved for
+encoding the background color image and the foreground color image using
+the forthcoming JPEG-2000 standard.  This capability is not implemented at
+the moment.  The JPEG-2000 standard may even become the preferred encoding
+method for color images in DjVu.  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

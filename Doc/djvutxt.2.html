@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">djvutxt</A></H2>
+<BLOCKQUOTE><TT>TXT*</TT> chunks extractor </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        djvutxt [-page &lt;page_num&gt;] &lt;djvu_file_in&gt; [&lt;txt_file_out&gt;]
+    </PRE><P><B>Description</B> --- File <TT>&quot;djvutxt.cpp&quot;</TT> illustrates how to use
+<!1><A HREF="DjVuDocument.html">DjVuDocument</A>, <!1><A HREF="DjVuImage.html">DjVuImage</A>, <!1><A HREF="DjVuTXT.html">DjVuTXT</A>
+to retrieve textual information stored inside a <TT>TXT*</TT> chunk of a DjVu
+document.<P><TT>TXT*</TT> chunks should have been created with the help of an OCR
+engine, and are used to allow indexing and searching of the DjVu
+document. The chunks contain the ASCII text itself, and layout information
+allowing the DjVu plugins to highlight found text.<P>This utility can be used to extract text from <TT>TXT*</TT> chunks and
+output it to a file or standard output.<P><B>Arguments</B>:
+<UL>
+<LI> <B>&lt;djvu_file_in&gt;</B> - Name of input DjVu file.
+<LI> <B>&lt;txt_file_out&gt;</B> - Name of the file where ASCII text
+will be stored. <TT>-</TT> means standard output.
+</UL><P><B>-page</B> option can be used to select a particular page from the
+<B>&lt;djvu_file_in&gt;</B> for processing.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt; -- initial implementation
+
+<DT><B>Version:</B><DD><TT>$Id: djvutxt.2.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,521 @@
+#!/bin/ksh
+# DjVu tools
+### ---------------------------
+### Determine directories
+
+if [ -z "$PROGRAM" ]
+then
+  PROGRAM="$0"
+fi
+CONFIG_FILE=`dirname "$PROGRAM"`"/config/functions.sh"
+conf=`basename "$PROGRAM"`
+if [ ! -r "$CONFIG_FILE" ]
+then
+    echo 1>&2 "$conf: Cannot recognize source directory"
+    echo 1>&2 "--  Check that your source directory is complete."
+    exit 1
+fi
+
+
+### ---------------------------
+### Get functions
+
+. "$CONFIG_FILE"
+
+### ---------------------------
+### Process arguments
+
+for arg 
+do
+  case $arg in
+    --with-reference )
+      without_reference=;
+      with_reference=true;
+      ;;
+    --without-reference )
+      with_reference=;
+      without_reference=true;
+      ;;
+    --with-gui )
+      without_unixgui=;
+      with_unixgui=true;
+      ;; 
+    --without-gui )
+      without_unixgui=true;
+      with_unixgui=;
+      ;; 
+    --without-threads )
+      threads=
+      ;;
+    --with-threads=* )
+      threads=`echo $arg | sed 's/[-A-Za-z_]*=//'`
+      ;;
+    --qtdir=*|--qt=* )
+      QTDIR=`echo $arg | sed 's/[-A-Za-z_]*=//'`
+      ;;
+    --with-rpo|--frepo )
+      use_rpo=yes
+      ;;
+    --without-rpo )
+      use_rpo=
+      ;;
+    --shared-decode|--with-shared-decode|--without-static-decode|--dynamic-decode|--with-dynamic-decode )
+      build_mode_decode=shared
+      ;;
+    --shared-encode|--with-shared-encode|--without-static-encode|--dynamic-encode|--with-dynamic-encode|--shared|--with-shared|--without-static|--dynamic|--with-dynamic )
+      build_mode_encode=shared
+      build_mode_decode=shared
+      ;;
+    --static-encode|--with-static-encode|--without-dynamic-encode|--without-shared-encode )
+      build_mode_encode=static
+      ;;
+    --static-decode|--with-static-decode|--without-dynamic-decode|--without-shared-decode|--static|--with-static|--without-dynamic|--without-shared )
+      build_mode_encode=static
+      build_mode_decode=static
+      without_unixgui=true
+      ;;
+    --without-jpeg )
+      without_jpeg=yes
+      ;;
+    --with-jpeg )
+      without_jpeg=
+      ;;
+    --without-iconv )
+      with_iconv=
+      ;;
+    --with-iconv )
+      with_iconv=true
+      ;;
+    *)
+      if process_general_option $arg
+      then true
+      else
+        if [ "x$arg" != "x--help" ] ; then echo 1>&2 "$conf: Unrecognized option '$arg'" ; fi
+        echo 1>&2 "Usage: $conf <options>"
+        echo 1>&2 "Recognized options:"
+        list_general_options
+        echo 1>&2 "  --with(out)-gui"
+        echo 1>&2 "  --with(out)-threads=(no|co|posix)threads "
+        echo 1>&2 "  --with(out)-rpo "
+        echo 1>&2 "  --shared, --with(out)-shared "
+        echo 1>&2 "  --static, --with(out)-static "
+        echo 1>&2 "  --with(out)-jpeg "
+        echo 1>&2 "  --with(out)-reference"
+        exit 1 
+      fi
+      ;;
+   esac
+done
+
+if [ "$build_mode_encode" = shared ]
+then
+  build_mode_decode=shared
+elif [ -z "$without_unixgui" ]
+then
+  build_mode_decode=shared
+fi
+
+### ---------------------------
+### Proceed
+
+if [ -n "$LIBICONV" ]
+then
+  require_compiler c++ c shared
+else 
+  require_compiler c++ c $build_mode_decode
+fi  
+
+check_debug_option $debug
+check_rpo_option $use_rpo
+
+require_make_stlib
+
+#############################################################################
+### Fix DEBUG options
+#############################################################################
+have_debug=`echo "$A_DEFS" | grep -- DEBUG`
+if [ -z "$have_debug" ];
+then
+   C_DEFS=APPEND
+   A_DEFS="$A_DEFS -DNO_DEBUG"
+fi
+
+### CHECK options
+if [ ! -d $TOPSRCDIR/src/unixgui ]
+then
+  without_unixgui=true
+  with_unixgui=
+elif [ ! -d $TOPSRCDIR/src/unixgui/bin2cpp ] 
+then 
+  without_unixgui=true
+  with_unixgui=
+elif [ ! -r $TOPSRCDIR/src/unixgui/bin2cpp/Makefile.in ] 
+then
+  without_unixgui=true
+  with_unixgui=
+elif [ -z "$without_unixgui" ] 
+then
+  if [ -z "$threads" ] 
+  then
+    case $SYS
+    in
+      Solaris*)
+         threads=posix
+      ;;
+      linux-libc5*)
+         threads=co
+      ;;
+      linux-libc6*)
+         threads=posix
+      ;;
+      IRIX*)
+         threads=posix
+      ;;
+      HP-UX*)
+         threads=co
+      ;;
+      *)
+         if [ -z "$with_unixgui" ] ; then
+           without_unixgui=true
+         else
+           echo "*** Unix GUI not supported on platform $SYS"
+           exit 1
+         fi
+      ;;
+    esac
+  else
+    case $SYS
+    in
+      Solaris*)
+        if [ $threads != posix ]
+        then
+           echo "*** POSIX threads are recommended on $SYS"
+        fi
+      ;;
+      linux-libc5*)
+        if [ $threads != co ]
+        then
+           echo "*** COTHREADS are recommended on $SYS"
+        fi
+      ;;
+      linux-libc6*)
+        if [ $threads != posix ]
+        then
+           echo "*** POSIX threads are recommended on $SYS"
+        fi
+      ;;
+      IRIX*)
+        if [ $threads != posix ]
+        then
+           echo "*** POSIX threads are recommended on $SYS"
+        fi
+      ;;
+      HP-UX*)
+        if [ $threads != co ]
+        then
+           echo "*** COTHREADS are recommended on $SYS"
+        fi
+      ;;
+    *)
+      if [ -z "$with_unixgui" ] ; then
+           without_unixgui=true
+      else
+        echo "*** Unix GUI not supported on platform $SYS"
+        exit 1
+      fi
+     ;;
+    esac
+  fi
+  require_library math log -lm
+  require_make_stlib
+  CONFIG_VARS="$CONFIG_VARS threads"
+  ### Do not allow check_thread_option mess with CXXFLAGS, CCFLAGS, LIBS and DEFS
+  check_thread_option $threads
+
+  #############################################################################
+  ### Check, that QT is available
+  #############################################################################
+  echon "Checking QT directory ... "
+  if [ -z "$without_unixgui" ]
+  then
+    if [ -z "$QTDIR" ];
+    then
+      echo "unknown"
+      echo "*** Don't know how to find QT. Please either preset QTDIR in the environment"
+      echo "*** or supply '--qtdir=' or '--qt=' options when running this script."
+      if [ -z "$with_unixgui" ] ; then
+        without_unixgui=true;
+      else
+        exit 1
+      fi
+    else
+       echo $QTDIR
+    fi
+  fi
+
+  if [ ! -d $QTDIR ];
+  then
+     echo "*** QT directory $QTDIR does not exist."
+     if [ -z "$with_unixgui" ] ; then
+       without_unixgui=true;
+     else
+       exit 1
+     fi
+  fi
+  if [ -z "$without_unixgui" ]
+  then
+    echon "Checking for QT include and lib subdirectories ... "
+    if [ ! -d $QTDIR/include -o ! -d $QTDIR/lib ];
+    then
+       echo "not found"
+       echo "*** Please check the $QTDIR directory"
+       if [ -z "$with_unixgui" ] ; then
+         without_unixgui=true;
+       else
+         exit 1;
+       fi
+    else
+       echo "present"
+    fi
+  fi
+  if [ -z "$without_unixgui" ]
+  then
+    echon "Checking for QT archive library libqt.so ... "
+    if [ ! -f $QTDIR/lib/libqt.so ];
+    then
+       echo "not found"
+       echo "*** Please check the $QTDIR directory"
+       if [ -z "$with_unixgui" ] ; then
+         without_unixgui=true;
+       else
+         exit 1;
+       fi
+    else
+       echo "present"
+    fi
+  fi
+  if [ -z "$without_unixgui" ]
+  then
+    echon "Checking for QT version number ... "
+testfile $temp.cpp <<EOF
+#include <qglobal.h>
+#include <stdio.h>
+int main(void) { printf("%d", QT_VERSION); }
+EOF
+    if (run $CXX -I$QTDIR/include $temp.cpp -o $temp.exe);
+    then
+       QTVER=`$temp.exe`
+       if [ -n "$QTVER" ];
+       then
+          echo $QTVER
+          if [ $QTVER -lt 200 ];
+          then
+             echo "*** QT version 1.X are no longer supported"
+             if [ -z "$with_unixgui" ] ; then
+                without_unixgui=true;
+             else
+                exit 1
+             fi
+          fi
+       else
+          echo "unknown"
+       fi
+    else
+       echo "unknown"
+    fi
+    rm -f $temp.cpp $temp.exe
+  fi
+  if [ -z "$without_unixgui" ]
+  then
+    INCLUDE_QT="-I$QTDIR/include"
+    LDFLAGS_QT="-L$QTDIR/lib"
+    MOC="$QTDIR/bin/moc"
+    CONFIG_VARS="$CONFIG_VARS QTDIR INCLUDE_QT LDFLAGS_QT MOC"
+
+  #############################################################################
+  ### Do platform-dependent things
+  #############################################################################
+
+    case $SYS
+    in
+      Solaris-sparc)
+         A_DEFS="$A_DEFS -UUSE_XSHM"
+         LDFLAGS="-L/usr/lib -R/usr/lib"
+         LDFLAGS_X11="-L/usr/openwin/lib -R/usr/openwin/lib"
+         with_unixgui=true;
+         ;;
+      Solaris-i386)
+         A_DEFS="$A_DEFS -DNO_MMX -DUSE_XSHM"
+         LDFLAGS="-L/usr/lib -R/usr/lib"
+         LDFLAGS_X11="-L/usr/openwin/lib -R/usr/openwin/lib"
+         with_unixgui=true;
+         ;;
+      linux*)
+        A_DEFS="$A_DEFS -DUSE_XSHM"
+        INCLUDE_X11="-I/usr/X11R6/include"
+        LDFLAGS_X11="-L/usr/X11R6/lib"
+        LDOPTS="-Wl,-noinhibit-exec"
+        with_unixgui=true;
+        ;;
+      IRIX*)
+        A_DEFS="$A_DEFS -DUSE_XSHM"
+        #LDOPTS="-Wl,-dont_warn_unused"
+        with_unixgui=true;
+        ;;
+      HP-UX*)
+        A_DEFS="$A_DEFS -UUSE_XSHM"
+        INCLUDE_X11="-I/usr/include/X11R6"
+        LDOPTS_X11="-L/usr/lib/X11R6"
+        with_unixgui=true;
+        ;;
+      *)
+        echo "Unknown GUI platform $SYS"
+        if [ -z "$with_unixgui" ] ; then
+          without_unixgui=true;
+        else
+          exit 1;
+        fi
+    esac
+    CONFIG_VARS="$CONFIG_VARS INCLUDE_X11 LDOPTS LDFLAGS LDFLAGS_X11"
+  fi
+fi
+# RPO things
+if [ x"$use_rpo" = xyes ]
+then
+   RPO=$TOPBUILDDIR/src/buildtools/rpo/rpo
+   CXXRPO="-frepo"
+   CONFIG_VARS="$CONFIG_VARS RPO CXXRPO"
+else
+   RPO=""
+   CONFIG_VARS="$CONFIG_VARS RPO"
+fi
+
+
+if [ ! -d $TOPSRCDIR/src/3rd-party/libjpeg ]
+then
+  without_jpeg=true
+fi
+
+libdirs="
+src/libdjvu++"
+#src/libio++ 
+#src/libimage
+#src/libapi/libdjvudecode
+libdirs=`echo $libdirs`
+
+
+tooldirs=""
+
+if [ -z "$without_reference" ]
+then
+  tooldirs="$tooldirs src/djvutools/reference"
+fi
+
+#testdirs="src/libdjvu++/Test"
+testdirs=
+
+if [ -z "$without_unixgui" ]
+then
+	tooldirs="$tooldirs src/unixgui/bin2cpp src/unixgui/djview src/unixgui/nsdejavu"
+fi 
+
+DYNAMICLIBS=
+
+C_DEFS=APPEND
+A_DEFS="$A_DEFS -DNEED_DJVU_PROGRESS"
+
+if [ -z "$without_jpeg" ]
+then
+  A_DEFS="$A_DEFS -DNEED_JPEG_DECODER"
+  C_INCS=APPEND
+  A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/libjpeg -I./TOPDIR/SRCDIR/src/3rd-party/libjpeg"
+  LIBJPEG='$(LIBPATH)/libjpeg.a'
+  C_CXXSYMBOLIC=APPEND
+  A_CXXSYMBOLIC="$A_CXXSYMBOLIC $WLWHOLEARCHIVE,"'$(LIBJPEG)'
+  libdirs="src/3rd-party/libjpeg $libdirs"
+  if [ shared = "$build_mode_decode" ]
+  then
+    DYNAMICLIBS=`echo '$(LIBJPEGSO)' $DYNAMICLIBS`
+  fi
+else
+  LIBJPEG=""
+fi
+
+if [ -n "$with_iconv" ]
+then
+  C_INCS=APPEND
+  A_INCS="$A_INCS -I./TOPDIR/src/3rd-party/iconv-v3.5.4/libiconv -I./TOPDIR/SRCDIR/src/3rd-party/iconv-v3.5.4/libiconv"
+  C_DEFS=APPEND
+  A_DEFS="$A_DEFS -DNEED_LIBICONV"
+  LIBICONV='$(LIBPATH)/libiconv.a'
+  iconvdir="src/3rd-party/libiconv-1.5.1/libiconv"
+  if [ shared = "$build_mode_decode" ]
+  then
+    DYNAMICLIBS=`echo '$(LIBICONVSO)' $DYNAMICLIBS`
+  fi
+else
+  LIBICONV=""
+fi
+
+CONFIG_VARS=`echo LIBJPEG LIBICONV $CONFIG_VARS`
+if [ -n "$DYNAMICLIBS" ]
+then
+  CONFIG_VARS=`echo DYNAMICLIBS $CONFIG_VARS`
+fi
+
+### ---------------------------
+### Want a distinct compilation directory
+
+if [ "$TOPSRCDIR" = "$TOPBUILDDIR" ]
+then
+    echo 1>&2 "$conf: Cannot compile in the source directory"
+    echo 1>&2 "--  You must mkdir a compilation directory and"
+    echo 1>&2 "    call $conf from there."
+    exit 1
+fi
+
+
+### ---------------------------
+### Build makefiles
+
+CONFIG_VARS=`echo libdirs tooldirs testdirs $CONFIG_VARS`
+
+for i in $libdirs $tooldirs $testdirs . ; do
+  rm -f $i/Makefile
+done
+for i in $libdirs $tooldirs $testdirs . ; do
+  if [ ! -r $i/Makefile ] 
+  then
+    generate_makefile $i
+  fi
+done
+
+
+if [ -n "$with_iconv" ]
+then
+  mkdir -p $TOPBUILDDIR/src/3rd-party/libiconv-1.5.1/
+  cd $TOPBUILDDIR/src/3rd-party/libiconv-1.5.1/ ; \
+  $TOPSRCDIR/src/3rd-party/libiconv-1.5.1/configure --enable-shared=no --enable-static=yes 
+  cd $TOPBUILDDIR
+fi
+
+
+### ------------------------------------------------------------------------
+### Success
+
+
+# --- save command line
+
+finish_config
+
+# --- display cool message
+
+echo " "
+echo Configuration is complete.
+echo You can proceed with the compilation by typing:
+if [ "$TOPBUILDDIR" != "`pwd`" ] ; then echo "    cd '$TOPBUILDDIR'" ; fi
+echo "    make clean"
+if [ -n "$compiler_is_gcc" ] ; then echo "    make depend" ; fi
+echo "    make all"
+echo " "
+

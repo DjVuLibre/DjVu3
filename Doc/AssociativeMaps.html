@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Associative Maps</A></H2>
+<BLOCKQUOTE>Associative maps.</BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GMapTemplate"></A>
+<B>template&lt;class KTYPE, class VTYPE, class TI&gt; class  </B><A HREF=GMapTemplate.html><B>GMapTemplate</B></A><B>: protected GMapImpl&lt;KTYPE, TI&gt;</B><DD><I>Common base class for all associative maps.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GMap"></A>
+<B>template&lt;class KTYPE, class VTYPE&gt; class  </B><A HREF=GMap.html><B>GMap</B></A><B>: public <!1><A HREF="GMapTemplate.html">GMapTemplate</A>&lt;KTYPE, VTYPE, VTYPE&gt;</B><DD><I>Associative maps.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GPMap"></A>
+<B>template&lt;class KTYPE, class VTYPE&gt; class  </B><A HREF=GPMap.html><B>GPMap</B></A><B>: public <!1><A HREF="GMapTemplate.html">GMapTemplate</A>&lt;KTYPE, <!1><A HREF="GP.html">GP</A>&lt;VTYPE&gt;, <!1><A HREF="GPBase.html">GPBase</A>&gt;</B><DD><I>Associative maps for smart-pointers.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="Hash functions"></A>
+<B></B><A HREF=Hashfunctions.html><B>Hash functions</B></A><B></B><DD><I>Hash functions for elementary types. </I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+These template classes implements a associative maps.  The associative map
+contains an arbitrary number of entries. Each entry is a pair containing
+one element of type <TT>KTYPE</TT> (named the "key") and one element of type
+<TT>VTYPE</TT> (named the "value").  All entries have distinct keys. 
+These template class must be able to access the following functions:
+<UL>
+<LI> a <TT>VTYPE</TT> default constructor <TT>VTYPE::VTYPE()</TT>, 
+<LI> a <TT>VTYPE</TT> copy constructor <TT>VTYPE::VTYPE(const VTYPE &amp;)</TT>, 
+<LI> optionally a <TT>VTYPE</TT> destructor <TT>VTYPE::~VTYPE()</TT>,
+<LI> a <TT>KTYPE</TT> default constructor <TT>KTYPE::KTYPE()</TT>, 
+<LI> a <TT>KTYPE</TT> copy constructor <TT>KTYPE::KTYPE(const KTYPE &amp;)</TT>, 
+<LI> optionally a <TT>KTYPE</TT> destructor <TT>KTYPE::~KTYPE()</TT>,
+<LI> a <TT>KTYPE</TT> comparison operator <TT>KTYPE::operator==(const KTYPE &amp;)</TT>,
+<LI> and a <TT>KTYPE</TT> hashing function <TT>hash(const KTYPE&amp;)</TT>.
+</UL> 
+The hashing function must return an <TT>unsigned int</TT> number. Multiple
+invocations of the hashing function with equal arguments (in the sense of
+<TT>KTYPE::operator==</TT>) must always return the same number.  
+Position objects (see <!1><A HREF="GPosition.html">GPosition</A>) may be used to iterate over the
+entries contained by an associative map. 
+</BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

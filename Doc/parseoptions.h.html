@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">parseoptions.h</A></H2>
+<BLOCKQUOTE>Class used for parsing options and configuration files. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuParseOptions Examples"></A>
+<B>class  </B><A HREF=DjVuParseOptionsExamples.html><B>DjVuParseOptions Examples</B></A><B></B><DD><I>Examples using the <!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> class</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuParseOptions"></A>
+<B>class  </B><A HREF=DjVuParseOptions.html><B>DjVuParseOptions</B></A><B></B><DD><I>Main class for parsing options.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuTokenList"></A>
+<B>class  </B><A HREF=DjVuTokenList.html><B>DjVuTokenList</B></A><B></B><DD><I>Token list.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>The idea is simply to have one object that we can use to parse arguments
+for all command line programs, and API type function calls.  The
+primary class implemented is <!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> in the files
+<TT>&quot;parseoptions.h&quot;</TT> and <TT>&quot;parseoptions.cpp&quot;</TT>.  <P>Normal usage is to first declare an array of djvu_option structures
+listing all the command line options.  The last element of the array must
+be
+<PRE>
+ {0,0,0,0}
+</PRE>
+Typically the djvu_option array is declared statically.<P>The next step is to declare the <!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> class, passing
+it the name of the default profile to read values from.  Profiles are
+normally contained in "/etc/DjVu" or "~/.DjVu" for UNIX.  The location
+is stored in the registry for Windows.  Legal profile variables can be
+any name beginning with a letter consisting of characters [-A-Za-z0-9].
+This includes all command long options of this format in the
+djvu_option structure.
+Finally, you can tell your new <!1><A HREF="DjVuParseOptions.html">DjVuParseOptions</A> object to parse
+the command line arguments and use the class methods to determine the
+value specified for each option.<P>For a better understanding of this procedure continue on to the 
+<!1><A HREF="DjVuParseOptionsExamples.html">DjVuParseOptions Examples</A>.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Bill Riemers
+
+<DT><B>Version:</B><DD><TT>$Id: parseoptions.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT>
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

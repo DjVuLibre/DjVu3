@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+   <TITLE>template<class TYPE> class  DPArray</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">DPArray</A>: public <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A>&lt;<!1><A HREF="GPBase.html">GPBase</A>&gt;</H2>
+<BLOCKQUOTE>Dynamic array for <!1><A HREF="GPBase.html">GPBase</A>d classes.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=155>
+<param name=classes value="M_ArrayBase,M,CArrayBase,MArrayBase.html,CArrayBaseT,MArrayBaseT.html,CDArray,MDArray.html,CDPArray,MDPArray.html">
+<param name=before value="M,M,M,M,M">
+<param name=after value="Md-SPSPSP,Md_SPSP,Md_SP,Md_,M">
+<param name=indent value="0,1,2,3,4">
+<param name=arrowdir value="down">
+</APPLET>
+<HR><H3>Inherited from <A HREF="DArray.html">DArray</A>:</H3>
+<DL>
+</DL>
+<HR><H3>Inherited from <A HREF="ArrayBaseT.html">ArrayBaseT</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>TYPE&amp; <B>operator[]</B>(int n)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>const TYPE&amp; <B>operator[]</B>(int n) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator TYPE* </B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator const TYPE* </B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>ins</B>(int n, const TYPE &amp;val, unsigned int howmany=1)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>sort</B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>sort</B>(int lo, int hi)
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="ArrayBase.html">ArrayBase</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>size</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>lbound</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>hbound</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>empty</B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>touch</B>(int n)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>resize</B>(int hibound)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>resize</B>(int lobound, int hibound)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>shift</B>(int disp)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>del</B>(int n, unsigned int howmany=1)
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Dynamic array for <!1><A HREF="GPBase.html">GPBase</A>d classes.<P>There are many situations when it's necessary to create arrays of
+<!1><A HREF="GP.html">GP</A> pointers. For example, <TT>DArray&lt;GP&lt;Dialog&gt; &gt;</TT> or <TT>DArray&lt;GP&lt;Button&gt; &gt;</TT>.
+This would result in compilation of two instances of <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A> because
+from the viewpoint of the compiler there are two different classes used
+as array elements: <TT>GP&lt;Dialog&gt;</TT> and <TT>GP&lt;Button&gt;</TT>. In reality though,
+all <!1><A HREF="GP.html">GP</A> pointers have absolutely the same binary structure because
+they are derived from <!1><A HREF="GPBase.html">GPBase</A> class and do not add any variables
+or virtual functions. That's why it's possible to instantiate <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A>
+only once for <!1><A HREF="GPBase.html">GPBase</A> elements and then just cast types.<P>To implement this idea we have created this <TT>DPArray&lt;TYPE&gt;</TT> class,
+which can be used instead of <TT>DArray&lt;GP&lt;TYPE&gt; &gt;</TT>. It behaves absolutely
+the same way as <!1><A HREF="DArray.html#DOC.1.5.7.4.1">DArray</A> but has one big advantage: overhead of
+using <TT>DPArray</TT> with one more type is negligible.</BLOCKQUOTE>
+<DL>
+</DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

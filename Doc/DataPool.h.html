@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">DataPool.h</A></H2>
+<BLOCKQUOTE>Thread safe data storage </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DataPool"></A>
+<B>class  </B><A HREF=DataPool.html><B>DataPool</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Thread safe data storage.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>Files <TT>&quot;DataPool.h&quot;</TT> and <TT>&quot;DataPool.cpp&quot;</TT> implement classes <!1><A HREF="DataPool.html">DataPool</A>
+and DataRange used by DjVu decoder to access data.<P>The main goal of class <!1><A HREF="DataPool.html">DataPool</A> is to provide concurrent access
+to the same data from many threads with a possibility to add data
+from yet another thread. It is especially important in the case of the
+Netscape plugin when data is not immediately available, but decoding
+should be started as soon as possible. In this situation it is vital
+to provide transparent access to the data from many threads possibly
+blocking readers that try to access information that has not been
+received yet.<P>When the data is local though, it can be accessed directly using
+standard IO mechanism. To provide a uniform interface for decoding
+routines, <!1><A HREF="DataPool.html">DataPool</A> supports file mode as well.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;, L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: DataPool.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT>
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

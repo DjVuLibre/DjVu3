@@ -1,0 +1,34 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">bzz</A></H2>
+<BLOCKQUOTE>General purpose compression/decompression program </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<DL>
+<DT><B>Compression:</B><DD>
+<TT>bzz -e[&lt;blocksize&gt;] &lt;infile&gt; &lt;outfile&gt;</TT>
+<DT><B>Decompression:</B><DD>
+<TT>bzz -d &lt;infile&gt; &lt;outfile&gt;</TT>
+</DL>    <P>Program bzz is a simple front-end for the Burrows Wheeler encoder
+implemented in <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>.  Although this compression model is
+not currently used in DjVu files, it may be used in the future for
+encoding textual data chunks.  Argument <TT>blocksize</TT> is expressed in
+kilobytes and must be in range 200 to 4096.  The default value is 2048.
+Arguments
+single dash (<TT>&quot;-&quot;</TT>) can be used to represent the standard input or output.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- initial implementation
+
+<DT><B>Version:</B><DD><TT>$Id: bzz.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

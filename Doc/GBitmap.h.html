@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+   <TITLE>class  GMonitor</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GBitmap.h</A></H2>
+<BLOCKQUOTE>Generic support for bilevel and gray-level images. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GBitmap"></A>
+<B>class  </B><A HREF=GBitmap.html><B>GBitmap</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Bilevel and gray-level images.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="PNM and RLE file formats"></A>
+<B></B><A HREF=PNMandRLEfileformats.html><B>PNM and RLE file formats</B></A><B></B><DD><I>Simple image file formats.  </I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;GBitmap.h&quot;</TT> and <TT>&quot;GBitmap.cpp&quot;</TT> implement class <!1><A HREF="GBitmap.html">GBitmap</A>.
+Instances of this class represent bilevel or gray-level images. The
+``bottom left'' coordinate system is used consistently in the DjVu library.
+Line zero of a bitmap is the bottom line in the bitmap.  Pixels are
+organized from left to right within each line.  As suggested by its name,
+class <TT>GBitmap</TT> was initially a class for bilevel images only.  It was
+extended to handle gray-level images when arose the need to render
+anti-aliased images.  This class has been a misnomer since then.<P><B>ToDo</B> --- Class <TT>GBitmap</TT> can internally represent bilevel images
+using a run-length encoded representation.  Some algorithms may benefit
+from a direct access to this run information.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: GBitmap.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT>
+
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

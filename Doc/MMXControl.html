@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _MMX_H_::MMXControl</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">MMXControl</A></H2>
+<BLOCKQUOTE>MMX Control.</BLOCKQUOTE>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.19.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>mmxflag</B>
+<DD><I>Contains a value greater than zero if the CPU supports vectorial instructions.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.19.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>enable_mmx</B>()
+<DD><I>Detects and enable MMX or similar technologies.</I>
+<DT>
+<A HREF="#DOC.1.5.19.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>disable_mmx</B>()
+<DD><I>Disables MMX or similar technologies.</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>MMX Control. 
+Class <TT>MMXControl</TT> encapsulates a few static functions for 
+globally enabling or disabling MMX support. </BLOCKQUOTE>
+<DL>
+
+<A NAME="enable_mmx">
+<A NAME="DOC.1.5.19.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int enable_mmx()</B></TT>
+<DD>Detects and enable MMX or similar technologies.  This function checks
+whether the CPU supports a vectorial instruction set (such as Intel's
+MMX) and enables them.  Returns a boolean indicating whether such an
+instruction set is available.  Speedups factors may vary. 
+<DL><DT><DD></DL><P>
+<A NAME="disable_mmx">
+<A NAME="DOC.1.5.19.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int disable_mmx()</B></TT>
+<DD>Disables MMX or similar technologies.  The transforms will then be
+performed using the baseline code. 
+<DL><DT><DD></DL><P>
+<A NAME="mmxflag">
+<A NAME="DOC.1.5.19.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int mmxflag</B></TT>
+<DD>Contains a value greater than zero if the CPU supports vectorial
+instructions. A negative value means that you must call <!1><A HREF="MMXControl.html#DOC.1.5.19.1.1">enable_mmx</A>
+and test the value again. Direct access to this member should only be
+used to transfer the instruction flow to the vectorial branch of the
+code. Never modify the value of this variable.  Use
+<TT>disable_mmx</TT> instead. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,115 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.2.13 i686) [Netscape]">
+</head>
+<body>
+&nbsp;
+<blockquote>
+<h2>
+HOW TO BUILD gcc-2.95.3</h2>
+</blockquote>
+<b>Step 1:</b> Optain a binary working version of gcc.&nbsp; This can be
+any version
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; greater than or equal to
+2.8.
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - I know it is silly.&nbsp;
+But it is the chicken and egg problem.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - There are many places
+you can find gcc on the net for download,
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in binary format,
+copy gcc off another machine, build gcc on
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a previous version
+of the same architecture, or build with a cross compiler.
+<p><b>Step 2:</b> Download binutils-2.11.tar.gz and gcc-2.95.3.tar.gz from
+www.gnu.org.
+<p><b>Step 3:</b> Unzip these.&nbsp; If you don't have gunzip, you can
+unzip them on
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; different box, and then
+copy them over.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+gunzip *.tar.gz
+<p><b>Step 4.</b> Untar the files.&nbsp; i.e.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd $HOME
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tar xvvf binutils-2.11.tar
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tar xvvf gcc-2.95.3.tar
+<p><b>Step 5.</b> Configure binutils-2.11 for a directory not currently
+in your
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; search path:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+mkdir $HOME/gcc-build
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd ~/binutils*11;./configure --prefix=$HOME/gcc-build
+<p><b>Step 6.</b>&nbsp; Build and install binutils-2.11:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make install
+<p><b>Step 7.</b>&nbsp; Add this new path to your PATH variable:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+export PATH=$HOME/gcc-build/bin:$PATH
+<p><b>Step 8.</b>&nbsp; Configure gcc:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd $HOME/gcc*3
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+./configure --prefix=$HOME/gcc-build \
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--with-gnu-as --with-gnu-ld --with-threads
+<p><b>Step 9.</b>&nbsp; Build and install gcc:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make bootstrap
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make install<b></b>
+<p><b>Step 10.</b> Remove your build directories and extract again:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd $HOME
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rm -rf gcc*3 binutils*11
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tar xvvf binutils-2.11.tar
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+tar xvvf gcc-2.95.3.tar
+<p><b>Step 11.</b> Reconfigure the binutils:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd ~/binutils*11;./configure --prefix=/usr/local
+<p><b>Step 12.</b> Build and install binutils-2.11:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+su -c "make install"
+<p><b>Step 13.</b> Make sure /usr/local/bin is first in your search path:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+export PATH=/usr/local/bin:$PATH
+<p><b>Step 14.</b> Configure gcc:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+cd $HOME/gcc*3
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+./configure --prefix=/usr/local \
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--with-gnu-as --with-gnu-ld --with-threads
+<p><b>Step 15.</b> Build and install gcc.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+make bootstrap
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; su
+-c "make install"
+<p><b>Step 16.</b> Remove your first build of gcc, as you don't need it
+anymore:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rm -rf $HOME/gcc-build
+<p>You now have a version of gcc-2.95.3 which is correctly built.&nbsp;
+You
+<br>can transport this to any other&nbsp; machine of the same OS version
+<br>without repeating steps 1-16 by simply:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On the machine you just built gcc:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tar cvvf $HOME/gcc.tar /usr/local
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On the next machine you wish to use
+gcc on:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cd /;tar xvvf $HOME/gcc.tar
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

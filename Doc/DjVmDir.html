@@ -1,0 +1,207 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVmDir</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVmDir</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>Implements DjVu multipage document directory.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVmDir,MDjVmDir.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Classes</H3><DD><DT>
+<A HREF="#DOC.1.5.29.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  <B>File</B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>
+<DD><I>Class <!1><A HREF="File.html">File</A> represents the directory records managed by class <!1><A HREF="DjVmDir.html">DjVmDir</A>.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.29.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Changes the title of the file with ID void set_file_title(const char * id, const char * title); </B>
+<DD><I></I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.29.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream)
+<DD><I>Decodes the directory from the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream) const 
+<DD><I>Encodes the directory into the specified stream.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_indirect</B>(void) const 
+<DD><I>Tests if directory defines an <EM>indirect</EM> document.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_bundled</B>(void) const 
+<DD><I>Tests if the directory defines a <EM>bundled</EM> document.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  <B>page_to_file</B>(int page_num) const 
+<DD><I>Translates page numbers to file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  <B>name_to_file</B>(const <!1><A HREF="GString.html">GString</A> &amp; name) const 
+<DD><I>Translates file names to file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  <B>id_to_file</B>(const char * id) const 
+<DD><I>Translates file IDs to file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  <B>title_to_file</B>(const char * title) const 
+<DD><I>Translates file shortcuts to file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_file_pos</B>(const <!1><A HREF="File.html">File</A> * f) const 
+<DD><I>Returns position of the file in the directory.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_page_pos</B>(int page_num) const 
+<DD><I>Returns position of the given page in the directory.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GPList&lt;<!1><A HREF="File.html">File</A>&gt;  <B>get_files_list</B>(void) const 
+<DD><I>Returns a copy of the list of file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_files_num</B>(void) const 
+<DD><I>Returns the number of file records.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_pages_num</B>(void) const 
+<DD><I>Returns the number of file records representing pages.</I>
+<DT>
+<A HREF="#DOC.1.5.29.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  <B>get_shared_anno_file</B>(void) const 
+<DD><I>Returns back pointer to the file with <TT>SHARED_ANNO</TT> flag.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Implements DjVu multipage document directory.  There are currently two
+multipage DjVu formats supported: <EM>bundled</EM> and <EM>indirect</EM>.  In
+the first format all component files composing a given document are
+packaged (or bundled) into one file, in the second one every page and
+component is stored in a separate file and there is one more file, which
+contains the list of all others.<P>The multipage document directory lists all component files composing the
+given document, helps to access every file, identify pages and maintain
+user-specified shortcuts.  Every directory record describes a file
+composing the document.  Each file is identified by a small string named
+the identifier (ID).  Each file may also contain a file name and a title.<P>The <TT>DjVmDir</TT> class represents a multipage document directory.  Its main
+purpose is to encode and decode the document directory when writing or
+reading the <TT>DIRM</TT> chunk.  Normally you don't have to create this class
+yourself. It's done automatically when <!1><A HREF="DjVmDoc.html">DjVmDoc</A> class initializes
+itself. It may be useful though to be able to access records in the
+directory because some classes (like <!1><A HREF="DjVuDocument.html">DjVuDocument</A> and <!1><A HREF="DjVmDoc.html">DjVmDoc</A>)
+return a pointer to <TT>DjVmDir</TT> in some cases. </BLOCKQUOTE>
+<DL>
+
+<A NAME="decode">
+<A NAME="DOC.1.5.29.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream)</B></TT>
+<DD>Decodes the directory from the specified stream. 
+<DL><DT><DD></DL><P>
+<A NAME="encode">
+<A NAME="DOC.1.5.29.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; stream) const </B></TT>
+<DD>Encodes the directory into the specified stream. 
+<DL><DT><DD></DL><P>
+<A NAME="is_indirect">
+<A NAME="DOC.1.5.29.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_indirect(void) const </B></TT>
+<DD>Tests if directory defines an <EM>indirect</EM> document. 
+<DL><DT><DD></DL><P>
+<A NAME="is_bundled">
+<A NAME="DOC.1.5.29.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_bundled(void) const </B></TT>
+<DD>Tests if the directory defines a <EM>bundled</EM> document. 
+<DL><DT><DD></DL><P>
+<A NAME="page_to_file">
+<A NAME="DOC.1.5.29.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  page_to_file(int page_num) const </B></TT>
+<DD>Translates page numbers to file records. 
+<DL><DT><DD></DL><P>
+<A NAME="name_to_file">
+<A NAME="DOC.1.5.29.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  name_to_file(const <!1><A HREF="GString.html">GString</A> &amp; name) const </B></TT>
+<DD>Translates file names to file records. 
+<DL><DT><DD></DL><P>
+<A NAME="id_to_file">
+<A NAME="DOC.1.5.29.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  id_to_file(const char * id) const </B></TT>
+<DD>Translates file IDs to file records. 
+<DL><DT><DD></DL><P>
+<A NAME="title_to_file">
+<A NAME="DOC.1.5.29.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  title_to_file(const char * title) const </B></TT>
+<DD>Translates file shortcuts to file records. 
+<DL><DT><DD></DL><P>
+<A NAME="get_file_pos">
+<A NAME="DOC.1.5.29.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_file_pos(const <!1><A HREF="File.html">File</A> * f) const </B></TT>
+<DD>Returns position of the file in the directory. 
+<DL><DT><DD></DL><P>
+<A NAME="get_page_pos">
+<A NAME="DOC.1.5.29.1.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_page_pos(int page_num) const </B></TT>
+<DD>Returns position of the given page in the directory. 
+<DL><DT><DD></DL><P>
+<A NAME="get_files_list">
+<A NAME="DOC.1.5.29.1.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GPList&lt;<!1><A HREF="File.html">File</A>&gt;  get_files_list(void) const </B></TT>
+<DD>Returns a copy of the list of file records. 
+<DL><DT><DD></DL><P>
+<A NAME="get_files_num">
+<A NAME="DOC.1.5.29.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_files_num(void) const </B></TT>
+<DD>Returns the number of file records. 
+<DL><DT><DD></DL><P>
+<A NAME="get_pages_num">
+<A NAME="DOC.1.5.29.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_pages_num(void) const </B></TT>
+<DD>Returns the number of file records representing pages. 
+<DL><DT><DD></DL><P>
+<A NAME="get_shared_anno_file">
+<A NAME="DOC.1.5.29.1.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="File.html">File</A>&gt;  get_shared_anno_file(void) const </B></TT>
+<DD>Returns back pointer to the file with <TT>SHARED_ANNO</TT> flag.
+Note that there may be only one file with shared annotations
+in any multipage DjVu document. 
+<DL><DT><DD></DL><P>
+<A NAME="Changes the title of the file with ID void set_file_title(const char * id, const char * title); ">
+<A NAME="DOC.1.5.29.1.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Changes the title of the file with ID void set_file_title(const char * id, const char * title); </B></TT>
+<DD>Changes the title of the file with ID
+void set_file_title(const char * id, const char * title);
+
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

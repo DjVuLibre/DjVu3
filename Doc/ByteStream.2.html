@@ -1,0 +1,144 @@
+<HTML>
+<HEAD>
+   <TITLE>class  ByteStream</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">ByteStream</A>: :Obsolete : public <!1><A HREF="ByteStream.html">ByteStream</A></H2>
+<BLOCKQUOTE>ByteStream::Obsolete impliments backwards compatable ByteStreams to support old code.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=155>
+<param name=classes value="M:,M,M:Obsolete,M,CGPEnabled,MGPEnabled.html,CByteStream,MByteStream.html,CByteStream,MByteStream.2.html">
+<param name=before value="M,M,M,M,M">
+<param name=after value="Ml-,ML-,Md_||,MD_,M">
+<param name=indent value="1,1,0,1,2">
+<param name=arrowdir value="down">
+</APPLET>
+<HR><H3>Inherited from <A HREF="ByteStream.html">ByteStream</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>(void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const char filename[], char const * const mode)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( const int fd, char const * const mode, const bool closeme)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create</B>( FILE * const f, char const * const mode, const bool closeme)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="ByteStream.html">ByteStream</A>&gt;  <B>create_static</B>( void const * const buffer, const size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<P>class  Stdioclass  Staticclass  Memoryclass  <B>Virtual Functions.</B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~ByteStream</B>()
+<DD><I>Virtual destructor.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>read</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DD><I>Reads data from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>write</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DD><I>Writes data to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   long <B>tell</B>(void) const 
+<DD><I>Returns the offset of the current position in the ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>seek</B>(long offset, int whence = SEEK_SET, bool nothrow=false)
+<DD><I>Sets the current position for reading or writing the ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>flush</B>(void)
+<DD><I>Flushes all buffers in the ByteStream.</I>
+</DL></P>
+<DT>
+<P> <B>Utility Functions.  </B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>readall</B>(void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DD><I>Reads data and blocks until everything has been read.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>writall</B>(const void *buffer, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>)
+<DD><I>Writes data and blocks until everything has been written.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>size_t <B>copy</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bsfrom, size_t <!1><A HREF="ByteStream.html#DOC.1.4.12.1.2.12">size</A>=0)
+<DD><I>Copy data from another ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write8</B>(unsigned int card8)
+<DD><I>Writes a one-byte integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write16</B>(unsigned int card16)
+<DD><I>Writes a two-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write24</B>(unsigned int card24)
+<DD><I>Writes a three-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>write32</B>(unsigned int card32)
+<DD><I>Writes a four-bytes integer to a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read8</B>()
+<DD><I>Reads a one-byte integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read16</B>()
+<DD><I>Reads a two-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read24</B>()
+<DD><I>Reads a three-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>read32</B>()
+<DD><I>Reads a four-bytes integer from a ByteStream.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>size</B>(void) const 
+<DD><I>Returns the total number of bytes contained in the buffer, file, etc.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="TArray.html">TArray</A>&lt;char&gt;  <B>get_data</B>(void)
+<DD><I>Use at your own risk, only guarenteed to work for ByteStream::Memorys.</I>
+<DT>
+<A HREF="#DOC.1.4.12.1.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   size_t <B>readat</B>(void *buffer, size_t sz, int pos)
+<DD><I>Reads data from a random position.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>ByteStream::Obsolete impliments backwards compatable ByteStreams
+to support old code.  Since an exception in a constructor will leak
+memory in your program, we recommend to use the <TT>ByteStream::create</TT> 
+methods instead.  </BLOCKQUOTE>
+<DL>
+</DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

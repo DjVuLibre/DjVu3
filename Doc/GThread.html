@@ -1,0 +1,183 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _GTHREADS_H_::GThread</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GThread</A></H2>
+<BLOCKQUOTE>Thread class.</BLOCKQUOTE>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.9.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GThread</B>(int stacksize = -1)
+<DD><I>Constructs a new thread object.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~GThread</B>()
+<DD><I>Destructor.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>create</B>(void (*entry)(void*), void *arg)
+<DD><I>Starts the thread.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>terminate</B>()
+<DD><I>Terminates a thread with extreme prejudice.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>wait_for_finish</B>(void)
+<DD><I>Will wait until the thread finishes.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>yield</B>()
+<DD><I>Causes the current thread to relinquish the processor.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void* <B>current</B>()
+<DD><I>Returns a value which uniquely identifies the current thread.</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   int <B>select</B>(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)
+<DD><I>Replaces system call <TT>select</TT> (COTHREADS only).</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>get_select</B>(int &amp;nfds, fd_set*, fd_set*, fd_set*, unsigned long &amp;timeout)
+<DD><I>Provide arguments for system call <TT>select</TT> (COTHREADS only).</I>
+<DT>
+<A HREF="#DOC.1.5.9.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   void <B>set_scheduling_callback</B>(void (*call)(int))
+<DD><I>Install hooks in the scheduler (COTHREADS only).</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Thread class.  A multithreaded process is composed of a main execution
+thread and of several secondary threads.  Each secondary thread is
+represented by a <TT>GThread</TT> object.  The amount of memory required for the
+stack of a secondary thread is defined when the <TT>GThread</TT> object is
+constructed.  The execution thread is started when function
+<!1><A HREF="GThread.html#DOC.1.5.9.1.3">create</A> is called.  The destructor of class GThread waits
+until the thread terminanes.  Note that the execution can be terminated at
+any time (with possible prejudice) by calling <!1><A HREF="GThread.html#DOC.1.5.9.1.4">terminate</A>.<P>Several static member functions control the thread scheduler.  Function
+<!1><A HREF="GThread.html#DOC.1.5.9.1.6">yield</A> relinquishes the processor to another thread.
+Function <!1><A HREF="GThread.html#DOC.1.5.9.1.8">select</A> (<TT>COTHREADS</TT> only) provides a thread-aware
+replacement for the well-known unix system call <TT>select</TT>.  <P><B>Note</B> --- Both the copy constructor and the copy operator are declared
+as private members. It is therefore not possible to make multiple copies
+of instances of this class, as implied by the class semantic. </BLOCKQUOTE>
+<DL>
+
+<A NAME="GThread">
+<A NAME="DOC.1.5.9.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GThread(int stacksize = -1)</B></TT>
+<DD>Constructs a new thread object.  Memory is allocated for the
+thread, but the thread is not started. 
+Argument <TT>stacksize</TT> is used by the <TT>COTHREADS</TT> model only for
+specifying the amount of memory needed for the processor stack. A
+negative value will be replaced by a suitable default value (128Kb as of
+12/1998). A minimum value of 32Kb is silently enforced. 
+<DL><DT><DD></DL><P>
+<A NAME="~GThread">
+<A NAME="DOC.1.5.9.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ~GThread()</B></TT>
+<DD>Destructor. If you attempt to destroy the <TT>GThread</TT> object before
+the thread is actually terminated the destructor will block waiting
+for the termination to happen (see <!1><A HREF="GThread.html#DOC.1.5.9.1.5">wait_for_finish</A>()). You
+should be very careful not to destroy the <TT>GThread</TT> object from its
+own thread, since this will abort the program, as no thread can wait
+for itself. 
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.5.9.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int create(void (*entry)(void*), void *arg)</B></TT>
+<DD>Starts the thread. The new thread executes function
+argument <TT>arg</TT>.  The thread terminates when the function returns.  A
+thread cannot be restarted after its termination. You must create a new
+<TT>GThread</TT> object. 
+<DL><DT><DD></DL><P>
+<A NAME="terminate">
+<A NAME="DOC.1.5.9.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void terminate()</B></TT>
+<DD>Terminates a thread with extreme prejudice. The thread is removed from
+the scheduling list.  Execution terminates regardless of the execution
+status of the thread function. Automatic variables may or may not be
+destroyed. This function must be considered as a last resort since
+memory may be lost. 
+<DL><DT><DD></DL><P>
+<A NAME="wait_for_finish">
+<A NAME="DOC.1.5.9.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void wait_for_finish(void)</B></TT>
+<DD>Will wait until the thread finishes. If called from the managed
+thread, an exception will be thrown. 
+<DL><DT><DD></DL><P>
+<A NAME="yield">
+<A NAME="DOC.1.5.9.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int yield()</B></TT>
+<DD>Causes the current thread to relinquish the processor.  The scheduler
+selects a thread ready to run and transfers control to that thread.  The
+actual effect of <TT>yield</TT> heavily depends on the selected implementation.
+Function <TT>yield</TT> usually returns zero when the execution of the current
+thread is resumed.  It may return a positive number when it can
+determine that the current thread will remain the only runnable thread
+for some time.  You may then call function <!1><A HREF="GThread.html#DOC.1.5.9.1.9">get_select</A> to
+obtain more information. 
+<DL><DT><DD></DL><P>
+<A NAME="current">
+<A NAME="DOC.1.5.9.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void* current()</B></TT>
+<DD>Returns a value which uniquely identifies the current thread. 
+<DL><DT><DD></DL><P>
+<A NAME="select">
+<A NAME="DOC.1.5.9.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   int select(int nfds, fd_set*, fd_set*, fd_set*, struct timeval*)</B></TT>
+<DD>Replaces system call <TT>select</TT> (COTHREADS only).  The <TT>COTHREADS</TT> model
+does not redefine system function.  System functions therefore can
+potentially block the whole process (instead of blocking the current
+thread only) because the system is not aware of the <TT>COTHREADS</TT>
+scheduler.  The function <TT>GThread::select</TT> is a <TT>COTHREADS</TT>-aware
+replacement for the well known system function <TT>select</TT>.  You can also
+use <TT>GThread::select</TT> for making sure that calls to system functions
+will not block the entire process, as demonstrated below:
+<PRE>
+      int 
+      gthread_read(int fd, void *buffer, size_t len) 
+      {
+        fd_set rdset; 
+        FD_ZERO(&amp;rdset); 
+        FD_SET(fd, &amp;rdset);
+        GThread::select(fd+1, &amp;rdset, 0, 0, 0);
+        return read(fd, buffer, len);
+      }
+      </PRE> 
+<DL><DT><DD></DL><P>
+<A NAME="get_select">
+<A NAME="DOC.1.5.9.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void get_select(int &amp;nfds, fd_set*, fd_set*, fd_set*, unsigned long &amp;timeout)</B></TT>
+<DD>Provide arguments for system call <TT>select</TT> (COTHREADS only). It may be
+appropriate to call the real system call <TT>select</TT> if the current thread
+is the only thread ready to run.  Other threads however may wake up when
+certain file descriptors are ready or when a certain delay expires.
+Function <TT>get_select</TT> returns this information by filling the three
+usual file descriptor sets (similar to the arguments of system call
+<TT>select</TT>).  It also returns a timeout <TT>timeout</TT> expressed in
+milliseconds.  Note that this timeout is zero is the current thread is
+not the sole thread ready to run. 
+<DL><DT><DD></DL><P>
+<A NAME="set_scheduling_callback">
+<A NAME="DOC.1.5.9.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   void set_scheduling_callback(void (*call)(int))</B></TT>
+<DD>Install hooks in the scheduler (COTHREADS only).  The hook function
+<TT>call</TT> is called when a new thread is created (argument is
+<TT>GThread::CallbackCreate</TT>), when a thread terminates (argument is
+<TT>GThread::CallbackTerminate</TT>), or when thread is unblocked (argument is
+<TT>GThread::CallbackUnblock</TT>).  This callback can be useful in certain GUI
+toolkits where the most convenient method for scheduling the threads
+consists in setting a timer event that calls <!1><A HREF="GThread.html#DOC.1.5.9.1.6">yield</A>.  
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

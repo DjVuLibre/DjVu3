@@ -1,0 +1,370 @@
+<HTML>
+<HEAD>
+   <TITLE>class  GURL</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GURL</A></H2>
+<BLOCKQUOTE>System independent URL representation.</BLOCKQUOTE>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.11.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>protocol</B>(void) const 
+<DD><I>Extracts the <EM>protocol</EM> part from the URL and returns it</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>hash_argument</B>(void) const 
+<DD><I>Returns string after the first '#' with decoded escape sequences.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_hash_argument</B>(const char * arg)
+<DD><I>Inserts the <TT>arg</TT> after a separating hash into the URL.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>cgi_arguments</B>(void) const 
+<DD><I>Returns the total number of CGI arguments in the URL.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>djvu_cgi_arguments</B>(void) const 
+<DD><I>Returns the total number of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> in the URL).</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>cgi_name</B>(int num) const 
+<DD><I>Returns that part of CGI argument number <TT>num</TT>, which is before the equal sign.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>djvu_cgi_name</B>(int num) const 
+<DD><I>Returns that part of DjVu-related CGI argument number <TT>num</TT>, which is before the equal sign.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>cgi_value</B>(int num) const 
+<DD><I>Returns that part of CGI argument number <TT>num</TT>, which is after the equal sign.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>djvu_cgi_value</B>(int num) const 
+<DD><I>Returns that part of DjVu-related CGI argument number <TT>num</TT>, which is after the equal sign.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  <B>cgi_names</B>(void) const 
+<DD><I>Returns array of all known CGI names (part of CGI argument before the equal sign) </I>
+<DT>
+<A HREF="#DOC.1.5.11.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  <B>djvu_cgi_names</B>(void) const 
+<DD><I>Returns array of names of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> option.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  <B>cgi_values</B>(void) const 
+<DD><I>Returns array of all known CGI names (part of CGI argument before the equal sign) </I>
+<DT>
+<A HREF="#DOC.1.5.11.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  <B>djvu_cgi_values</B>(void) const 
+<DD><I>Returns array of values of DjVu-related CGI arguments (arguments following <TT>DJVUOPTS</TT> option.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_all_arguments</B>(void)
+<DD><I>Erases everything after the first '#' or '?'</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_hash_argument</B>(void)
+<DD><I>Erases everything after the first '#'</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_djvu_cgi_arguments</B>(void)
+<DD><I>Erases DjVu CGI arguments (following "<TT>DJVUOPTS</TT>")</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.24"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>clear_cgi_arguments</B>(void)
+<DD><I>Erases all CGI arguments (following the first '?')</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>add_djvu_cgi_argument</B>(const char * <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>, const char * value=0)
+<DD><I>Appends the specified CGI argument.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> <B>base</B>(void) const 
+<DD><I>Returns the URL corresponding to the directory containing the document with this URL.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>name</B>(void) const 
+<DD><I>Returns the name part of this URL.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>fname</B>(void) const 
+<DD><I>Returns the name part of this URL with escape sequences expanded.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.25"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>extension</B>(void) const 
+<DD><I>Returns the extention part of name of document in this URL.</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.26"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_empty</B>(void) const 
+<DD><I>Checks if this is an empty URL</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.27"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_local_file_url</B>(void) const 
+<DD><I>Checks if the URL is local (starts from <TT>file:/</TT>) or not</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.28"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator==</B>(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl2)
+<DD><I>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are the same</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.29"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend int <B>operator!=</B>(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl2)
+<DD><I>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are different</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.30"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A>&amp; <B>operator=</B>(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; url)
+<DD><I>Assignment operator</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.31"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator	const char*</B>(void) const 
+<DD><I>Returns Internal URL representation</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.32"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl)
+<DD><I>Copy constructor</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.33"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <B>~GURL</B>(void)
+<DD><I>The descructor</I>
+<DT>
+<A HREF="#DOC.1.5.11.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend unsigned int <B>hash</B>(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl)
+<DD><I>Hashing function.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<A HREF="#DOC.1.5.11.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Concatenation operators</B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.11.1.17.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> <B>operator+</B>(const char * <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>) const 
+<DD><I></I>
+<DT>
+<A HREF="#DOC.1.5.11.1.17.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> <B>operator+</B>(const <!1><A HREF="GString.html">GString</A> &amp; <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>) const 
+<DD><I></I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.11.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Constructors</B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.11.1.18.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const <!1><A HREF="GString.html">GString</A> &amp; url_string)
+<DD><I></I>
+<DT>
+<A HREF="#DOC.1.5.11.1.18.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GURL</B>(const char * url_string=0)
+<DD><I></I>
+</DL></P>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>System independent URL representation.<P>This class is used in the library to store URLs in a system independent
+format. The idea to use a general class to hold URL arose after we
+realized, that DjVu had to be able to access files both from the WEB
+and from the local disk. While it is strange to talk about system
+independence of HTTP URLs, file names formats obviously differ from
+platform to platform. They may contain forward slashes, backward slashes,
+colons as separators, etc. There maybe more than one URL corresponding
+to the same file name. Compare <TT>file:/dir/file.djvu</TT> and
+<TT>file://localhost/dir/file.djvu</TT>.<P>To simplify a developer's life we have created this class, which contains
+inside a canonical representation of URLs.<P>File URLs are converted to internal format with the help of <!1><A HREF="GOS.html">GOS</A> class.<P>All other URLs are modified to contain only forward slashes.</BLOCKQUOTE>
+<DL>
+
+<A NAME="protocol">
+<A NAME="DOC.1.5.11.1.20">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> protocol(void) const </B></TT>
+<DD>Extracts the <EM>protocol</EM> part from the URL and returns it
+<DL><DT><DD></DL><P>
+<A NAME="hash_argument">
+<A NAME="DOC.1.5.11.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> hash_argument(void) const </B></TT>
+<DD>Returns string after the first '#' with decoded
+escape sequences. 
+<DL><DT><DD></DL><P>
+<A NAME="set_hash_argument">
+<A NAME="DOC.1.5.11.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_hash_argument(const char * arg)</B></TT>
+<DD>Inserts the <TT>arg</TT> after a separating hash into the URL.
+The function encodes any illegal character in <TT>arg</TT> using
+<!1><A HREF="GOS.html#DOC.1.5.10.1.14">encode_reserved</A>(). 
+<DL><DT><DD></DL><P>
+<A NAME="cgi_arguments">
+<A NAME="DOC.1.5.11.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int cgi_arguments(void) const </B></TT>
+<DD>Returns the total number of CGI arguments in the URL.
+CGI arguments follow '<TT>?</TT>' sign and are separated by '<TT>&amp;</TT>' signs 
+<DL><DT><DD></DL><P>
+<A NAME="djvu_cgi_arguments">
+<A NAME="DOC.1.5.11.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int djvu_cgi_arguments(void) const </B></TT>
+<DD>Returns the total number of DjVu-related CGI arguments (arguments
+following <TT>DJVUOPTS</TT> in the URL). 
+<DL><DT><DD></DL><P>
+<A NAME="cgi_name">
+<A NAME="DOC.1.5.11.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> cgi_name(int num) const </B></TT>
+<DD>Returns that part of CGI argument number <TT>num</TT>, which is
+before the equal sign. 
+<DL><DT><DD></DL><P>
+<A NAME="djvu_cgi_name">
+<A NAME="DOC.1.5.11.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> djvu_cgi_name(int num) const </B></TT>
+<DD>Returns that part of DjVu-related CGI argument number <TT>num</TT>,
+which is before the equal sign. 
+<DL><DT><DD></DL><P>
+<A NAME="cgi_value">
+<A NAME="DOC.1.5.11.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> cgi_value(int num) const </B></TT>
+<DD>Returns that part of CGI argument number <TT>num</TT>, which is
+after the equal sign. 
+<DL><DT><DD></DL><P>
+<A NAME="djvu_cgi_value">
+<A NAME="DOC.1.5.11.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> djvu_cgi_value(int num) const </B></TT>
+<DD>Returns that part of DjVu-related CGI argument number <TT>num</TT>,
+which is after the equal sign. 
+<DL><DT><DD></DL><P>
+<A NAME="cgi_names">
+<A NAME="DOC.1.5.11.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  cgi_names(void) const </B></TT>
+<DD>Returns array of all known CGI names (part of CGI argument before
+the equal sign) 
+<DL><DT><DD></DL><P>
+<A NAME="djvu_cgi_names">
+<A NAME="DOC.1.5.11.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  djvu_cgi_names(void) const </B></TT>
+<DD>Returns array of names of DjVu-related CGI arguments (arguments
+following <TT>DJVUOPTS</TT> option. 
+<DL><DT><DD></DL><P>
+<A NAME="cgi_values">
+<A NAME="DOC.1.5.11.1.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  cgi_values(void) const </B></TT>
+<DD>Returns array of all known CGI names (part of CGI argument before
+the equal sign) 
+<DL><DT><DD></DL><P>
+<A NAME="djvu_cgi_values">
+<A NAME="DOC.1.5.11.1.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DArray.html">DArray</A>&lt;<!1><A HREF="GString.html">GString</A>&gt;  djvu_cgi_values(void) const </B></TT>
+<DD>Returns array of values of DjVu-related CGI arguments (arguments
+following <TT>DJVUOPTS</TT> option. 
+<DL><DT><DD></DL><P>
+<A NAME="clear_all_arguments">
+<A NAME="DOC.1.5.11.1.21">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void clear_all_arguments(void)</B></TT>
+<DD>Erases everything after the first '#' or '?'
+<DL><DT><DD></DL><P>
+<A NAME="clear_hash_argument">
+<A NAME="DOC.1.5.11.1.22">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void clear_hash_argument(void)</B></TT>
+<DD>Erases everything after the first '#'
+<DL><DT><DD></DL><P>
+<A NAME="clear_djvu_cgi_arguments">
+<A NAME="DOC.1.5.11.1.23">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void clear_djvu_cgi_arguments(void)</B></TT>
+<DD>Erases DjVu CGI arguments (following "<TT>DJVUOPTS</TT>")
+<DL><DT><DD></DL><P>
+<A NAME="clear_cgi_arguments">
+<A NAME="DOC.1.5.11.1.24">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void clear_cgi_arguments(void)</B></TT>
+<DD>Erases all CGI arguments (following the first '?')
+<DL><DT><DD></DL><P>
+<A NAME="add_djvu_cgi_argument">
+<A NAME="DOC.1.5.11.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void add_djvu_cgi_argument(const char * <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>, const char * value=0)</B></TT>
+<DD>Appends the specified CGI argument. Will insert "<TT>DJVUOPTS</TT>" if
+necessary 
+<DL><DT><DD></DL><P>
+<A NAME="base">
+<A NAME="DOC.1.5.11.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> base(void) const </B></TT>
+<DD>Returns the URL corresponding to the directory containing
+the document with this URL. The function basically takes the
+URL and clears everything after the last slash. 
+<DL><DT><DD></DL><P>
+<A NAME="name">
+<A NAME="DOC.1.5.11.1.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> name(void) const </B></TT>
+<DD>Returns the name part of this URL.
+For example, if the URL is <TT>http:          this function will return </TT>file%201.djvu<TT>. \Ref{fname}() will</TT>return <TT>file 1.djvu</TT> at the same time. 
+<DL><DT><DD></DL><P>
+<A NAME="fname">
+<A NAME="DOC.1.5.11.1.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> fname(void) const </B></TT>
+<DD>Returns the name part of this URL with escape sequences expanded.
+For example, if the URL is <TT>http:          this function will return </TT>file 1.djvu<TT>. \Ref{name}() will</TT>return <TT>file%201.djvu</TT> at the same time. 
+<DL><DT><DD></DL><P>
+<A NAME="extension">
+<A NAME="DOC.1.5.11.1.25">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> extension(void) const </B></TT>
+<DD>Returns the extention part of name of document in this URL.
+<DL><DT><DD></DL><P>
+<A NAME="is_empty">
+<A NAME="DOC.1.5.11.1.26">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_empty(void) const </B></TT>
+<DD>Checks if this is an empty URL
+<DL><DT><DD></DL><P>
+<A NAME="is_local_file_url">
+<A NAME="DOC.1.5.11.1.27">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_local_file_url(void) const </B></TT>
+<DD>Checks if the URL is local (starts from <TT>file:/</TT>) or not
+<DL><DT><DD></DL><P>
+<A NAME="Concatenation operators">
+<A NAME="DOC.1.5.11.1.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Concatenation operators</B></TT>
+<DD>Concatenate the GURL with the passed <EM>name</EM>. If the <EM>name</EM>
+is absolute (has non empty protocol prefix), we just return
+<TT>GURL(name)</TT>. Otherwise the <TT>name</TT> is appended to the GURL after a
+separating slash.
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="operator+">
+<A NAME="DOC.1.5.11.1.17.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> operator+(const char * <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>) const </B></TT>
+<DL><DT><DD></DL><P>
+<A NAME="operator+">
+<A NAME="DOC.1.5.11.1.17.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> operator+(const <!1><A HREF="GString.html">GString</A> &amp; <!1><A HREF="GURL.html#DOC.1.5.11.1.15">name</A>) const </B></TT>
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="operator==">
+<A NAME="DOC.1.5.11.1.28">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator==(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl2)</B></TT>
+<DD>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are the same
+<DL><DT><DD></DL><P>
+<A NAME="operator!=">
+<A NAME="DOC.1.5.11.1.29">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend int operator!=(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl1, const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl2)</B></TT>
+<DD>Returns TRUE if <TT>gurl1</TT> and <TT>gurl2</TT> are different
+<DL><DT><DD></DL><P>
+<A NAME="operator=">
+<A NAME="DOC.1.5.11.1.30">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A>&amp; operator=(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; url)</B></TT>
+<DD>Assignment operator
+<DL><DT><DD></DL><P>
+<A NAME="operator	const char*">
+<A NAME="DOC.1.5.11.1.31">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator	const char*(void) const </B></TT>
+<DD>Returns Internal URL representation
+<DL><DT><DD></DL><P>
+<A NAME="Constructors">
+<A NAME="DOC.1.5.11.1.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Constructors</B></TT>
+<DD>Accept the string URL, check that it starts from <TT>file:/</TT>
+or <TT>http:/</TT> and convert to internal system independent
+representation.
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="GURL">
+<A NAME="DOC.1.5.11.1.18.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GURL(const <!1><A HREF="GString.html">GString</A> &amp; url_string)</B></TT>
+<DL><DT><DD></DL><P>
+<A NAME="GURL">
+<A NAME="DOC.1.5.11.1.18.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GURL(const char * url_string=0)</B></TT>
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="GURL">
+<A NAME="DOC.1.5.11.1.32">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GURL(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl)</B></TT>
+<DD>Copy constructor
+<DL><DT><DD></DL><P>
+<A NAME="~GURL">
+<A NAME="DOC.1.5.11.1.33">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   ~GURL(void)</B></TT>
+<DD>The descructor
+<DL><DT><DD></DL><P>
+<A NAME="hash">
+<A NAME="DOC.1.5.11.1.19">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend unsigned int hash(const <!1><A HREF="GURL.html#DOC.1.5.11.1.32">GURL</A> &amp; gurl)</B></TT>
+<DD>Hashing function.
+
+<DL><DT><DT><B>Returns:</B><DD>  hash suitable for usage in <!1><A HREF="GMap.html">GMap</A> <BR><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,752 @@
+# This is a Qt message file in .po format.  Each msgid starts with
+# a scope.  This scope should *NOT* be translated - eg. translating
+# from French to English, "Foo::Bar" would be translated to "Pub",
+# not "Foo::Pub".
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2001-05-11 10:58:18 AM PDT\n"
+"PO-Revision-Date: YYYY-MM-DD\n"
+"Last-Translator: FULLNAME <EMAIL@ADDRESS>\n"
+"Content-Type: text/plain; charset=Big5\n"
+
+#: qd_doc_info.cpp:1032
+msgid "QDDocInfo::&All Files"
+msgstr "©Ò¦³¤å¥ó"
+
+#: qd_doc_info.cpp:465
+msgid "QDDocInfo::&Cancel"
+msgstr "¨ú®ø"
+
+#: qd_doc_info.cpp:1034
+msgid "QDDocInfo::&Close"
+msgstr "Ãö³¬"
+
+#: qd_doc_info.cpp:575
+msgid "QDDocInfo::&Goto to page"
+msgstr "´«­¶"
+
+#: qd_doc_info.cpp:757
+msgid "QDDocInfo::&Goto"
+msgstr "´«­¶"
+
+#: qd_doc_info.cpp:849
+msgid "QDDocInfo::&Info"
+msgstr "«H®§"
+
+#: qd_doc_info.cpp:1028
+msgid "QDDocInfo::&Pages"
+msgstr "­¶¼Æ"
+
+#: qd_doc_info.cpp:1026
+msgid "QDDocInfo::&Summary"
+msgstr "Á`µ²"
+
+#: qd_doc_info.cpp:1030
+msgid "QDDocInfo::&Thumbnails"
+msgstr "ÁY¼v¹Ï"
+
+#: qd_doc_info.cpp:662
+msgid "QDDocInfo::BUNDLED"
+msgstr "³æ§ô"
+
+#: qd_doc_info.cpp:185
+msgid "QDDocInfo::DjVu Error"
+msgstr "DjVu ¿ù»~"
+
+#: qd_doc_info.cpp:603
+msgid "QDDocInfo::DjVu multipage document info"
+msgstr "DjVu ¦h­¶¤å¥ó«H®§"
+
+#: qd_doc_info.cpp:660
+msgid "QDDocInfo::Document Format:"
+msgstr "¤å¥ó®æ¦¡"
+
+#: qd_doc_info.cpp:620
+msgid "QDDocInfo::Document Information"
+msgstr "¤å¥ó«H®§"
+
+#: qd_doc_info.cpp:650
+msgid "QDDocInfo::Document Name:"
+msgstr "¤å¥ó¦W"
+
+#: qd_doc_info.cpp:747
+msgid "QDDocInfo::Double click any page from the list to view it.\n"
+msgstr ""
+
+#: qd_doc_info.cpp:835
+msgid "QDDocInfo::File Name"
+msgstr "¥»­¶¤å¥ó¦W"
+
+#: qd_doc_info.cpp:841
+msgid "QDDocInfo::File Size"
+msgstr "¤å¥ó¤j¤p"
+
+#: qd_doc_info.cpp:838
+msgid "QDDocInfo::File Type"
+msgstr "¤å¥óÃþ«¬"
+
+#: qd_doc_info.cpp:696
+msgid "QDDocInfo::Files:"
+msgstr "¤å¥ó"
+
+#: qd_doc_info.cpp:664
+msgid "QDDocInfo::INDIRECT"
+msgstr "¤À´²"
+
+#: qd_doc_info.cpp:447
+msgid "QDDocInfo::Information on file "
+msgstr "¤å¥ó«H®§"
+
+#: qd_doc_info.cpp:434
+msgid "QDDocInfo::Information on page "
+msgstr "¥»­¶«H®§"
+
+#: qd_doc_info.cpp:663
+msgid "QDDocInfo::Obsolete BUNDLED"
+msgstr "¦ÑÃÑ³æ§ô"
+
+#: qd_doc_info.cpp:665
+msgid "QDDocInfo::Obsolete INDEXED"
+msgstr "¦ÑÃÑ¤À´²"
+
+#: qd_doc_info.cpp:833
+msgid "QDDocInfo::Order #"
+msgstr "¶¶§Ç¸¹#"
+
+#: qd_doc_info.cpp:574
+msgid "QDDocInfo::Page &Info"
+msgstr "¥»­¶«H®§"
+
+#: qd_doc_info.cpp:738
+msgid "QDDocInfo::Page"
+msgstr "­¶¸¹"
+
+#: qd_doc_info.cpp:784
+msgid "QDDocInfo::Pages Covered"
+msgstr "¥]¬A­¶¼Æ"
+
+#: qd_doc_info.cpp:681
+msgid "QDDocInfo::Pages:"
+msgstr "Á`­¶¼Æ"
+
+#: qd_doc_info.cpp:460
+msgid "QDDocInfo::Please wait while I'm downloading the data..."
+msgstr "½Ðµy­Ô, ¥¿¦b¤U¸ü¼Æ¾Ú..."
+
+#: qd_doc_info.cpp:456
+msgid "QDDocInfo::Please wait..."
+msgstr "½Ðµy­Ô..."
+
+#: qd_doc_info.cpp:748
+msgid "QDDocInfo::Press the right mouse button to see popup menu."
+msgstr ""
+
+#: qd_doc_info.cpp:666
+msgid "QDDocInfo::SINGLE_PAGE"
+msgstr "³æ­¶"
+
+#: qd_doc_info.cpp:673
+msgid "QDDocInfo::Total size:"
+msgstr "¤å¥óÁ`¤j¤p"
+
+#: qd_doc_info.cpp:667
+msgid "QDDocInfo::UNKNOWN"
+msgstr "¥¼ª¾"
+
+#: qd_doc_info.cpp:675
+msgid "QDDocInfo::unknown"
+msgstr "¥¼ª¾"
+
+#: qd_prefs.cpp:550
+msgid "QDCachePrefs::  Clear  "
+msgstr "  ²M°£  "
+
+#: qd_prefs.cpp:509
+msgid "QDCachePrefs::Cache Preferences"
+msgstr "¦sÀx°¾¦n­È"
+
+#: qd_prefs.cpp:548
+msgid "QDCachePrefs::Clear"
+msgstr "²M°£"
+
+#: qd_prefs.cpp:563
+msgid "QDCachePrefs::Decoded pages cache is used to store\npages that you have already seen in memory\nfor fast access in future."
+msgstr ""
+
+#: qd_prefs.cpp:531
+msgid "QDCachePrefs::Decoded pages cache"
+msgstr "¸Ñ½X­¶¦sÀx"
+
+#: qd_prefs.cpp:562
+msgid "QDCachePrefs::Off screen cache is used to cache the\nimage margins to make the scrolling smoother."
+msgstr ""
+
+#: qd_prefs.cpp:517
+msgid "QDCachePrefs::Off screen cache size"
+msgstr "«Ì¹õ¥~¦sÀx¤j¤p"
+
+#: qd_prefs.cpp:124
+msgid "QDGammaDispl::DjVu Error"
+msgstr "DjVu ¿ù»~"
+
+#: qd_prefs.cpp:272
+msgid "QDGammaPrefs::Adjust slider on the left until all\nareas of the square look approximately\nthe same"
+msgstr ""
+
+#: qd_prefs.cpp:207
+msgid "QDGammaPrefs::Adjust slider until\ngray shades look similar"
+msgstr "½Õ¾ã·Æ±ìª½¨ì¦Ç¦â³±¼v¬Ýªº¬Û¦ü"
+
+#: qd_prefs.cpp:255
+msgid "QDGammaPrefs::Darker"
+msgstr "²`¦â"
+
+#: qd_prefs.cpp:190
+msgid "QDGammaPrefs::Gamma Correction"
+msgstr "Gamma ®Õ¥¿"
+
+#: qd_prefs.cpp:257
+msgid "QDGammaPrefs::Lighter"
+msgstr "²L¦â"
+
+#: qd_prefs.cpp:260
+msgid "QDGammaPrefs::Match screen colors"
+msgstr "°t©M«Ì¹õÃC¦â"
+
+#: qd_prefs.cpp:242
+msgid "QDGammaPrefs::Printer color correction."
+msgstr "¥´¦L¾÷ÃC¦â½Õ¾ã"
+
+#: qd_prefs.cpp:204
+msgid "QDGammaPrefs::Screen color correction."
+msgstr "«Ì¹õÃC¦â½Õ¾ã"
+
+#: qd_prefs.cpp:364
+msgid "QDLensPrefs::Magnification: "
+msgstr "©ñ¤j:"
+
+#: qd_prefs.cpp:335
+msgid "QDLensPrefs::Magnifying Glass"
+msgstr "©ñ¤jÃè"
+
+#: qd_prefs.cpp:346
+msgid "QDLensPrefs::Size: "
+msgstr "¤Ø¤o:"
+
+#: qd_prefs.cpp:382
+msgid "QDLensPrefs::To activate press: "
+msgstr "§@¥ÎÁä"
+
+#: qd_prefs.cpp:406
+msgid "QDLensPrefs::To use the magnifying glass\npress the CTRL key and point to the\ndocument area you want to magnify."
+msgstr ""
+
+#: qd_prefs.cpp:452
+msgid "QDOptimPrefs::Enable fast thumbnails."
+msgstr "§Ö³tÁY¼v¹Ï"
+
+#: qd_prefs.cpp:447
+msgid "QDOptimPrefs::Favor fast magnifications for \"Fit\" resolutions."
+msgstr "§Ö³t©ñ¤j\"Fit\"¤À¿ë²v"
+
+#: qd_prefs.cpp:439
+msgid "QDOptimPrefs::Optimization"
+msgstr "Àu¤Æ"
+
+#: qd_prefs.cpp:457
+msgid "QDOptimPrefs::Optimize images for 24-bit LCD displays."
+msgstr "24-bit Åã¥Ü«Ì¹Ï¹³Àu¤Æ"
+
+#: qd_tbar_mode_piece.cpp:137
+msgid "QDTBarModePiece::B&W"
+msgstr "¶Â¥Õ"
+
+#: qd_tbar_mode_piece.cpp:139
+msgid "QDTBarModePiece::Back"
+msgstr "­I´º"
+
+#: qd_tbar_mode_piece.cpp:136
+msgid "QDTBarModePiece::Color"
+msgstr "±m¦â"
+
+#: qd_tbar_mode_piece.cpp:141
+msgid "QDTBarModePiece::Display mode"
+msgstr "Åã¥Üª¬ºA"
+
+#: qd_tbar_mode_piece.cpp:121
+msgid "QDTBarModePiece::Fit Page"
+msgstr "°t¦X¾ã­¶"
+
+#: qd_tbar_mode_piece.cpp:120
+msgid "QDTBarModePiece::Fit Width"
+msgstr "°t¦X¼e«×"
+
+#: qd_tbar_mode_piece.cpp:138
+msgid "QDTBarModePiece::Fore"
+msgstr "«e´º"
+
+#: qd_tbar_mode_piece.cpp:123
+msgid "QDTBarModePiece::Stretch"
+msgstr "©µ®i"
+
+#: qd_tbar_mode_piece.cpp:162
+msgid "QDTBarModePiece::Zoom"
+msgstr "©ñÁY"
+
+#: qd_tbar_nav_piece.cpp:116
+msgid "QDTBarNavPiece::Page"
+msgstr "­¶¸¹"
+
+#: qd_prefs.cpp:620
+msgid "QDTbarPrefs::Always visible"
+msgstr "Á`¬O¥i¨£ªº"
+
+#: qd_prefs.cpp:606
+msgid "QDTbarPrefs::Toolbar Preferences"
+msgstr "¤u¨ã±ì°¾¦n­È"
+
+#: qd_prefs.cpp:616
+msgid "QDTbarPrefs::Toolbar enabled"
+msgstr "¤u¨ã±ì"
+
+#: qd_prefs.cpp:626
+msgid "QDTbarPrefs::Toolbar hide delay"
+msgstr "¤u¨ã±ìÁô½ª¯´«á®É¶¡"
+
+#: qd_viewer_menu.cpp:66
+msgid "QDViewer::&+10 Pages"
+msgstr "+10 ­¶"
+
+#: qd_viewer_menu.cpp:67
+msgid "QDViewer::&-10 Pages"
+msgstr "-10 ­¶"
+
+#: qd_viewer_menu.cpp:38
+msgid "QDViewer::&Background"
+msgstr "­I´º"
+
+#: qd_viewer_menu.cpp:36
+msgid "QDViewer::&Color"
+msgstr "±m¦â"
+
+#: qd_viewer_menu.cpp:51
+msgid "QDViewer::&Custom..."
+msgstr "¦Û¿ï..."
+
+#: qd_viewer_menu.cpp:40
+msgid "QDViewer::&Display"
+msgstr "Åã¥Ü"
+
+#: qd_viewer_menu.cpp:85
+msgid "QDViewer::&Export page"
+msgstr "¿é¥X¥»­¶"·
+
+#: qd_viewer_menu.cpp:76
+msgid "QDViewer::&Find"
+msgstr "´M§ä"
+
+#: qd_viewer_menu.cpp:68
+msgid "QDViewer::&First Page"
+msgstr "­º­¶"
+
+#: qd_viewer_menu.cpp:39
+msgid "QDViewer::&Foreground"
+msgstr "«e´º"
+
+#: qd_viewer_menu.cpp:70
+msgid "QDViewer::&Goto Page..."
+msgstr "´«­¶..."
+
+#: qd_viewer_menu.cpp:97
+msgid "QDViewer::&Help ..."
+msgstr "À°§U..."
+
+#: qd_viewer_menu.cpp:69
+msgid "QDViewer::&Last Page"
+msgstr "¥½­¶"
+
+#: qd_viewer_menu.cpp:71
+msgid "QDViewer::&Navigate"
+msgstr "Âsø°"
+
+#: qd_viewer_menu.cpp:64
+msgid "QDViewer::&Next Page"
+msgstr "¤U¤@­¶"
+
+#: qd_viewer_menu.cpp:65
+msgid "QDViewer::&Previous Page"
+msgstr "«e¤@­¶"
+
+#: qd_viewer_menu.cpp:89
+msgid "QDViewer::&Print Document"
+msgstr "¥´¦L¥»¤å¥ó"
+
+#: qd_viewer_menu.cpp:54
+msgid "QDViewer::&Stretch"
+msgstr "©µ®i"
+
+#: qd_viewer_menu.cpp:60
+msgid "QDViewer::&Zoom"
+msgstr "©ñÁY"
+
+#: qd_viewer_menu.cpp:96
+msgid "QDViewer::A&bout DjVu ..."
+msgstr "DjVu Â²¤¶..."
+
+#: qd_viewer_menu.cpp:37
+msgid "QDViewer::Black and &White"
+msgstr "¶Â¥Õ"
+
+#: qd_viewer_menu.cpp:317
+msgid "QDViewer::DjVu: Page Information"
+msgstr "¥»­¶«H®§"
+
+#: qd_viewer_menu.cpp:78
+msgid "QDViewer::Document In&formation"
+msgstr "¤å¥ó«H®§"
+
+#: qd_viewer_menu.cpp:56
+msgid "QDViewer::Fit &Page"
+msgstr "°t¦X¾ã­¶"
+
+#: qd_viewer_menu.cpp:55
+msgid "QDViewer::Fit &Width"
+msgstr "°t¦X¼e«×"
+
+#: qd_viewer_menu.cpp:53
+msgid "QDViewer::One &to One"
+msgstr "¤@¹ï¤@"
+
+#: qd_viewer_menu.cpp:92
+msgid "QDViewer::P&references ..."
+msgstr "°¾¦n­È³]¸m..."
+
+#: qd_viewer_menu.cpp:77
+msgid "QDViewer::Page &Information"
+msgstr "¥»­¶«H®§"
+
+#: qd_viewer_menu.cpp:90
+msgid "QDViewer::Print &Window"
+msgstr "¥´¦Lµ¡¤f"
+
+#: qd_viewer_menu.cpp:88
+msgid "QDViewer::Print Pa&ge"
+msgstr "¥´¦L¥»­¶"
+
+#: qd_viewer_menu.cpp:83
+msgid "QDViewer::Save D&ocument As ..."
+msgstr "¦s¶J¥»¤å¥ó..."
+
+#: qd_viewer_menu.cpp:84
+msgid "QDViewer::Save P&age As ..."
+msgstr "¦s¶J¥»­¶..."
+
+#: qd_viewer_menu.cpp:79
+msgid "QDViewer::Show &Thumbnails"
+msgstr "Åã¥ÜÁY¼v"
+
+#: qd_viewer_menu.cpp:58
+msgid "QDViewer::Zoom &In"
+msgstr "©ñ¤j"
+
+#: qd_viewer_menu.cpp:59
+msgid "QDViewer::Zoom &Out"
+msgstr "ÁY¤p"
+
+#: qd_viewer.cpp:774
+msgid "QDViewer::&Download"
+msgstr "¤U¸ü"
+
+#: qd_viewer.cpp:774
+msgid "QDViewer::&Ignore"
+msgstr "¤£²z·|"
+
+#: qd_viewer.cpp:1281
+msgid "QDViewer::DjVu Error"
+msgstr "DjVu ¿ù»~"
+
+#: qd_viewer.cpp:393
+msgid "QDViewer::DjVu Viewer - "
+msgstr "DjVu Âsø°¾¹ - "
+
+#: qd_viewer.cpp:996
+msgid "QDViewer::Finish printing first"
+msgstr "¥ý§¹¦¨¥´¦L"
+
+#: qd_viewer.cpp:867
+msgid "QDViewer::Page decoding done ("
+msgstr ""
+
+#: qd_viewer.cpp:997
+msgid "QDViewer::Please close the Print dialog first."
+msgstr "½Ð¥ýÃö³¬¥´¦L¹ï¸Üµ¡"
+
+#: qd_viewer.cpp:779
+msgid "QDViewer::Please upgrade the viewer to\nview this document.\n"
+msgstr "¦pªG­n¾\Åª¸Ó¤å¥ó, ±z¥²¶·§ó·s±zªºÂsø°¾¹"
+
+#: qd_viewer.cpp:865
+msgid "QDViewer::Plese send a flame to the webmaster who\nuses outdated tools.\n"
+msgstr ""
+
+#: qd_viewer.cpp:738
+msgid "QDViewer::Printing prohibited"
+msgstr "¤£¥i¥´¦L"
+
+#: qd_viewer.cpp:1053
+msgid "QDViewer::Requesting URL "
+msgstr "¯Á­nURL"
+
+#: qd_viewer.cpp:1347
+msgid "QDViewer::Subprocess diagnostics"
+msgstr ""
+
+#: qd_viewer.cpp:864
+msgid "QDViewer::This DjVu document uses an inferior\ntechnology, which is no longer supported.\n"
+msgstr ""
+
+#: qd_viewer.cpp:772
+msgid "QDViewer::To install the newest\nversion click \"Download\" and "
+msgstr ""
+
+#: qd_viewer.cpp:863
+msgid "QDViewer::Upgrade DjVu now!"
+msgstr ""
+
+#: qd_viewer.cpp:739
+msgid "QDViewer::We are sorry, but printing of this image\nhas been disallowed."
+msgstr ""
+
+#: qd_viewer.cpp:778
+msgid "QDViewer::You are using an obsolete version of the\nDjVu plugin. "
+msgstr ""
+
+#: qd_viewer.cpp:773
+msgid "QDViewer::follow the\ninstructions.\n"
+msgstr ""
+
+#: qd_viewer_prefs.cpp:100
+msgid "QDHlinkPrefs::'Show all hyperlinks' key"
+msgstr "Åã¥Ü©Ò¦³ªº¶W¯ÅÃì±µÁä"
+
+#: qd_viewer_prefs.cpp:111
+msgid "QDHlinkPrefs::Combination of keys to be pressed to display\nall the hyperlinks present on the page."
+msgstr ""
+
+#: qd_viewer_prefs.cpp:90
+msgid "QDHlinkPrefs::Disable popup messages"
+msgstr "¤£­n¿ù»~«H®§"
+
+#: qd_viewer_prefs.cpp:94
+msgid "QDHlinkPrefs::Draw using simple border"
+msgstr "Â²³æÃä¬É"
+
+#: qd_viewer_prefs.cpp:82
+msgid "QDHlinkPrefs::Hyperlinks Preferences"
+msgstr "¶W¯ÅÃì±µ°¾¦n­È"
+
+#: qd_viewer_prefs.cpp:226
+msgid "QDViewerPrefs::&Cancel"
+msgstr "¨ú®ø"
+
+#: qd_viewer_prefs.cpp:223
+msgid "QDViewerPrefs::&OK"
+msgstr "½T»{"
+
+#: qd_viewer_prefs.cpp:182
+msgid "QDViewerPrefs::DjVu: Viewer Preferences"
+msgstr "Âsø°¾¹°¾¦n­È"
+
+#: qd_viewer_prefs.cpp:219
+msgid "QDViewerPrefs::Update preferences globally"
+msgstr "§ó·s©Ò¦³ªº°¾¦n­È"
+
+#: qd_viewer_shell.cpp:446
+msgid "QDViewerShell::&+10 Pages"
+msgstr "+10 ­¶"
+
+#: qd_viewer_shell.cpp:447
+msgid "QDViewerShell::&-10 Pages"
+msgstr "-10 ­¶"
+
+#: qd_viewer_shell.cpp:463
+msgid "QDViewerShell::&About"
+msgstr "Ãö©ó"
+
+#: qd_viewer_shell.cpp:418
+msgid "QDViewerShell::&Background"
+msgstr "­I´º"
+
+#: qd_viewer_shell.cpp:409
+msgid "QDViewerShell::&Close"
+msgstr "Ãö³¬"
+
+#: qd_viewer_shell.cpp:416
+msgid "QDViewerShell::&Color"
+msgstr "ÃC¦â"
+
+#: qd_viewer_shell.cpp:431
+msgid "QDViewerShell::&Custom..."
+msgstr "¦Û¿ï..."
+
+#: qd_viewer_shell.cpp:421
+msgid "QDViewerShell::&Display"
+msgstr "Åã¥Ü"
+
+#: qd_viewer_shell.cpp:456
+msgid "QDViewerShell::&Document Information"
+msgstr "¤å¥ó«H®§"
+
+#: qd_viewer_shell.cpp:401
+msgid "QDViewerShell::&Export page"
+msgstr "¿é¥X¥»­¶"
+
+#: qd_viewer_shell.cpp:412
+msgid "QDViewerShell::&File"
+msgstr "¤å¥ó"
+
+#: qd_viewer_shell.cpp:403
+msgid "QDViewerShell::&Find"
+msgstr "´M§ä"
+
+#: qd_viewer_shell.cpp:448
+msgid "QDViewerShell::&First Page"
+msgstr "­º­¶"
+
+#: qd_viewer_shell.cpp:419
+msgid "QDViewerShell::&Foreground"
+msgstr "«e´º"
+
+#: qd_viewer_shell.cpp:450
+msgid "QDViewerShell::&Goto Page..."
+msgstr "´«­¶..."
+
+#: qd_viewer_shell.cpp:466
+msgid "QDViewerShell::&Help"
+msgstr "À°§U"
+
+#: qd_viewer_shell.cpp:459
+msgid "QDViewerShell::&Info"
+msgstr "«H®§"
+
+#: qd_viewer_shell.cpp:449
+msgid "QDViewerShell::&Last Page"
+msgstr "¥½­¶"
+
+#: qd_viewer_shell.cpp:452
+msgid "QDViewerShell::&Navigate"
+msgstr "Âsø°"
+
+#: qd_viewer_shell.cpp:397
+msgid "QDViewerShell::&New Window"
+msgstr "·sµ¡¤f"
+
+#: qd_viewer_shell.cpp:444
+msgid "QDViewerShell::&Next Page"
+msgstr "¤U¤@­¶"
+
+#: qd_viewer_shell.cpp:396
+msgid "QDViewerShell::&Open"
+msgstr "¶}°_·s¤å¥ó"
+
+#: qd_viewer_shell.cpp:455
+msgid "QDViewerShell::&Page Information"
+msgstr "¥»­¶«H®§"
+
+#: qd_viewer_shell.cpp:404
+msgid "QDViewerShell::&Preferences"
+msgstr "°¾¦n­È³]¸m"»
+
+#: qd_viewer_shell.cpp:445
+msgid "QDViewerShell::&Previous Page"
+msgstr "¤W¤@­¶"
+
+#: qd_viewer_shell.cpp:434
+msgid "QDViewerShell::&Stretch"
+msgstr "©µÝª"
+
+#: qd_viewer_shell.cpp:441
+msgid "QDViewerShell::&Zoom"
+msgstr "©ñÁY"
+
+#: qd_viewer_shell.cpp:180
+msgid "QDViewerShell::AT&T DjVu(tm) standalone viewer"
+msgstr "DjVu(tm) Âsø°¾¹"
+
+#: qd_viewer_shell.cpp:168
+msgid "QDViewerShell::About DjVu"
+msgstr "DjVu Â²¤¶"
+
+#: qd_viewer_shell.cpp:417
+msgid "QDViewerShell::Black and &White"
+msgstr "¶Â&¥Õ"¥
+
+#: qd_viewer_shell.cpp:314
+msgid "QDViewerShell::DjVu Error"
+msgstr "DjVu ¿ù»~"
+
+#: qd_viewer_shell.cpp:380
+msgid "QDViewerShell::DjVu Standalone Viewer"
+msgstr "DjVu(tm) Âsø°¾¹"
+
+#: qd_viewer_shell.cpp:239
+msgid "QDViewerShell::DjVu: Select DjVu file to open"
+msgstr "DjVu: ¿ï¾ÜDjVu¤å¥ó"
+
+#: qd_viewer_shell.cpp:410
+msgid "QDViewerShell::E&xit"
+msgstr "°h¥X"
+
+#: qd_viewer_shell.cpp:296
+msgid "QDViewerShell::Failed to open file '"
+msgstr "¤å¥óµLªk¥´¶}"
+
+#: qd_viewer_shell.cpp:436
+msgid "QDViewerShell::Fit &Page"
+msgstr "°t¦X¾ã­¶"
+
+#: qd_viewer_shell.cpp:435
+msgid "QDViewerShell::Fit &Width"
+msgstr "°t¦X¼e«×"
+
+#: qd_viewer_shell.cpp:433
+msgid "QDViewerShell::One &to One"
+msgstr "¤@¹ï¤@"
+
+#: qd_viewer_shell.cpp:406
+msgid "QDViewerShell::P&rint Page"
+msgstr "¥´¦L¥»­¶"
+
+#: qd_viewer_shell.cpp:407
+msgid "QDViewerShell::Pr&int Document"
+msgstr "¥´¦L¥»¤å¥ó"
+
+#: qd_viewer_shell.cpp:399
+msgid "QDViewerShell::Save D&ocument As..."
+msgstr "¦s¶J¥»¤å¥ó..."
+
+#: qd_viewer_shell.cpp:400
+msgid "QDViewerShell::Save P&age As..."
+msgstr "¦s¶J¥»­¶..."
+
+#: qd_viewer_shell.cpp:457
+msgid "QDViewerShell::Show &Thumbnails"
+msgstr "Åã¥ÜÁY¼v¹Ï"
+
+#: qd_viewer_shell.cpp:477
+msgid "QDViewerShell::Status bar"
+msgstr "ª¬ºAÄæ"
+
+#: qd_viewer_shell.cpp:188
+msgid "QDViewerShell::Version "
+msgstr "ª©¥»"
+
+#: qd_viewer_shell.cpp:438
+msgid "QDViewerShell::Zoom &In"
+msgstr "©ñ¤j"
+
+#: qd_viewer_shell.cpp:439
+msgid "QDViewerShell::Zoom &Out"
+msgstr "ÁY¤p"
+

@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+   <TITLE>static   char* progname</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>static   char* <A HREF="#DOC.DOCU">djvmcvt</A></H2>
+<BLOCKQUOTE>DjVu multipage document converter. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B><BR>
+<PRE>
+        djvmcvt -b[undled] &lt;doc_in.djvu&gt; &lt;doc_out.djvu&gt;
+
+	or
+	
+	djvmcvt -i[ndirect] &lt;doc_in.djvu&gt; &lt;dir_out&gt; &lt;idx_fname.djvu&gt;
+    </PRE><P><B>Description</B> ---
+File <TT>&quot;djvmcvt.cpp&quot;</TT> and the program <TT>djvmcvt</TT> serve the purpose of
+convertion of obsolete DjVu documents into the new formats. The program
+can also read documents in the new formats, so you can use it to
+perform conversion between <TT>BUNDLED</TT> and <TT>INDIRECT</TT> formats. This is a
+simple illustration of the capabilities of <!1><A HREF="DjVuDocument.html">DjVuDocument</A> class.<P>As a matter of fact, there are two ways to make conversion between
+different formats:
+<OL>
+<LI> If the input format is one of obsolete formats (<TT>OLD_BUNDLED</TT>
+or <TT>OLD_INDEXED</TT>) then the conversion can be done by
+<!1><A HREF="DjVuDocument.html">DjVuDocument</A> only.
+<LI> If the input format is one of new formats (<TT>BUNDLED</TT> or
+<TT>INDIRECT</TT>) then the best candidate to perform conversion
+is <!1><A HREF="DjVmDoc.html">DjVmDoc</A> class. It will do it at the lowest possible
+with the least expenses.
+</OL><P><B>Arguments</B> ---
+Depending on the output format, the number and types of arguments
+differ. The second argument though (<TT>&lt;doc_in.djvu&gt;</TT>) is the same in both
+cases, and depending on the format of input document, it means:
+<UL>
+<LI> <B>OLD_BUNDLED</B> format: just name of the document
+<LI> <B>OLD_INDEXED</B> format: name of any page of the document
+<LI> <B>BUNDLED</B> format: name of the document
+<LI> <B>INDIRECT</B> format: name of the top-level file with the
+list of all pages of the document.
+</UL>.<P>So, in order to do conversion choose one of syntaxes below:
+<UL>
+<LI> To create a new <EM>BUNDLED</EM> document<P><TT>djvmcvt -b[undled] &lt;doc_in.djvu&gt; &lt;doc_out.djvu&gt;</TT><P>This will read the document referenced by <TT>&lt;doc_in.djvu&gt;</TT> as
+descrived above, will convert it into the <TT>BUNDLED</TT>
+format and will save the results into the <TT>&lt;doc_out.djvu&gt;</TT> file.<P><LI> To create a new <EM>INDIRECT</EM> document<P><TT>djvmcvt -i[ndirect] &lt;doc_in.djvu&gt; &lt;dir_out&gt; &lt;idx_fname.djvu&gt;</TT><P>This will read the input document referenced by <TT>&lt;doc_in.djvu&gt;</TT>
+as described above, will convert it into the <TT>INDIRECT</TT>
+format and will save it into the <TT>&lt;dir_out&gt;</TT> directory. Since
+DjVu multipage documents in the <TT>INDIRECT</TT> formats are
+represented by a bunch of files, you have to specify a directory
+name where all of the files will be saved. In addition to these
+files the program will also create a top-level file named
+<TT>&lt;idx_fname.djvu&gt;</TT> with the list of all pages and components
+composing the given DjVu document. Whenever you need to open
+this document later, open this top-level file.
+</UL><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: djvmcvt.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

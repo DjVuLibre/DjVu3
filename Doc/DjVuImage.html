@@ -1,0 +1,529 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _DJVUIMAGE_H::DjVuImage</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuImage</A>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></H2>
+<BLOCKQUOTE>Main DjVu Image data structure.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVuPort,MDjVuPort.html,CDjVuImage,MDjVuImage.html">
+<param name=before value="M,M,M">
+<param name=after value="Md_SP,Md_,M">
+<param name=indent value="0,1,2">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<A HREF="#DOC.1.5.32.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Construction. </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuImage</B>(void)
+<DD><I>Constructs an empty DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>connect</B>(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt; &amp; file)
+<DD><I>Connects this <TT>DjVuImage</TT> to the passed <!1><A HREF="DjVuFile.html">DjVuFile</A>.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Components. </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuInfo.html">DjVuInfo</A>&gt;  <B>get_info</B>() const 
+<DD><I>Returns a pointer to a DjVu information component.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;IWPixmap&gt;  <B>get_bg44</B>() const 
+<DD><I>Returns a pointer to the IW44 encoded background component of a DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_bgpm</B>() const 
+<DD><I>Returns a pointer to the raw background component of a DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Image.html">JB2Image</A>&gt;  <B>get_fgjb</B>() const 
+<DD><I>Returns a pointer to the mask of the foreground component of a DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_fgpm</B>() const 
+<DD><I>Returns a pointer to the colors of the foreground component of a DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  <B>get_fgbc</B>() const 
+<DD><I>Returns a pointer to a palette object containing colors for the  foreground components of a DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  <B>get_anno</B>() const 
+<DD><I>Returns a pointer to a MemoryByteStream containing all the annotation chunks collected so far for this image.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>New style decoding. </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>wait_for_complete_decode</B>(void)
+<DD><I>The decoder is now started when the image is created by function <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.5">get_page</A> in <!1><A HREF="DjVuDocument.html">DjVuDocument</A>.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Old style decoding (backward compatibility). </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.4.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, DjVuInterface *notifier=0)
+<DD><I>This function is here for backward compatibility.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Utilities </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>() const 
+<DD><I>Returns the width of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>() const 
+<DD><I>Returns the height of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_version</B>() const 
+<DD><I>Returns the format version the DjVu data.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_dpi</B>() const 
+<DD><I>Returns the resolution of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_rounded_dpi</B>() const 
+<DD><I>Same as <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.5.4">get_dpi</A>() but instead of precise value returns the closest "standard" one: 25, 50, 75, 100, 150, 300, 600.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>double <B>get_gamma</B>() const 
+<DD><I>Returns the gamma coefficient of the display for which the image was designed.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_mimetype</B>() const 
+<DD><I>Returns a MIME type string describing the DjVu data.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_short_description</B>() const 
+<DD><I>Returns a short string describing the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>get_long_description</B>() const 
+<DD><I>Returns a verbose description of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  <B>get_djvu_file</B>(void) const 
+<DD><I>Returns pointer to <!1><A HREF="DjVuFile.html">DjVuFile</A> which contains this image in compressed form.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Checking for legal DjVu files. </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.6.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>is_legal_photo</B>() const 
+<DD><I>This function returns true if this object contains a well formed <EM>Photo DjVu Image</EM>.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.6.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>is_legal_bilevel</B>() const 
+<DD><I>This function returns true if this object contains a well formed <EM>Bilevel DjVu Image</EM>.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.6.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>is_legal_compound</B>() const 
+<DD><I>This function returns true if this object contains a well formed <EM>Compound DjVu Image</EM>.</I>
+</DL></P>
+<DT>
+<A HREF="#DOC.1.5.32.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Rendering.  </B>
+<DD><I></I>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.32.1.7.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_pixmap</B>(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const 
+<DD><I>Renders the image and returns a color pixel image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.7.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>get_bitmap</B>(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, int align = 1) const 
+<DD><I>Renders the mask of the foreground layer of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.7.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_bg_pixmap</B>(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const 
+<DD><I>Renders the background layer of the DjVu image.</I>
+<DT>
+<A HREF="#DOC.1.5.32.1.7.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_fg_pixmap</B>(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const 
+<DD><I>Renders the foreground layer of the DjVu image.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="DjVuPort.html">DjVuPort</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>* <B>get_portcaster</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> &amp; port)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>virtual   bool <B>inherits</B>(const char * class_name) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<P> <B>Notifications. </B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is used to get a file corresponding to the given ID.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<DD><I>This request is issued when decoder needs additional data for decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent to update the decoding status.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by <!1><A HREF="DjVuImage.html">DjVuImage</A> when it should be redrawn.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * name)
+<DD><I>This notification is sent when a new chunk has been decoded.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuFile.html">DjVuFile</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuDocument.html">DjVuDocument</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, float done)
+<DD><I>This notification is sent from time to time while decoding is in progress.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
+<DD><I>This is the standard types for defining what to do in case of errors.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Main DjVu Image data structure.  This class defines the internal
+representation of a DjVu image.  This representation consists of a few
+pointers referencing the various components of the DjVu image.  These
+components are created and populated by the decoding function.  The
+rendering functions then can use the available components to compute a
+pixel representation of the desired segment of the DjVu image. </BLOCKQUOTE>
+<DL>
+
+<A NAME="Construction. ">
+<A NAME="DOC.1.5.32.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Construction. </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="DjVuImage">
+<A NAME="DOC.1.5.32.1.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuImage(void)</B></TT>
+<DD>Constructs an empty DjVu image. After the image has been constructed,
+it may be connected to an existing <!1><A HREF="DjVuFile.html">DjVuFile</A> or left as is.<P>In the former case <TT>DjVuImage</TT> will look for its decoded components
+(like <TT>Sjbz</TT> or <TT>BG44</TT>) by decending the hierarchy of <!1><A HREF="DjVuFile.html">DjVuFile</A>s
+starting from the one passed to <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.1.2">connect</A>().<P>In the latter case you can use <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.4.1">decode</A>() function to decode
+<B>single-page</B> DjVu documents in the old-style way. 
+<DL><DT><DD></DL><P>
+<A NAME="connect">
+<A NAME="DOC.1.5.32.1.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void connect(const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt; &amp; file)</B></TT>
+<DD>Connects this <TT>DjVuImage</TT> to the passed <!1><A HREF="DjVuFile.html">DjVuFile</A>. The <TT>DjVuImage</TT>
+will use this <!1><A HREF="DjVuFile.html">DjVuFile</A> to retrieve components necessary for
+decoding. It will also connect itself to <!1><A HREF="DjVuFile.html">DjVuFile</A> using the
+communication mechanism provided by <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> and <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>.
+This will allow it to receive and relay messages and requests generated
+by the passed <!1><A HREF="DjVuFile.html">DjVuFile</A> and any file included into it. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="Components. ">
+<A NAME="DOC.1.5.32.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Components. </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="get_info">
+<A NAME="DOC.1.5.32.1.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuInfo.html">DjVuInfo</A>&gt;  get_info() const </B></TT>
+<DD>Returns a pointer to a DjVu information component.
+This function returns a null pointer until the decoder
+actually processes an <TT>&quot;INFO&quot;</TT> chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bg44">
+<A NAME="DOC.1.5.32.1.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;IWPixmap&gt;  get_bg44() const </B></TT>
+<DD>Returns a pointer to the IW44 encoded background component of a DjVu
+image.  This function returns a null pointer until the decoder actually
+processes an <TT>&quot;BG44&quot;</TT> chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bgpm">
+<A NAME="DOC.1.5.32.1.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_bgpm() const </B></TT>
+<DD>Returns a pointer to the raw background component of a DjVu image. The
+background component is used for JPEG encoded backgrounds.  This
+function returns a null pointer until the decoder actually processes an
+<TT>&quot;BGjp&quot;</TT> chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="get_fgjb">
+<A NAME="DOC.1.5.32.1.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Image.html">JB2Image</A>&gt;  get_fgjb() const </B></TT>
+<DD>Returns a pointer to the mask of the foreground component of a DjVu
+image. The mask of the foreground component is always a JB2 image in
+this implementation. This function returns a null pointer until the
+decoder actually processes an <TT>&quot;Sjbz&quot;</TT> chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="get_fgpm">
+<A NAME="DOC.1.5.32.1.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_fgpm() const </B></TT>
+<DD>Returns a pointer to the colors of the foreground component of a DjVu
+image. The mask of the foreground component is always a small pixmap in
+this implementation. This function returns a null pointer until the
+decoder actually processes an <TT>&quot;FG44&quot;</TT> chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="get_fgbc">
+<A NAME="DOC.1.5.32.1.2.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;DjVuPalette&gt;  get_fgbc() const </B></TT>
+<DD>Returns a pointer to a palette object containing colors for the 
+foreground components of a DjVu image.  These colors are only
+pertinent with respect to the JB2Image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_anno">
+<A NAME="DOC.1.5.32.1.2.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A>&gt;  get_anno() const </B></TT>
+<DD>Returns a pointer to a MemoryByteStream containing all the annotation
+chunks collected so far for this image.  Individual chunks can be
+retrieved using <!1><A HREF="IFFByteStream.html">IFFByteStream</A>. Returns NULL if no chunks have been
+collected yet. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="New style decoding. ">
+<A NAME="DOC.1.5.32.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> New style decoding. </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="wait_for_complete_decode">
+<A NAME="DOC.1.5.32.1.3.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool wait_for_complete_decode(void)</B></TT>
+<DD>The decoder is now started when the image is created
+by function <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.5">get_page</A> in <!1><A HREF="DjVuDocument.html">DjVuDocument</A>. 
+This function waits until the decoding thread terminates
+and returns TRUE if the image has been successfully decoded. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="Old style decoding (backward compatibility). ">
+<A NAME="DOC.1.5.32.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Old style decoding (backward compatibility). </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="decode">
+<A NAME="DOC.1.5.32.1.4.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, DjVuInterface *notifier=0)</B></TT>
+<DD>This function is here for backward compatibility. Now, with the
+introduction of multipage DjVu documents, the decoding is handled
+by <!1><A HREF="DjVuFile.html">DjVuFile</A> and <!1><A HREF="DjVuDocument.html">DjVuDocument</A> classes. For single page
+documents though, we still have this wrapper. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="Utilities ">
+<A NAME="DOC.1.5.32.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Utilities </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="get_width">
+<A NAME="DOC.1.5.32.1.5.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_width() const </B></TT>
+<DD>Returns the width of the DjVu image. This function just extracts this
+information from the DjVu information component. It returns zero if such
+a component is not yet available. 
+<DL><DT><DD></DL><P>
+<A NAME="get_height">
+<A NAME="DOC.1.5.32.1.5.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_height() const </B></TT>
+<DD>Returns the height of the DjVu image. This function just extracts this
+information from the DjVu information component. It returns zero if such
+a component is not yet available. 
+<DL><DT><DD></DL><P>
+<A NAME="get_version">
+<A NAME="DOC.1.5.32.1.5.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_version() const </B></TT>
+<DD>Returns the format version the DjVu data. This function just extracts
+this information from the DjVu information component. It returns zero if
+such a component is not yet available.  This version number should
+be compared with the <!1><A HREF="DjVuversionconstants.html">DjVu version constants</A>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_dpi">
+<A NAME="DOC.1.5.32.1.5.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_dpi() const </B></TT>
+<DD>Returns the resolution of the DjVu image. This information is given in
+pixels per 2.54 cm.  Display programs can use this information to
+determine the natural magnification to use for rendering a DjVu
+image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_rounded_dpi">
+<A NAME="DOC.1.5.32.1.5.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_rounded_dpi() const </B></TT>
+<DD>Same as <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.5.4">get_dpi</A>() but instead of precise value returns the closest
+"standard" one: 25, 50, 75, 100, 150, 300, 600. If dpi is greater than
+700, it's returned as is. 
+<DL><DT><DD></DL><P>
+<A NAME="get_gamma">
+<A NAME="DOC.1.5.32.1.5.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>double get_gamma() const </B></TT>
+<DD>Returns the gamma coefficient of the display for which the image was
+designed.  The rendering functions can use this information in order to
+perform color correction for the intended display device. 
+<DL><DT><DD></DL><P>
+<A NAME="get_mimetype">
+<A NAME="DOC.1.5.32.1.5.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> get_mimetype() const </B></TT>
+<DD>Returns a MIME type string describing the DjVu data.  This information
+is auto-sensed by the decoder.  The MIME type can be <TT>&quot;image/djvu&quot;</TT> or
+<TT>&quot;image/iw44&quot;</TT> depending on the data stream. 
+<DL><DT><DD></DL><P>
+<A NAME="get_short_description">
+<A NAME="DOC.1.5.32.1.5.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> get_short_description() const </B></TT>
+<DD>Returns a short string describing the DjVu image.
+Example: <TT>&quot;2500x3223 in 23.1 Kb&quot;</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_long_description">
+<A NAME="DOC.1.5.32.1.5.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> get_long_description() const </B></TT>
+<DD>Returns a verbose description of the DjVu image.  This description lists
+all the chunks with their size and a brief comment, as shown in the
+following example.
+<PRE>
+      DJVU Image (2325x3156) version 17:
+       0.0 Kb   'INFO'  Page information.
+       17.3 Kb  'Sjbz'  JB2 foreground mask (2325x3156)
+       2.5 Kb   'BG44'  IW44 background (775x1052)
+       1.0 Kb   'FG44'  IW44 foreground colors (194x263)
+       3.0 Kb   'BG44'  IW44 background (part 2).
+       0.9 Kb   'BG44'  IW44 background (part 3).
+       7.1 Kb   'BG44'  IW44 background (part 4).
+      Compression ratio: 676 (31.8 Kb)
+      </PRE> 
+<DL><DT><DD></DL><P>
+<A NAME="get_djvu_file">
+<A NAME="DOC.1.5.32.1.5.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  get_djvu_file(void) const </B></TT>
+<DD>Returns pointer to <!1><A HREF="DjVuFile.html">DjVuFile</A> which contains this image in
+compressed form. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="Checking for legal DjVu files. ">
+<A NAME="DOC.1.5.32.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Checking for legal DjVu files. </B></TT>
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="is_legal_photo">
+<A NAME="DOC.1.5.32.1.6.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int is_legal_photo() const </B></TT>
+<DD>This function returns true if this object contains a well formed <EM>
+Photo DjVu Image</EM>. Calling function <TT>get_pixmap</TT> on a well formed photo
+image should always return a non zero value.  Note that function
+<TT>get_pixmap</TT> works as soon as sufficient information is present,
+regardless of the fact that the image follows the rules or not. 
+<DL><DT><DD></DL><P>
+<A NAME="is_legal_bilevel">
+<A NAME="DOC.1.5.32.1.6.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int is_legal_bilevel() const </B></TT>
+<DD>This function returns true if this object contains a well formed <EM>
+Bilevel DjVu Image</EM>.  Calling function <TT>get_bitmap</TT> on a well formed
+bilevel image should always return a non zero value.  Note that function
+<TT>get_bitmap</TT> works as soon as a foreground mask component is present,
+regardless of the fact that the image follows the rules or not. 
+<DL><DT><DD></DL><P>
+<A NAME="is_legal_compound">
+<A NAME="DOC.1.5.32.1.6.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int is_legal_compound() const </B></TT>
+<DD>This function returns true if this object contains a well formed <EM>
+Compound DjVu Image</EM>.  Calling function <TT>get_bitmap</TT> or <TT>get_pixmap</TT> on
+a well formed compound DjVu image should always return a non zero value.
+Note that functions <TT>get_bitmap</TT> or <TT>get_pixmap</TT> works as soon as
+sufficient information is present, regardless of the fact that the image
+follows the rules or not.  
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="Rendering.  ">
+<A NAME="DOC.1.5.32.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Rendering.  </B></TT>
+<DD>All these functions take two rectangles as argument.  Conceptually,
+these function first render the whole image into a rectangular area
+defined by rectangle <TT>all</TT>.  The relation between this rectangle and the
+image size define the appropriate scaling.  The rendering function then
+extract the subrectangle <TT>rect</TT> and return the corresponding pixels as a
+<TT>GPixmap</TT> or <TT>GBitmap</TT> object.  The actual implementation performs these
+two operation simultaneously for obvious efficiency reasons.  The best
+rendering speed is achieved by making sure that the size of rectangle
+<TT>all</TT> and the size of the DjVu image are related by an integer ratio. 
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="get_pixmap">
+<A NAME="DOC.1.5.32.1.7.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_pixmap(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const </B></TT>
+<DD>Renders the image and returns a color pixel image.  Rectangles <TT>rect</TT>
+and <TT>all</TT> are used as explained above. Color correction is performed
+according to argument <TT>gamma</TT>, which represents the gamma coefficient of
+the display device on which the pixmap will be rendered.  The default
+value, zero, means that no color correction should be performed. 
+This function returns a null pointer if there is not enough information
+in the DjVu image to properly render the desired image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bitmap">
+<A NAME="DOC.1.5.32.1.7.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  get_bitmap(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, int align = 1) const </B></TT>
+<DD>Renders the mask of the foreground layer of the DjVu image.  This
+functions is a wrapper for <!1><A HREF="JB2Image.html#DOC.1.5.23.5.7">get_bitmap</A>.  Argument <TT>align</TT>
+specified the alignment of the rows of the returned images.  Setting
+<TT>align</TT> to <TT>4</TT>, for instance, will adjust the bitmap border in order to
+make sure that each row of the returned image starts on a word (four
+byte) boundary.  This function returns a null pointer if there is not
+enough information in the DjVu image to properly render the desired
+image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bg_pixmap">
+<A NAME="DOC.1.5.32.1.7.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_bg_pixmap(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const </B></TT>
+<DD>Renders the background layer of the DjVu image.  Rectangles <TT>rect</TT> and
+<TT>all</TT> are used as explained above. Color correction is performed
+according to argument <TT>gamma</TT>, which represents the gamma coefficient of
+the display device on which the pixmap will be rendered.  The default
+value, zero, means that no color correction should be performed.  This
+function returns a null pointer if there is not enough information in
+the DjVu image to properly render the desired image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_fg_pixmap">
+<A NAME="DOC.1.5.32.1.7.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_fg_pixmap(const <!1><A HREF="GRect.html">GRect</A> &amp;rect, const <!1><A HREF="GRect.html">GRect</A> &amp;all, double gamma=0) const </B></TT>
+<DD>Renders the foreground layer of the DjVu image.  Rectangles <TT>rect</TT> and
+<TT>all</TT> are used as explained above. Color correction is performed
+according to argument <TT>gamma</TT>, which represents the gamma coefficient of
+the display device on which the pixmap will be rendered.  The default
+value, zero, means that no color correction should be performed.  This
+function returns a null pointer if there is not enough information in
+the DjVu image to properly render the desired image. 
+<DL><DT><DD></DL><P></DL>
+</DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

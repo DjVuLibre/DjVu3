@@ -1,0 +1,435 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _DJVUDOCUMENT_H::DjVuDocument</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuDocument</A>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></H2>
+<BLOCKQUOTE><TT>DjVuDocument</TT> provides convenient interface for opening, decoding and saving back DjVu documents in single page and multi page formats.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=125>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVuPort,MDjVuPort.html,CDjVuDocument,MDjVuDocument.html,CDjVuDocEditor,MDjVuDocEditor.html">
+<param name=before value="M,M,M,M^_">
+<param name=after value="Md_SP,Md_,M,M">
+<param name=indent value="0,1,2,2">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+</DL>
+<HR><H3>Inherited from <A HREF="DjVuPort.html">DjVuPort</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>* <B>get_portcaster</B>(void)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>&amp; <B>operator=</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> &amp; port)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>virtual   bool <B>inherits</B>(const char * class_name) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<P> <B>Notifications. </B>
+<P><DL>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GURL.html">GURL</A> <B>id_to_url</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is issued to request translation of the ID, used in an DjVu INCL chunk to a URL, which may be used to request data associated with included file.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GPBase.html">GPBase</A> <B>id_to_file</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * id)
+<DD><I>This request is used to get a file corresponding to the given ID.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  <B>request_data</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const <!1><A HREF="GURL.html">GURL</A> &amp; url)
+<DD><I>This request is issued when decoder needs additional data for decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_error</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent when an error occurs and the error message should be shown to the user.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   bool <B>notify_status</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * msg)
+<DD><I>This notification is sent to update the decoding status.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_redisplay</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by <!1><A HREF="DjVuImage.html">DjVuImage</A> when it should be redrawn.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_relayout</B>(const class <!1><A HREF="DjVuImage.html">DjVuImage</A> * source)
+<DD><I>This notification is sent by \ref{DjVuImage} when its geometry has been changed as a result of decoding.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_chunk_done</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, const char * name)
+<DD><I>This notification is sent when a new chunk has been decoded.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_file_flags_changed</B>(const class <!1><A HREF="DjVuFile.html">DjVuFile</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuFile.html">DjVuFile</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_doc_flags_changed</B>(const class <!1><A HREF="DjVuDocument.html">DjVuDocument</A> * source, long set_mask, long clr_mask)
+<DD><I>This notification is sent after the <!1><A HREF="DjVuDocument.html">DjVuDocument</A> flags have been changed.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>notify_decode_progress</B>(const <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * source, float done)
+<DD><I>This notification is sent from time to time while decoding is in progress.</I>
+<DT>
+<A HREF="#DOC.1.5.27.1.5.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ErrorRecoveryAction</B>
+<DD><I>This is the standard types for defining what to do in case of errors.</I>
+</DL></P>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE><TT>DjVuDocument</TT> provides convenient interface for opening, decoding
+and saving back DjVu documents in single page and multi page formats.<P><B>Input formats</B>
+It can read multi page DjVu documents in either of the 4 formats: 2
+obsolete (<EM>old bundled</EM> and <EM>old indexed</EM>) and two new
+(<EM>new bundled</EM> and <EM>new indirect</EM>).<P><B>Output formats</B>
+To encourage users to switch to the new formats, the <TT>DjVuDocument</TT> can
+save documents back only in the new formats: <EM>bundled</EM> and
+<EM>indirect</EM>.<P><B>Conversion.</B> Since <TT>DjVuDocument</TT> can open DjVu documents in
+an obsolete format and save it in any of the two new formats
+(<EM>new bundled</EM> and <EM>new indirect</EM>), this class can be used for
+conversion from obsolete formats to the new ones. Although it can also
+do conversion between the new two formats, it's not the best way to
+do it. Please refer to <!1><A HREF="DjVmDoc.html">DjVmDoc</A> for details.<P><B>Decoding.</B> <TT>DjVuDocument</TT> provides convenient interface for obtaining
+<!1><A HREF="DjVuImage.html">DjVuImage</A> corresponding to any page of the document. It uses
+<!1><A HREF="DjVuFileCache.html">DjVuFileCache</A> to do caching thus avoiding unnecessary multiple decoding of
+the same page. The real decoding though is accomplished by <!1><A HREF="DjVuFile.html">DjVuFile</A>.<P><B>Messenging.</B> Being derived from <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>, <TT>DjVuDocument</TT>
+takes an active part in exchanging messages (requests and notifications)
+between different parties involved in decoding. It reports (relays)
+errors, progress information and even handles some requests for data (when
+these requests deal with local files).<P>Typical usage of <TT>DjVuDocument</TT> class in a threadless command line
+program would be the following:
+<PRE>
+    GString file_name=&quot;/tmp/document.djvu&quot;;
+    GP&lt;DjVuDocument&gt; doc=new DjVuDocument;
+    doc-&gt;init(GOS::filename_to_url(file_name));
+    int pages=doc-&gt;get_pages_num();
+    for(int page=0;page&lt;pages;page++)
+    {
+       GP&lt;DjVuImage&gt; dimg=doc-&gt;get_page(page);
+       // Do something
+    };
+    </PRE><P><B>Comments for the code above</B>
+<OL>
+<LI> Since the document is assumed to be stored on the hard drive,
+we don't have to cope with <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>s and can pass
+<TT>ZERO</TT> pointer to the <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() function. <TT>DjVuDocument</TT>
+can access local data itself. In the case of a plugin though,
+one would have to implement his own <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>, which
+would handle requests for data arising when the document
+is being decoded.
+<LI> In a threaded program instead of calling the <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>()
+function one can call <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.3">start_init</A>() and <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.4">stop_init</A>()
+to initiate and interrupt initialization carried out in
+another thread. This possibility of initializing the document
+in another thread has been added specially for the plugin
+because the initialization itself requires data, which is
+not immediately available in the plugin. Thus, to prevent the
+main thread from blocking, we perform initialization in a
+separate thread. To check if the class is completely initialized,
+use <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.6">is_init_complete</A>(). To wait for this to happen use
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>(). Once again, all these things are
+not required for single-threaded program.<P>Another difference between single-threaded and multi-threaded
+environments is that in a single-threaded program, the image is
+fully decoded before it's returned. In a multi-threaded
+application decoding starts in a separate thread, and the pointer
+to the <!1><A HREF="DjVuImage.html">DjVuImage</A> being decoded is returned immediately.
+This has been done to enable progressive redisplay
+in the DjVu plugin. Use communication mechanism provided by
+<!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> and <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A> to learn about progress
+of decoding.  Or try <TT>dimg-&gt;wait_for_complete_decode()</TT> to wait
+until the decoding ends.
+<LI> See Also: <!1><A HREF="DjVuFile.html">DjVuFile</A>, <!1><A HREF="DjVuImage.html">DjVuImage</A>, <!1><A HREF="GOS.html">GOS</A>.
+</OL><P><B>Initialization</B>
+As mentioned above, the <TT>DjVuDocument</TT> can go through several stages
+of initialization. The functionality is gradually added while it passes
+one stage after another:
+<OL>
+<LI> First of all, immediately after the object is created <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>()
+or <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.3">start_init</A>() functions must be called. <B>Nothing</B>
+will work until this is done. <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() function will not
+return until the initialization is complete. You need to make
+sure, that enough data is available. <B>Do not call <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>()
+in the plugin</B>. <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.3">start_init</A>() will start initialization
+in another thread. Use <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.4">stop_init</A>() to interrupt it.
+Use <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.6">is_init_complete</A>() to check the initialization progress.
+Use <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>() to wait for init to finish.
+<LI> The first thing the initializing code learns about the document
+is its type (<TT>BUNDLED</TT>, <TT>INDIRECT</TT>, <TT>OLD_BUNDLED</TT> or <TT>OLD_INDEXED</TT>).
+As soon as it happens, document flags are changed and
+<TT>notify_doc_flags_changed()</TT> request is sent through the
+communication mechanism provided by <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>.
+<LI> After the document type becomes known, the initializing code
+proceeds with learning the document structure. Gradually the
+flags are updated with values:
+<UL>
+<LI> <TT>DOC_DIR_KNOWN</TT>: Contents of the document became known.
+This is meaningful for <TT>BUNDLED</TT>, <TT>OLD_BUNDLED</TT> and
+<TT>INDIRECT</TT> documents only.
+<LI> <TT>DOC_NDIR_KNOWN</TT>: Contents of the document navigation
+directory became known. This is meaningful for old-style
+documents (<TT>OLD_BUNDLED</TT> and <TT>OLD_INDEXED</TT>) only
+<LI> <TT>DOC_INIT_COMPLETE</TT>: The initializating code finished.
+</UL>
+</OL> </BLOCKQUOTE>
+<DL>
+<DL>
+
+<A NAME="get_pages_num">
+<A NAME="DOC.1.5.30.1.11.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_pages_num(void) const </B></TT>
+<DD>Returns the number of pages in the document. If there is still
+insufficient information about the document structure (initialization
+has not finished yet), <TT>1</TT> will be returned. Please refer to
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() for details. 
+<DL><DT><DD></DL><P>
+<A NAME="page_to_url">
+<A NAME="DOC.1.5.30.1.11.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html">GURL</A> page_to_url(int page_num) const </B></TT>
+<DD>Translates the page number to the full URL of the page. This URL
+is "artificial" for the <EM>bundled</EM> formats and is obtained
+by appending the page name to the document's URL honoring possible
+<TT>;</TT> and <TT>?</TT> in it. Negative page number has a special meaning for
+<TT>OLD_INDEXED</TT> documents: it points to the URL, which the
+<TT>DjVuDocument</TT> has been initialized with. For other formats this
+is the same as page <TT>0</TT>.<P>The function tries it best to map the page number to the URL.
+Although, if the document structure has not been fully discovered
+yet, an empty URL will be returned. Use <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>()
+to wait until the document initialization completes. Refer to
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() for details.<P>Depending on the document format, the function assumes, that there
+is enough information to complete the request when:
+<UL>
+<LI> <TT>OLD_INDEXED</TT>: If <TT>page_num&lt;0</TT>, <TT>DOC_TYPE_KNOWN</TT> flag must
+be set. Otherwise <TT>DOC_NDIR_KNOWN</TT> must be set.
+<LI> <TT>OLD_BUNDLED</TT>: If <TT>page_num=0</TT>, <TT>DOC_DIR_KNOWN</TT> flag must
+be set. Otherwise <TT>DOC_NDIR_KNOWN</TT> flag must be set.
+<LI> <TT>INDIRECT</TT> and <TT>BUNDLED</TT>: <TT>DOC_DIR_KNOWN</TT> flag must be set.
+</UL> 
+<DL><DT><DD></DL><P>
+<A NAME="url_to_page">
+<A NAME="DOC.1.5.30.1.11.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int url_to_page(const <!1><A HREF="GURL.html">GURL</A> &amp; url) const </B></TT>
+<DD>Translates the page URL back to page number. Returns <TT>-1</TT> if the
+page is not in the document or the document's structure
+has not been learnt yet.<P>Depending on the document format, the function starts working
+properly as soon as:
+<UL>
+<LI> <TT>OLD_INDEXED</TT> and <TT>OLD_BUNDLED</TT> and <TT>SINGLE_PAGE</TT>:
+<TT>DOC_NDIR_KNOWN</TT> is set
+<LI> <TT>INDIRECT</TT> and <TT>BUNDLED</TT>: <TT>DOC_DIR_KNOWN</TT> is set.
+</UL> 
+<DL><DT><DD></DL><P>
+<A NAME="id_to_url">
+<A NAME="DOC.1.5.30.1.11.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GURL.html">GURL</A> id_to_url(const char * id) const </B></TT>
+<DD>Translates the textual ID to the complete URL if possible.<P>Depending on the document format the translation is done in the
+following way:
+<UL>
+<LI> For <TT>BUNDLED</TT> and <TT>INDIRECT</TT> documents the function
+scans the <!1><A HREF="DjVmDir.html">DjVmDir</A> (the document directory) and
+matches the ID against:
+<OL>
+<LI> File ID from the <!1><A HREF="DjVmDir.html">DjVmDir</A>
+<LI> File name from the <!1><A HREF="DjVmDir.html">DjVmDir</A>
+<LI> File title from the <!1><A HREF="DjVmDir.html">DjVmDir</A>
+</OL>
+Then for <TT>BUNDLED</TT> document the URL is obtained by
+appending the <TT>name</TT> of the found file to the document's
+URL.<P>For <TT>INDIRECT</TT> documents the URL is obtained by
+appending the <TT>name</TT> of the found file to the URL of
+the directory containing the document.
+<LI> For <TT>OLD_BUNDLED</TT> documents the function compares the ID
+with internal name of every file inside the bundle and
+composes an artificial URL by appending the file name to
+the document's URL.
+<LI> For <TT>OLD_INDEXED</TT> or <TT>SINGLE_PAGE</TT> documents the function
+composes the URL by appending the ID to the URL of the
+directory containing the document.
+</UL><P>If information obtained by the initialization thread is not
+sufficient yet, the
+Depending on the document type, the information is sufficient when
+<UL>
+<LI> <TT>BUNDLED</TT> and <TT>INDIRECT</TT>: <TT>DOC_DIR_KNOWN</TT> flag is set.
+<LI> <TT>OLD_BUNDLED</TT> and <TT>OLD_INDEXED</TT> and <TT>SINGLE_PAGE</TT>:
+<TT>DOC_TYPE_KNOWN</TT> flag is set.
+</UL> 
+<DL><DT><DD></DL><P>
+<A NAME="get_page">
+<A NAME="DOC.1.5.30.1.11.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  get_page(int page_num, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * port=0)</B></TT>
+<DD>Returns <!1><A HREF="GP.html">GP</A> pointer to <!1><A HREF="DjVuImage.html">DjVuImage</A> corresponding to page
+<TT>page_num</TT>. If caching is enabled, and there is a <EM>fully decoded</EM>
+<!1><A HREF="DjVuFile.html">DjVuFile</A> in the cache, the image will be reused and will
+be returned fully decoded. Otherwise, if multi-threaded behavior
+is allowed, and <TT>sync</TT> is set to <TT>FALSE</TT>, the decoding will be
+started in a separate thread, which enables to do progressive
+redisplay. Thus, in this case the image returned may be partially
+decoded.<P>Negative <TT>page_num</TT> has a special meaning for the <EM>old indexed</EM>
+multipage documents: the <TT>DjVuDocument</TT> will start decoding of the
+URL with which it has been initialized. For other formats page
+<TT>-1</TT> is the same as page <TT>0</TT>.<P><TT>DjVuDocument</TT> can also connect the created page to the specified
+<TT>port</TT> <EM>before starting decoding</EM>. This option will allow
+the future owner of <!1><A HREF="DjVuImage.html">DjVuImage</A> to receive all messages and
+requests generated during its decoding.<P>If this function is called before the document's structure becomes
+known (the initialization process completes), the <!1><A HREF="DjVuFile.html">DjVuFile</A>,
+which the returned image will be attached to, will be assigned a
+temporary artificial URL, which will be corrected as soon as enough
+information becomes available. The trick prevents the main thread
+from blocking and in some cases helps to start decoding earlier.
+The URL is corrected and decoding will start as soon as
+<TT>DjVuDocument</TT> passes some given stages of initialization and
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.2">page_to_url</A>(), <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.4">id_to_url</A>() functions start working
+properly. Please look through their description for details.<P><B>Note:</B> To wait for the initialization to complete use
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>(). For single threaded applications
+the initialization completes before the <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() function
+returns.<P>
+<DL><DT><DT><B>Parameters:</B><DD><B>page_num</B> -  Number of the page to be decoded
+<BR><B>sync</B> -  When set to <TT>TRUE</TT> the function will not return
+until the page is completely decoded. Otherwise,
+in a multi-threaded program, this function will
+start decoding in a new thread and will return
+a partially decoded image. Refer to
+<!1><A HREF="DjVuImage.html#DOC.1.5.32.1.3.1">wait_for_complete_decode</A>() and
+<!1><A HREF="DjVuFile.html#DOC.1.5.28.1.6.6">is_decode_ok</A>().
+<BR><B>port</B> -  A pointer to <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A>, that the created image
+will be connected to. <BR><DD></DL><P>
+<A NAME="get_page">
+<A NAME="DOC.1.5.30.1.11.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuImage.html">DjVuImage</A>&gt;  get_page(const char * id, bool sync=true, <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A> * port=0)</B></TT>
+<DD>Returns <!1><A HREF="GP.html">GP</A> pointer to <!1><A HREF="DjVuImage.html">DjVuImage</A> corresponding to the
+specified ID. This function behaves exactly as the <TT>get_page()</TT>
+function above. The only thing worth mentioning here is how the <TT>ID</TT>
+parameter is treated.<P>First of all the function checks, if the ID contains a number.
+If so, it just calls the <TT>get_page()</TT> function above. If ID is
+<TT>ZERO</TT> or just empty, page number <TT>-1</TT> is assumed. Otherwise
+the ID is translated to the URL using <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.4">id_to_url</A>(). 
+<DL><DT><DD></DL><P>
+<A NAME="get_djvu_file">
+<A NAME="DOC.1.5.30.1.11.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  get_djvu_file(int page_num, bool dont_create=false)</B></TT>
+<DD>Returns <!1><A HREF="DjVuFile.html">DjVuFile</A> corresponding to the specified page.
+Normally it translates the page number to the URL using
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.2">page_to_url</A>() and then creates <!1><A HREF="DjVuFile.html">DjVuFile</A> initializing
+it with data from the URL.<P>The behavior becomes different, though in the case when the
+document structure is unknown at the moment this function is called.
+In this situations it invents a temporary URL, creates a
+<!1><A HREF="DjVuFile.html">DjVuFile</A>, initializes it with this URL and returns
+immediately. The caller may start decoding the file right away
+(if necessary). The decoding will block but will automatically
+continue as soon as enough information is collected about the
+document. This trick should be quite transparent to the user and
+helps to prevent the main thread from blocking. The decoding will
+unblock and this function will stop using this "trick" as soon
+as <TT>DjVuDocument</TT> passes some given stages of initialization and
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.2">page_to_url</A>(), <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.4">id_to_url</A>() functions start working
+properly.<P>If <TT>dont_create</TT> is <TT>FALSE</TT> the function will return the file
+only if it already exists.<P><B>Note:</B> To wait for the initialization to complete use
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>(). For single threaded applications
+the initialization completes before the <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A>() function
+returns. 
+<DL><DT><DD></DL><P>
+<A NAME="get_djvu_file">
+<A NAME="DOC.1.5.30.1.11.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuFile.html">DjVuFile</A>&gt;  get_djvu_file(const char * id, bool dont_create=false)</B></TT>
+<DD>Returns <!1><A HREF="DjVuFile.html">DjVuFile</A> corresponding to the specified ID.
+This function behaves exactly as the <TT>get_djvu_file()</TT> function
+above. The only thing worth mentioning here is how the <TT>ID</TT>
+parameter is treated.<P>First of all the function checks, if the ID contains a number.
+If so, it just calls the <TT>get_djvu_file()</TT> function above. If ID is
+<TT>ZERO</TT> or just empty, page number <TT>-1</TT> is assumed. Otherwise
+the ID is translated to the URL using <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.4">id_to_url</A>().<P>If <TT>dont_create</TT> is <TT>FALSE</TT> the function will return the file
+only if it already exists. 
+<DL><DT><DD></DL><P>
+<A NAME="get_thumbnail">
+<A NAME="DOC.1.5.30.1.11.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DataPool.html">DataPool</A>&gt;  get_thumbnail(int page_num, bool dont_decode)</B></TT>
+<DD>Returns a <!1><A HREF="DataPool.html">DataPool</A> containing one chunk <TT>TH44</TT> with
+the encoded thumbnail for the specified page. The function
+first looks for thumbnails enclosed into the document and if
+it fails to find one, it decodes the required page and creates
+the thumbnail on the fly (unless <TT>dont_decode</TT> is true).<P><B>Note:</B> It may happen that the returned <!1><A HREF="DataPool.html">DataPool</A> will
+not contain all the data you need. In this case you will need
+to install a trigger into the <!1><A HREF="DataPool.html">DataPool</A> to learn when the
+data actually arrives. 
+<DL><DT><DD></DL><P></DL>
+<DL>
+
+<A NAME="get_djvm_doc">
+<A NAME="DOC.1.5.30.1.13.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVmDoc.html">DjVmDoc</A>&gt;  get_djvm_doc(void)</B></TT>
+<DD>Returns pointer to the <!1><A HREF="DjVmDoc.html">DjVmDoc</A> class, which can save the
+document contents on the hard disk in one of the two new formats:
+<EM>bundled</EM> and <EM>indirect</EM>. You may also want to look
+at <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.13.2">write</A>() and <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.13.3">expand</A>() if you are interested in
+how to save the document.<P><B>Plugin Warning</B>. This function will read contents of the whole
+document. Thus, if you call it from the main thread (the thread,
+which transfers data from Netscape), the plugin will block. 
+<DL><DT><DD></DL><P>
+<A NAME="write">
+<A NAME="DOC.1.5.30.1.13.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void write(<!1><A HREF="ByteStream.html">ByteStream</A> &amp; str, bool force_djvm=false)</B></TT>
+<DD>Saves the document in the <EM>new bundled</EM> format. All the data
+is "bundled" into one file and this file is written into the
+passed stream.<P>If <TT>force_djvm</TT> is <TT>TRUE</TT> then even one page documents will be
+saved in the <TT>DJVM BUNDLED</TT> format (inside a <TT>FORM:DJVM</TT>);<P><B>Plugin Warning</B>. This function will read contents of the whole
+document. Thus, if you call it from the main thread (the thread,
+which transfers data from Netscape), the plugin will block. 
+<DL><DT><DD></DL><P>
+<A NAME="expand">
+<A NAME="DOC.1.5.30.1.13.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void expand(const char * dir_name, const char * idx_name)</B></TT>
+<DD>Saves the document in the <EM>new indirect</EM> format when every
+page and component are stored in separate files. This format
+is ideal for web publishing because it allows direct access to
+any page and component. In addition to it, a top-level file
+containing the list of all components will be created. To view
+the document later in the plugin or in the viewer one should
+load the top-level file.<P><B>Plugin Warning</B>. This function will read contents of the whole
+document. Thus, if you call it from the main thread (the thread,
+which transfers data from Netscape), the plugin will block.<P>
+<DL><DT><DT><B>Parameters:</B><DD><B>dir_name</B> -  - Name of the directory which the document should
+be expanded into.
+<BR><B>idx_name</B> -  - Name of the top-level file containing the document
+directory (basically, list of all files composing the document).<BR><DD></DL><P>
+<A NAME="save_as">
+<A NAME="DOC.1.5.30.1.13.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void save_as(const char where[], const bool bundled=0)</B></TT>
+<DD>This function can be used instead of <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.13.2">write</A>() and <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.13.3">expand</A>().
+It allows to save the document either in the new <TT>BUNDLED</TT> format
+or in the new <TT>INDIRECT</TT> format depending on the value of parameter
+<TT>bundled</TT>.<P>Depending on the document's type, the meaning of <TT>where</TT> is:
+<UL>
+<LI> For <TT>BUNDLED</TT> documents this is the name of the file
+<LI> For <TT>INDIRECT</TT> documents this is the name of top-level
+index file. All document files will be saved into the
+save directory where the index file will resize. 
+<DL><DT><DD></DL><P></DL>
+</DL>
+<HR>
+<DL><DT><B>Direct child classes:
+</B><DD><A HREF="DjVuDocEditor.html">DjVuDocEditor</A><BR>
+</DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

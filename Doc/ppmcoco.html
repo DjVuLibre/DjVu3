@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">ppmcoco</A></H2>
+<BLOCKQUOTE>Perform color correction on PPM files. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        ppmcoco [-from &lt;gamma&gt;] [-to &lt;gamma&gt;] [&lt;ppmin&gt;] [&lt;ppmout&gt;]
+    </PRE><P><B>Arguments</B><BR>
+<DL>
+<DT><B>-from &lt;gamma&gt;</B><DD>  
+Gamma coefficient of the display for which the image was designed.
+The default value 2.2 is assumed when this argument is omitted.
+<DT><B>-to &lt;gamma&gt;</B><DD>  
+Gamma coefficient of the display on the image will be rendered.
+The default value 2.2 is assumed when this argument is omitted.
+<DT><B>&lt;ppmin&gt;</B><DD>
+Name of the PPM file to read. A single dash (<TT>&quot;-&quot;</TT>) means that the PPM
+file is to be read on the standard input.  See 
+<!1><A HREF="PNMandRLEfileformats.html">PNM and RLE file formats</A> for more information about PPM files.
+<DT><B>&lt;ppmout&gt;</B><DD>
+Name of the PPM file into which the color corrected image will be written.
+Omitting this argument or providing a single dash (<TT>&quot;-&quot;</TT>) means that the
+PPM data will be written to the standard output.
+</DL><P>
+<B>Description</B> ---
+File <TT>&quot;ppmcoco.cpp&quot;</TT> illustrates how the DjVu Reference Library performs
+color correction on <!1><A HREF="GPixmap.html">GPixmap</A> objects.  Each color image is in theory
+designed to be rendered on a particular device.  In order to display this
+image on a different device, we need to correct the image in order to
+compensate the differences between the color profile of the <EM>design
+device</EM> (the device for which the image was designed) and the color
+profile of the <EM>rendering device</EM> (the device on which the image will
+be displayed.)<P>The current release of the DjVu Reference Library only implements gamma
+correction.  Cathodic displays are reasonably well characterized by a
+single floating point number called ``gamma''.  Typical gamma values 
+are given in the table below:
+<CENTER><TABLE BORDER>
+<TR><TD>
+<B>computer</B> </TD><TD> <B>gamma</B></TD></TR><TR><TD>
+PC                </TD><TD>  2.5 </TD></TR><TR><TD>
+Apple Macintosh   </TD><TD>  1.9 </TD></TR><TR><TD>
+Silicon Graphics  </TD><TD>  1.4
+</TR></TABLE></CENTER><P>Gamma correction is performed by function <!1><A HREF="GPixmap.html#DOC.1.5.18.2.6.3">color_correct</A> in
+class <!1><A HREF="GPixmap.html">GPixmap</A>.  The argument of function <TT>color_correct</TT> must be the
+ratio between the gamma coefficient of the rendering device and the gamma
+coefficient of the design device.  This function works best when both
+gamma coefficients are close, partly because the color values have a
+limited dynamical range, and partly because we do not exactly perform a
+regular gamma correction: regular gamma correction tends to reveal ugly
+data compression artifacts in the dark areas of the image.  We suggest
+therefore to design images with a intermediate gamma coefficient.  Value
+2.2 gives decent results on all computers.  This value is suggested by
+several photo editing programs (such as Photoshop), and is
+supported by virtually all scanner drivers.<P>Program <TT>ppmcoco</TT> reads a PPM file <TT>ppmin</TT> containing an image designed
+for a display whose gamma coefficient is specified with option <TT>-from</TT>.
+Color correction is then performed for a display whose gamma coefficient
+is specified with option <TT>-to</TT>.  The corrected file is then written into
+PPM file <TT>ppmout</TT>.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: ppmcoco.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">DjVu File Structure</A></H2>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVu Image Files"></A>
+<B></B><A HREF=DjVuImageFiles.html><B>DjVu Image Files</B></A><B></B><DD><I></I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="IW44 Image Files"></A>
+<B></B><A HREF=IW44ImageFiles.html><B>IW44 Image Files</B></A><B></B><DD><I></I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="Annotations and Textual Information."></A>
+<B></B><A HREF=AnnotationsandTextualInformation..html><B>Annotations and Textual Information.</B></A><B></B><DD><I></I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="Multipage DjVu documents."></A>
+<B></B><A HREF=MultipageDjVudocuments..html><B>Multipage DjVu documents.</B></A><B></B><DD><I></I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+DjVu files are organized according to the ``EA IFF 85'' layout.  Pointers to
+the appropriate reference document are provided in section
+<!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A>.  IFF files are logically composed of a sequence of
+data <EM>chunks</EM>.  Each chunk comes with a four character <EM>chunk
+identifier</EM> describing the type of the data stored in the chunk.  A few
+special chunk identifiers, for instance <TT>&quot;FORM&quot;</TT>, are reserved for so
+called <EM>composite chunks</EM> containing a sequence of data chunks.  This
+convention effectively provides IFF files with a hierarchical structure.
+Composite chunks are further identified by a <EM>secondary chunk
+identifier</EM>.  For convenience, both identifiers are gathered as an
+extended chunk identifier such as <TT>&quot;FORM:DJVU&quot;</TT>.<P>The four octets <TT>&quot;AT&amp;T&quot;</TT> may be inserted in front of the IFF compliant
+byte stream.  The decoder simply ignores these four octets when they are
+present.  These four octets are not part of the IFF format and are not
+required components of a valid DjVu file.  Certain versions of MSIE
+incorrectly recognize any IFF file as a Microsoft AIFF sound file.  The
+presence of these four octets prevents this incorrect identification.<P>The DjVu specification mandates that the decoder should silently
+skip chunks whose identifier is not recognized.  This mechanism
+provides a backward compatible way to extend the initial format by
+allocating new chunk identifiers. </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

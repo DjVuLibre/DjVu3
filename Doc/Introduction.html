@@ -1,0 +1,124 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Introduction</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>DjVu Technology</B> --- Over 90 percent of the information in the world
+is still on paper. Many of those paper documents include color graphics
+and/or photographs that represent significant invested value. And almost
+none of that rich content is on the Internet.  That's because scanning
+such documents and getting them onto a Web site has been problematic at
+best. At the high resolution necessary to preserve the quality of images
+and to keep type readable, file sizes become far too bulky for acceptable
+download speed. Reducing resolution to achieve satisfactory download speed
+means forfeiting quality and legibility. Conventional JPEG and GIF
+compression techniques only begin to solve the problem. As a result, Web
+site content developers have been unable to leverage existing printed
+materials.<P>The DjVu image compression technology <A HREF=http://www.djvu.att.com/>http://www.djvu.att.com/</A>
+addresses this problem.  Content developers can scan high-resolution color
+pages of books, magazines, catalogs, manuals, historical or ancient
+documents.  The DjVu document format provides the means to compress these
+bulky images to a size comparable to that of an HTML page.  Content
+providers and consumers around the world can leverage the incredible
+wealth of information and images that were previously trapped in hard copy
+form. DjVu is the enabling technology that will deliver on the promise of
+the Internet as the world's universal library.<P>There are in fact three kinds of DjVu image files:
+<DL>
+<DT><B>Photo DjVu Image.</B><DD>
+Photo DjVu Image files are best used for encoding photographic images
+in colors or in shades of gray.  The images are coded using the IW44
+wavelet representation optimized for fast progressive rendering.
+<DT><B>Bilevel DjVu Image.</B><DD>
+Bilevel DjVu Image files are best used to compress black and white
+images representing text and simple drawings.  The JB2 data compression
+model uses a the "soft pattern matching" technique which essentially
+consists of encoding each character by describing how it differs from a
+well chosen already encoded character.
+<DT><B>Compound DjVu Image.</B><DD>
+Compound DjVu Image files are an extremely efficient way to compress
+high resolution color document images containing both pictures and
+text, such as a page of a magazine.  Compound DjVu Images represent the
+document images using two layers.  The <EM>background layer</EM> is used
+for encoding the pictures and the paper texture.  The <EM>foreground
+layer</EM> is used for encoding the text and the drawings.
+</DL>
+In addition we often use <B>IW44 Image</B> files. This is the native format
+for the IW44 wavelet representation. These files have the same uses then
+Photo DjVu Images but use a simpler file format.  There are two variants of
+IW44 files for gray level images and color images.<P><B>DjVu Reference Library</B> --- The DjVu Reference Library implements the
+components of the DjVu technology that are essential for the definition of
+the file formats.  AT&amp;T Labs <A HREF=http://www.att.com/attlabs>http://www.att.com/attlabs</A>
+releases the full source code of the DjVu Reference Library under the terms
+of the AT&T Source Code License.<P>To understand the meaning of this release, it is important to realize that
+the separation of AT&amp;T, NCR and Lucent Technologies has significantly
+changed the business equation.  AT&amp;T is not in the business of selling
+software.  The DjVu technology is interesting for AT&amp;T because it gives
+the means to propose enhanced services to its customers.  This can only
+happen if we ensure that the DjVu technology is widely disseminated.<P>This source code release serves three purposes:
+<UL>
+<LI> It demonstrates our intention to create a lasting technology.
+Regardless of AT&amp;T involvement, developers around the world now have a
+permanent access to critical parts of DjVu technology.
+<LI> It allows developers around the world to work with the DjVu
+technology, to create new advances using our basic building blocks, to
+create bridges between DjVu and other document representation formats,
+to create viewers for various platforms, etc.
+<LI> It provides an authoritative implementation of the DjVu format
+for standardization purposes.
+</UL><P>The DjVu Reference Library is the first component of DjVu released in
+source code form.  The DjVu Reference Library completely defines the DjVu
+and IW44 image formats.  It does not implement however the sophisticated
+encoding strategies which allow for the highest compression ratios.  These
+strategies however are very application dependent.  We have developed
+encoders for scanned documents (see <A HREF=http://www.djvu.att.com/djvu>http://www.djvu.att.com/djvu</A>.  We
+also know that completely different (and probably much easier) encoding
+strategies are needed for electronically created documents.<P>We intend to keep releasing new versions of this library and additional
+software such as viewers and encoders.  Using the currently released code,
+you can <EM>easily</EM> do the following:
+<UL>
+<LI> <EM>Decoding</EM> DjVu and IW44 images.
+<LI> <EM>Rendering</EM> DjVu or IW44 image fragments at any resolution.
+<LI> <EM>Encode IW44 wavelet images</EM>.
+</UL>
+The following tasks can be achieved with an increasing effort level.  
+The documentation somehow explains the basic ideas, but this is 
+not currently implemented:
+<UL>
+<LI> <EM>Creating DjVu Photo Images</EM> which are basically embedded IW44
+images according to the instructions in <!1><A HREF="djvumake.html">djvumake</A>.
+<LI> <EM>Creating Lossless Bilevel DjVu Images</EM> using lossless encoding.
+Instructions are provided in <!1><A HREF="JB2Image.h.html">JB2Image.h</A> and <!1><A HREF="djvumake.html">djvumake</A>.
+Lossless encoding should be very efficient with electronically
+produced documents (since the character shapes are perfectly
+defined). A DVI to DJVU program comes to mind ...
+<LI> <EM>Creating Compound DjVu Images for Electronically Produced Images</EM>.
+Just combine the above task with the masking technique described in
+<!1><A HREF="djvumake.html">djvumake</A>.  A GIMP to DJVU filter comes to mind ...
+<LI> <EM>Creating DjVu Images from Scans</EM>.  The most difficult part
+involves the separation of the foreground and the background.  A
+simple thresholding works on half the documents and fails miserably
+on the second half.  Creating a robust solution is not easy at all.
+</UL><P>We do not plan to publish soon the source code pertaining to the DjVu
+compression of scanned images.  We may provide the source code of older
+versions.  We also provide executables for personal uses.  We license this
+technology to business partners who commit to support the DjVu format.
+Releasing this code today would negatively affect the business of our
+partners and eventually reduce the dissemination of the DjVu technology.<P>We think that this is preferable to the Java alternative where the license
+mandates that you cannot use the software unless your work fully complies
+with the Java specifications.  We think that we should not prevent people
+from using our code for completely different purposes.  In other words, we
+prefer to release less software but make it really <EM>free</EM> (in the sense
+of <EM>free speech</EM> not <EM>free lunch</EM> as you probably know.)  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

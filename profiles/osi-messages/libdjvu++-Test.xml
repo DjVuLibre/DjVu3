@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "pubtext/DjVuMessages.dtd">
+<DjVuMessages>
+<BODY>
+<MESSAGE name="TestJB2.bad_suffix" value="Unrecognized suffix for output file" />
+<MESSAGE name="TextException.test" value="Test exception" />
+</BODY>
+</DjVuMessages>

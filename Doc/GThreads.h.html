@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+   <TITLE>define _GTHREADS_H_</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>define <A HREF="#DOC.DOCU">GThreads.h</A></H2>
+<BLOCKQUOTE>Portable threads </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GThread"></A>
+<B>class  </B><A HREF=GThread.html><B>GThread</B></A><B></B><DD><I>Thread class.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GMonitor"></A>
+<B>class  </B><A HREF=GMonitor.html><B>GMonitor</B></A><B></B><DD><I>Monitor class.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="GSafeFlags"></A>
+<B>class  </B><A HREF=GSafeFlags.html><B>GSafeFlags</B></A><B>: public <!1><A HREF="GMonitor.html">GMonitor</A></B><DD><I>A thread safe class representing a set of flags.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;GThreads.h&quot;</TT> and <TT>&quot;GThreads.cpp&quot;</TT> implement common entry points
+for multithreading on multiple platforms.  Each execution thread is
+represented by an instance of class <!1><A HREF="GThread.html">GThread</A>.  Synchronization is
+provided by class <!1><A HREF="GMonitor.html">GMonitor</A> which implements a monitor (C.A.R Hoare,
+Communications of the ACM, 17(10), 1974).<P>The value of compiler symbol <TT>THREADMODEL</TT> selects an appropriate
+implementation for these classes. The current implementation supports
+the following values:
+<DL>
+<DT><B>-DTHREADMODEL=NOTHREADS</B><DD> Dummy implementation.  This is a
+good choice when the multithreading features are not required,
+because it minimizes the portability problems.  This is currently
+the default when compiling under Unix.
+<DT><B>-DTHREADMODEL=WINTHREADS</B><DD> Windows implementation.
+This is the default when compiling under Windows.
+<DT><B>-DTHREADMODEL=MACTHREADS</B><DD> Macintosh implementation,
+which is based on the MacOS cooperative model. The current 
+implementation does not yet fully support synchronization.
+This is the default when compiling under MacOS.
+<DT><B>-DTHREADMODEL=POSIXTHREADS</B><DD> Posix implementation.
+This implementation also supports DCE threads. The behavior of
+the code is subject to the quality of the system implementation of
+Posix threads.
+<DT><B>-DTHREADMODEL=COTHREADS</B><DD> Custom cooperative threads.
+These custom threads do not redefine system calls. Before executing
+a potentially blocking system function, each thread must explicitly
+check whether it is going to block and yield control explicitly if
+this is the case.  This code must be compiled with a patched version
+of egcs-1.1.1 <A HREF=http://egcs.cygnus.com>http://egcs.cygnus.com</A>. The patch addresses
+exception thread-safety and is provided in <TT>&quot;@Tools/libgcc2.c.diff&quot;</TT>.
+Once you get the right compiler, this implementation is remarkably
+compact and portable. A variety of processors are supported,
+including mips, intel, sparc, hppa, and alpha.
+<DT><B>-DTHREADMODEL=JRITHREADS</B><DD> Java implementation hooks.
+Multi-threading within a Netscape plugin can be tricky.  A simple
+idea however consists of implementing the threading primitives in
+Java and to access them using JRI.  The classes just contain a
+JRIGlobalRef.  This is not a real implementation since everything
+(Java code, native functions, stubs, exception thread safety) must
+be addressed by the plugin source code. Performance may be a serious
+issue.
+</DL><P><B>Portability</B>: The simultaneous use of threads and exceptions caused a
+lot of portability headaches under Unix.  We eventually decided to
+implement the COTHREADS cooperative threads (because preemptive threads
+have more problems) and to patch EGCS in order to make exception handling
+COTHREAD-safe. <P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- initial implementation.<BR>
+Praveen Guduru &lt;praveen@sanskrit.lz.att.com&gt; -- mac implementation.
+
+<DT><B>Version:</B><DD><TT>$Id: GThreads.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,311 @@
+<HTML>
+<HEAD>
+   <TITLE>class  IW44Image</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">IW44Image</A>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>IW44 encoded gray-level and color images.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CIW44Image,MIW44Image.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Classes</H3><DD><DT>
+<A HREF="#DOC.1.4.21.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>CRCBMode</B>
+<DD><I>Chrominance processing selector.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.4.21.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  <B>create_decode</B>(const bool color=true)
+<DD><I>Null constructor.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  <B>create_encode</B>(const bool color=true)
+<DD><I>Null constructor.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  <B>create</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;bm, const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt; mask=0)
+<DD><I>Initializes an IWBitmap with image <TT>bm</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  <B>create</B>(const <!1><A HREF="GPixmap.html">GPixmap</A> &amp;bm, const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt; mask=0, <!1><A HREF="IW44Image.html#DOC.1.4.21.2.1">CRCBMode</A> crcbmode=CRCBnormal)
+<DD><I>Initializes an IWPixmap with color image <TT>bm</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>(void) const 
+<DD><I>Returns the width of the IWBitmap image.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>(void) const 
+<DD><I>Returns the height of the IWBitmap image.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>get_bitmap</B>(void)
+<DD><I>Reconstructs the complete image.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>get_bitmap</B>(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<DD><I>Reconstructs a segment of the image at a given scale.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_pixmap</B>(void)
+<DD><I>Reconstructs the complete image.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_pixmap</B>(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<DD><I>Reconstructs a segment of the image at a given scale.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   unsigned int <B>get_memory_usage</B>(void) const 
+<DD><I>Returns the amount of memory used by the wavelet coefficients.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>get_percent_memory</B>(void) const 
+<DD><I>Returns the filling ratio of the internal data structure.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>encode_chunk</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)
+<DD><I>Encodes one data chunk into ByteStream <TT>bs</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>encode_iff</B>(<!1><A HREF="IFFByteStream.html">IFFByteStream</A> &amp;iff, int nchunks, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> *parms)
+<DD><I>Writes a gray level image into DjVu IW44 file.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>decode_chunk</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
+<DD><I>Decodes one data chunk from ByteStream <TT>bs</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>decode_iff</B>(<!1><A HREF="IFFByteStream.html">IFFByteStream</A> &amp;iff, int maxchunks=999)
+<DD><I>This function enters a composite chunk (identifier <TT>FORM:BM44</TT>, or <TT>FORM:PM44</TT>), and decodes a maximum of <TT>maxchunks</TT> data chunks (identifier <TT>BM44</TT>).</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>close_codec</B>(void)
+<DD><I>Resets the encoder/decoder state.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>get_serial</B>(void)
+<DD><I>Returns the chunk serial number.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   int <B>parm_crcbdelay</B>(const int parm)
+<DD><I>Sets the chrominance delay parameter.</I>
+<DT>
+<A HREF="#DOC.1.4.21.2.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   void <B>parm_dbfrac</B>(float frac)
+<DD><I>Sets the <TT>dbfrac</TT> parameter.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>IW44 encoded gray-level and color images.  This class acts as a base for
+images represented as a collection of IW44 wavelet coefficients.  The
+coefficients are stored in a memory efficient data structure.  Member
+function <!1><A HREF="IW44Image.html#DOC.1.4.21.2.8">get_bitmap</A> renders an arbitrary segment of the image into
+a <!1><A HREF="GBitmap.html">GBitmap</A>.  Member functions <!1><A HREF="IW44Image.html#DOC.1.4.21.2.17">decode_iff</A> and <!1><A HREF="IW44Image.html#DOC.1.4.21.2.15">encode_iff</A>
+read and write DjVu IW44 files (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).  Both the copy
+constructor and the copy operator are declared as private members. It is
+therefore not possible to make multiple copies of instances of this
+class. </BLOCKQUOTE>
+<DL>
+
+<A NAME="CRCBMode">
+<A NAME="DOC.1.4.21.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>enum  CRCBMode</B></TT>
+<DD>Chrominance processing selector.  The following constants may be used as
+argument to the following IWPixmap constructor to indicate how the
+chrominance information should be processed. There are four possible values:
+<DL>
+<DT><B>CRCBnone:</B><DD> The wavelet transform will discard the chrominance 
+information and only keep the luminance. The image will show in shades of gray.
+<DT><B>CRCBhalf:</B><DD> The wavelet transform will process the chrominance at only 
+half the image resolution. This option creates smaller files but may create
+artifacts in highly colored images.
+<DT><B>CRCBnormal:</B><DD> The wavelet transform will process the chrominance at full 
+resolution. This is the default.
+<DT><B>CRCBfull:</B><DD> The wavelet transform will process the chrominance at full 
+resolution. This option also disables the chrominance encoding delay
+(see <!1><A HREF="IW44Image.html#DOC.1.4.21.2.20">parm_crcbdelay</A>) which usually reduces the bitrate associated with the
+chrominance information.
+</DL> 
+<DL><DT><DD></DL><P>
+<A NAME="create_decode">
+<A NAME="DOC.1.4.21.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  create_decode(const bool color=true)</B></TT>
+<DD>Null constructor.  Constructs an empty IW44Image object. This object does
+not contain anything meaningful. You must call function init,
+<!1><A HREF="IW44Image.html#DOC.1.4.21.2.17">decode_iff</A> or <!1><A HREF="IW44Image.html#DOC.1.4.21.2.16">decode_chunk</A> to populate the wavelet
+coefficient data structure. You may not use <!1><A HREF="IW44Image.html#DOC.1.4.21.2.15">encode_iff</A> or 
+<!1><A HREF="IW44Image.html#DOC.1.4.21.2.14">encode_chunk</A>. 
+<DL><DT><DD></DL><P>
+<A NAME="create_encode">
+<A NAME="DOC.1.4.21.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  create_encode(const bool color=true)</B></TT>
+<DD>Null constructor.  Constructs an empty IW44Image object. This object does
+not contain anything meaningful. You must call function init,
+<!1><A HREF="IW44Image.html#DOC.1.4.21.2.17">decode_iff</A> or <!1><A HREF="IW44Image.html#DOC.1.4.21.2.16">decode_chunk</A> to populate the wavelet
+coefficient data structure.  You may then use <!1><A HREF="IW44Image.html#DOC.1.4.21.2.15">encode_iff</A>
+and <!1><A HREF="IW44Image.html#DOC.1.4.21.2.14">encode_chunk</A>. 
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.21.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  create(const <!1><A HREF="GBitmap.html">GBitmap</A> &amp;bm, const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt; mask=0)</B></TT>
+<DD>Initializes an IWBitmap with image <TT>bm</TT>.  This constructor
+performs the wavelet decomposition of image <TT>bm</TT> and records the
+corresponding wavelet coefficient.  Argument <TT>mask</TT> is an optional
+bilevel image specifying the masked pixels (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>). 
+<DL><DT><DD></DL><P>
+<A NAME="create">
+<A NAME="DOC.1.4.21.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>static   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="IW44Image.html">IW44Image</A>&gt;  create(const <!1><A HREF="GPixmap.html">GPixmap</A> &amp;bm, const <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt; mask=0, <!1><A HREF="IW44Image.html#DOC.1.4.21.2.1">CRCBMode</A> crcbmode=CRCBnormal)</B></TT>
+<DD>Initializes an IWPixmap with color image <TT>bm</TT>.  This constructor
+performs the wavelet decomposition of image <TT>bm</TT> and records the
+corresponding wavelet coefficient.  Argument <TT>mask</TT> is an optional
+bilevel image specifying the masked pixels (see <!1><A HREF="IW44Image.h.html">IW44Image.h</A>).
+Argument <TT>crcbmode</TT> specifies how the chrominance information should be
+encoded (see <!1><A HREF="IW44Image.html#DOC.1.4.21.2.1">CRCBMode</A>). 
+<DL><DT><DD></DL><P>
+<A NAME="get_width">
+<A NAME="DOC.1.4.21.2.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_width(void) const </B></TT>
+<DD>Returns the width of the IWBitmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_height">
+<A NAME="DOC.1.4.21.2.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_height(void) const </B></TT>
+<DD>Returns the height of the IWBitmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bitmap">
+<A NAME="DOC.1.4.21.2.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  get_bitmap(void)</B></TT>
+<DD>Reconstructs the complete image.  The reconstructed image
+is then returned as a GBitmap object. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bitmap">
+<A NAME="DOC.1.4.21.2.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  get_bitmap(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<DD>Reconstructs a segment of the image at a given scale.  The subsampling
+ratio <TT>subsample</TT> must be a power of two between <TT>1</TT> and <TT>32</TT>.  Argument
+<TT>rect</TT> specifies which segment of the subsampled image should be
+reconstructed.  The reconstructed image is returned as a GBitmap object
+whose size is equal to the size of the rectangle <TT>rect</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_pixmap">
+<A NAME="DOC.1.4.21.2.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_pixmap(void)</B></TT>
+<DD>Reconstructs the complete image.  The reconstructed image
+is then returned as a GPixmap object. 
+<DL><DT><DD></DL><P>
+<A NAME="get_pixmap">
+<A NAME="DOC.1.4.21.2.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_pixmap(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<DD>Reconstructs a segment of the image at a given scale.  The subsampling
+ratio <TT>subsample</TT> must be a power of two between <TT>1</TT> and <TT>32</TT>.  Argument
+<TT>rect</TT> specifies which segment of the subsampled image should be
+reconstructed.  The reconstructed image is returned as a GPixmap object
+whose size is equal to the size of the rectangle <TT>rect</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_memory_usage">
+<A NAME="DOC.1.4.21.2.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   unsigned int get_memory_usage(void) const </B></TT>
+<DD>Returns the amount of memory used by the wavelet coefficients.  This
+amount of memory is expressed in bytes. 
+<DL><DT><DD></DL><P>
+<A NAME="get_percent_memory">
+<A NAME="DOC.1.4.21.2.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int get_percent_memory(void) const </B></TT>
+<DD>Returns the filling ratio of the internal data structure.  Wavelet
+coefficients are stored in a sparse array.  This function tells what
+percentage of bins have been effectively allocated. 
+<DL><DT><DD></DL><P>
+<A NAME="encode_chunk">
+<A NAME="DOC.1.4.21.2.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int encode_chunk(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)</B></TT>
+<DD>Encodes one data chunk into ByteStream <TT>bs</TT>.  Parameter <TT>parms</TT> controls
+how much data is generated.  The chunk data is written to ByteStream
+<TT>bs</TT> with no IFF header.  Successive calls to
+successive chunks.  You must call <TT>close_codec</TT> after encoding the last
+chunk of a file. 
+<DL><DT><DD></DL><P>
+<A NAME="encode_iff">
+<A NAME="DOC.1.4.21.2.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void encode_iff(<!1><A HREF="IFFByteStream.html">IFFByteStream</A> &amp;iff, int nchunks, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> *parms)</B></TT>
+<DD>Writes a gray level image into DjVu IW44 file.  This function creates a
+composite chunk (identifier <TT>FORM:BM44</TT> or <TT>FORM:PM44</TT>) composed of
+<TT>nchunks</TT> chunks (identifier <TT>BM44</TT> or <TT>PM44</TT>).  Data for each chunk is
+generated with
+array <TT>parms</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="decode_chunk">
+<A NAME="DOC.1.4.21.2.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int decode_chunk(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
+<DD>Decodes one data chunk from ByteStream <TT>bs</TT>.  Successive calls to
+<TT>decode_chunk</TT> decode successive chunks.  You must call <TT>close_codec</TT>
+after decoding the last chunk of a file.  Note that function
+<TT>get_bitmap</TT> and <TT>decode_chunk</TT> may be called simultaneously from two
+execution threads. 
+<DL><DT><DD></DL><P>
+<A NAME="decode_iff">
+<A NAME="DOC.1.4.21.2.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void decode_iff(<!1><A HREF="IFFByteStream.html">IFFByteStream</A> &amp;iff, int maxchunks=999)</B></TT>
+<DD>This function enters a composite chunk (identifier <TT>FORM:BM44</TT>, or
+<TT>FORM:PM44</TT>), and decodes a maximum of <TT>maxchunks</TT> data chunks
+(identifier <TT>BM44</TT>).  Data for each chunk is processed using the
+function <TT>decode_chunk</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="close_codec">
+<A NAME="DOC.1.4.21.2.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void close_codec(void)</B></TT>
+<DD>Resets the encoder/decoder state.  The first call to <TT>decode_chunk</TT> or<P><TT>close_codec</TT> must be called after processing the last chunk in order to
+reset the coder and release the associated memory. 
+<DL><DT><DD></DL><P>
+<A NAME="get_serial">
+<A NAME="DOC.1.4.21.2.19">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int get_serial(void)</B></TT>
+<DD>Returns the chunk serial number.  This function returns the serial
+number of the last chunk encoded with
+<TT>decode_chunk</TT>. The first chunk always has serial number <TT>1</TT>. Successive
+chunks have increasing serial numbers.  Value <TT>0</TT> is returned if this
+function is called before calling
+after calling <TT>close_codec</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="parm_crcbdelay">
+<A NAME="DOC.1.4.21.2.20">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   int parm_crcbdelay(const int parm)</B></TT>
+<DD>Sets the chrominance delay parameter.  This function can be called
+before encoding the first color IW44 data chunk.  Parameter <TT>parm</TT> is an
+encoding delay which reduces the bitrate associated with the
+chrominance information. The default chrominance encoding delay is 10. 
+<DL><DT><DD></DL><P>
+<A NAME="parm_dbfrac">
+<A NAME="DOC.1.4.21.2.21">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   void parm_dbfrac(float frac)</B></TT>
+<DD>Sets the <TT>dbfrac</TT> parameter.  This function can be called before
+encoding the first IW44 data chunk.  Parameter <TT>frac</TT> modifies the
+decibel estimation algorithm in such a way that the decibel target only
+pertains to the average error of the fraction <TT>frac</TT> of the most
+misrepresented 32x32 pixel blocks.  Setting arguments <TT>frac</TT> to <TT>1.0</TT>
+restores the normal behavior.  
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

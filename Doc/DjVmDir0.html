@@ -1,0 +1,134 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVmDir0</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVmDir0</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>Directory of all-in-one-file DjVu documents (also known as DjVm documents).</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVmDir0,MDjVmDir0.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Classes</H3><DD><DT>
+<A HREF="#DOC.1.5.36.1.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>class  <B>FileRec</B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>
+<DD><I>Describes a file record inside a DjVm document (archive) </I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.36.1.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Creates a new file record with name <TT>name</TT> at offset <TT>offset</TT> and size <TT>size</TT>, which is in IFF format if</B>
+<DD><I></I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.36.1.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_files_num</B>(void) const 
+<DD><I>Returns the number of files in the DjVm archive</I>
+<DT>
+<A HREF="#DOC.1.5.36.1.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  <B>get_file</B>(const char * name)
+<DD><I>Returns the file record with name <TT>name</TT></I>
+<DT>
+<A HREF="#DOC.1.5.36.1.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  <B>get_file</B>(int file_num)
+<DD><I>Returns the file record number <TT>file_num</TT></I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Directory of all-in-one-file DjVu documents (also known as DjVm documents).
+This class can read and write the directory (table of contents, in other
+words) of a DjVm document. This table of contents lists all <B>files</B>
+included into the document, not <B>pages</B> like <!1><A HREF="DjVuNavDir.html">DjVuNavDir</A> does.
+It is normally stored in the document inside <B>DIR0</B> chunk where
+<B>"0"</B> refers to the version number.<P>An object of this class can be created either as a result of the decoding
+of an existing DjVm file, or manually by calling the default constructor
+and adding later directory entries by means of add_file() function.<P>You normally will not want to create or decode this directory manually.
+DjVmFile class will do it for you. </BLOCKQUOTE>
+<DL>
+
+<A NAME="get_files_num">
+<A NAME="DOC.1.5.36.1.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_files_num(void) const </B></TT>
+<DD>Returns the number of files in the DjVm archive
+<DL><DT><DD></DL><P>
+<A NAME="get_file">
+<A NAME="DOC.1.5.36.1.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  get_file(const char * name)</B></TT>
+<DD>Returns the file record with name <TT>name</TT>
+<DL><DT><DD></DL><P>
+<A NAME="get_file">
+<A NAME="DOC.1.5.36.1.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="FileRec.html">FileRec</A>&gt;  get_file(int file_num)</B></TT>
+<DD>Returns the file record number <TT>file_num</TT>
+<DL><DT><DD></DL><P>
+<A NAME="Creates a new file record with name #name# at offset #offset# and size #size#, which is in IFF format if">
+<A NAME="DOC.1.5.36.1.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Creates a new file record with name <TT>name</TT> at offset <TT>offset</TT> and size <TT>size</TT>, which is in IFF format if</B></TT>
+<DD>Creates a new file record with name <TT>name</TT> at offset
+<TT>offset</TT> and size <TT>size</TT>, which is in IFF format if<P>void		add_file(const char * name, bool iff_file,
+int offset=-1, int size=-1);<P>int		get_size(void) const;<P>
+void		encode(ByteStream &amp; bs);<P>
+void		decode(ByteStream &amp; bs);<P>DjVmDir0(const DjVmDir0 &amp; d);<P>DjVmDir0(void) {};
+virtual ~DjVmDir0(void) {};
+};<P>inline
+DjVmDir0::FileRec::FileRec(const char * name_in, bool iff_file_in,
+int offset_in, int size_in) :
+name(name_in), iff_file(iff_file_in),
+offset(offset_in), size(size_in)
+{
+}<P>inline
+DjVmDir0::FileRec::FileRec(void) : iff_file(0), offset(-1), size(-1)
+{
+}<P>inline
+DjVmDir0::FileRec::~FileRec(void)
+{
+}<P>inline int
+DjVmDir0::get_files_num(void) const
+{
+return num2file.size();
+}<P>inline
+DjVmDir0::DjVmDir0(const DjVmDir0 &amp; d) :
+name2file(d.name2file), num2file(d.num2file)
+{
+}<P>
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

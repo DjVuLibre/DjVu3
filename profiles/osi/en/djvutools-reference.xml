@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" ?>
+<!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../../pubtext/DjVuMessages.dtd">
+<!-- Error messages from the reference library -->
+<!-- $Id: djvutools-reference.xml,v 1.1 2001/06/11 17:11:12 bcr Exp $ -->
+<DjVuMessages>
+<BODY>
+<MESSAGE name="annotate.failed_chunk" number="17000" value="[%0!05d!] Failed to find chunk %1!d! in the source file." />
+<MESSAGE name="annotate.failed_stat" number="17001" value="[%0!05d!] Failed to stat annotation file." />
+<MESSAGE name="annotate.usage" number="17002" value="[%0!05d!] USAGE:&#10;    annotate -extract|-insert &lt;djvu_in&gt; &lt;ant_file&gt; [&lt;djvu_out&gt;]&#10;or  annotate -remove &lt;djvu_in&gt; [&lt;djvu_out&gt;]." />
+<MESSAGE name="Callback.seek_failed" number="17200" value="[%0!05d!] Failed seek" />
+<MESSAGE name="convert_io.read_failed" number="17400" value="[%0!05d!] Failed to read page." />
+</BODY>
+</DjVuMessages>

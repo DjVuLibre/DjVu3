@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVuTokenList</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuTokenList</A></H2>
+<BLOCKQUOTE>Token list.</BLOCKQUOTE>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.35.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>DjVuTokenList</B>()
+<DD><I>Simple Constructor </I>
+<DT>
+<A HREF="#DOC.1.5.35.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~DjVuTokenList</B>()
+<DD><I>Simple Destructor </I>
+<DT>
+<A HREF="#DOC.1.5.35.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>inline   const char* const <B>GetString</B>(const int token) const 
+<DD><I>Lookup up a string given the token </I>
+<DT>
+<A HREF="#DOC.1.5.35.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>GetToken</B>(const char name[]) const 
+<DD><I>Lookup up a token given a string </I>
+<DT>
+<A HREF="#DOC.1.5.35.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>SetToken</B>(const char name[])
+<DD><I>Assign a token if not already assigned and return it given the string </I>
+<DT>
+<A HREF="#DOC.1.5.35.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>friend void <B>DjVuParseOptions::init</B>(const char [], const char [])
+<DD><I>Everybody needs friends </I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Token list.
+This is a class very similar to GMap, only it is limited much more
+limited scope.  It is an associative array "string" to integer.  But
+the integer is assigned uniquely by this class in sequential order.
+This is of use when you want to store items sequentially in an array
+without making the array too large.  This list is always sorted, so
+this class is also useful for creating a sorted unique list of words.<P>At some point the TokenList class could easily be replace by GMap, but
+is left as a separate class so static install programs can link just
+one object from the libdjvu++ library.<P>The DjVuTokenList keeps track of string/integer pairs.  One unique     
+integer is assigned per string.  With the integer range stored from   
+zero to the number of strings present.  This is primarily intended to  
+allow a simple mapping between strings and a fixed size array. </BLOCKQUOTE>
+<DL>
+
+<A NAME="DjVuTokenList">
+<A NAME="DOC.1.5.35.3.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> DjVuTokenList()</B></TT>
+<DD>Simple Constructor 
+<DL><DT><DD></DL><P>
+<A NAME="~DjVuTokenList">
+<A NAME="DOC.1.5.35.3.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ~DjVuTokenList()</B></TT>
+<DD>Simple Destructor 
+<DL><DT><DD></DL><P>
+<A NAME="GetString">
+<A NAME="DOC.1.5.35.3.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>inline   const char* const GetString(const int token) const </B></TT>
+<DD>Lookup up a string given the token 
+<DL><DT><DD></DL><P>
+<A NAME="GetToken">
+<A NAME="DOC.1.5.35.3.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int GetToken(const char name[]) const </B></TT>
+<DD>Lookup up a token given a string 
+<DL><DT><DD></DL><P>
+<A NAME="SetToken">
+<A NAME="DOC.1.5.35.3.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int SetToken(const char name[])</B></TT>
+<DD>Assign a token if not already assigned and return it given the string 
+<DL><DT><DD></DL><P>
+<A NAME="DjVuParseOptions::init">
+<A NAME="DOC.1.5.35.3.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>friend void DjVuParseOptions::init(const char [], const char [])</B></TT>
+<DD>Everybody needs friends 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

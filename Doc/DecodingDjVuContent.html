@@ -1,0 +1,108 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Decoding DjVu Content</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Classes <!1><A HREF="DjVuImage.html">DjVuImage</A> and <!1><A HREF="DjVuDocument.html">DjVuDocument</A> provide the preferred way
+to decode the contents of a DjVu file.  The complete documentation is
+found in section <!1><A HREF="DjVuDocument.h.html">DjVuDocument.h</A>, <!1><A HREF="DjVuImage.h.html">DjVuImage.h</A> and
+<!1><A HREF="DjVuFile.html">DjVuFile</A>.  You may also consult the source code of programs
+<!1><A HREF="ddjvu.html">ddjvu</A> and <!1><A HREF="djvm.html">djvm</A>.<P>The DjVu Reference Library uses a two stage decoding model. 
+<UL>
+<LI> The first stage, called <EM>decoding</EM>, consists of analyzing a DjVu
+or IW44 file and constructing a partially decoded representation of
+the image in memory.  This partially decoded representation requires
+much less memory (typically 1-2 MBytes) than the raw image
+(typically 20-30 MBytes).  
+<LI> The second stage, called <EM>rendering</EM>, consists of using this
+representation to recreate the pixels for any part of the image at
+any resolution.  You should render <EM>on-the-fly</EM> the part of the
+image that you actually wish to display.  This strategy minimizes
+both the memory and the computational requirements.
+</UL><P>An example of decoding a multipage DjVu document is shown below.
+First you create <!1><A HREF="DjVuDocument.html">DjVuDocument</A> and call
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A> with a proper file URL.  This function
+starts a thread which decodes the document structure (i.e. the
+number of pages, the page names, etc.).  You can use function
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A> to wait for the
+termination of this thread and check its result.  Then you can use
+function <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.5">get_page</A> to obtain a <!1><A HREF="DjVuImage.html">DjVuImage</A>
+for a given page number.  This function starts a thread which
+decodes the image data. Again you can call function
+<!1><A HREF="DjVuImage.html#DOC.1.5.32.1.3.1">wait_for_complete_decode</A> to wait for the
+termination of this thread and check its result.<P><PRE>
+      GP&lt;DjVuDocument&gt; doc = new DjVuDocument;
+      // Decode the document structure
+      doc-&gt;init(GOS::filename_to_url(&quot;file.djvu&quot;));
+      if (! doc-&gt;wait_for_complete_init())
+        THROW(&quot;A decoding error has occured&quot;);      
+      // Decode a page
+      GP&lt;DjVuImage&gt; dimg = doc-&gt;get_page(2);
+      if (! dimg-&gt;wait_for_complete_decode() )
+        THROW(&quot;A decoding error has occured&quot;);
+    </PRE><P>Note: When the reference library is compiled without threads, both functions
+<!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.5">init</A> and <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.11.5">get_page</A> perform their
+task before returning.  The functions <!1><A HREF="DjVuDocument.html#DOC.1.5.30.1.12">wait_for_complete_init</A>
+and <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.3.1">wait_for_complete_decode</A> do not wait, but are still
+useful for testing that the operation was successful.<P>The sample rendering code below may be called whenever you need to
+redisplay part of a window showing DjVu image.  Class <!1><A HREF="GRect.html">GRect</A> is used
+to represent two rectangles of interest. Rectangle <TT>full</TT> represents the
+range of pixels that would be occupied by the full DjVu image. This
+rectangle may be much larger than your computer screen.  The ratio between
+the size of this rectangle and the size of the image implicitly defines
+the resolution of the displayed image.  Rectangle <TT>part</TT> represents the
+range of pixel that you actually want to compute.  This rectangle always
+corresponds to a visible portion of your screen.  The functions
+<!1><A HREF="DjVuImage.html#DOC.1.5.32.1.7.1">get_pixmap</A> and <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.7.2">get_bitmap</A> return a
+"smart" <!1><A HREF="GP.html">GP</A> pointer to either a <!1><A HREF="GPixmap.html">GPixmap</A> or <!1><A HREF="GBitmap.html">GBitmap</A>
+containing the requested pixels.
+<PRE>
+       GRect part = my_rectangle_to_redisplay();
+       GRect full = my_rectangle_for_the_full_image();
+       // Try rendering in color
+       GP&lt;GPixmap&gt; pm = img-&gt;get_pixmap(part, full);
+       if (pm) { my_display_in_color(pm); return; }
+       // Try rendering in gray
+       GP&lt;GBitmap&gt; bm = img-&gt;get_bitmap(part, full);
+       if (bm) { my_display_in_grays(bm); return ; }
+    </PRE><P>This is the easiest way to decode and render a DjVu document
+stored in the filesystem. <!1><A HREF="DjVuDocument.html">DjVuDocument</A> accesses all the
+required and prints all potential error messages directly to
+<TT>stderr</TT>.<P>In a more complex environment you may want to have more control on
+where the data is coming from and where status and error messages
+are directed.  By definining a subclass of <!1><A HREF="DjVuPort.html">DjVuPort</A>, you can
+receive notifications from the decoding threads.  These
+notifications allow you to provide data from various sources, to
+know about various error conditions, and to know when enough data
+has been decoded to display a preliminary version of the image.<P>Progressive display, for instance, can be implemented by letting
+the decoding threads run in the background.  These threads wait
+for data and process it as soon as possible.  The main thread
+handles the user interface and can call the rendering functions at
+any time while the decoding is in progress.  These function will
+render the best possible image given the amount of data currently
+received (or simply return 0 if no rendering is possible yet).
+The <!1><A HREF="DjVuPort.html">DjVuPort</A> notification mechanism allows you to determine
+when enough data has been received to justify redisplaying an
+updated version of the image.<P>Section <!1><A HREF="GThreads.h.html">GThreads.h</A> discusses the multi-threading capabilities of the
+DjVu Reference Library.  These features must be enabled at compile-time
+using the adequate option of the configuration script.  <P><B>Note:</B> In previous versions of the library, decoding was
+achieved by calling function <!1><A HREF="DjVuImage.html#DOC.1.5.32.1.4.1">decode</A> in class
+<!1><A HREF="DjVuImage.html">DjVuImage</A>.  This method has been made obsolete by the
+introduction of multipage DjVu documents and <TT>INCL</TT> chunks.  The
+decoder has to handle more than one stream of incoming data and
+should be able to keep track of relationships between different
+files in the same document.  All this activity is now orchestrated
+by class <!1><A HREF="DjVuDocument.html">DjVuDocument</A>.  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

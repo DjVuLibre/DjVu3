@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">djvuinfo</A></H2>
+<BLOCKQUOTE>Prints the structure of an IFF file. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        djvudump &lt;... iff_file_names ...&gt;
+    </PRE><P><B>Description</B> --- File <TT>&quot;djvudump.cpp&quot;</TT> uses the facilities
+provided by <!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A> to display an indented
+representation of the chunk structure of an ``EA IFF 85'' file.
+Each line represent contains a chunk ID followed by the chunk
+size.  Additional information about the chunk is provided when
+program <TT>djvuinfo.cpp</TT> recognizes the chunk name and knows how to
+summarize the chunk data.  Furthermore, page identifiers are
+printed between curly braces when <TT>djvudump</TT> recognizes a bundled
+multipage document.  Lines are indented in order to reflect the
+hierarchical structure of the IFF files.<P><B>Example</B>
+<PRE>
+    % djvuinfo graham1.djvu 
+    graham1.djvu:
+      FORM:DJVU [32553] 
+        INFO [5]            2325x3156, version 20, 300 dpi, gamma 2.2
+	ANTa [34]	    Page annotation
+	INCL [11]	    Indirection chunk (document.dir)
+        Sjbz [17692]        JB2 data, no header
+        BG44 [2570]         #1 - 74 slices - v1.2 (color) - 775x1052
+        FG44 [1035]         #1 - 100 slices - v1.2 (color) - 194x263
+        BG44 [3048]         #2 - 10 slices 
+        BG44 [894]          #3 - 4 slices 
+        BG44 [7247]         #4 - 9 slices 
+    </PRE><P><B>References</B> ---
+EA IFF 85 file format specification:<BR>
+<A HREF=http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt>http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt</A>
+or <A HREF=http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre>http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre</A><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: djvuinfo.2.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,117 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _GTHREADS_H_::GMonitor</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GMonitor</A></H2>
+<BLOCKQUOTE>Monitor class.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGMonitor,MGMonitor.html,CGSafeFlags,MGSafeFlags.html">
+<param name=before value="M,M^_">
+<param name=after value="M,M">
+<param name=indent value="0,0">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.9.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GMonitorLock</B>(<!1><A HREF="GMonitor.html">GMonitor</A> *gsec)
+<DD><I>Enters the monitor.</I>
+<DT>
+<A HREF="#DOC.1.5.9.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>~GMonitorLock</B>()
+<DD><I>Destructor.</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Monitor class.  Monitors have been first described in (C.A.R Hoare,
+Communications of the ACM, 17(10), 1974).  This mechanism provides the
+basic mutual exclusion (mutex) and thread notification facilities
+(condition variables).<P>Only one thread can own the monitor at a given time.  Functions
+enter and leave can be used to acquire and release the
+monitor. This mutual exclusion provides an efficient way to protect
+segment of codes (<EM>critical sections</EM>) which should not be
+simultaneously executed by two threads. Class <!1><A HREF="GMonitor.html#DOC.1.5.9.2.1">GMonitorLock</A> provides
+a convenient way to do this effectively.<P>When the thread owning the monitor calls function wait, the monitor
+is released and the thread starts waiting until another thread calls
+function signal or broadcast.  When the thread wakes-up, it
+re-acquires the monitor and function <TT>wait</TT> returns.  Since the signaling
+thread must acquire the monitor before calling functions <TT>signal</TT> and
+<TT>broadcast</TT>, the signaled thread will not be able to re-acquire the
+monitor until the signaling thread(s) releases the monitor.<P><B>Note</B> --- Both the copy constructor and the copy operator are declared
+as private members. It is therefore not possible to make multiple copies
+of instances of this class, as implied by the class semantic. </BLOCKQUOTE>
+<DL>
+
+<A NAME="GMonitorLock">
+<A NAME="DOC.1.5.9.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GMonitorLock(<!1><A HREF="GMonitor.html">GMonitor</A> *gsec)</B></TT>
+<DD>Enters the monitor.  If the monitor is acquired by another thread this
+function waits until the monitor is released.  The current thread then
+acquires the monitor.  Calls to
+void enter();<P>void leave();<P>void wait();<P>void wait(unsigned long timeout);<P>void signal();<P>void broadcast();
+private:<P>int ok;
+int count;
+DWORD locker;
+CRITICAL_SECTION cs;
+HANDLE hev[2];<P>int ok;
+int count;
+unsigned long locker;<P>int ok;
+int count;
+pthread_t locker;
+pthread_mutex_t mutex;
+pthread_cond_t cond;<P>int ok;
+int count;
+void *locker;<P>JRIGlobalRef obj;<P>private:
+GMonitor(const GMonitor&amp;);
+GMonitor&amp; operator=(const GMonitor&amp;);
+};<P><P><P>
+inline GThread::GThread(int stacksize) {}
+inline GThread::~GThread(void) {}
+inline void GThread::terminate() {}
+inline int GThread::yield() { return 0; }
+inline void* GThread::current() { return 0; }
+inline void GThread::wait_for_finish(void) {}
+inline GMonitor::GMonitor() {}
+inline GMonitor::~GMonitor() {}
+inline void GMonitor::enter() {}
+inline void GMonitor::leave() {}
+inline void GMonitor::wait() {}
+inline void GMonitor::wait(unsigned long timeout) {}
+inline void GMonitor::signal() {}
+inline void GMonitor::broadcast() {}<P><P><P>
+class GMonitorLock 
+{
+private:
+GMonitor *gsec;
+public:
+/** Constructor. Enters the monitor <TT>gsec</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="~GMonitorLock">
+<A NAME="DOC.1.5.9.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> ~GMonitorLock()</B></TT>
+<DD>Destructor. Leaves the associated monitor. 
+<DL><DT><DD></DL><P></DL>
+<HR>
+<DL><DT><B>Direct child classes:
+</B><DD><A HREF="GSafeFlags.html">GSafeFlags</A><BR>
+</DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

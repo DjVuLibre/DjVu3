@@ -1,0 +1,300 @@
+<HTML>
+<HEAD>
+   <TITLE>class  GMapArea</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GMapArea</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>This is the base object for all map areas.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=155>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CGMapArea,MGMapArea.html,CGMapRect,MGMapRect.html,CGMapPoly,MGMapPoly.html,CGMapOval,MGMapOval.html">
+<param name=before value="M,M,M|_,MR_,Mr_">
+<param name=after value="Md_,M,M,M,M">
+<param name=indent value="0,1,1,1,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.26.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>url</B>
+<DD><I>Optional URL which this map area can be associated with.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>target</B>
+<DD><I>The target for the <TT>URL</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>comment</B>
+<DD><I>Comment (displayed in a status line or as a popup hint when the mouse pointer moves over the map area </I>
+<DT>
+<A HREF="#DOC.1.5.26.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>BorderType <B>border_type</B>
+<DD><I>Border type.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>border_always_visible</B>
+<DD><I>If <TT>TRUE</TT>, the border will be made always visible.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>u_int32 <B>border_color</B>
+<DD><I>Border color (when relevant) in <TT>0x00RRGGBB</TT> format</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>border_width</B>
+<DD><I>Border width in pixels</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>u_int32 <B>hilite_color</B>
+<DD><I>Specified a color for highlighting the internal area of the map area.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.26.1.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GMapArea</B>(void)
+<DD><I>Default constructor</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>is_point_inside</B>(int x, int y)
+<DD><I>Returns 1 if the given point is inside the hyperlink area</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmin</B>(void)
+<DD><I>Returns xmin of the bounding rectangle</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymin</B>(void)
+<DD><I>Returns ymin of the bounding rectangle</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_xmax</B>(void)
+<DD><I>Returns xmax of the bounding rectangle.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_ymax</B>(void)
+<DD><I>Returns xmax of the bounding rectangle.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GRect.html">GRect</A> <B>get_bound_rect</B>(void)
+<DD><I>Returns the hyperlink bounding rectangle</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>move</B>(int dx, int dy)
+<DD><I>Moves the hyperlink along the given vector.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>resize</B>(int new_width, int new_height)
+<DD><I>Resizes the hyperlink to fit new bounding rectangle while keeping the (xmin, ymin) points at rest.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>transform</B>(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)
+<DD><I>Transforms the hyperlink to be within the specified rectangle </I>
+<DT>
+<A HREF="#DOC.1.5.26.1.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>check_object</B>(void)
+<DD><I>Checks if the object is OK.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>print</B>(void)
+<DD><I>Stores the contents of the hyperlink object in a lisp-like format for sving into <TT>ANTa</TT> chunk (see <!1><A HREF="DjVuAnno.html">DjVuAnno</A>) </I>
+<DT>
+<A HREF="#DOC.1.5.26.1.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GString.html">GString</A> <B>get_shape_name</B>(void) const 
+<DD><I>Virtual function returning the shape name.</I>
+<DT>
+<A HREF="#DOC.1.5.26.1.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.5.26.1.16">GMapArea</A>&gt;  <B>get_copy</B>(void) const 
+<DD><I>Virtual function generating a copy of this object</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>This is the base object for all map areas. It defines some standard
+interface to access the geometrical properties of the areas and
+describes the area itsef:
+<UL>
+<LI> <TT>url</TT> If the optional <TT>URL</TT> is specified, the map area will
+also work as a hyperlink meaning that if you click it with
+your mouse pointer, the browser will be advised to load
+the page referenced by the <TT>URL</TT>.
+<LI> <TT>target</TT> Defines where the specified <TT>URL</TT> should be loaded
+<LI> <TT>comment</TT> This is a string displayed in a status line or in
+a popup window when the mouse pointer moves over the hyperlink
+area
+<LI> <TT>border_type</TT>, <TT>border_color</TT> and <TT>border_width</TT> describes
+how the area border should be drawn
+<LI> <TT>area_color</TT> describes how the area should be highlighted.
+</UL><P>The map areas can be displayed using two different techniques, which
+can be combined together:
+<UL>
+<LI> Visible border. The border of a map area can be drawn in several
+different ways (like <TT>XOR_BORDER</TT> or <TT>SHADOW_IN_BORDER</TT>).
+It can be made always visible, or appearing only when the
+mouse pointer moves over the map area.
+<LI> Highlighted contents. Contents of rectangular map areas can
+also be highlighted with some given color.
+</UL></BLOCKQUOTE>
+<DL>
+
+<A NAME="url">
+<A NAME="DOC.1.5.26.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> url</B></TT>
+<DD>Optional URL which this map area can be associated with.
+If it's not empty then clicking this map area with the mouse
+will make the browser load the HTML page referenced by
+this <TT>url</TT> 
+<DL><DT><DD></DL><P>
+<A NAME="target">
+<A NAME="DOC.1.5.26.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> target</B></TT>
+<DD>The target for the <TT>URL</TT>. Standard targets are:
+<UL>
+<LI> <TT>_blank</TT> - Load the link in a new blank window
+<LI> <TT>_self</TT> - Load the link into the plugin window
+<LI> <TT>_top</TT> - Load the link into the top-level frame
+</UL> 
+<DL><DT><DD></DL><P>
+<A NAME="comment">
+<A NAME="DOC.1.5.26.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> comment</B></TT>
+<DD>Comment (displayed in a status line or as a popup hint when
+the mouse pointer moves over the map area 
+<DL><DT><DD></DL><P>
+<A NAME="border_type">
+<A NAME="DOC.1.5.26.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>BorderType border_type</B></TT>
+<DD>Border type. Defines how the map area border should be drawn
+<UL>
+<LI> <TT>NO_BORDER</TT> - No border drawn
+<LI> <TT>XOR_BORDER</TT> - The border is drawn using XOR method.
+<LI> <TT>SOLID_BORDER</TT> - The border is drawn as a solid line
+of a given color.
+<LI> <TT>SHADOW_IN_BORDER</TT> - Supported for <!1><A HREF="GMapRect.html">GMapRect</A> only.
+The map area area looks as if it was "pushed-in".
+<LI> <TT>SHADOW_OUT_BORDER</TT> - The opposite of <TT>SHADOW_OUT_BORDER</TT>
+<LI> <TT>SHADOW_EIN_BORDER</TT> - Also for <!1><A HREF="GMapRect.html">GMapRect</A> only.
+Is translated as "shadow etched in"
+<LI> <TT>SHADOW_EOUT_BORDER</TT> - The opposite of <TT>SHADOW_EIN_BORDER</TT>.
+</UL> 
+<DL><DT><DD></DL><P>
+<A NAME="border_always_visible">
+<A NAME="DOC.1.5.26.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool border_always_visible</B></TT>
+<DD>If <TT>TRUE</TT>, the border will be made always visible. Otherwise
+it will be drawn when the mouse moves over the map area. 
+<DL><DT><DD></DL><P>
+<A NAME="border_color">
+<A NAME="DOC.1.5.26.1.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>u_int32 border_color</B></TT>
+<DD>Border color (when relevant) in <TT>0x00RRGGBB</TT> format
+<DL><DT><DD></DL><P>
+<A NAME="border_width">
+<A NAME="DOC.1.5.26.1.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int border_width</B></TT>
+<DD>Border width in pixels
+<DL><DT><DD></DL><P>
+<A NAME="hilite_color">
+<A NAME="DOC.1.5.26.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>u_int32 hilite_color</B></TT>
+<DD>Specified a color for highlighting the internal area of the map
+area. Will work with rectangular map areas only. The color is
+specified in #00RRGGBB format. A special value of #FFFFFFFF disables
+highlighting and #FF000000 is for XOR highlighting. 
+<DL><DT><DD></DL><P>
+<A NAME="GMapArea">
+<A NAME="DOC.1.5.26.1.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GMapArea(void)</B></TT>
+<DD>Default constructor
+<DL><DT><DD></DL><P>
+<A NAME="is_point_inside">
+<A NAME="DOC.1.5.26.1.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool is_point_inside(int x, int y)</B></TT>
+<DD>Returns 1 if the given point is inside the hyperlink area
+<DL><DT><DD></DL><P>
+<A NAME="get_xmin">
+<A NAME="DOC.1.5.26.1.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_xmin(void)</B></TT>
+<DD>Returns xmin of the bounding rectangle
+<DL><DT><DD></DL><P>
+<A NAME="get_ymin">
+<A NAME="DOC.1.5.26.1.19">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_ymin(void)</B></TT>
+<DD>Returns ymin of the bounding rectangle
+<DL><DT><DD></DL><P>
+<A NAME="get_xmax">
+<A NAME="DOC.1.5.26.1.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_xmax(void)</B></TT>
+<DD>Returns xmax of the bounding rectangle. In other words, if <TT>X</TT> is
+a coordinate of the last point in the right direction, the
+function will return <TT>X+1</TT> 
+<DL><DT><DD></DL><P>
+<A NAME="get_ymax">
+<A NAME="DOC.1.5.26.1.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_ymax(void)</B></TT>
+<DD>Returns xmax of the bounding rectangle. In other words, if <TT>Y</TT> is
+a coordinate of the last point in the top direction, the
+function will return <TT>Y+1</TT> 
+<DL><DT><DD></DL><P>
+<A NAME="get_bound_rect">
+<A NAME="DOC.1.5.26.1.20">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GRect.html">GRect</A> get_bound_rect(void)</B></TT>
+<DD>Returns the hyperlink bounding rectangle
+<DL><DT><DD></DL><P>
+<A NAME="move">
+<A NAME="DOC.1.5.26.1.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void move(int dx, int dy)</B></TT>
+<DD>Moves the hyperlink along the given vector. Is used by the
+hyperlinks editor. 
+<DL><DT><DD></DL><P>
+<A NAME="resize">
+<A NAME="DOC.1.5.26.1.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void resize(int new_width, int new_height)</B></TT>
+<DD>Resizes the hyperlink to fit new bounding rectangle while
+keeping the (xmin, ymin) points at rest. 
+<DL><DT><DD></DL><P>
+<A NAME="transform">
+<A NAME="DOC.1.5.26.1.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void transform(const <!1><A HREF="GRect.html">GRect</A> &amp; grect)</B></TT>
+<DD>Transforms the hyperlink to be within the specified rectangle 
+<DL><DT><DD></DL><P>
+<A NAME="check_object">
+<A NAME="DOC.1.5.26.1.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> check_object(void)</B></TT>
+<DD>Checks if the object is OK. Especially useful with <!1><A HREF="GMapPoly.html">GMapPoly</A>
+where edges may intersect. If there is a problem it returns a
+string describing it. 
+<DL><DT><DD></DL><P>
+<A NAME="print">
+<A NAME="DOC.1.5.26.1.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> print(void)</B></TT>
+<DD>Stores the contents of the hyperlink object in a lisp-like format
+for sving into <TT>ANTa</TT> chunk (see <!1><A HREF="DjVuAnno.html">DjVuAnno</A>) 
+<DL><DT><DD></DL><P>
+<A NAME="get_shape_name">
+<A NAME="DOC.1.5.26.1.21">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GString.html">GString</A> get_shape_name(void) const </B></TT>
+<DD>Virtual function returning the shape name.
+<DL><DT><DD></DL><P>
+<A NAME="get_copy">
+<A NAME="DOC.1.5.26.1.22">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>virtual   <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GMapArea.html#DOC.1.5.26.1.16">GMapArea</A>&gt;  get_copy(void) const </B></TT>
+<DD>Virtual function generating a copy of this object
+<DL><DT><DD></DL><P></DL>
+<HR>
+<DL><DT><B>Direct child classes:
+</B><DD><A HREF="GMapRect.html">GMapRect</A><BR>
+<A HREF="GMapPoly.html">GMapPoly</A><BR>
+<A HREF="GMapOval.html">GMapOval</A><BR>
+</DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+   <TITLE>template<class TYPE> class  GArray</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>template&lt;class TYPE&gt; class  <A HREF="#DOC.DOCU">GArray</A>: public <!1><A HREF="GArrayTemplate.html">GArrayTemplate</A>&lt;TYPE&gt;</H2>
+<BLOCKQUOTE>Dynamic array for general types.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
+<param name=classes value="MGArrayBase,M,CGArrayTemplate,MGArrayTemplate.html,CGArray,MGArray.html">
+<param name=before value="M,M,M">
+<param name=after value="Md-SP,Md_,M">
+<param name=indent value="0,1,2">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.6.1.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GArray</B>()
+<DD><I>Constructs an empty array.</I>
+<DT>
+<A HREF="#DOC.1.5.6.1.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GArray</B>(int hi)
+<DD><I>Constructs an array with subscripts in range 0 to <TT>hibound</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.6.1.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GArray</B>(int lo, int hi)
+<DD><I>Constructs an array with subscripts in range <TT>lobound</TT> to <TT>hibound</TT>.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GArrayTemplate.html">GArrayTemplate</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>size</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>lbound</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>hbound</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>TYPE&amp; <B>operator[]</B>(int n)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>const TYPE&amp; <B>operator[]</B>(int n) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator TYPE* </B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator const TYPE* </B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>empty</B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>touch</B>(int n)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>resize</B>(int hibound)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>resize</B>(int lobound, int hibound)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>shift</B>(int disp)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>del</B>(int n, int howmany=1)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>ins</B>(int n, int howmany=1)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>ins</B>(int n, const TYPE &amp;val, int howmany=1)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>steal</B>(<!1><A HREF="GArrayTemplate.html">GArrayTemplate</A> &amp;ga)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>sort</B>()
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>sort</B>(int lo, int hi)
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Dynamic array for general types.  
+Template class <TT>GArray&lt;TYPE&gt;</TT> implements an array of elements of type
+<TT>TYPE</TT>. This template class must be able to access the following
+functions.
+<UL>
+<LI> a default constructor <TT>TYPE::TYPE()</TT>, 
+<LI> a copy constructor <TT>TYPE::TYPE(const TYPE &amp;)</TT>,
+<LI> and optionally a destructor <TT>TYPE::~TYPE()</TT>.
+</UL>
+This class only implement constructors.  See class <!1><A HREF="GArrayTemplate.html">GArrayTemplate</A>
+for a description of all access methods. </BLOCKQUOTE>
+<DL>
+
+<A NAME="GArray">
+<A NAME="DOC.1.5.6.1.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GArray()</B></TT>
+<DD>Constructs an empty array. The valid subscript range is initially
+empty. Member function <TT>touch</TT> and <TT>resize</TT> provide convenient ways
+to enlarge the subscript range. 
+<DL><DT><DD></DL><P>
+<A NAME="GArray">
+<A NAME="DOC.1.5.6.1.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GArray(int hi)</B></TT>
+<DD>Constructs an array with subscripts in range 0 to <TT>hibound</TT>. 
+The subscript range can be subsequently modified with member functions
+<TT>touch</TT> and <TT>resize</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="GArray">
+<A NAME="DOC.1.5.6.1.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GArray(int lo, int hi)</B></TT>
+<DD>Constructs an array with subscripts in range <TT>lobound</TT> to <TT>hibound</TT>.  
+The subscript range can be subsequently modified with member functions
+<TT>touch</TT> and <TT>resize</TT>. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

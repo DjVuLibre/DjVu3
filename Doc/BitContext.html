@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+   <TITLE>typedef  unsigned char BitContext</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>typedef  unsigned char <A HREF="#DOC.DOCU">BitContext</A></H2>
+<BLOCKQUOTE>Context variable.</BLOCKQUOTE>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Context variable.  
+Variables of type <TT>BitContext</TT> hold a single byte describing how to encode
+or decode message bits with similar statistical properties.  This single
+byte simultaneously represents the current estimate of the bit probability
+distribution (which is determined by the frequencies of <TT>1</TT>s and <TT>0</TT>s
+already coded with this context) and the confidence in this estimate
+(which determines how fast the estimate can change.)<P>A coding program typically allocates hundreds of context variables.  Each
+coding context is initialized to zero before encoding or decoding.  Value
+zero represents equal probabilities for <TT>1</TT>s and <TT>0</TT>s with a minimal
+confidence and therefore a maximum adaptation speed.  Each message bit is
+encoded using a coding context determined as a function of previously
+encoded message bits.  The decoder therefore can examine the previously
+decoded message bits and decode the current bit using the same context as
+the encoder.  This is critical for proper decoding.  </BLOCKQUOTE>
+<DL>
+</DL>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

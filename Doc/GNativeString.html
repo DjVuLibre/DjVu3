@@ -1,0 +1,430 @@
+<HTML>
+<HEAD>
+   <TITLE>class  _GSTRING_H_::GNativeString</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GNativeString</A>: public <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A></H2>
+<BLOCKQUOTE>General purpose character string.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=125>
+<param name=classes value="CGPBase,MGPBase.html,CGP,MGP.html,CGBaseString,MGBaseString.html,CGNativeString,MGNativeString.html">
+<param name=before value="M,M,M,M">
+<param name=after value="Md-SPSP,Md-SP,Md_,M">
+<param name=indent value="0,1,2,3">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.4.7.3.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(void)
+<DD><I>Null constructor.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const char dat)
+<DD><I>Constructs a string from a character.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const char *str)
+<DD><I>Constructs a string from a null terminated character array.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const unsigned char *str)
+<DD><I>Constructs a string from a null terminated character array.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const char *dat, unsigned int len)
+<DD><I>Constructs a string from a character array.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt; &amp;str)
+<DD><I>Construct from base class.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;gs, int from, unsigned int len)
+<DD><I>Constructs a string from a character array.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const <!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> &amp;fmt, va_list &amp;args)
+<DD><I>Constructs a string with a formatted string (as in <TT>vprintf</TT>).</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const int number)
+<DD><I>Constructs a string with a human-readable representation of integer <TT>number</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GNativeString</B>(const double number)
+<DD><I>Constructs a string with a human-readable representation of floating point number <TT>number</TT>.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.19"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(void)
+<DD><I>Initialize this string class</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.20"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>init</B>(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt; &amp;rep)
+<DD><I>Initialize this string class</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>operator= </B>(const char str)
+<DD><I>Copy a null terminated character array.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.21"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>operator+= </B>(char ch)
+<DD><I>Appends character <TT>ch</TT> to the string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.22"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>operator+= </B>(const char *str)
+<DD><I>Appends the null terminated character array <TT>str</TT> to the string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.23"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>operator+= </B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;str)
+<DD><I>Appends the specified GBaseString to the string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> <B>substr</B>(int from, unsigned int len=1) const 
+<DD><I>Returns a sub-string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> <B>upcase</B>( void ) const 
+<DD><I>Returns an upper case copy of this string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> <B>downcase</B>( void ) const 
+<DD><I>Returns an lower case copy of this string.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>format</B>(const char *fmt, ... )
+<DD><I>Initializes a string with a formatted string (as in <TT>printf</TT>).</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; <B>vformat</B>(const <!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> &amp;fmt, va_list &amp;args)
+<DD><I>Initializes a string with a formatted string (as in <TT>vprintf</TT>).</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>char* <B>getbuf</B>(int n = -1)
+<DD><I>Provides a direct access to the string buffer.</I>
+<DT>
+<A HREF="#DOC.1.4.7.3.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>setat</B>(const int n, const char ch)
+<DD><I>Set the character at position <TT>n</TT> to value <TT>ch</TT>.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GBaseString.html">GBaseString</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>static   unsigned long <B>UTF8toUCS4</B>( unsigned char const *&amp;s, void const * const endptr )
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   int <B>UTF8toUCS4</B>( unsigned long &amp;w, unsigned char const s[], void const * const endptr )
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   int <B>UTF16toUCS4</B>( unsigned long &amp;w, unsigned short const * const s, void const * const eptr)
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator const char* </B>( void ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>unsigned int <B>length</B>( void ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator! </B>( void ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>char <B>operator[] </B>(int n) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>is_int</B>(void) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>is_float</B>(void) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GNativeString.html">GNativeString</A> <B>getUTF82Native</B>( char* tocode=NULL ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>void <B>empty</B>( void )
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>search</B>(char c, int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>search</B>(const char *str, int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>rsearch</B>(char c, const int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>rsearch</B>(const char *str, const int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>contains</B>(const char accept[], const int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>rcontains</B>(const char accept[], const int from=0) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GUTF8String.html">GUTF8String</A> <B>operator+</B>(const <!1><A HREF="GUTF8String.html">GUTF8String</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>toInt</B>(void) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>long <B>toLong</B>(const int pos, int &amp;endpos, const int base=10) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>unsigned long <B>toULong</B>( const int pos, int &amp;endpos, const int base=10) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>double <B>toDouble</B>( const int pos, int &amp;endpos ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   long <B>toLong</B>( const <!1><A HREF="GUTF8String.html">GUTF8String</A>&amp; src, const int pos, int &amp;endpos, const int base=10)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   long <B>toLong</B>( const <!1><A HREF="GNativeString.html">GNativeString</A>&amp; src, const int pos, int &amp;endpos, const int base=10)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>cmp</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2, const int len=(-1)) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>cmp</B>(const char *s2, const int len=(-1)) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>cmp</B>(const char s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>static   int <B>cmp</B>(const char *s1, const char *s2, const int len=(-1))
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator==</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator!=</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator&gt;=</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator&lt;</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator&gt; </B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>bool <B>operator&lt;=</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;s2) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>friend unsigned int <B>hash</B>(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;ref)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>nextNonSpace</B>( const int from=0, const int len=(-1) ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>nextChar</B>( const int from=0 ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>nextSpace</B>( const int from=0, const int len=(-1) ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>firstEndSpace</B>( const int from=0, const int len=(-1) ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>inline   double <B>toDouble</B>( const int pos, int &amp;endpos ) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>inline   int <B>toInt</B>(void) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>inline   long <B>toLong</B>(const int pos, int &amp;endpos, const int base) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>inline   unsigned long <B>toULong</B>(const int pos, int &amp;endpos, const int base) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Public</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif> <B>Returns a boolean.</B>
+<DT>
+<IMG ALT="o" SRC=icon2.gif> <B>Returns an integer.</B>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GP.html">GP</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif> <B>operator TYPE* </B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>TYPE* <B>operator-&gt;</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>TYPE&amp; <B>operator*</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>operator== </B>(TYPE *nptr) const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>operator!= </B>(TYPE *nptr) const 
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPBase.html">GPBase</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>get</B>() const 
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>assign</B>(const <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A> &amp;sptr)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>assign</B>(<!1><A HREF="GPEnabled.html">GPEnabled</A> *nptr)
+<DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A>&amp; <B>operator=</B>(const <!1><A HREF="GPBase.html#DOC.1.4.5.1">GPBase</A> &amp; obj)
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html">GPEnabled</A>* <B>ptr</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>General purpose character string.
+Each instance of class <TT>GNativeString</TT> represents a character
+string.  Overloaded operators provide a value semantic to
+<TT>GNativeString</TT> objects.  Conversion operators and constructors
+transparently convert between <TT>GNativeString</TT> objects and
+<TT>const char*</TT> pointers.<P>Functions taking strings as arguments should declare their
+arguments as "<TT>const char*</TT>".  Such functions will work equally
+well with <TT>GNativeString</TT> objects since there is a fast conversion
+operator from <TT>GNativeString</TT> to "<TT>const char*</TT>".  Functions
+returning strings should return <TT>GUTF8String</TT> or <TT>GNativeString</TT>
+objects because the class will automatically manage the necessary
+memory.<P>Characters in the string can be identified by their position.  The
+first character of a string is numbered zero. Negative positions
+represent characters relative to the end of the string (i.e.
+position <TT>-1</TT> accesses the last character of the string,
+position <TT>-2</TT> represents the second last character, etc.)  </BLOCKQUOTE>
+<DL>
+
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(void)</B></TT>
+<DD>Null constructor. Constructs an empty string. 
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const char dat)</B></TT>
+<DD>Constructs a string from a character.
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const char *str)</B></TT>
+<DD>Constructs a string from a null terminated character array.
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const unsigned char *str)</B></TT>
+<DD>Constructs a string from a null terminated character array.
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const char *dat, unsigned int len)</B></TT>
+<DD>Constructs a string from a character array.  Elements of the
+character array <TT>dat</TT> are added into the string until the
+string length reaches <TT>len</TT> or until encountering a null
+character (whichever comes first). 
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt; &amp;str)</B></TT>
+<DD>Construct from base class.
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;gs, int from, unsigned int len)</B></TT>
+<DD>Constructs a string from a character array.  Elements of the
+character array <TT>dat</TT> are added into the string until the
+string length reaches <TT>len</TT> or until encountering a null
+character (whichever comes first). 
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const <!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> &amp;fmt, va_list &amp;args)</B></TT>
+<DD>Constructs a string with a formatted string (as in <TT>vprintf</TT>).
+The string is re-initialized with the characters generated
+according to the specified format <TT>fmt</TT> and using the optional
+arguments.  See the ANSI-C function <TT>vprintf()</TT> for more
+information. The current implementation will cause a
+segmentation violation if the resulting string is longer than
+32768 characters. 
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const int number)</B></TT>
+<DD>Constructs a string with a human-readable representation of
+integer <TT>number</TT>.  The format is similar to format <TT>&quot;%d&quot;</TT> in
+function <TT>printf</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="GNativeString">
+<A NAME="DOC.1.4.7.3.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GNativeString(const double number)</B></TT>
+<DD>Constructs a string with a human-readable representation of
+floating point number <TT>number</TT>. The format is similar to
+format <TT>&quot;%f&quot;</TT> in function <TT>printf</TT>.  
+<DL><DT><DD></DL><P>
+<A NAME="init">
+<A NAME="DOC.1.4.7.3.19">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(void)</B></TT>
+<DD>Initialize this string class
+<DL><DT><DD></DL><P>
+<A NAME="init">
+<A NAME="DOC.1.4.7.3.20">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; init(const <!1><A HREF="GP.html#DOC.1.4.6.1">GP</A>&lt;GStringRep&gt; &amp;rep)</B></TT>
+<DD>Initialize this string class
+<DL><DT><DD></DL><P>
+<A NAME="operator= ">
+<A NAME="DOC.1.4.7.3.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; operator= (const char str)</B></TT>
+<DD>Copy a null terminated character array. Resets this string with
+the character string contained in the null terminated character
+array <TT>str</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="operator+= ">
+<A NAME="DOC.1.4.7.3.21">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; operator+= (char ch)</B></TT>
+<DD>Appends character <TT>ch</TT> to the string.
+<DL><DT><DD></DL><P>
+<A NAME="operator+= ">
+<A NAME="DOC.1.4.7.3.22">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; operator+= (const char *str)</B></TT>
+<DD>Appends the null terminated character array <TT>str</TT> to the string.
+<DL><DT><DD></DL><P>
+<A NAME="operator+= ">
+<A NAME="DOC.1.4.7.3.23">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; operator+= (const <!1><A HREF="GBaseString.html#DOC.1.4.7.1.5">GBaseString</A> &amp;str)</B></TT>
+<DD>Appends the specified GBaseString to the string.
+<DL><DT><DD></DL><P>
+<A NAME="substr">
+<A NAME="DOC.1.4.7.3.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> substr(int from, unsigned int len=1) const </B></TT>
+<DD>Returns a sub-string.  The sub-string is composed by copying
+<TT>len</TT> characters starting at position <TT>from</TT> in this string.
+The length of the resulting string may be smaller than <TT>len</TT>
+if the specified range is too large. 
+<DL><DT><DD></DL><P>
+<A NAME="upcase">
+<A NAME="DOC.1.4.7.3.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> upcase( void ) const </B></TT>
+<DD>Returns an upper case copy of this string.  The returned
+string contains a copy of the current string with all letters
+turned into upper case letters. 
+<DL><DT><DD></DL><P>
+<A NAME="downcase">
+<A NAME="DOC.1.4.7.3.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> downcase( void ) const </B></TT>
+<DD>Returns an lower case copy of this string.  The returned
+string contains a copy of the current string with all letters
+turned into lower case letters. 
+<DL><DT><DD></DL><P>
+<A NAME="format">
+<A NAME="DOC.1.4.7.3.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; format(const char *fmt, ... )</B></TT>
+<DD>Initializes a string with a formatted string (as in <TT>printf</TT>).
+The string is re-initialized with the characters generated
+according to the specified format <TT>fmt</TT> and using the optional
+arguments.  See the ANSI-C function <TT>printf()</TT> for more
+information. The current implementation will cause a
+segmentation violation if the resulting string is longer than
+32768 characters. 
+<DL><DT><DD></DL><P>
+<A NAME="vformat">
+<A NAME="DOC.1.4.7.3.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A>&amp; vformat(const <!1><A HREF="GNativeString.html#DOC.1.4.7.3.1">GNativeString</A> &amp;fmt, va_list &amp;args)</B></TT>
+<DD>Initializes a string with a formatted string (as in <TT>vprintf</TT>).
+The string is re-initialized with the characters generated
+according to the specified format <TT>fmt</TT> and using the optional
+arguments.  See the ANSI-C function <TT>vprintf()</TT> for more
+information. The current implementation will cause a
+segmentation violation if the resulting string is longer than
+32768 characters. 
+<DL><DT><DD></DL><P>
+<A NAME="getbuf">
+<A NAME="DOC.1.4.7.3.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>char* getbuf(int n = -1)</B></TT>
+<DD>Provides a direct access to the string buffer.  Returns a
+pointer for directly accessing the string buffer.  This
+pointer valid remains valid as long as the string is not
+modified by other means.  Positive values for argument <TT>n</TT>
+represent the length of the returned buffer.  The returned
+string buffer will be large enough to hold at least <TT>n</TT>
+characters plus a null character.  If <TT>n</TT> is positive but
+smaller than the string length, the string will be truncated
+to <TT>n</TT> characters. 
+<DL><DT><DD></DL><P>
+<A NAME="setat">
+<A NAME="DOC.1.4.7.3.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void setat(const int n, const char ch)</B></TT>
+<DD>Set the character at position <TT>n</TT> to value <TT>ch</TT>.  An exception
+<!1><A HREF="GException.html">GException</A> is thrown if number <TT>n</TT> is not in range <TT>-len</TT>
+to <TT>len</TT>, where <TT>len</TT> is the length of the string.  If
+character <TT>ch</TT> is zero, the string is truncated at position
+<TT>n</TT>.  The first character of a string is numbered zero.
+Negative positions represent characters relative to the end of
+the string. If position <TT>n</TT> is equal to the length of the
+string, this function appends character <TT>ch</TT> to the end of the
+string. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,77 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">JB2 extensions for version 21.</A></H2>
+<BLOCKQUOTE>Extensions to the JB2 format introduced in version 21.  </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Two extensions of the JB2 encoding format have been introduced
+with DjVu files version 21.  Both extensions maintain significant
+backward compatibility with previous version of the JB2 format.
+These extensions are described below by reference to the ICFDD
+proposal dated August 1999.  Both extension make use of the unused
+record type value <TT>9</TT> (cf. ICFDD page 24) which has been renamed
+<TT>REQUIRED_DICT_OR_RESET</TT>.<P><B>Shared Shape Dictionaries</B> --- This extension provides
+support for sharing symbol definitions between the pages of a
+document.  To achieve this objective, the JB2 image data chunk
+must be able to address symbols defined elsewhere by a JB2
+dictionary data chunk shared by all the pages of a document.<P>The arithmetically encoded JB2 image data logically consist of a
+sequence of records. The decoder processes these records in
+sequence and maintains a library of symbols which can be addressed
+by the following records.  The first record usually is a ``Start
+Of Image'' record describing the size of the image.<P>Starting with version 21, a <TT>REQUIRED_DICT_OR_RESET</TT> (9) record
+type can appear <EM>before</EM> the <TT>START_OF_DATA</TT> (0) record.  The
+record type field is followed by a single number arithmetically
+encoded (cf. ICFDD page 26) using a sixteenth context (cf. ICFDD
+page 25).  This record appears when the JB2 data chunk requires
+symbols encoded in a separate JB2 dictionary data chunk.  The
+number (the <B>dictionary size</B>) indicates how many symbols
+should have been defined by the JB2 dictionary data chunk.  The
+decoder should simply load these symbols in the symbol library and
+proceed as usual.  New symbols potentially defined by the
+subsequent JB2 image data records will therefore be numbered with
+integers greater or equal than the dictionary size.<P>The JB2 dictionary data format is a pure subset of the JB2 image
+data format.  The <TT>START_OF_DATA</TT> (0) record always specifies an
+image width of zero and an image height of zero.  The only allowed
+record types are those defining library symbols only
+(<TT>NEW_SYMBOL_LIBRARY_ONLY</TT> (2) and <TT>MATCHED_REFINE_LIBRARY_ONLY</TT>
+(5) cf. ICFDD page 24) followed by a final <TT>END_OF_DATA</TT> (11)
+record.<P>The JB2 dictionary data is usually located in an <B>Djbz</B> chunk.
+Each page <B>FORM:DJVU</B> may directly contain a <B>Djbz</B> chunk,
+or may indirectly point to such a chunk using an <B>INCL</B> chunk
+(cf. <!1><A HREF="MultipageDjVudocuments..html">Multipage DjVu documents.</A>).<P>
+<B>Numcoder Reset</B> --- This extension addresses a problem for
+hardware implementations.  The encoding of numbers (cf. ICFDD page
+26) potentially uses an unbounded number of binary coding
+contexts. These contexts are normally allocated when they are used
+for the first time (cf. ICFDD informative note, page 27).<P>Starting with version 21, a <TT>REQUIRED_DICT_OR_RESET</TT> (9) record
+type can appear <EM>after</EM> the <TT>START_OF_DATA</TT> (0) record.  The
+decoder should proceed with the next record after <EM>clearing
+all binary contexts used for coding numbers</EM>.  This operation
+implies that all binary contexts previously allocated for coding
+numbers can be deallocated.<P>Starting with version 21, the JB2 encoder should insert a
+<TT>REQUIRED_DICT_OR_RESET</TT> record type whenever the number of these
+allocated binary contexts exceeds <TT>20000</TT>.  Only very large
+documents ever reach such a large number of allocated binary
+contexts (e.g large maps).  Hardware implementation however can
+benefit greatly from a hard bound on the total number of binary
+coding contexts.  Old JB2 decoders will treat this record type as
+an <TT>END_OF_DATA</TT> record and cleanly stop decoding (cf. ICFDD page
+30, Image refinement data).<P>
+<B>References</B> ---
+<UL>
+<LI> ICFDD Draft Proposed American National Standard, 1999-08-26.
+<LI> DjVu Specification, <A HREF=http://www.djvu.com/djvu/sci/djvuspec>http://www.djvu.com/djvu/sci/djvuspec</A>.
+</UL><P></BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

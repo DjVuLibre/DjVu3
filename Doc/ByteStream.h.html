@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">ByteStream.h</A></H2>
+<BLOCKQUOTE>Input/output classes </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ByteStream"></A>
+<B>class  </B><A HREF=ByteStream.html><B>ByteStream</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Abstract class for a stream of bytes.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="StdioByteStream"></A>
+<B>class  </B><A HREF=StdioByteStream.html><B>StdioByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>ByteStream interface for stdio files.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="MemoryByteStream"></A>
+<B>class  </B><A HREF=MemoryByteStream.html><B>MemoryByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>ByteStream interface managing a memory buffer.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="StaticByteStream"></A>
+<B>class  </B><A HREF=StaticByteStream.html><B>StaticByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>Read-only ByteStream interface to a memory area.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;ByteStream.h&quot;</TT> and <TT>&quot;ByteStream.cpp&quot;</TT> define input/output classes
+similar in spirit to the well known C++
+<!1><A HREF="ByteStream.html">ByteStream</A> is an abstract base class for all byte streams.  It
+defines a virtual interface and also provides useful functions.  These
+files provide two subclasses. Class <!1><A HREF="StdioByteStream.html">StdioByteStream</A> provides a
+simple interface to the Ansi C buffered input/output functions. Class
+<!1><A HREF="MemoryByteStream.html">MemoryByteStream</A> provides stream-like access to a dynamical array
+maintained in memory. Class <!1><A HREF="StaticByteStream.html">StaticByteStream</A> provides read-only
+stream-like access to a user allocated data buffer.<P><B>Notes</B> --- These classes were partly written because we did not want to
+depend on the standard C++ library.  The main reason however is related to
+the browser interface. We want to have a tight control over the
+implementation of subclasses because we want to use a byte stream to
+represent data passed by a web browser to a plugin.  This operation
+involves multi-threading issues that many implementations of the standard
+C++ library would squarely ignore.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- initial implementation<BR>
+Andrei Erofeev &lt;eaf@geocities.com&gt; -- 
+
+<DT><B>Version:</B><DD><TT>$Id: ByteStream.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

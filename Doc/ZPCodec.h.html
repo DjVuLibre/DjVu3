@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">ZPCodec.h</A></H2>
+<BLOCKQUOTE>Binary adaptive quasi-arithmetic coder. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="BitContext"></A>
+<B>typedef  unsigned char </B><A HREF=BitContext.html><B>BitContext</B></A><B></B><DD><I>Context variable.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec"></A>
+<B>class  </B><A HREF=ZPCodec.html><B>ZPCodec</B></A><B></B><DD><I>Performs ZP-Coder encoding and decoding.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="ZPCodec Examples"></A>
+<B></B><A HREF=ZPCodecExamples.html><B>ZPCodec Examples</B></A><B></B><DD><I>Suggestions for efficiently using the ZP-Coder.  </I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;ZPCodec.h&quot;</TT> and <TT>&quot;ZPCodec.cpp&quot;</TT> implement a fast binary adaptive
+quasi-arithmetic coder named ZP-Coder.  Because of its speed and
+convenience, the ZP-Coder is used in several parts of the DjVu reference
+library (See <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>, <!1><A HREF="JB2Image.h.html">JB2Image.h</A>, <!1><A HREF="IWImage.h.html">IWImage.h</A>).
+The following comments avoid the theory (see the historical remarks for
+useful pointers) and concentrate on the user perspective on the ZP-Coder.<P><B>Introduction</B> ---
+Encoding consists of transforming a sequence of <EM>message bits</EM> into a
+sequence of <EM>code bits</EM>. Decoding consists of retrieving the message
+bits using only the code bits.  We can make the code smaller than the
+message as soon as we can predict a message bit on the basis of a <EM>
+coding context</EM> composed of previously encoded or decoded bits. If the
+prediction is always correct, we do not even need to encode the message
+bit. If the prediction is totally unreliable, we need to generate one code
+bit in order to unambiguously specify the message bit.  In other words,
+the more reliable the prediction, the more compression we get.<P>The ZP-Coder handles prediction by means of <EM>context variables</EM> (see
+<!1><A HREF="BitContext.html">BitContext</A>).  There must be a context variable for each possible
+combination of context bits.  Both the encoder and the decoder use same
+context variable for coding each message bit.  For instance, we can code a
+binary image by successively coding all the pixels (the message bits) in
+row and column order.  It is reasonable to assume that each pixel can be
+reasonably well predicted by looking at a few (say 10) neighboring pixels
+located above and to the left of the current pixel.  Since these 10 pixels
+make 1024 combinations, we need 1024 context variables. Each pixel is
+encoded using the context variable corresponding to the values of the 10
+neighboring pixels.  Each pixel will be decoded by specifying the same
+context variable corresponding to the values of these 10 pixels. This is
+possible because these 10 pixels (located above and to the left) have
+already been decoded and therefore are known by the decoder program.<P>The context variables are initially set to zero, which mean that we do not
+know yet how to predict the current message bit on the basis of the
+context bits. While coding the message bits, the ZP-Coder automatically
+estimates the frequencies of <TT>0</TT>s and <TT>1</TT>s coded using each context
+variable.  These frequencies actually provide a prediction (the most
+probable bit value) and an estimation of the prediction reliability (how
+often the prediction was correct in the past).  All this statistical
+information is stored into the context variable after coding each bit.  In
+other words, the more we code bits within a particular context, the better
+the ZP-Coder adapts its prediction model, and the more compression we can
+obtain.<P>All this adaptation works indeed because both the encoder program and the
+decoder program are always synchronized. Both the encoder and the decoder
+see the same message bits encoded (or decoded) with the same context
+variables.  Both the encoder and the decoder apply the same rules to
+update the context variables and improve the predictors.  Both the encoder
+and the decoder programs use the same predictors for any given message
+bit.  The decoder could not work if this was not the case.<P>Just before encoding a message bit, all the context variables in the
+encoder program contain certain values. Just before decoding this message
+bit, all the context variables in the decoder program must contain the same
+values as for the encoder program.  This is guaranteed as long as
+each prediction only depends on already coded bits: <EM>the coding context,
+on which the each prediction is based, must be composed of message bits which
+have already been coded. </EM><P><B>Usage</B> ---
+Once you know how to organize the predictions (i.e. which coding context
+to use, how many context variables to initialize, etc.), using the
+ZP-Coder is straightforward (see <!1><A HREF="ZPCodecExamples.html">ZPCodec Examples</A>):
+<UL>
+<LI> The <EM>encoder program</EM> allocates context variables and
+initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
+encoding. For each message bit, the encoder program retrieves the context
+bits, selects a context variable on the basis of the context bits and
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.4">encoder</A> with the message bit and a
+reference to the context variable.
+<LI> The <EM>decoder program</EM> allocates context variables and
+initializes them to zero. It then constructs a <!1><A HREF="ZPCodec.html">ZPCodec</A> object for
+decoding. For each message bit, the decoder program retrieves the context
+bits, selects a context variable on the basis of the context bits and
+calls member function <!1><A HREF="ZPCodec.html#DOC.1.5.15.2.3">decoder</A> with a reference to the
+context variable. This function returns the message bit.
+</UL>
+Functions
+perform two essential tasks, namely <EM>coding</EM> and <EM>context
+adaptation</EM>.  Function <TT>decoder</TT> often returns after two arithmetic
+operations only.  To make your program fast, you just need to feed message
+bits and context variables fast enough.<P><B>History</B> --- The ZP-Coder is similar in function and performance to
+the seminal Q-Coder (Pennebaker, Mitchell, Langdon, Arps, IBM J. Res
+Dev. 32, 1988). An improved version of the Q-Coder, named QM-Coder, has
+been described in certain parts of the JPEG standard.  Unfortunate patent
+policies have made these coders very difficult to use in general purpose
+applications.  The Z-Coder is constructed using a new approach based on an
+extension of the Golomb codes (Bottou, Howard, Bengio, IEEE DCC 98, 1998
+<A HREF=http://www.research.att.com/~leonb/DJVU/bottou-howard-bengio>DjVu</A>
+<A HREF=http://www.research.att.com/~leonb/PS/bottou-howard-bengio.ps.gz>PostScript</A>)
+This new approach does not infringe the QM-Coder patents.  Unfortunately
+the Z-Coder is dangerously close to the patented Arithmetic MEL Coder.
+Therefore we wrote the ZP-Coder (pronounce Zee-Prime Coder) which we
+believe is clear of legal problems.  Needless to say, AT&amp;T has patents
+pending for both the Z-Coder and the ZP-Coder. The good news however is
+that we can grant a license to use the ZP-Coder in ``free software''
+without further complication. See the <!1><A HREF="ATTSourceCodeAgreement.html">AT&amp;T Source Code Agreement</A> for
+more information.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt; 
+<DT><B>Version:</B><DD><TT>$Id: ZPCodec.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT>
+
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

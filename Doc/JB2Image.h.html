@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">JB2Image.h</A></H2>
+<BLOCKQUOTE>Coding bilevel images with JB2. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2Blit"></A>
+<B>class  JB2Dictclass  JB2Imageclass  </B><A HREF=JB2Blit.html><B>JB2Blit</B></A><B></B><DD><I>Blit data structure.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2Shape"></A>
+<B>class  </B><A HREF=JB2Shape.html><B>JB2Shape</B></A><B></B><DD><I>Shape data structure.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2DecoderCallback"></A>
+<B>typedef  <!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="JB2Dict.html">JB2Dict</A>&gt;  </B><A HREF=JB2DecoderCallback.html><B>JB2DecoderCallback</B></A><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>( void* )</B><DD><I>JB2 Dictionary callback.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2Dict"></A>
+<B>class  </B><A HREF=JB2Dict.html><B>JB2Dict</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Dictionary of JB2 shapes.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2Image"></A>
+<B>class  </B><A HREF=JB2Image.html><B>JB2Image</B></A><B>: public <!1><A HREF="JB2Dict.html#DOC.1.5.23.4.1">JB2Dict</A></B><DD><I>Main JB2 data structure.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="JB2 extensions for version 21."></A>
+<B></B><A HREF=JB2extensionsforversion21..html><B>JB2 extensions for version 21.</B></A><B></B><DD><I>Extensions to the JB2 format introduced in version 21.  </I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;JB2Image.h&quot;</TT> and <TT>&quot;JB2Image.cpp&quot;</TT> address the compression of
+bilevel images using the JB2 soft pattern matching scheme.  These files
+provide the complete decoder and the decoder back-end.  The JB2 scheme is
+optimized for images containing a large number of self-similar small
+components such as characters.  Typical text images can be compressed into
+files 3 to 5 times smaller than with G4/MMR and 2 to 4 times smaller than
+with JBIG1.<P><B>JB2 and JBIG2</B> --- JB2 has strong similarities with the forthcoming
+JBIG2 standard developed by the "ISO/IEC JTC1 SC29 Working Group 1" which
+is responsible for both the JPEG and JBIG standards.  This is hardly
+surprising since JB2 was our own proposal for the JBIG2 standard
+and remained the only proposal for years.  The full JBIG2 standard however
+is significantly more complex and slighlty less efficient than JB2 because
+it addresses a broader range of applications.  Full JBIG2 compliance may
+be implemented in the future.<P><B>JB2 Images</B> --- Class <!1><A HREF="JB2Image.html">JB2Image</A> is the central data structure
+implemented here.  A <TT>JB2Image</TT> is composed of an array of shapes
+and an array of blits.  Each shape contains a small bitmap representing an
+elementary blob of ink, such as a character or a segment of line art.
+Each blit instructs the decoder to render a particular shape at a
+specified position in the image.  Some compression is already achieved
+because several blits can refer to the same shape.  A shape can also
+contain a pointer to a parent shape.  Additional compression is achieved
+when both shapes are similar because each shape is encoded using the
+parent shape as a model.  A <TT>&quot;O&quot;</TT> shape for instance could be a parent for
+both a <TT>&quot;C&quot;</TT> shape and a <TT>&quot;Q&quot;</TT> shape.<P><B>JB2 Dictionary</B> --- Class <!1><A HREF="JB2Dict.html">JB2Dict</A> is a peculiar kind of
+JB2Image which only contains an array of shapes.  These shapes can be
+referenced from another JB2Dict/JB2Image.  This is arranged by setting the
+``inherited dictionary'' of a JB2Dict/JB2Image using function
+<!1><A HREF="JB2Dict.html#DOC.1.5.23.4.5">set_inherited_dict</A>. Several JB2Images can use shapes from a
+same JB2Dict encoded separately.  This is how several pages of a same
+document can share information.<P><B>Decoding JB2 data</B> --- The first step for decoding JB2 data consists of 
+creating an empty <TT>JB2Image</TT> object.  Function <!1><A HREF="JB2Image.html#DOC.1.5.23.5.14">decode</A> then
+reads the data and populates the <TT>JB2Image</TT> with the shapes and the blits.
+Function <!1><A HREF="JB2Image.html#DOC.1.5.23.5.7">get_bitmap</A> finally produces an anti-aliased image.<P><B>Encoding JB2 data</B> --- The first step for decoding JB2 data also
+consists of creating an empty <TT>JB2Image</TT> object.  You must then use
+functions <!1><A HREF="JB2Dict.html#DOC.1.5.23.4.9">add_shape</A> and <!1><A HREF="JB2Image.html#DOC.1.5.23.5.11">add_blit</A> to
+populate the <TT>JB2Image</TT> object.  Function <!1><A HREF="JB2Image.html#DOC.1.5.23.5.13">encode</A> finally
+produces the JB2 data.  Function
+and the necessary shapes.  The compression ratio depends on several
+factors:
+<UL>
+<LI> Blits should reuse shapes as often as possible.
+<LI> Blits should be sorted in reading order because this facilitates
+the prediction of the blit coordinates.
+<LI> Shapes should be sorted according to the order of first appearance
+in the sequence of blits because this facilitates the prediction of the
+shape indices.
+<LI> Shapes should be compared to all previous shapes in the shape array.
+The shape parent pointer should be set to a suitable parent shape if
+such a parent shape exists.  The parent shape should have almost the
+same size and the same pixels.
+</UL>
+All this is quite easy to achieve in the case of an electronically
+produced document such as a DVI file or a PS file: we know what the
+characters are and where they are located.  If you only have a scanned
+image however you must first locate the characters (connected component
+analysis) and cut the remaining pieces of ink into smaller blobs.
+Ordering the blits and matching the shapes is then an essentially
+heuristic process.  Although the quality of the heuristics substantially
+effects the file size, misordering blits or mismatching shapes never
+effects the quality of the image.  The last refinement consists in
+smoothing the shapes in order to reduce the noise and maximize the
+similarities between shapes.<P><B>JB2 extensions</B> --- Two extensions of the JB2
+encoding format have been introduced with DjVu files version 21. The first
+extension addresses the shared shape dictionaries. The second extension
+bounds the number of probability contexts used for coding numbers.
+Both extensions maintain backward compatibility with JB2 as 
+described in the ICFDD proposal. A more complete discussion
+can be found in section <!1><A HREF="JB2extensionsforversion21..html">JB2 extensions for version 21.</A>.<P><B>References</B> 
+<UL>
+<LI> Paul G. Howard : <EM>Text image compression using soft 
+pattern matching</EM>, Computer Journal, volume 40:2/3, 1997.
+<LI> JBIG1 : <A HREF=http://www.jpeg.org/public/jbighomepage.htm>http://www.jpeg.org/public/jbighomepage.htm</A>.
+<LI> JBIG2 draft : <A HREF=http://www.jpeg.org/public/jbigpt2.htm>http://www.jpeg.org/public/jbigpt2.htm</A>.
+<LI> ICFDD Draft Proposed American National Standard, 1999-08-26.
+</UL><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Paul Howard &lt;pgh@research.att.com&gt; -- JB2 design<BR>
+L&eacute;on Bottou &lt;leonb@research.att.com&gt; -- this implementation 
+<DT><B>Version:</B><DD><TT>$Id: JB2Image.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT>
+
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

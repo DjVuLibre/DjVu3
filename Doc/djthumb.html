@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">djthumb</A></H2>
+<BLOCKQUOTE>Thumbnails generator </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        djthumb [options] &lt;djvu_file_in&gt; &lt;djvu_file_out&gt;
+    </PRE><P><B>Description</B> --- File <TT>&quot;djthumb.cpp&quot;</TT> illustrates how to use
+<!1><A HREF="DjVuDocEditor.html">DjVuDocEditor</A> class for thumbnails generation. Any multipage
+DjVu document can have integrated thumbnails. These are small icons
+stored inside the document (one per every page), which can be displayed
+by DjVu plugins in a narrow column along the left side of DjVu page.<P><EM><B>Note</B>: As of DjVu release 3.0 only UNIX DjVu plugin is capable of
+viewing them. Windows support for thumbnails is expected in the next
+release. </EM><P><B>Arguments</B> --- <TT>&lt;djvu_file_in&gt;</TT> and <TT>&lt;djvu_file_out&gt;</TT>
+are names of input and output files. The <TT>options</TT> can be:
+<DL>
+<DT><B>-verbose</B><DD> Do verbose processing (progress indicator and
+status messages).
+<DT><B>-size &lt;icon_size&gt;</B><DD> Specifies the size of thumbnail images to be
+generated. This parameter affects only the quality of the images.
+DjVu plugin can scale thumbnails arbitrary and regardless of
+their original size.
+</DL><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt; -- initial implementation
+
+<DT><B>Version:</B><DD><TT>$Id: djthumb.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">DjVu Memory </A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+This section is enabled when compilation symbol <TT>NEED_DJVU_MEMORY</TT> is
+defined.  Function <TT>_djvu_memory_callback</TT> can be used to redefine the C++
+memory allocation operators.  Some operating systems (e.g. Macintoshes)
+require very peculiar memory allocation in shared objects.  We redefine
+the operators <TT>new</TT> and <TT>delete</TT> as <TT>STATIC_INLINE</TT> because we do not
+want to export these redefined versions to other libraries.  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

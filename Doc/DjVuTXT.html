@@ -1,0 +1,232 @@
+<HTML>
+<HEAD>
+   <TITLE>class  DjVuTXT</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">DjVuTXT</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>Description of the text contained in a DjVu page.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CDjVuTXT,MDjVuTXT.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Classes</H3><DD><DT>
+<A HREF="#DOC.1.5.25.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>enum  <B>ZoneType</B>
+<DD><I>These constant are used to tell what a zone describes.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>struct  <B>Zone</B>
+<DD><I>Data structure representing document textual components.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.25.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GString.html">GString</A> <B>textUTF8</B>
+<DD><I>Textual data for this page.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> <B>main</B>
+<DD><I>Main zone in the document.</I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.25.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>has_valid_zones</B>() const 
+<DD><I>Tests whether there is a meaningful zone hierarchy.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>normalize_text</B>()
+<DD><I>Normalize textual data.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>encode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs) const 
+<DD><I>Encode data for a TXT chunk.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>decode</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
+<DD><I>Decode data from a TXT chunk.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt;  <B>copy</B>(void) const 
+<DD><I>Returns a copy of this object.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  <B>search_string</B>(const char * string, int &amp; start_pos, bool search_fwd, bool match_case) const 
+<DD><I>Searches the TXT chunk for the given string and returns a list of the smallest zones covering the text.</I>
+<DT>
+<A HREF="#DOC.1.5.25.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<DD><I>Returns the number of bytes needed by this data structure.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Description of the text contained in a DjVu page.  This class contains the
+textual data for the page.  It describes the text as a hierarchy of zones
+corresponding to page, column, region, paragraph, lines, words, etc...
+The piece of text associated with each zone is represented by an offset
+and a length describing a segment of a global UTF8 encoded string.  </BLOCKQUOTE>
+<DL>
+
+<A NAME="ZoneType">
+<A NAME="DOC.1.5.25.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>enum  ZoneType</B></TT>
+<DD>These constant are used to tell what a zone describes.
+This can be useful for a copy/paste application. 
+The deeper we go into the hierarchy, the higher the constant. 
+<DL><DT><DD></DL><P>
+<A NAME="Zone">
+<A NAME="DOC.1.5.25.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>struct  Zone</B></TT>
+<DD>Data structure representing document textual components.
+The text structure is represented by a hierarchy of rectangular zones. 
+<DL><DT><DD></DL><P><DL>
+
+<A NAME="ztype">
+<A NAME="DOC.1.5.25.2.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>enum  <!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.1">ZoneType</A> ztype</B></TT>
+<DD>Type fo the zone. 
+<DL><DT><DD></DL><P>
+<A NAME="rect">
+<A NAME="DOC.1.5.25.2.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GRect.html">GRect</A> rect</B></TT>
+<DD>Rectangle spanned by the zone 
+<DL><DT><DD></DL><P>
+<A NAME="text_start">
+<A NAME="DOC.1.5.25.2.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int text_start</B></TT>
+<DD>Position of the zone text in string <TT>textUTF8</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="text_length">
+<A NAME="DOC.1.5.25.2.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int text_length</B></TT>
+<DD>Length of the zone text in string <TT>textUTF8</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="children">
+<A NAME="DOC.1.5.25.2.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A>&gt;  children</B></TT>
+<DD>List of children zone. 
+<DL><DT><DD></DL><P>
+<A NAME="append_child">
+<A NAME="DOC.1.5.25.2.2.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A>* append_child()</B></TT>
+<DD>Appends another subzone inside this zone.  The new zone is initialized
+with an empty rectangle, empty text, and has the same type as this
+zone. 
+<DL><DT><DD></DL><P></DL>
+
+<A NAME="textUTF8">
+<A NAME="DOC.1.5.25.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GString.html">GString</A> textUTF8</B></TT>
+<DD>Textual data for this page.  
+The content of this string is encoded using the UTF8 code.
+This code corresponds to ASCII for the first 127 characters.
+Columns, regions, paragraph and lines are delimited by the following
+control character:
+<TABLE BORDER>
+<TR><TD>
+<B>Name</B> </TD><TD> <B>Octal</B> </TD><TD> <B>Ascii name</B> </TD></TR><TR><TD></TD></TR><TR><TD></TD></TR><TR><TD>
+<TT>DjVuText::end_of_column</TT>    </TD><TD> 013 </TD><TD> VT, Vertical Tab </TD></TR><TR><TD>
+<TT>DjVuText::end_of_region</TT>    </TD><TD> 035 </TD><TD> GS, Group Separator </TD></TR><TR><TD>
+<TT>DjVuText::end_of_paragraph</TT> </TD><TD> 037 </TD><TD> US, Unit Separator </TD></TR><TR><TD>
+<TT>DjVuText::end_of_line</TT>      </TD><TD> 012 </TD><TD> LF: Line Feed
+</TR></TABLE> 
+<DL><DT><DD></DL><P>
+<A NAME="main">
+<A NAME="DOC.1.5.25.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> main</B></TT>
+<DD>Main zone in the document.
+This zone represent the page. 
+<DL><DT><DD></DL><P>
+<A NAME="has_valid_zones">
+<A NAME="DOC.1.5.25.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int has_valid_zones() const </B></TT>
+<DD>Tests whether there is a meaningful zone hierarchy. 
+<DL><DT><DD></DL><P>
+<A NAME="normalize_text">
+<A NAME="DOC.1.5.25.2.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void normalize_text()</B></TT>
+<DD>Normalize textual data.  Assuming that a zone hierarchy has been built
+and represents the reading order.  This function reorganizes the string
+<TT>textUTF8</TT> by gathering the highest level text available in the zone
+hierarchy.  The text offsets and lengths are recomputed for all the
+zones in the hierarchy. Separators are inserted where appropriate. 
+<DL><DT><DD></DL><P>
+<A NAME="encode">
+<A NAME="DOC.1.5.25.2.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void encode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs) const </B></TT>
+<DD>Encode data for a TXT chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="decode">
+<A NAME="DOC.1.5.25.2.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void decode(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)</B></TT>
+<DD>Decode data from a TXT chunk. 
+<DL><DT><DD></DL><P>
+<A NAME="copy">
+<A NAME="DOC.1.5.25.2.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="DjVuTXT.html">DjVuTXT</A>&gt;  copy(void) const </B></TT>
+<DD>Returns a copy of this object. 
+<DL><DT><DD></DL><P>
+<A NAME="search_string">
+<A NAME="DOC.1.5.25.2.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>GList&lt;<!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.2">Zone</A> *&gt;  search_string(const char * string, int &amp; start_pos, bool search_fwd, bool match_case) const </B></TT>
+<DD>Searches the TXT chunk for the given string and returns a list of
+the smallest zones covering the text.
+
+<DL><DT><DT><B>Parameters:</B><DD><B>string</B> -  String to be found. May contain spaces as word separators.
+<BR><B>start_pos</B> -  Position where to start searching. It may be negative
+or it may be bigger than the length of the <!1><A HREF="DjVuTXT.html#DOC.1.5.25.2.3">textUTF8</A>
+string. If the <TT>start_pos</TT> is out of bounds, it will be fixed
+before starting the search
+<UL>
+<LI> If <TT>start_pos</TT> is negative and we search forward,
+the <TT>start_pos</TT> will be reset to <TT>0</TT>.
+<LI> If <TT>start_pos</TT> is too big and we search backward,
+the <TT>start_pos</TT> will be reset to the <TT>textUTF8.length()-1</TT>.
+<LI> Otherwise the <TT>start_pos</TT> will remain unchanged, and
+nothing will be found.
+</UL>
+If the function manages to find an occurrence of the string,
+it will modify the <TT>start_pos</TT> to point to it. If no match has
+been found, the <TT>start_pos</TT> will be reset to some big number
+if searching forward and <TT>-1</TT> otherwise.
+<BR><B>search_fwd</B> -  <TT>TRUE</TT> means to search forward. <TT>FALSE</TT> - backward.
+<BR><B>match_case</B> -  If set to <TT>FALSE</TT> the search will be case-insensitive.<BR><DD></DL><P>
+<A NAME="get_memory_usage">
+<A NAME="DOC.1.5.25.2.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
+<DD>Returns the number of bytes needed by this data structure. It's
+used by caching routines to estimate the size of a <!1><A HREF="DjVuImage.html">DjVuImage</A>. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

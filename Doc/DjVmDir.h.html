@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">DjVmDir.h</A></H2>
+<BLOCKQUOTE>Implements DjVu multipage document directory </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVmDir"></A>
+<B>class  </B><A HREF=DjVmDir.html><B>DjVmDir</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Implements DjVu multipage document directory.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>Files <TT>&quot;DjVmDir.h&quot;</TT> and <TT>&quot;DjVmDir.cpp&quot;</TT> implement class <!1><A HREF="DjVmDir.html">DjVmDir</A> for
+representing the directory of a DjVu multipage document.<P><B>Bundled vs. Indirect format</B> --- There are currently two multipage
+DjVu formats supported: <EM>bundled</EM> and <EM>indirect</EM>.  In the first
+format all component files composing a given document are packaged (or
+bundled) into one file, in the second one every page and component is
+stored in a separate file and there is one more file, which contains the
+list of all others.<P><B>Multipage DjVu format</B> --- Multipage DjVu documents follow the EA
+IFF85 format (cf. <!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A>.)  A document is composed of a
+<TT>&quot;FORM:DJVM&quot;</TT> whose first chunk is a <TT>&quot;DIRM&quot;</TT> chunk containing the <EM>
+document directory</EM>.  This directory lists all component files composing
+the given document, helps to access every component file and identify the
+pages of the document.
+<UL> 
+<LI> In a <EM>bundled</EM> multipage file, the component files 
+are stored immediately after the <TT>&quot;DIRM&quot;</TT> chunk,
+within the <TT>&quot;FORM:DJVU&quot;</TT> composite chunk.  
+<LI> In an <EM>indirect</EM> multipage file, the component files are 
+stored in different files whose URLs are composed using information 
+stored in the <TT>&quot;DIRM&quot;</TT> chunk.
+</UL> 
+Most of the component files represent pages of a document.  Some files
+however represent data shared by several pages.  The pages refer to these
+supporting files by means of an inclusion chunk (<TT>&quot;INCL&quot;</TT> chunks)
+identifying the supporting file.<P><B>Document Directory</B> --- Every directory record describes a component
+file.  Each component file is identified by a small string named the
+identifier (ID).  Each component file also contains a file name and a
+title.  The format of the <TT>&quot;DIRM&quot;</TT> chunk is described in section
+Format of the DIRM chunk..<P>Theoretically, IDs are used to uniquely identify each component file in
+<TT>&quot;INCL&quot;</TT> chunks, names are used to compose the the URLs of the component
+files in an indirect multipage DjVu file, and titles are cosmetic names
+possibly displayed when viewing a page of a document.  There are however
+many problems with this scheme, and we <EM>strongly suggest</EM>, with the
+current implementation to always make the file ID, the file name and the
+file title identical.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: DjVmDir.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,280 @@
+<HTML>
+<HEAD>
+   <TITLE>class  IWBitmap</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">IWBitmap</A>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></H2>
+<BLOCKQUOTE>IW44 encoded gray-level image.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="CGPEnabled,MGPEnabled.html,CIWBitmap,MIWBitmap.html">
+<param name=before value="M,M">
+<param name=after value="Md_,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.22.2.18"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>Writes a color image into a DjVu IW44 file.</B>
+<DD><I></I>
+</DL></P>
+
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.22.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>IWBitmap</B>()
+<DD><I>Null constructor.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>init</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GBitmap.html">GBitmap</A> *mask=0)
+<DD><I>Initializes an IWBitmap with image <TT>bm</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>IWBitmap</B>(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GBitmap.html">GBitmap</A> *mask=0)
+<DD><I>Convenience constructor.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>() const 
+<DD><I>Returns the width of the IWBitmap image.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>() const 
+<DD><I>Returns the height of the IWBitmap image.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>get_bitmap</B>()
+<DD><I>Reconstructs the complete image.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.7"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>get_bitmap</B>(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<DD><I>Reconstructs a segment of the image at a given scale.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.8"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<DD><I>Returns the amount of memory used by the wavelet coefficients.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.9"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_percent_memory</B>() const 
+<DD><I>Returns the filling ratio of the internal data structure.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.10"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>encode_chunk</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)
+<DD><I>Encodes one data chunk into ByteStream <TT>bs</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_width</B>() const 
+<DD><I>Writes a gray level image into DjVu IW44 file.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.12"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_height</B>() const 
+<DD><I>Returns the height of the IWPixmap image.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.13"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_pixmap</B>()
+<DD><I>Reconstructs the complete image.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.14"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  <B>get_pixmap</B>(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)
+<DD><I>Reconstructs a segment of the image at a given scale.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.15"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>unsigned int <B>get_memory_usage</B>() const 
+<DD><I>Returns the amount of memory used by the wavelet coefficients.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.16"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_percent_memory</B>() const 
+<DD><I>Returns the filling ratio of the internal data structure.</I>
+<DT>
+<A HREF="#DOC.1.5.22.2.17"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>encode_chunk</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)
+<DD><I>Encodes one data chunk into ByteStream <TT>bs</TT>.</I>
+</DL></P>
+
+</DL>
+<HR><H3>Inherited from <A HREF="GPEnabled.html">GPEnabled</A>:</H3>
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif><!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A>&amp; <B>operator=</B>(const <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A> &amp; obj)
+<DT>
+<IMG ALT="o" SRC=icon2.gif>int <B>get_count</B>(void) const 
+</DL></P>
+
+<P><DL>
+<DT><H3>Protected Fields</H3><DD><DT>
+<IMG ALT="o" SRC=icon2.gif>volatile   int <B>count</B>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>IW44 encoded gray-level image.  This class provided functions for managing
+a gray level image represented as a collection of IW44 wavelet
+coefficients.  The coefficients are stored in a memory efficient data
+structure.  Member function <!1><A HREF="IWBitmap.html#DOC.1.5.22.2.7">get_bitmap</A> renders an arbitrary segment
+of the image into a <!1><A HREF="GBitmap.html">GBitmap</A>.  Member functions decode_iff and
+encode_iff read and write DjVu IW44 files (see <!1><A HREF="IWImage.h.html">IWImage.h</A>).
+Both the copy constructor and the copy operator are declared as private
+members. It is therefore not possible to make multiple copies of instances
+of this class. </BLOCKQUOTE>
+<DL>
+
+<A NAME="IWBitmap">
+<A NAME="DOC.1.5.22.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> IWBitmap()</B></TT>
+<DD>Null constructor.  Constructs an empty IWBitmap object. This object does
+not contain anything meaningful. You must call function <!1><A HREF="IWBitmap.html#DOC.1.5.22.2.2">init</A>,
+decode_iff or decode_chunk to populate the wavelet
+coefficient data structure. 
+<DL><DT><DD></DL><P>
+<A NAME="init">
+<A NAME="DOC.1.5.22.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void init(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GBitmap.html">GBitmap</A> *mask=0)</B></TT>
+<DD>Initializes an IWBitmap with image <TT>bm</TT>.  This constructor
+performs the wavelet decomposition of image <TT>bm</TT> and records the
+corresponding wavelet coefficient.  Argument <TT>mask</TT> is an optional
+bilevel image specifying the masked pixels (see <!1><A HREF="IWImage.h.html">IWImage.h</A>). 
+<DL><DT><DD></DL><P>
+<A NAME="IWBitmap">
+<A NAME="DOC.1.5.22.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> IWBitmap(const <!1><A HREF="GBitmap.html">GBitmap</A> *bm, const <!1><A HREF="GBitmap.html">GBitmap</A> *mask=0)</B></TT>
+<DD>Convenience constructor. This constructors creates an empty IWBitmap
+and then calls function <!1><A HREF="IWBitmap.html#DOC.1.5.22.2.2">init</A> above. 
+<DL><DT><DD></DL><P>
+<A NAME="get_width">
+<A NAME="DOC.1.5.22.2.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_width() const </B></TT>
+<DD>Returns the width of the IWBitmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_height">
+<A NAME="DOC.1.5.22.2.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_height() const </B></TT>
+<DD>Returns the height of the IWBitmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bitmap">
+<A NAME="DOC.1.5.22.2.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  get_bitmap()</B></TT>
+<DD>Reconstructs the complete image.  The reconstructed image
+is then returned as a GBitmap object. 
+<DL><DT><DD></DL><P>
+<A NAME="get_bitmap">
+<A NAME="DOC.1.5.22.2.7">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  get_bitmap(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<DD>Reconstructs a segment of the image at a given scale.  The subsampling
+ratio <TT>subsample</TT> must be a power of two between <TT>1</TT> and <TT>32</TT>.  Argument
+<TT>rect</TT> specifies which segment of the subsampled image should be
+reconstructed.  The reconstructed image is returned as a GBitmap object
+whose size is equal to the size of the rectangle <TT>rect</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_memory_usage">
+<A NAME="DOC.1.5.22.2.8">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
+<DD>Returns the amount of memory used by the wavelet coefficients.  This
+amount of memory is expressed in bytes. 
+<DL><DT><DD></DL><P>
+<A NAME="get_percent_memory">
+<A NAME="DOC.1.5.22.2.9">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_percent_memory() const </B></TT>
+<DD>Returns the filling ratio of the internal data structure.  Wavelet
+coefficients are stored in a sparse array.  This function tells what
+percentage of bins have been effectively allocated. 
+<DL><DT><DD></DL><P>
+<A NAME="encode_chunk">
+<A NAME="DOC.1.5.22.2.10">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int encode_chunk(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)</B></TT>
+<DD>Encodes one data chunk into ByteStream <TT>bs</TT>.  Parameter <TT>parms</TT> controls
+how much data is generated.  The chunk data is written to ByteStream
+<TT>bs</TT> with no IFF header.  Successive calls to
+successive chunks.  You must call <TT>close_codec</TT> after encoding the last
+chunk of a file. 
+<DL><DT><DD></DL><P>
+<A NAME="get_width">
+<A NAME="DOC.1.5.22.2.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_width() const </B></TT>
+<DD>Writes a gray level image into DjVu IW44 file.  This function creates a
+composite chunk (identifier <TT>FORM:BM44</TT>) composed of <TT>nchunks</TT> chunks
+(identifier <TT>BM44</TT>).  Data for each chunk is generated with<P>void encode_iff(IFFByteStream &amp;iff, int nchunks, const IWEncoderParms *parms);<P>int  decode_chunk(ByteStream &amp;bs);<P>void decode_iff(IFFByteStream &amp;iff, int maxchunks=999);<P>void close_codec();  <P>int get_serial();<P>void parm_dbfrac(float frac);
+private:
+float db_frac;
+_IWMap *ymap;
+_IWCodec *ycodec;
+int cslice;
+int cserial;
+int cbytes;
+IWBitmap(const IWBitmap &amp;ref);
+IWBitmap&amp; operator=(const IWBitmap &amp;ref);
+};<P><P><P>class IWPixmap : public GPEnabled
+{
+public:<P>IWPixmap();<P>enum CRCBMode { 
+CRCBnone, 
+CRCBhalf, 
+CRCBnormal, 
+CRCBfull };<P>void init(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal);<P>IWPixmap(const GPixmap *bm, const GBitmap *mask=0, CRCBMode crcbmode=CRCBnormal );
+~IWPixmap();
+/** Returns the width of the IWPixmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_height">
+<A NAME="DOC.1.5.22.2.12">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_height() const </B></TT>
+<DD>Returns the height of the IWPixmap image. 
+<DL><DT><DD></DL><P>
+<A NAME="get_pixmap">
+<A NAME="DOC.1.5.22.2.13">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_pixmap()</B></TT>
+<DD>Reconstructs the complete image.  The reconstructed image
+is then returned as a GPixmap object. 
+<DL><DT><DD></DL><P>
+<A NAME="get_pixmap">
+<A NAME="DOC.1.5.22.2.14">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GPixmap.html">GPixmap</A>&gt;  get_pixmap(int subsample, const <!1><A HREF="GRect.html">GRect</A> &amp;rect)</B></TT>
+<DD>Reconstructs a segment of the image at a given scale.  The subsampling
+ratio <TT>subsample</TT> must be a power of two between <TT>1</TT> and <TT>32</TT>.  Argument
+<TT>rect</TT> specifies which segment of the subsampled image should be
+reconstructed.  The reconstructed image is returned as a GPixmap object
+whose size is equal to the size of the rectangle <TT>rect</TT>. 
+<DL><DT><DD></DL><P>
+<A NAME="get_memory_usage">
+<A NAME="DOC.1.5.22.2.15">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>unsigned int get_memory_usage() const </B></TT>
+<DD>Returns the amount of memory used by the wavelet coefficients.  This
+amount of memory is expressed in bytes. 
+<DL><DT><DD></DL><P>
+<A NAME="get_percent_memory">
+<A NAME="DOC.1.5.22.2.16">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int get_percent_memory() const </B></TT>
+<DD>Returns the filling ratio of the internal data structure.  Wavelet
+coefficients are stored in a sparse array.  This function tells what
+percentage of bins have been effectively allocated. 
+<DL><DT><DD></DL><P>
+<A NAME="encode_chunk">
+<A NAME="DOC.1.5.22.2.17">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int encode_chunk(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs, const <!1><A HREF="IWEncoderParms.html">IWEncoderParms</A> &amp;parms)</B></TT>
+<DD>Encodes one data chunk into ByteStream <TT>bs</TT>.  Parameter <TT>parms</TT> controls
+how much data is generated.  The chunk data is written to ByteStream
+<TT>bs</TT> with no IFF header.  Successive calls to
+successive chunks.  You must call <TT>close_codec</TT> after encoding the last
+chunk of a file. 
+<DL><DT><DD></DL><P>
+<A NAME="Writes a color image into a DjVu IW44 file.">
+<A NAME="DOC.1.5.22.2.18">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> Writes a color image into a DjVu IW44 file.</B></TT>
+<DD>Writes a color image into a DjVu IW44 file.  This function creates a
+composite chunk (identifier <TT>FORM:PM44</TT>) composed of <TT>nchunks</TT> chunks
+(identifier <TT>PM44</TT>).  Data for each chunk is generated with<P>void encode_iff(IFFByteStream &amp;iff, int nchunks, const IWEncoderParms *parms);<P>int  decode_chunk(ByteStream &amp;bs);<P>void decode_iff(IFFByteStream &amp;iff, int maxchunks=999);<P>void close_codec();  <P>int  get_serial();<P>int  parm_crcbdelay(int parm);<P>void parm_dbfrac(float frac);
+private:
+int   crcb_delay;
+int   crcb_half;
+float db_frac;
+_IWMap *ymap, *cbmap, *crmap;
+_IWCodec *ycodec, *cbcodec, *crcodec;
+int cslice;
+int cserial;
+int cbytes;
+IWPixmap(const IWPixmap &amp;ref);
+IWPixmap&amp; operator=(const IWPixmap &amp;ref);
+};<P><P>
+
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "pubtext/DjVuMessages.dtd">
+<DjVuMessages>
+<HEAD>
+<INCLUDE name="osi-messages/djvutools-reference.xml" />
+<INCLUDE name="osi-messages/libdjvu++-Test.xml" />
+<INCLUDE name="osi-messages/libdjvu++.xml" />
+</HEAD>
+<BODY>
+</BODY>
+</DjVuMessages>

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">cjb2</A></H2>
+<BLOCKQUOTE>Simple JB2 encoder. </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Synopsis</B>
+<PRE>
+        cjb2 [options] &lt;inputpbmfile&gt;  &lt;outputdjvufile&gt;
+    </PRE><P><B>Description</B><P>File <TT>&quot;cjb2.cpp&quot;</TT> demonstrates a simple encoder for Bilevel DjVu Images.
+It is able to perform lossless encoding and limited lossy encoding.  Lots
+of lossy encoding refinements are missing from this simple implementation.
+Comments in the code suggest a few improvements.<P>Options are:
+<DL>
+<DT><B>-dpi xxx</B><DD>  Specify image resolution (default 300).
+<DT><B>-clean</B><DD>    Clean small flyspecs (lossy).
+<DT><B>-loose</B><DD>    Substitute patterns with small variations (lossy).
+<DT><B>-verbose</B><DD>  Displays additional messages.
+</DL>
+Encoding is lossless unless one or several lossy options are selected.
+The <TT>dpi</TT> argument mostly affects the cleaning thresholds.<P><B>Bugs</B><P>This is not the full-fledged multipage DjVu compressor, but merely a free
+tool provided with the DjVu Reference Library as a demonstrative example.<P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;<BR>
+Paul Howard &lt;pgh@research.att.com&gt;<BR>
+Pascal Vincent &lt;vincentp@iro.umontreal.ca&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: cjb2.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

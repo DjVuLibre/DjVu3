@@ -1,0 +1,73 @@
+<HTML>
+<HEAD>
+   <TITLE>class  JB2Shape</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">JB2Shape</A></H2>
+<BLOCKQUOTE>Shape data structure.</BLOCKQUOTE>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.23.2.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>parent</B>
+<DD><I>Subscript of the parent shape.</I>
+<DT>
+<A HREF="#DOC.1.5.23.2.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  <B>bits</B>
+<DD><I>Bilevel image of the shape pixels.</I>
+<DT>
+<A HREF="#DOC.1.5.23.2.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>long <B>userdata</B>
+<DD><I>Private user data.</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Shape data structure.  A <TT>JB2Image</TT> contains an array of <TT>JB2Shape</TT> data
+structures.  Each array entry represents an elementary blob of ink such as
+a character or a segment of line art.  Member <TT>bits</TT> points to a bilevel
+image representing the shape pixels.  Member <TT>parent</TT> is the subscript of
+the parent shape.  </BLOCKQUOTE>
+<DL>
+
+<A NAME="parent">
+<A NAME="DOC.1.5.23.2.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int parent</B></TT>
+<DD>Subscript of the parent shape.  The parent shape must always be located
+before the current shape in the shape array.  A negative value indicates
+that this shape has no parent.  Any negative values smaller than <TT>-1</TT>
+further indicates that this shape does not look like a character.  This
+is used to enable a few internal optimizations.  This information is
+saved into the JB2 file, but the actual value of the <TT>parent</TT> variable
+is not. 
+<DL><DT><DD></DL><P>
+<A NAME="bits">
+<A NAME="DOC.1.5.23.2.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GP.html">GP</A>&lt;<!1><A HREF="GBitmap.html">GBitmap</A>&gt;  bits</B></TT>
+<DD>Bilevel image of the shape pixels.  This must be a pointer to a bilevel
+<TT>GBitmap</TT> image.  This pointer can also be null. The encoder will just
+silently discard all blits referring to a shape containing a null
+bitmap. 
+<DL><DT><DD></DL><P>
+<A NAME="userdata">
+<A NAME="DOC.1.5.23.2.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>long userdata</B></TT>
+<DD>Private user data. This long word is provided as a convenience for users
+of the JB2Image data structures.  Neither the rendering functions nor
+the coding functions ever access this value. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">IFFByteStream.h</A></H2>
+<BLOCKQUOTE>IFF file parser. </BLOCKQUOTE>
+
+<HR>
+<DL>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="IFFByteStream"></A>
+<B>class  </B><A HREF=IFFByteStream.html><B>IFFByteStream</B></A><B>: public <!1><A HREF="ByteStream.html">ByteStream</A></B><DD><I>ByteStream interface for an IFF file.</I>
+</DL>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+Files <TT>&quot;IFFByteStream.h&quot;</TT> and <TT>&quot;IFFByteStream.cpp&quot;</TT> implement a parser for
+files structured according the Electronic Arts ``EA IFF 85 Interchange
+File Format''.  IFF files are composed of a sequence of data <EM>chunks</EM>.
+Each chunk is identified by a four character <EM>chunk identifier</EM>
+describing the type of the data stored in the chunk.  A few special chunk
+identifiers, for instance <TT>&quot;FORM&quot;</TT>, are reserved for <EM>composite
+chunks</EM> which themselves contain a sequence of data chunks.  This
+conventions effectively provides IFF files with a convenient hierarchical
+structure.  Composite chunks are further identified by a secondary chunk
+identifier.<P>We found convenient to define a <EM>extended chunk identifier</EM>.  In the
+case of a regular chunk, the extended chunk identifier is simply the
+chunk identifier, as in <TT>&quot;PM44&quot;</TT>. In the case of a composite chunk, the
+extended chunk identifier is composed by concatenating the main chunk
+identifier, a colon, and the secondary chunk identifier, as in
+<TT>&quot;FORM:DJVU&quot;</TT>.<P>Class <!1><A HREF="IFFByteStream.html">IFFByteStream</A> provides a way to read or write IFF structured
+files.  Member functions provide an easy mean to position the underlying
+<!1><A HREF="ByteStream.html">ByteStream</A> at the beginning of each chunk and to read or write the
+data until reaching the end of the chunk.  The utility program
+<!1><A HREF="djvuinfo.2.html">djvuinfo</A> demonstrates how to use class <TT>IFFByteStream</TT>.<P><B>IFF Files and ZP-Coder</B> ---
+Class <TT>IFFByteStream</TT> repositions the underlying ByteStream whenever a new
+chunk is accessed.  It is possible to code chunk data with the ZP-Coder
+without worrying about the final file position. See class <!1><A HREF="ZPCodec.html">ZPCodec</A>
+for more details.<P><B>AT&amp;T IFF Files</B> --- We had initially planned to exactly follow the
+IFF specifications.  Then we realized that certain versions of MSIE
+recognize any IFF file as a Microsoft AIFF sound file and pop a message
+box "Cannot play that sound".  It appears that the structure of AIFF files
+is entirely modeled after the IFF standard, with small variations
+regarding the endianness of numbers and the padding rules.  We eliminate
+this problem by casting the AT&amp;T protection spell.  Our IFF files always
+start with the four octets <TT>&quot;AT&amp;T&quot;</TT> followed by the fully conformant IFF
+byte stream.  Class <TT>IFFByteStream</TT> silently skips these four
+octets when it encounters them.<P><B>References</B> --- EA IFF 85 Interchange File Format specification:<BR>
+<A HREF=http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt>http://www.cica.indiana.edu/graphics/image_specs/ilbm.format.txt</A> or
+<A HREF=http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre>http://www.tnt.uni-hannover.de/soft/compgraph/fileformats/docs/iff.pre</A><P></BLOCKQUOTE>
+<DL><DT><DT><B>Author:</B><DD>L&eacute;on Bottou &lt;leonb@research.att.com&gt;
+
+<DT><B>Version:</B><DD><TT>$Id: IFFByteStream.h.html,v 1.1 2001-08-08 17:38:04 docbill Exp $</TT> 
+<DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Annotations and Textual Information.</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>Annotation chunks</B> --- All types of DjVu images may contain
+annotation chunks.  Annotation chunks are currently used to describe
+hyperlinks as well as specifying more closely the behavior of the viewers.
+Annotation chunks can be edited with the DjVu editor <TT>djedit</TT>.  Annotation
+chunks can be inserted or removed using command <TT>djvuiff</TT>.  Annotations
+are contained in <TT>&quot;ANTa&quot;</TT> or <TT>&quot;ANTz&quot;</TT> chunks.  The <TT>&quot;ANTa&quot;</TT> chunks contain
+the annotation in plain text. The <TT>&quot;ANTz&quot;</TT> chunks contain the same
+information compressed with the BZZ encoder (cf. <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>).
+The syntax of the uncompressed annotation chunk uses a simple
+parenthesized notation. Erroneous and unrecognized constructs are silently
+ignored.  The following constructs are recognized:<P><DL>
+<DT><B>(background &lt;color&gt;)</B><DD>
+Sets the color of the viewer area surrounding the DjVu image.
+The color argument <TT>color</TT> are always represented using X11 
+syntax #<TT>RRGGBB</TT>. For instance #<TT>000000</TT> is black 
+and #<TT>FFFFFF</TT> is white.<P><DT><B>(zoom &lt;zoom-value&gt;)</B><DD>
+Sets the initial zoom factor of the image.  Argument <TT>zoom-value</TT> may
+be <TT>stretch</TT>, <TT>one2one</TT>, <TT>width</TT>, <TT>page</TT>, or composed of the letter
+<TT>&quot;d&quot;</TT> followed by a number between <TT>1</TT> and <TT>999</TT> (such as in <TT>d300</TT> for
+instance.)<P><DT><B>(mode &lt;mode-value&gt;)</B><DD>
+Sets the display mode for the image.  Argument <TT>mode-value</TT> may
+be <TT>color</TT>, <TT>bw</TT>, <TT>fore</TT> or <TT>back</TT>.<P><DT><B>(align &lt;horz-align&gt; &lt;vert-align&gt;)</B><DD>
+Specifies how the image should be aligned on the viewer surface.
+By default the image is located in the center.  Argument <TT>horz-align</TT>
+may be <TT>left</TT>, <TT>center</TT>, or <TT>right</TT>.  Argument <TT>vert-align</TT> may be
+<TT>top</TT>, <TT>center</TT>, or <TT>bottom</TT>.<P><DT><B>(maparea &lt;url&gt; &lt;comment&gt; &lt;area&gt; &lt;...options...&gt;</B><DD>
+Defines an hyperlink for the URL specified by argument <TT>url</TT>.<P>Argument <TT>url</TT> may have one of the following two forms:
+<PRE>
+            &quot;&lt;href&gt;&quot;
+            (url &quot;&lt;href&gt;&quot; &quot;&lt;target&gt;&quot;)
+       </PRE>
+where <TT>href</TT> is a string representing the URL and <TT>target</TT> is a string
+representing the target frame for the hyperlink (cf. Documentation for
+the HTML tag <TT>&lt;A&gt;</TT>).  Both strings are surrounded with double quotes.
+Argument <TT>comment</TT> is a string surrounded by double quotes.
+This string may be displayed as a tooltip when the user
+moves the mouse over the hyperlink.
+Argument <TT>area</TT> defines the shape of the hyperlink.
+The following options are supported for representing
+rectangle, circle, or polygons.
+<PRE>
+            (rect &lt;xmin&gt; &lt;ymin&gt; &lt;width&gt; &lt;height&gt;)
+            (oval &lt;xmin&gt; &lt;ymin&gt; &lt;width&gt; &lt;height&gt;)
+            (polygon &lt;x0&gt; &lt;y0&gt; &lt;x1&gt; &lt;y1&gt; ....)
+       </PRE>
+All parameters are numbers representing coordinates measured in image
+pixels with the origin set at the bottom left corner of the image.  The
+remaining arguments describe options regarding the hyperlink borders.
+A first set of option define the type of the borders:
+<PRE>
+            (xor)
+            (border &lt;color&gt;
+            (shadow_in [&lt;thickness&gt;])
+            (shadow_out [&lt;thickness&gt;])
+            (shadow_ein [&lt;thickness&gt;])
+            (shadow_eout [&lt;thickness&gt;])
+       </PRE>
+where parameter <TT>color</TT> has syntax #<TT>RRGGBB</TT> (as above) and parameter
+<TT>thickness</TT> is a number from 1 to 32.  The last four border modes are
+only supported with rectangular areas. The border becomes visible when
+the user moves the mouse over the hyperlink.  The border may be made
+always visible by using the following option:
+<PRE>
+            (border-avis)
+       </PRE>
+Finally the following option may be used with rectangular areas only.
+The complete area will be hilited using the specified color (specified
+with syntax #<TT>RRGGBB</TT> as usual).
+<PRE>
+            (hilite &lt;color&gt;)
+       </PRE>
+This is often used with an empty URL for simply emphasizing a specific
+segment of an image.
+</DL><P>
+<B>Textual Information Chunks</B> --- DjVu image files also contain a
+computer readable description of the text appearing on the page.  This
+information is contained by either a <TT>&quot;TXTa&quot;</TT> chunk or <TT>&quot;TXTz&quot;</TT> chunk.
+The <TT>&quot;TXTa&quot;</TT> chunk contains uncompressed data.  The <TT>&quot;TXTz&quot;</TT> chunk
+contains the same data compressed with the <!1><A HREF="bzz.html">bzz</A> compressor
+(cf. <!1><A HREF="BSByteStream.h.html">BSByteStream.h</A>).  The <TT>&quot;TXTa&quot;</TT> chunks begins by a 24 bit
+integer (most significant byte first) describing the length of the text in
+bytes.  Then come the ISO10646/UTF8 text.  Additional information
+indicates the position of each column/region/paragraph/line/word in the
+document.  More information about the capabilities of the chunk can be
+found in section <!1><A HREF="DjVuTXT.html">DjVuTXT</A>.  More information about the encoding of
+textual information can be found in file <TT>&quot;DjVuAnno.cpp&quot;</TT>.  </BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

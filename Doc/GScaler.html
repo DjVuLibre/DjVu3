@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+   <TITLE>class  GScaler</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GScaler</A></H2>
+<BLOCKQUOTE>Base class for GBitmapScaler and GPixmapScaler.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=95>
+<param name=classes value="CGScaler,MGScaler.html,CGPixmapScaler,MGPixmapScaler.html,CGBitmapScaler,MGBitmapScaler.html">
+<param name=before value="M,M|_,Mr_">
+<param name=after value="M,M,M">
+<param name=indent value="0,0,0">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.20.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_input_size</B>(int w, int h)
+<DD><I>Sets the size of the input image.</I>
+<DT>
+<A HREF="#DOC.1.5.20.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_output_size</B>(int w, int h)
+<DD><I>Sets the size of the output image.</I>
+<DT>
+<A HREF="#DOC.1.5.20.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_horz_ratio</B>(int numer, int denom)
+<DD><I>Sets the horizontal scaling ratio <TT>numer/denom</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.20.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>set_vert_ratio</B>(int numer, int denom)
+<DD><I>Sets the vertical scaling ratio to <TT>numer/denom</TT>.</I>
+<DT>
+<A HREF="#DOC.1.5.20.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>get_input_rect</B>( const <!1><A HREF="GRect.html">GRect</A> &amp;desired_output, <!1><A HREF="GRect.html">GRect</A> &amp;required_input )
+<DD><I>Computes which input pixels are required to compute specified output pixels.</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Base class for GBitmapScaler and GPixmapScaler.  This base class
+implements the common elements of class <!1><A HREF="GBitmapScaler.html">GBitmapScaler</A> and
+<!1><A HREF="GPixmapScaler.html">GPixmapScaler</A>.  Functions <!1><A HREF="GScaler.html#DOC.1.5.20.1.1">set_input_size</A> and
+<!1><A HREF="GScaler.html#DOC.1.5.20.1.2">set_output_size</A> are used to specify the size of the input image and
+the size of the output image.  Functions <!1><A HREF="GScaler.html#DOC.1.5.20.1.3">set_horz_ratio</A> and
+<!1><A HREF="GScaler.html#DOC.1.5.20.1.4">set_vert_ratio</A> may be used to override the scaling ratios computed
+from the image sizes.  You can then call function <!1><A HREF="GScaler.html#DOC.1.5.20.1.5">get_input_rect</A> to
+know which pixels of the input image are necessary to compute a specified
+rectangular zone of the output image.  The actual computation is then
+performed by calling function <TT>scale</TT> in class <!1><A HREF="GBitmapScaler.html">GBitmapScaler</A> and
+<!1><A HREF="GPixmapScaler.html">GPixmapScaler</A>.  </BLOCKQUOTE>
+<DL>
+
+<A NAME="set_input_size">
+<A NAME="DOC.1.5.20.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_input_size(int w, int h)</B></TT>
+<DD>Sets the size of the input image. Argument <TT>w</TT> (resp. <TT>h</TT>) contains the
+horizontal (resp. vertical) size of the input image.  This size is used
+to initialize the internal data structures of the scaler object. 
+<DL><DT><DD></DL><P>
+<A NAME="set_output_size">
+<A NAME="DOC.1.5.20.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_output_size(int w, int h)</B></TT>
+<DD>Sets the size of the output image. Argument <TT>w</TT> (resp. <TT>h</TT>) contains the
+horizontal (resp. vertical) size of the output image. This size is used
+to initialize the internal data structures of the scaler object. 
+<DL><DT><DD></DL><P>
+<A NAME="set_horz_ratio">
+<A NAME="DOC.1.5.20.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_horz_ratio(int numer, int denom)</B></TT>
+<DD>Sets the horizontal scaling ratio <TT>numer/denom</TT>.  This function may be
+used to force an exact scaling ratio.  The scaling ratios are otherwise
+derived from the sizes of the input and output images. 
+<DL><DT><DD></DL><P>
+<A NAME="set_vert_ratio">
+<A NAME="DOC.1.5.20.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void set_vert_ratio(int numer, int denom)</B></TT>
+<DD>Sets the vertical scaling ratio to <TT>numer/denom</TT>.  This function may be
+used to force an exact scaling ratio.  The scaling ratios are otherwise
+derived from the sizes of the input and output images. 
+<DL><DT><DD></DL><P>
+<A NAME="get_input_rect">
+<A NAME="DOC.1.5.20.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void get_input_rect( const <!1><A HREF="GRect.html">GRect</A> &amp;desired_output, <!1><A HREF="GRect.html">GRect</A> &amp;required_input )</B></TT>
+<DD>Computes which input pixels are required to compute specified output
+pixels.  Let us assume that we only need a part of the output
+image. This part is defined by rectangle <TT>desired_output</TT>.  Only a part
+of the input image is necessary to compute the output pixels.  Function
+<TT>get_input_rect</TT> computes the coordinates of that part of the input
+image, and stores them into rectangle <TT>required_input</TT>.  
+<DL><DT><DD></DL><P></DL>
+<HR>
+<DL><DT><B>Direct child classes:
+</B><DD><A HREF="GPixmapScaler.html">GPixmapScaler</A><BR>
+<A HREF="GBitmapScaler.html">GBitmapScaler</A><BR>
+</DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

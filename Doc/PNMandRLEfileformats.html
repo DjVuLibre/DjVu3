@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+   <TITLE> GMonitor::</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">PNM and RLE file formats</A></H2>
+<BLOCKQUOTE>Simple image file formats.  </BLOCKQUOTE>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+<B>PNM</B> --- There are actually three PNM file formats: PBM for bilevel
+images, PGM for gray level images, and PPM for color images.  These
+formats are widely used by popular image manipulation packages such as
+NetPBM <A HREF=http://www.arc.umn.edu/GVL/Software/netpbm.html>http://www.arc.umn.edu/GVL/Software/netpbm.html</A> or
+ImageMagick <A HREF=http://www.wizards.dupont.com/cristy/>http://www.wizards.dupont.com/cristy/</A>.<P><B>RLE</B> --- The binary RLE file format is a simple run-length encoding
+scheme for storing bilevel images.  Encoding or decoding a RLE encoded
+file is extremely simple. Yet RLE encoded files are usually much smaller
+than the corresponding PBM encoded files.  RLE files always begin with a
+header line composed of:<BR>
+- the two characters <TT>&quot;R4&quot;</TT>,<BR>
+- one or more blank characters,<BR>
+- the number of columns, encoded using characters <TT>&quot;0&quot;</TT> to <TT>&quot;9&quot;</TT>,<BR>
+- one or more blank characters,<BR>
+- the number of lines, encoded using characters <TT>&quot;0&quot;</TT> to <TT>&quot;9&quot;</TT>,<BR>
+- exactly one blank character (usually a line-feed character).<P>The rest of the file encodes a sequence of numbers representing the
+lengths of alternating runs of white and black pixels.  Lines are encoded
+starting with the top line and progressing towards the bottom line.  Each
+line starts with a white run. The decoder knows that a line is finished
+when the sum of the run lengths for that line is equal to the number of
+columns in the image.  Numbers in range <TT>0</TT> to <TT>191</TT> are represented by a
+single byte in range <TT>0x00</TT> to <TT>0xbf</TT>.  Numbers in range <TT>192</TT> to <TT>16383</TT>
+are represented by a two byte sequence: the first byte, in range <TT>0xc0</TT> to
+<TT>0xff</TT>, encodes the six most significant bits of the number, the second
+byte encodes the remaining eight bits of the number. This scheme allows
+for runs of length zero, which are useful when a line starts with a black
+pixel, and when a very long run (whose length exceeds <TT>16383</TT>) must be
+split into smaller runs.<P></BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

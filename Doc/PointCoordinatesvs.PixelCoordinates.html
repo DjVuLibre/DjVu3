@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+   <TITLE> </TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2> <A HREF="#DOC.DOCU">Point Coordinates vs. Pixel Coordinates</A></H2>
+<A NAME="DOC.DOCU">
+<BLOCKQUOTE>
+The DjVu technology relies on the accurate superposition of images at
+different resolutions.  Such an accuracy cannot be reached with the usual
+assumption that pixels are small enough to be considered infinitesimally
+small.  We must distinguish very precisely ``points'' and ``pixels''.
+This distinction is essential for performing scaling operations.<P>The pixels of an image are identified by ``pixel coordinates''.  The
+bottom-left corner pixel has coordinates <TT>(0,0)</TT> and the top-right corner
+pixel has coordinates <TT>(w-1,h-1)</TT> where <TT>w</TT> and <TT>h</TT> are the image size.
+Pixel coordinates are necessarily integers since pixels never overlap.<P>An infinitesimally small point is identified by its ``point coordinates''.
+There may be fractional point coordinates, although this library does not
+make use of them.  Points with integer coordinates are located <EM>on the
+corners of each pixel</EM>.  They are not located on the pixel centers.  The
+center of the pixel with pixel coordinates <TT>(i,j)</TT> is located at point
+coordinates <TT>(i+1/2,j+1/2)</TT>.  In other words, the pixel <TT>(i,j)</TT> extends
+from point <TT>(i,j)</TT> to point <TT>(i+1,j+1)</TT>.<P>Therefore, the point located on the bottom left corner of an image has
+coordinates <TT>(0,0)</TT>.  This point is in fact the bottom left corner of the
+bottom left pixel of the image.  The point located on the top right corner
+of an image has coordinates <TT>(w,h)</TT> where <TT>w</TT> and <TT>h</TT> are the image size.
+This is in fact the top right corner of pixel <TT>(w-1,h-1)</TT> which is the
+image pixel with the highest coordinates.</BLOCKQUOTE>
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>

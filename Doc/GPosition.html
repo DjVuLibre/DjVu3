@@ -1,0 +1,114 @@
+<HTML>
+<HEAD>
+   <TITLE>class  GPosition</TITLE>
+   <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
+</HEAD>
+<BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
+
+<H2>class  <A HREF="#DOC.DOCU">GPosition</A>: protected GCont</H2>
+<BLOCKQUOTE>Generic iterator class.</BLOCKQUOTE>
+<HR>
+
+<H2>Inheritance:</H2>
+<APPLET CODE="ClassGraph.class" WIDTH=600 HEIGHT=65>
+<param name=classes value="MGCont,M,CGPosition,MGPosition.html">
+<param name=before value="M,M">
+<param name=after value="Md-,M">
+<param name=indent value="0,1">
+<param name=arrowdir value="down">
+</APPLET>
+<HR>
+
+<DL>
+<P><DL>
+<DT><H3>Public Methods</H3><DD><DT>
+<A HREF="#DOC.1.5.6.2.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPosition</B>()
+<DD><I>Creates a null GPosition object.</I>
+<DT>
+<A HREF="#DOC.1.5.6.2.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>GPosition</B>(const <!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A> &amp;ref)
+<DD><I>Creates a copy of a GPosition object.</I>
+<DT>
+<A HREF="#DOC.1.5.6.2.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>operator int</B>() const 
+<DD><I>Tests whether this GPosition object is non null.</I>
+<DT>
+<A HREF="#DOC.1.5.6.2.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>operator !</B>() const 
+<DD><I>Tests whether this GPosition object is null.</I>
+<DT>
+<A HREF="#DOC.1.5.6.2.1.5"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A>&amp; <B>operator ++</B>()
+<DD><I>Moves this GPosition object to the next object in the container.</I>
+<DT>
+<A HREF="#DOC.1.5.6.2.1.6"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A><!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A>&amp; <B>operator --</B>()
+<DD><I>Moves this GPosition object to the previous object in the container.</I>
+</DL></P>
+
+</DL>
+
+<A NAME="DOC.DOCU">
+<HR>
+<H2>Documentation</H2>
+<BLOCKQUOTE>Generic iterator class.
+This class represents a position in a list (see GList) or a map
+(see <!1><A HREF="GMap.html">GMap</A>).   As demonstrated by the following examples,
+this class should be used to iterate over the objects contained
+in a list or a map:
+<PRE>
+    void print_list(GList&lt;GString&gt; a)
+    {
+      for (GPosition i = a ; i; ++i) 
+        printf(&quot;%s\n&quot;, (const char*) a[i] );
+    }
+
+    void print_list_backwards(GList&lt;GString&gt; a)
+    {
+      for (GPosition i = a.lastpos() ; i; --i) 
+        printf(&quot;%s\n&quot;, (const char*) a[i] );
+    }
+    </PRE>
+GPosition objects should only be used with the list or map for which they
+have been created (using the member functions <TT>firstpos</TT> or <TT>lastpos</TT> of
+the container).  Furthermore, you should never use a GPosition object
+which designates a list element which has been removed from the list
+(using member function <TT>del</TT> or by other means.)</BLOCKQUOTE>
+<DL>
+
+<A NAME="GPosition">
+<A NAME="DOC.1.5.6.2.1.1">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPosition()</B></TT>
+<DD>Creates a null GPosition object. 
+<DL><DT><DD></DL><P>
+<A NAME="GPosition">
+<A NAME="DOC.1.5.6.2.1.2">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> GPosition(const <!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A> &amp;ref)</B></TT>
+<DD>Creates a copy of a GPosition object. 
+<DL><DT><DD></DL><P>
+<A NAME="operator int">
+<A NAME="DOC.1.5.6.2.1.3">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B> operator int() const </B></TT>
+<DD>Tests whether this GPosition object is non null. 
+<DL><DT><DD></DL><P>
+<A NAME="operator !">
+<A NAME="DOC.1.5.6.2.1.4">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>int operator !() const </B></TT>
+<DD>Tests whether this GPosition object is null. 
+<DL><DT><DD></DL><P>
+<A NAME="operator ++">
+<A NAME="DOC.1.5.6.2.1.5">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A>&amp; operator ++()</B></TT>
+<DD>Moves this GPosition object to the next object in the container. 
+<DL><DT><DD></DL><P>
+<A NAME="operator --">
+<A NAME="DOC.1.5.6.2.1.6">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B><!1><A HREF="GPosition.html#DOC.1.5.6.2.1.1">GPosition</A>&amp; operator --()</B></TT>
+<DD>Moves this GPosition object to the previous object in the container. 
+<DL><DT><DD></DL><P></DL>
+
+<HR><DL><DT><B>This class has no child classes.</B></DL>
+
+<DL><DT><DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">HTML hierarchy of classes</A> or <A HREF="HIERjava.html">Java</A></I><P><HR>
+<!-- This is were the DOC++ footer is defined  -->
+
+<font face="arial,helvetica" size="2">
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
+<br>All other products mentioned are registered trademarks or trademarks of
+their respective companies.
+</font>
