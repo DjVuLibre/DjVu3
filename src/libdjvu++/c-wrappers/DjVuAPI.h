@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.45 2000-02-28 04:07:57 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.46 2000-02-29 03:39:07 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.45  2000-02-28 04:07:57  bcr
+ * Revision 1.46  2000-02-29 03:39:07  bcr
+ * Added a 'Strict' option to the Native() method.  Then this option is false we
+ * don't require color and gray to be bottom-up.
+ *
+ * Revision 1.45  2000/02/28 04:07:57  bcr
  * Added missing functions.
  *
  * Revision 1.44  2000/02/26 18:53:20  bcr
@@ -371,7 +375,7 @@ typedef struct _djvu_image_priv * djvu_image_priv;
                  // Gets the vertical DPI using bottom up coordinates.
                inline unsigned int get_ydpi(void) const;
                  // Tests if this image is in the "native" format.
-               inline bool isNative(void) const;
+               inline bool isNative(const bool Strict=true) const;
                  // Does a rotate of 0,90,180, or 270 degrees.
                inline void Rotate(const int angle);
 		 // This does a vertical flip in the raw coordinate system.
@@ -433,6 +437,16 @@ typedef struct _djvu_image_priv * djvu_image_priv;
     (((IMAGE)->type==DJVU_RLE)?((IMAGE)->orientation==DJVU_TDLRNR):\
     (((IMAGE)->rowsize==((IMAGE)->w)*((IMAGE)->pixsize))&&\
       ((IMAGE)->orientation==DJVU_BULRNR)&&((IMAGE)->type!=DJVU_RGB)&&\
+      ((IMAGE)->pixsize==(unsigned int)((IMAGE)->type==DJVU_GRAY)?1:3))))
+
+/* Nearly Native is the same as Native, but bottom up is not required.
+ */
+#define DJVU_IMAGE_NEARLY_NATIVE(IMAGE) \
+  (((IMAGE)->start_alloc == (IMAGE)->data)&&\
+    (((IMAGE)->type==DJVU_RLE)?((IMAGE)->orientation==DJVU_TDLRNR):\
+    (((IMAGE)->rowsize==((IMAGE)->w)*((IMAGE)->pixsize))&&\
+      (((IMAGE)->orientation==DJVU_BULRNR)||\
+        ((IMAGE)->orientation==DJVU_TDLRNR))&&((IMAGE)->type!=DJVU_RGB)&&\
       ((IMAGE)->pixsize==(unsigned int)((IMAGE)->type==DJVU_GRAY)?1:3))))
 
 /* This macro will set the flags to indicate a the specified rotation.
@@ -515,8 +529,8 @@ typedef struct _djvu_image_priv * djvu_image_priv;
              inline unsigned int djvu_image_struct::get_ydpi(void) const
              {return DJVU_IMAGE_GET_YDPI(this);}
                // This tests if the image is in the "native" format.
-             inline bool djvu_image_struct::isNative(void) const
-             {return DJVU_IMAGE_IS_NATIVE(this);}
+             inline bool djvu_image_struct::isNative(const bool Strict) const
+             {return Strict?DJVU_IMAGE_IS_NATIVE(this):DJVU_IMAGE_NEARLY_NATIVE(this);}
                // Does a rotate of 0,90,180, or 270 degrees.
              inline void djvu_image_struct::Rotate(const int angle)
              DJVU_IMAGE_ROTATE(this,angle)
