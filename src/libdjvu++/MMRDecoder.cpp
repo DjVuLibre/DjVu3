@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.22 2000-12-18 17:13:42 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.23 2000-12-22 04:15:39 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -400,7 +400,7 @@ public:
   const VLCode *code;
   int codewordshift;
   unsigned char *index;
-  ~VLTable();
+  GPBuffer<unsigned char> gindex;
   // Construct a VLTable given a codebook with #nbits# long codes.
   VLTable(const VLCode *codes, int nbits);
   // Reads one symbol from a VLSource
@@ -416,7 +416,7 @@ MMRDecoder::VLTable::decode(MMRDecoder::VLSource *src)
 }
 
 MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
-  : code(codes), codewordshift(0), index(0)
+  : code(codes), codewordshift(0), gindex(index,0)
 {
   int i;
   // count entries
@@ -431,7 +431,7 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
   codewordshift = 32 - nbits;
   // allocate table
   int size = (1<<nbits);
-  index = new unsigned char[size];
+  gindex.resize(size);
   // fill table with pointer to illegal entry
   for (i=0; i<size; i++)
     index[i] = ncodes;
@@ -453,15 +453,6 @@ MMRDecoder::VLTable::VLTable(const VLCode *codes, int nbits)
   }
 }
 
-MMRDecoder::VLTable::~VLTable()
-{
-  delete [] index;
-}
-
-
-
-
-
 // ----------------------------------------
 // MMR DECODER
 
@@ -473,22 +464,18 @@ MMRDecoder::~MMRDecoder()
   delete btable;
   delete mrtable;
   delete src;
-  delete [] line;
-  delete [] lineruns;
-  delete [] prevruns;
 }
 
 
 
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   : width(width), height(height), lineno(0), 
-    striplineno(0), rowsperstrip(0),
-    line(0), lineruns(0), prevruns(0),
+    striplineno(0), rowsperstrip(0), gline(line,width+8),
+    glineruns(lineruns,width+4), gprevruns(prevruns,width+4),
     src(0), mrtable(0), wtable(0), btable(0)
 {
-  lineruns = new unsigned short[width+4];
+  memset(line,0,width+8);
   memset(lineruns,0,width+4);
-  prevruns = new unsigned short[width+4];
   memset(prevruns,0,width+4);
   lineruns[0] = width;
   prevruns[0] = width;
@@ -686,13 +673,7 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
   // Obtain run lengths
   const unsigned short *xr = scanruns();
   if (!xr) return 0;
-  // Allocate data buffer if needed
-  unsigned char *p = line;
-  if (!p) 
-  {
-    line = p = new unsigned char[width+8];
-    memset(line,0,width+8);
-  }
+  unsigned char *p=line;
   // Process inversion
   if (invert)
     {
@@ -717,7 +698,7 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
 }
 
 
-
+#if 0
 const unsigned char *
 MMRDecoder::scanline()
 {
@@ -726,11 +707,6 @@ MMRDecoder::scanline()
   if (!xr) return 0;
   // Allocate data buffer if needed
   unsigned char *p = line;
-  if (!p)
-  {
-    line = p = new unsigned char[width+8];
-    memset(line,0,width+8);
-  }
   // Decode run lengths
   int a0 = 0;
   int a0color = 0;
@@ -743,6 +719,7 @@ MMRDecoder::scanline()
     }
   return line;
 }
+#endif
 
 
 
