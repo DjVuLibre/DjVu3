@@ -25,11 +25,10 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.cpp,v 1.15 2000-11-02 01:08:34 bcr Exp $
+// $Id: GRect.cpp,v 1.16 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.15 2000-11-02 01:08:34 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__

@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.68 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuDocument.h,v 1.69 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
 
@@ -51,7 +50,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.68 2000-11-02 01:08:34 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.69 2000-11-03 02:08:36 bcr Exp $#
 */
 
 //@{

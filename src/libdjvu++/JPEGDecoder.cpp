@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.11 2000-11-02 01:08:35 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.12 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #include "JPEGDecoder.h"
 #ifdef NEED_JPEG_DECODER

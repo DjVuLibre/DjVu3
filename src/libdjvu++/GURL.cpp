@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.41 2000-11-02 01:08:35 bcr Exp $
+// $Id: GURL.cpp,v 1.42 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifdef __GNUC__
 #pragma implementation

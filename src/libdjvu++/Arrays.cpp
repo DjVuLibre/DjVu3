@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.cpp,v 1.12 2000-11-03 00:04:36 mchen Exp $
+// $Id: Arrays.cpp,v 1.13 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
 
 #ifdef __GNUC__
 #pragma implementation

@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.21 2000-11-02 01:08:34 bcr Exp $
+// $Id: GException.h,v 1.22 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _GEXCEPTION_H_
 #define _GEXCEPTION_H_
@@ -89,7 +87,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.21 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GException.h,v 1.22 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

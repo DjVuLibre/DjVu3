@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.26 2000-11-03 00:04:36 mchen Exp $
+// $Id: ByteStream.h,v 1.27 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _BYTESTREAM_H
 #define _BYTESTREAM_H
@@ -59,7 +57,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.26 2000-11-03 00:04:36 mchen Exp $# */
+    #$Id: ByteStream.h,v 1.27 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

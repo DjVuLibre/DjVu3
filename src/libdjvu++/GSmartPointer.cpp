@@ -25,16 +25,16 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.cpp,v 1.16 2000-11-02 01:08:34 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.17 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 05/1997
 
-/* Put this into *one* file, which instantiates all the required containers
+#if 0 // Put this into *one* file, which instantiates all the required containers
 #ifdef __GNUC__
 #pragma implementation
+#endif 
 #endif
-*/
 
 #include "GThreads.h"
 #include "GSmartPointer.h"

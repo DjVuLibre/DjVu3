@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.12 2000-11-02 01:08:35 bcr Exp $
+// $Id: debug.h,v 1.13 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
@@ -89,7 +87,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.12 2000-11-02 01:08:35 bcr Exp $#
+    #$Id: debug.h,v 1.13 2000-11-03 02:08:37 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */

@@ -25,11 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.37 2000-11-02 01:08:35 bcr Exp $
+// $Id: parseoptions.h,v 1.38 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-/*C- -*- C++ -*-
-*/
 
 #ifndef __DJVUPARSEOPTIONS_H__
 #define __DJVUPARSEOPTIONS_H__
@@ -64,7 +61,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.37 2000-11-02 01:08:35 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.38 2000-11-03 02:08:37 bcr Exp $#
  */
 
 /*@{*/

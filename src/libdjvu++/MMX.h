@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMX.h,v 1.11 2000-11-02 01:08:35 bcr Exp $
+// $Id: MMX.h,v 1.12 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _MMX_H_
 #define _MMX_H_
@@ -67,7 +66,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.11 2000-11-02 01:08:35 bcr Exp $#
+    #$Id: MMX.h,v 1.12 2000-11-03 02:08:37 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{

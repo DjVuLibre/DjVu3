@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.23 2000-11-02 01:08:34 bcr Exp $
+// $Id: GException.cpp,v 1.24 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifdef __GNUC__
 #pragma implementation
@@ -46,7 +44,6 @@
 #include "DjVuMessage.h"
 #include "debug.h"
 
-// File "$Id: GException.cpp,v 1.23 2000-11-02 01:08:34 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 

@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.35 2000-11-02 01:08:34 bcr Exp $
+// $Id: DataPool.h,v 1.36 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
 
@@ -62,7 +61,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.35 2000-11-02 01:08:34 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.36 2000-11-03 02:08:36 bcr Exp $#
 */
 
 //@{

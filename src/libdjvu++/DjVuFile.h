@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.65 2000-11-02 02:59:20 bcr Exp $
+// $Id: DjVuFile.h,v 1.66 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
 
@@ -66,7 +65,7 @@ class DjVuTXT;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.65 2000-11-02 02:59:20 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.66 2000-11-03 02:08:37 bcr Exp $#
 */
 
 //@{

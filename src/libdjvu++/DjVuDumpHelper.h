@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.h,v 1.6 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuDumpHelper.h,v 1.7 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H
@@ -44,7 +43,7 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.6 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.7 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 
 

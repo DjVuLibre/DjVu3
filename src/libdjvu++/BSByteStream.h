@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.17 2000-11-02 01:08:34 bcr Exp $
+// $Id: BSByteStream.h,v 1.18 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _BSBYTESTREAM_H
 #define _BSBYTESTREAM_H
@@ -112,7 +110,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.17 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.18 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

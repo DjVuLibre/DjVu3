@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.17 2000-11-02 01:08:35 bcr Exp $
+// $Id: GString.h,v 1.18 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _GSTRING_H_
 #define _GSTRING_H_
@@ -54,7 +52,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.17 2000-11-02 01:08:35 bcr Exp $# */
+    #$Id: GString.h,v 1.18 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

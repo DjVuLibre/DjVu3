@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.31 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuImage.h,v 1.32 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -69,7 +68,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.31 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.32 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 

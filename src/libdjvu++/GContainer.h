@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.35 2000-11-02 01:08:34 bcr Exp $
+// $Id: GContainer.h,v 1.36 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
@@ -96,7 +94,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.35 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GContainer.h,v 1.36 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 

@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.17 2000-11-02 02:59:20 bcr Exp $
+// $Id: ZPCodec.h,v 1.18 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _ZPCODEC_H
 #define _ZPCODEC_H
@@ -149,7 +147,7 @@
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.17 2000-11-02 02:59:20 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.18 2000-11-03 02:08:37 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

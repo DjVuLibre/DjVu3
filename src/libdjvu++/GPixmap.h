@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.h,v 1.18 2000-11-02 01:08:34 bcr Exp $
+// $Id: GPixmap.h,v 1.19 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -48,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.18 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GPixmap.h,v 1.19 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

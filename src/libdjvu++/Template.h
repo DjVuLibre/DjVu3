@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Template.h,v 1.10 2000-11-02 01:08:35 bcr Exp $
+// $Id: Template.h,v 1.11 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 //T// This is a template for the header files in the
 //T// DjVu reference library. It describes the general
@@ -94,7 +92,7 @@
     @memo 
     Template header file
     @version 
-    #$Id: Template.h,v 1.10 2000-11-02 01:08:35 bcr Exp $# 
+    #$Id: Template.h,v 1.11 2000-11-03 02:08:37 bcr Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation \\
     Andrew Erofeev <eaf@geocities.com> -- implemented EXTERNAL_TEMPLATES */

@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.4 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
 
 
 /** @name cpaldjvu
@@ -65,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.3 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.4 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 //@}
 

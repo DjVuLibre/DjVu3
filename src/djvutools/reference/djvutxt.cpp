@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $
+// $Id: djvutxt.cpp,v 1.5 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
 
 // DJVUTXT -- DjVu TXT extractor
 
@@ -65,7 +64,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.4 2000-11-02 22:33:07 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.5 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 //@}
 

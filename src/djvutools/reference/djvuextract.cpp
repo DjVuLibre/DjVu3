@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $
+// $Id: djvuextract.cpp,v 1.4 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
 
 /** @name djvuextract
 
@@ -61,7 +60,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.3 2000-11-02 22:33:07 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.4 2000-11-03 02:08:36 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */

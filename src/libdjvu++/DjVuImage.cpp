@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.44 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.45 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifdef __GNUC__
 #pragma implementation

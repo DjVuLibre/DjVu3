@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.14 2000-11-02 02:59:20 bcr Exp $
+// $Id: ZPCodec.cpp,v 1.15 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifdef __GNUC__
 #pragma implementation

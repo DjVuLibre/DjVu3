@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.22 2000-11-02 02:17:05 bcr Exp $
+// $Id: JB2Image.h,v 1.23 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -125,7 +124,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.22 2000-11-02 02:17:05 bcr Exp $#
+    #$Id: JB2Image.h,v 1.23 2000-11-03 02:08:37 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author

@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.18 2000-11-02 01:08:34 bcr Exp $
+// $Id: Arrays.h,v 1.19 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _ARRAYS_H_
 #define _ARRAYS_H_
@@ -94,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.18 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: Arrays.h,v 1.19 2000-11-03 02:08:36 bcr Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

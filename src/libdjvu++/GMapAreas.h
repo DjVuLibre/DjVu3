@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.14 2000-11-02 01:08:34 bcr Exp $
+// $Id: GMapAreas.h,v 1.15 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -65,7 +64,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.14 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.15 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 

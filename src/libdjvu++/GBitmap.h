@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.h,v 1.25 2000-11-02 01:08:34 bcr Exp $
+// $Id: GBitmap.h,v 1.26 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -63,7 +62,7 @@ class GMonitor;
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.25 2000-11-02 01:08:34 bcr Exp $#
+    #$Id: GBitmap.h,v 1.26 2000-11-03 02:08:37 bcr Exp $#
 
  */
 //@{

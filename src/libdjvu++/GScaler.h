@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GScaler.h,v 1.12 2000-11-02 01:08:34 bcr Exp $
+// $Id: GScaler.h,v 1.13 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
@@ -57,7 +56,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.12 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GScaler.h,v 1.13 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 

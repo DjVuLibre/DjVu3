@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.h,v 1.31 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuPort.h,v 1.32 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
 
@@ -89,7 +88,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.31 2000-11-02 01:08:34 bcr Exp $# */
+    @version #$Id: DjVuPort.h,v 1.32 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 class DjVuPort;

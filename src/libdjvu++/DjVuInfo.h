@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.8 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuInfo.h,v 1.9 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
@@ -42,7 +41,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.8 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: DjVuInfo.h,v 1.9 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 

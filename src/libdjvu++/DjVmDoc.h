@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.16 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVmDoc.h,v 1.17 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
 
@@ -50,7 +49,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.16 2000-11-02 01:08:34 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.17 2000-11-03 02:08:36 bcr Exp $#
 */
 
 //@{

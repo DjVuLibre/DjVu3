@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWTransform.h,v 1.7 2000-11-02 01:08:35 bcr Exp $
+// $Id: IWTransform.h,v 1.8 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _IWTRANSFORM_H_
 #define _IWTRANSFORM_H_
@@ -46,7 +45,7 @@
     @memo 
     Fast IW44 transforms.
     @version 
-    #$Id: IWTransform.h,v 1.7 2000-11-02 01:08:35 bcr Exp $# 
+    #$Id: IWTransform.h,v 1.8 2000-11-03 02:08:37 bcr Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{

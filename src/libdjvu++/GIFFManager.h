@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.10 2000-11-02 01:08:34 bcr Exp $
+// $Id: GIFFManager.h,v 1.11 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GIFFMANAGER_H
 #define _GIFFMANAGER_H
@@ -58,7 +57,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.10 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: GIFFManager.h,v 1.11 2000-11-03 02:08:37 bcr Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed

@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.29 2000-11-02 02:17:05 bcr Exp $
+// $Id: GURL.h,v 1.30 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -45,7 +44,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.29 2000-11-02 02:17:05 bcr Exp $#
+    @version #$Id: GURL.h,v 1.30 2000-11-03 02:08:37 bcr Exp $#
 */
 
 //@{

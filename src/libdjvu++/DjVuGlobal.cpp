@@ -1,5 +1,4 @@
 //C-  -*- C++ -*-
-<<<<<<< DjVuGlobal.cpp
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
 //C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
@@ -26,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.28 2000-11-03 01:35:37 bcr Exp $
+// $Id: DjVuGlobal.cpp,v 1.29 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory

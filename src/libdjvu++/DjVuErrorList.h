@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuErrorList.h,v 1.9 2000-11-02 02:17:05 bcr Exp $
+// $Id: DjVuErrorList.h,v 1.10 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVUERRORLIST_H
 #define _DJVUERRORLIST_H
 
@@ -46,7 +45,7 @@
 
     @memo DjVuErrorList class.
     @author Bill C Riemers <bcr@lizardtech.com>
-    @version #$Id: DjVuErrorList.h,v 1.9 2000-11-02 02:17:05 bcr Exp $#
+    @version #$Id: DjVuErrorList.h,v 1.10 2000-11-03 02:08:36 bcr Exp $#
 */
 
 //@{

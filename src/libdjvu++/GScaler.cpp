@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GScaler.cpp,v 1.11 2000-11-02 01:08:34 bcr Exp $
+// $Id: GScaler.cpp,v 1.12 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 // Rescale images with fast bilinear interpolation
 

@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.14 2000-11-02 01:08:35 bcr Exp $
+// $Id: debug.cpp,v 1.15 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #include "debug.h"
 #include "GString.h"

@@ -25,12 +25,10 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.53 2000-11-02 01:08:35 bcr Exp $
+// $Id: GThreads.cpp,v 1.54 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
 
 
-
-// **** File "$Id: GThreads.cpp,v 1.53 2000-11-02 01:08:35 bcr Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998

@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.21 2000-11-02 02:59:20 bcr Exp $
+// $Id: IFFByteStream.h,v 1.22 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifndef _IFFBYTESTREAM_H_
 #define _IFFBYTESTREAM_H_
@@ -86,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.21 2000-11-02 02:59:20 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.22 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__

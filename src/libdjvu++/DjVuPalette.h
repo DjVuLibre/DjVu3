@@ -25,11 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.h,v 1.19 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuPalette.h,v 1.20 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
-
 
 #ifndef _DJVUPALETTE_H_
 #define _DJVUPALETTE_H_
@@ -59,7 +56,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.19 2000-11-02 01:08:34 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.20 2000-11-03 02:08:37 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{

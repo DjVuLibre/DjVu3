@@ -25,9 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.h,v 1.40 2000-11-02 01:08:35 bcr Exp $
+// $Id: GThreads.h,v 1.41 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -91,7 +90,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.40 2000-11-02 01:08:35 bcr Exp $# */
+    #$Id: GThreads.h,v 1.41 2000-11-03 02:08:37 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

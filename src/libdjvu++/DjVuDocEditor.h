@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.26 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.27 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
 
@@ -46,7 +45,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.26 2000-11-02 01:08:34 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.27 2000-11-03 02:08:36 bcr Exp $#
 */
 
 //@{

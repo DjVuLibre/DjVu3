@@ -25,10 +25,8 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.35 2000-11-02 01:08:34 bcr Exp $
+// $Id: GBitmap.cpp,v 1.36 2000-11-03 02:08:37 bcr Exp $
 // $Name:  $
-
-
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,7 +39,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.35 2000-11-02 01:08:34 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.36 2000-11-03 02:08:37 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 

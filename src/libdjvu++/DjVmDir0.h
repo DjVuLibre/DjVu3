@@ -25,10 +25,9 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.h,v 1.11 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVmDir0.h,v 1.12 2000-11-03 02:08:36 bcr Exp $
 // $Name:  $
 
- 
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
 
@@ -55,7 +54,7 @@
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.11 2000-11-02 01:08:34 bcr Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.12 2000-11-03 02:08:36 bcr Exp $# */
 
 //@{
 
