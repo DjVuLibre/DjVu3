@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.3 1999-05-25 20:36:38 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.4 1999-05-25 22:29:18 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -760,7 +760,7 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
 	    DEBUG_MSG("found maparea '" << comment << "' (" <<
 		      url << ":" << target << ")\n");
 	    
-	    GHLObject::HLType hltype = GHLObject::NONE;
+	    GHLObject::HLType hltype=GHLObject::XOR;
 	    GString hlcolor="blue";
 	    int shadow_thick=3;
 	    GLObject * hl=obj[3];
