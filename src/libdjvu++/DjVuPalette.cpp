@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.16 2000-11-03 02:08:37 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.17 2000-11-06 18:20:18 mrosen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -204,9 +204,9 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
         pdata.touch(ncolors);
         PData &data = pdata[ncolors++];
         PHist &hist = hcube[i];
-        data.p[0] = (unsigned char) fmin(255, hist.p[0]/hist.w);
-        data.p[1] = (unsigned char) fmin(255, hist.p[1]/hist.w);
-        data.p[2] = (unsigned char) fmin(255, hist.p[2]/hist.w);
+        data.p[0] = (unsigned char) fmin(255, static_cast<float>(hist.p[0]/hist.w));
+        data.p[1] = (unsigned char) fmin(255, static_cast<float>(hist.p[1]/hist.w));
+        data.p[2] = (unsigned char) fmin(255, static_cast<float>(hist.p[2]/hist.w));
         data.w = hist.w;
         sum += data.w;
       }
