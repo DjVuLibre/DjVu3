@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.h,v 1.3 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: GString.h,v 1.4 1999-02-22 22:47:18 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -20,22 +20,21 @@
     \Ref{GSmartPointer.h}).
     
     {\bf Historical Comments} --- At some point during the DjVu research era,
-    it became clear that C++ compilers rarely provided portable libraries. I
+    it became clear that C++ compilers rarely provided portable libraries. We
     then decided to avoid fancy classes (like #iostream# or #string#) and to
     rely only on the good old C library.  A good string class however is very
     useful.  We had already randomly picked letter 'G' to prefix class names
-    and derived the new class name #GString#.  Native english speakers kept
-    laughing in hiding and did not tell me anything until it was too late to
-    change (how naive...).  This is ironic because I completely forgot this
-    letter 'G' when creating more challenging things like #ZPCodec# or
-    #IWCodec#.
+    and we logically derived the new class name.  Native english speakers kept
+    laughing in hiding.  This is ironic because we completely forgot this
+    letter 'G' when creating more challenging things like the ZP Coder or the
+    IW44 wavelets.
     
     @memo
     General purpose string class.
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.3 1999-02-01 18:32:33 leonb Exp $# */
+    #$Id: GString.h,v 1.4 1999-02-22 22:47:18 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -66,34 +65,32 @@ private:
 
 
 
-/** General purpose character strings.
+/** General purpose character string.
     Each instance of class #GString# represents a character string.
     Overloaded operators provide a value semantic to #GString# objects.
     Conversion operators and constructors transparently convert between
     #GString# objects and #const char*# pointers.
 
     Functions taking strings as arguments should declare their arguments as
-    "#const char*#". Such functions will work equally well with #GString#
-    objects since there is a fast conversion operator from #GString# to 
-    "#const char*#". Functions returning strings however should return 
-    #GString# objects in order to avoid managing the memory necessary 
-    to represent the returned string.
+    "#const char*#".  Such functions will work equally well with #GString#
+    objects since there is a fast conversion operator from #GString# to
+    "#const char*#".  Functions returning strings should return #GString#
+    objects because the class will automatically manage the necessary memory.
     
-    Characters in the string can be identified by their position. 
-    The first character of a string
-    is numbered zero. Negative values for argument #from# represent
-    characters relative to the end of the string (i.e. position #-1#
-    accesses the last character of the string, position #-2# represents
-    the second last character, etc.)  */
+    Characters in the string can be identified by their position.  The first
+    character of a string is numbered zero. Negative values for argument
+    #from# represent characters relative to the end of the string
+    (i.e. position #-1# accesses the last character of the string, position
+    #-2# represents the second last character, etc.)  */
 
     
 class GString : protected GP<GStringRep> 
 {
 public: 
   // -- CONSTRUCTORS
-  /** Null constructor. Constructs an empty string (with zero characters). */
+  /** Null constructor. Constructs an empty string. */
   GString();
-  /** Copy constructor. Constructs a string by copying #gs#. */
+  /** Copy constructor. Constructs a string by copying the string #gs#. */
   GString(const GString &gs);
   /** Constructs a string from a zero terminated character array. */ 
   GString(const char *dat);
@@ -103,8 +100,8 @@ public:
   GString(const char *dat, unsigned int len);
   /** Construct a string by copying a sub-string. The string will be
       initialized with at most #len# characters from string #gs# starting at
-      position #from#.  The length of the constructed string is smaller than
-      #len# when the specified range is too large. */
+      position #from#.  The length of the constructed string may be smaller
+      than #len# if the specified range is too large. */
   GString(const GString &gs, int from, unsigned int len);
   /** Constructs a string with a human-readable representation of integer
       #number#. */
@@ -113,18 +110,20 @@ public:
       point number #number#. */
   GString(const double number);
   // -- COPY OPERATOR
-  /** Copy operator. Resets the string with the value of string #gs#.  This
-      operation is efficient : both strings will share the same segment of
-      memory with a copy-on-demand scheme. */
+  /** Copy operator. Resets this string with the value of the string #gs#.
+      This operation is efficient because string memory is allocated using a
+      "copy-on-write" strategy. Both strings will share the same segment of
+      memory until one of the strings is modified. */
   GString& operator= (const GString &gs);
-  /** Copy a zero terminated character array. Resets the string with the
+  /** Copy a zero terminated character array. Resets this string with the
       character string contained in the zero terminated character array
       #str#. */
   GString& operator= (const char *str);
   // -- ACCESS
   /** Converts a string into a constant zero terminated character array.  This
-      conversion operator is very efficient. The returned pointer remains
-      valid as long as the string is unmodified. */
+      conversion operator is very efficient because it simply returns a
+      pointer to the internal string data. The returned pointer remains valid
+      as long as the string is unmodified. */
   operator const char* () const  { return (*this)->data; }
   /** Returns the string length. */
   unsigned int length() const { return (*this)->size; }
@@ -134,9 +133,9 @@ public:
          if (! str) { ... }
          while (!! str) { ... }  -- Note the double operator!
       \end{verbatim}
-      We chose not to support syntax "#if# #(str)# #{}#" because the required
-      conversion operator introduces dangerous ambiguities with certain
-      compilers. */
+      Class #GString# does not to support syntax "#if# #(str)# #{}#" because
+      the required conversion operator introduces dangerous ambiguities with
+      certain compilers. */
   int operator! () const { return ((*this)->data[0] == 0); }
   // -- INDEXING
   /** Returns the character at position #n#. An exception
@@ -153,8 +152,8 @@ public:
   // -- DERIVED STRINGS
   /** Returns a sub-string.  The sub-string is composed by copying #len#
       characters starting at position #from# in this string.  The length of
-      the resulting string can be smaller than #len# when the specified range 
-      is too large. */
+      the resulting string may be smaller than #len# if the specified range is
+      too large. */
   GString substr(int from, unsigned int len=1) const;
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
@@ -162,19 +161,18 @@ public:
   GString upcase() const;
   /** Returns an lower case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
-      loweer case letters. */
+      lower case letters. */
   GString downcase() const;
   // -- ALTERING
   /** Reinitializes a string with the null string. */
   void empty();
   /** Provides a direct access to the string buffer.  Returns a pointer for
       directly accessing the string buffer.  This pointer valid remains valid
-      as long as the string is not modified by other means.  Argument #n#
-      represents the minimum length of the returned buffer.  If #n# is greater
-      than the string length, the returned string buffer will be large enough to
-      hold at least #n# characters plus a zero termination. If #n# is positive
-      but smaller than the string length, the string will be truncated to #n#
-      characters. */
+      as long as the string is not modified by other means.  Positive values
+      for argument #n# represent the length of the returned buffer.  The
+      returned string buffer will be large enough to hold at least #n#
+      characters plus a zero termination.  If #n# is positive but smaller than
+      the string length, the string will be truncated to #n# characters. */
   char *getbuf(int n = -1);
   /** Initializes a string with a formatted string (as in #printf#).  The
       string is re-initialized with the characters generated according to the
@@ -183,25 +181,25 @@ public:
       will not work with strings longer than 4096 characters. */
   void format(const char *fmt, ... );
   // -- SEARCHING
-  /* Searches character #c# in the strin scanning forward from position #from#
-     until reaching the end of the string.  This function returns the position
-     of the matching character.  It returns #-1# if character #c# cannot be
-     found. */
+  /** Searches character #c# in the string, starting at position #from# and
+      scanning forward until reaching the end of the string.  This function
+      returns the position of the matching character.  It returns #-1# if
+      character #c# cannot be found. */
   int search(char c, int from=0) const;
-  /* Searches sub-string #str# in the string scanning forward from position
-     #from# until reaching the end of the string.  This function returns the
-     position of the first matching character of the sub-string.  It returns
-     #-1# if character #c# cannot be found. */
+  /** Searches sub-string #str# in the string, starting at position #from# and
+      scanning forward until reaching the end of the string.  This function
+      returns the position of the first matching character of the sub-string.
+      It returns #-1# if string #str# cannot be found. */
   int search(const char *str, int from=0) const;
-  /* Searches character #c# in the strin scanning backward from position
-     #from# until reaching the beginning of the string.  This function returns
-     the position of the matching character.  It returns #-1# if character #c#
-     cannot be found. */
+  /** Searches character #c# in the string, starting at position #from# and
+      scanning backwards until reaching the beginning of the string.  This
+      function returns the position of the matching character.  It returns
+      #-1# if character #c# cannot be found. */
   int rsearch(char c, int from=-1) const;
-  /* Searches sub-string #str# in the strin scanning backward from position
-     #from# until reaching the beginning of the string.  This function returns
-     the position of the first matching character of the sub-string. It
-     returns #-1# if character #c# cannot be found. */
+  /** Searches sub-string #str# in the string, starting at position #from# and
+      scanning backwards until reaching the beginning of the string.  This
+      function returns the position of the first matching character of the
+      sub-string. It returns #-1# if string #str# cannot be found. */
   int rsearch(const char *str, int from=-1) const;
   // -- CONCATENATION
   /** Appends character #ch# to the string. */
@@ -218,7 +216,7 @@ public:
     { return GString::concat(s1,s2);}
   // -- COMPARISONS
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
-      are equal (in the sense of #strcmp#.) */
+      are equal (as with #strcmp#.) */
   friend int operator==(const GString &s1, const GString &s2) 
     { return strcmp(s1,s2)==0; }
   friend int operator==(const GString &s1, const char    *s2) 
@@ -226,7 +224,7 @@ public:
   friend int operator==(const char    *s1, const GString &s2) 
     { return strcmp(s1,s2)==0; }
   /** String comparison. Returns true if and only if character strings #s1# and #s2#
-      are not equal (in the sense of #strcmp#.) */
+      are not equal (as with #strcmp#.) */
   friend int operator!=(const GString &s1, const GString &s2)
     { return strcmp(s1,s2)!=0; }
   friend int operator!=(const GString &s1, const char    *s2)
@@ -266,8 +264,8 @@ public:
   friend int operator< (const char    *s1, const GString &s2) 
     { return strcmp(s1,s2)< 0; }
   // -- HASHING
-  /** Returns a hash code for the string.  This is useful for creating
-      associative maps with string keys (see \Ref{GMap}). */
+  /** Returns a hash code for the string.  This hashing function
+      helps when creating associative maps with string keys (see \Ref{GMap}). */
   friend unsigned int hash(const GString &ref);
   // -- HELPERS
 protected:
