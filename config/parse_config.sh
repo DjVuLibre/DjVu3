@@ -26,6 +26,7 @@ if [ -z "$prefix" ] ; then
       prefix="/usr"
     fi
   fi
-  CONFIG_VARS=`echo prefix INSTALL_CONFIG INSTALL_CONFIG_DIR "$CONFIG_VARS"`
+  PROJECT_PREFIX="$prefix/ATT-DjVu/$PROJECT_FULLNAME"
+  CONFIG_VARS=`echo prefix INSTALL_CONFIG INSTALL_CONFIG_DIR PROJECT_PREFIX "$CONFIG_VARS"`
 fi
 

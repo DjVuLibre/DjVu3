@@ -61,14 +61,17 @@
 #
 # generate_main_makefile
 #   (to be documented)
+#
+# finish_config
+#   Writes the reconfigure script and cache file.
 
 
-# --- Prefix for temporary files
+# --- prefix for temporary files
 tempdir=/tmp
 temp="${tempdir}"/c$$
 
 # --- Make sure that all temp files are removed
-trap "rm 2>>/dev/null $temp $temp.*" 0
+trap "rm -rf 2>>/dev/null $temp $temp.*" 0
 
 ### ------------------------------------------------------------------------
 ### Support functions
@@ -104,6 +107,7 @@ if [ -d "$temp/test/test" ] ; then
   {
     mkdir -p "$*"
   }
+  MKDIRP="mkdir -p"
 else
   mkdirp()
   {
@@ -113,6 +117,7 @@ else
       mkdir "$*"
     fi
   }
+  MKDIRP="'${CONFIG_DIR}/mkdirp.sh'"
 fi
 
 
@@ -490,27 +495,35 @@ generate_makefile()
 
   # substitute
   mkdirp "$TOPBUILDDIR/$1"
-  sed < $TOPSRCDIR/$1/Makefile.in > "$TOPBUILDDIR/$1/Makefile" \
-    -e 's!@prefix@!'"$prefix"'!g' \
-    -e 's!@topsrcdir@!'"$xtopsrcdir"'!g' \
-    -e 's!@topbuilddir@!'"$xtopbuilddir"'!g' \
-    -e 's!@srcdir@!'"$xsrcdir"'!g' \
-    -e 's!@cc@!'"$CC $CCFLAGS"'!g' \
-    -e 's!@cxx@!'"$CXX $CXXFLAGS"'!g' \
-    -e 's!@defs@!'"$DEFS"'!g' \
-    -e 's!@opt@!'"$OPT"'!g' \
-    -e 's!@warn@!'"$WARN"'!g' \
-    -e 's!@libs@!'"$LIBS"'!g' \
-    -e 's!@ranlib@!'"$RANLIB"'!g' \
-    -e 's!@rpo@!'"$RPO"'!g' \
-    -e 's!@docxx@!'"doc++"'!g' \
-    -e 's!@make_stlib@!'"$MAKE_STLIB"'!g' \
-    -e 's!@make_shlib@!'"$MAKE_SHLIB"'!g'
+  if [ -z "$WROTE_STATUS" ]
+  then
+    . "${CONFIG_DIR}/write_status.sh"
+  fi
+  run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
+  mv "$TOPBUILDDIR/$1/Makefile" "$temp"
+  sed < "$temp" > "$TOPBUILDDIR/$1/Makefile" \
+    -e 's!@%prefix%@!'"${prefix}"'!g' \
+    -e 's!@%PROJECT_PREFIX%@!'"${PROJECT_PREFIX}"'!g' \
+    -e 's!@%MKDIRP%@!'"$MKDIRP"'!g' \
+    -e 's!@%topsrcdir%@!'"$xtopsrcdir"'!g' \
+    -e 's!@%topbuilddir%@!'"$xtopbuilddir"'!g' \
+    -e 's!@%srcdir%@!'"$xsrcdir"'!g' \
+    -e 's!@%cc%@!'"$CC $CCFLAGS"'!g' \
+    -e 's!@%cxx%@!'"$CXX $CXXFLAGS"'!g' \
+    -e 's!@%defs%@!'"$DEFS"'!g' \
+    -e 's!@%opt%@!'"$OPT"'!g' \
+    -e 's!@%warn%@!'"$WARN"'!g' \
+    -e 's!@%libs%@!'"$LIBS"'!g' \
+    -e 's!@%ranlib%@!'"$RANLIB"'!g' \
+    -e 's!@%rpo%@!'"$RPO"'!g' \
+    -e 's!@%docxx%@!'"doc++"'!g' \
+    -e 's!@%make_stlib%@!'"$MAKE_STLIB"'!g' \
+    -e 's!@%make_shlib%@!'"$MAKE_SHLIB"'!g'
 
   # dependencies
-  if [ -r $TOPSRCDIR/$1/Makefile.depend ]
+  if [ -r "$TOPSRCDIR/$1/Makefile.depend" ]
   then
-    cat $TOPSRCDIR/$1/Makefile.depend >> "$TOPBUILDDIR/$1/Makefile"
+    cat "$TOPSRCDIR/$1/Makefile.depend" >> "$TOPBUILDDIR/$1/Makefile"
   fi
 }
 
@@ -559,6 +572,16 @@ depend:
 
 PHONY: all install clean html depend
 EOF
+}
+
+finish_config()
+{
+  if [ -z "$WROTE_STATUS" ]
+  then
+    . "${CONFIG_DIR}/write_status.sh"
+  fi
+  . ${CONFIG_DIR}/write_cache.sh
+  . ${CONFIG_DIR}/write_reconfig.sh
 }
 
 # We always need to know the program name and directory.

@@ -7,7 +7,7 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
 
 if [ -z "$SYS" ] ; then
-  echo "Detecting system type"
+  echon "Checking system type ... "
   SYS=`uname -s`
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
@@ -22,7 +22,7 @@ if [ -z "$SYS" ] ; then
       SYS=Solaris
     fi
   fi
-  echo "Configuring for $SYS"
+  echo "$SYS"
   CONFIG_VARS=`echo SYS "$CONFIG_VARS"`
 fi
 

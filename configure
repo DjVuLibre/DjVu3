@@ -34,10 +34,10 @@ do
       rpo=yes
       ;;
     *)
-      if process_general_option $arg
+      if ( process_general_option $arg )
       then true  
       else
-        test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
+        if [ "x$arg" != "x--help" ] ; then echo 1>&2 "$conf: Unrecognized option '$arg'" ; fi
         echo 1>&2 "Usage: $conf <options>"
         echo 1>&2 "Recognized options:"
         list_general_options
@@ -97,28 +97,18 @@ EOF
 
 # --- save command line
 
-echo '#!/bin/sh' > "$TOPBUILDDIR/reconfigure"
-echo "'$PROGRAM' \\" >> "$TOPBUILDDIR/reconfigure"
-while [ $# != 0 ] ; do
-  echon "'$1' \\" >> "$TOPBUILDDIR/reconfigure"
-  shift
-done
-echo " "  >> "$TOPBUILDDIR/reconfigure"
-chmod 755 "$TOPBUILDDIR/reconfigure"
-
-# --- save configuration variables
-
-. "${CONFIG_DIR}/write_cache.sh"
+finish_config
 
 # --- display cool message
 
-echo
+echo " "
 echo Configuration is complete.
 echo You can proceed with the compilation by typing:
-                              echo "    make clean"
-test -n "$compiler_is_gcc" && echo "    make depend"
-                              echo "    make all"
-echo
+if [ "$TOPBUILDDIR" != "`pwd`" ] ; then echo "    cd '$TOPBUILDDIR'" ; fi
+echo "    make clean"
+if [ -n "$compiler_is_gcc" ] ; then echo "    make depend" ; fi
+echo "    make all"
+echo " "
 
 
 

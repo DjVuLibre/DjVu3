@@ -6,11 +6,7 @@ if [ -z "$CONFIG_DIR" ] ; then
 fi
 
 if [ -z "$CONFIG_READONLY" ] ; then
-
-  if [ -z "${CONFIG_CACHE}" ] ; then
-    "${CONFIG_DIR}"/dirs.sh
-  fi
-
+  echo "Writing the ${CONFIG_CACHE} file"|sed -e "s! `pwd`[/]*! !" 
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi

@@ -9,13 +9,18 @@ if [ -z "${CONFIG_CACHE}" ] ; then
 fi
 
 if [ -r "${CONFIG_CACHE}" ] ; then
+  p=`pwd`
+  echon `echo "Checking the values in ${CONFIG_CACHE} ..."|sed -e "s! ${p}[/]*! !"` 
   THISSYS="$SYS"
   SYS=""
   . "${CONFIG_CACHE}"
   if [ "x${SYS}" != "x${THISSYS}" ] ; then
+    echo "no good"
     for i in $CONFIG_VARS ; do
       eval `$i=''`
     done
+  else
+    echo good
   fi
   SYS="$THISSYS"
 fi
