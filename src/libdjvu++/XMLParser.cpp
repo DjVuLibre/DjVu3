@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.19 2001-07-17 00:32:22 fcrary Exp $
+// $Id: XMLParser.cpp,v 1.20 2001-07-18 23:48:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -263,23 +263,22 @@ lt_XMLParser::Impl::ChangeAnno(
   const GP<DjVuInfo> info(dfile.info);
   const GP<DjVuAnno> ganno(DjVuAnno::create());
   DjVuAnno &anno=*ganno;
+  GPosition map_pos;
+  map_pos=map.contains(areatag);
   if(dfile.contains_anno())
   {
     GP<ByteStream> annobs=dfile.get_merged_anno();
     if(annobs)
     {
       anno.decode(annobs);
+      if(anno.ant && info)
+      {
+        anno.ant->map_areas.empty();
+      }
     }
-//  dfile.remove_anno();
+//    dfile.remove_anno();
   }
-  GPosition map_pos;
-  if(!info || !(map_pos=map.contains(areatag)))
-  {
-    if(anno.ant)
-    {
-      anno.ant->map_areas.empty();
-    }  
-  }else
+  if(info && map_pos)
   {
     const int h=info->height;
     const int w=info->width;

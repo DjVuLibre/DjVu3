@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.176 2001-07-10 17:38:14 mchen Exp $
+// $Id: DjVuFile.cpp,v 1.177 2001-07-18 23:48:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -242,6 +242,7 @@ DjVuFile::~DjVuFile(void)
 void
 DjVuFile::reset(void)
 {
+   flags.enter();
    info = 0; 
    anno = 0; 
    text = 0; 
@@ -254,6 +255,8 @@ DjVuFile::reset(void)
    dir  = 0; 
    description = ""; 
    mimetype = "";
+   flags=(flags&(ALL_DATA_PRESENT|DECODE_STOPPED|DECODE_FAILED));
+   flags.leave();
 }
 
 unsigned int
@@ -458,8 +461,10 @@ DjVuFile::decode_func(void)
     for(GPosition pos=inc_files_list;pos;++pos)
     {
       GP<DjVuFile> & f=inc_files_list[pos];
-      if (f->is_decode_failed()) G_THROW( ERR_MSG("DjVuFile.decode_fail") );
-      if (f->is_decode_stopped()) G_THROW( DataPool::Stop );
+      if (f->is_decode_failed())
+        G_THROW( ERR_MSG("DjVuFile.decode_fail") );
+      if (f->is_decode_stopped())
+        G_THROW( DataPool::Stop );
       if (!f->is_decode_ok())
       {
         DEBUG_MSG("this_url='" << url << "'\n");
@@ -831,14 +836,14 @@ DjVuFile::decode_chunk( const GUTF8String &id, const GP<ByteStream> &gbs,
   // INFO  (information chunk for djvu page)
   if (is_info(chkid) && (djvu || djvi))
   {
-    if (DjVuFile::info)
+    if (info)
       G_THROW( ERR_MSG("DjVuFile.corrupt_dupl") );
     if (djvi)
       G_THROW( ERR_MSG("DjVuFile.corrupt_INFO") );
     // DjVuInfo::decode no longer throws version exceptions
-    GP<DjVuInfo> info=DjVuInfo::create();
-    info->decode(bs);
-    DjVuFile::info = info;
+    GP<DjVuInfo> xinfo=DjVuInfo::create();
+    xinfo->decode(bs);
+    info = xinfo;
     desc.format( ERR_MSG("DjVuFile.page_info") );
     // Consistency checks (previously in DjVuInfo::decode)
     if (info->width<0 || info->height<0)

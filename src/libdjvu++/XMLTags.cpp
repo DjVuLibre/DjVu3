@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.24 2001-06-13 18:26:19 bcr Exp $
+// $Id: XMLTags.cpp,v 1.25 2001-07-18 23:48:45 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -155,8 +155,8 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     G_THROW( ERR_MSG("XMLTags.no_GP") );
   }
   GPList<lt_XMLTags> level;
-  GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
-  GMap<GUTF8String,GMap<GUTF8String,GPList<lt_XMLTags> > > namedTags;
+//  GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
+//  GMap<GUTF8String,GMap<GUTF8String,GPList<lt_XMLTags> > > namedTags;
   GUTF8String tag,raw(xmlbs.gets(0,'<',false));
   int linesread=xmlbs.get_lines_read();
   if(!isspaces(raw))
@@ -272,9 +272,9 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           if(tag[len-2] != '/')
           {
             level.append(t);
-          }else
-          {
-            level[last]->addtag(t);
+//          }else
+//          {
+//            level[last]->addtag(t);
           }
         }else if(tag[len-2] != '/')
         {
@@ -288,11 +288,11 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           G_THROW( ERR_MSG("XMLTags.no_body") );
         }
         t->set_Line(linesread+1);
-        allTags[t->name].append(t);
-        for(GPosition pos=t->args;pos;++pos)
-        {
-          namedTags[t->args.key(pos)][t->args[pos]].append(t);
-        }
+//        allTags[t->name].append(t);
+//        for(GPosition pos=t->args;pos;++pos)
+//        {
+//          namedTags[t->args.key(pos)][t->args[pos]].append(t);
+//        }
         break;
       }
     }
