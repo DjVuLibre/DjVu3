@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.13 2001-01-04 22:04:55 bcr Exp $
+// $Id: JPEGDecoder.h,v 1.14 2001-07-12 23:33:16 bcr Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
@@ -47,7 +47,11 @@ class GPixmap;
 extern "C" {
 #endif
 
-#include <jinclude.h>
+#if HAS_DLOPEN && defined(__linux__)
+#define LIBJPEGNAME "libjpeg.so"
+#endif
+#include <stdio.h>
+#include <jconfig.h>
 #include <jpeglib.h>
 #include <jerror.h>
 
@@ -64,20 +68,38 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.13 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: JPEGDecoder.h,v 1.14 2001-07-12 23:33:16 bcr Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */
 //@{
 
+class GUTF8String;
+
 /** This class ensures namespace isolation. */
-class JPEGDecoder {
+class JPEGDecoder
+{
 public:
+  class Impl;
+
   /** Decodes the JPEG formated ByteStream */ 
   static GP<GPixmap> decode(ByteStream & bs);
+#ifdef LIBJPEGNAME
+  static void *jpeg_lookup(const GUTF8String &name);
+  static jpeg_error_mgr *jpeg_std_error(jpeg_error_mgr *x);
+  static void jpeg_CreateDecompress(jpeg_decompress_struct *x,int v, size_t s);
+  static void jpeg_destroy_decompress(j_decompress_ptr x);
+  static int jpeg_read_header(j_decompress_ptr x,boolean y);
+  static JDIMENSION jpeg_read_scanlines(j_decompress_ptr x,JSAMPARRAY y,JDIMENSION z);
+  static boolean jpeg_finish_decompress(j_decompress_ptr x);
+  static boolean jpeg_resync_to_restart(jpeg_decompress_struct *x,int d);
+  static boolean jpeg_start_decompress(j_decompress_ptr x);
+#endif // LIBJPEGNAME
 };
+
 
 //@}
 
 #endif // NEED_JPEG_DECODER
 #endif // _JPEGDECODER_H_
+

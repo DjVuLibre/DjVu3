@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.18 2001-04-05 16:06:27 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.19 2001-07-12 23:33:16 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -39,6 +39,16 @@
 
 #include "ByteStream.h"
 #include "GPixmap.h"
+#ifdef LIBJPEGNAME
+#include "DjVuDynamic.h"
+#include "GString.h"
+#endif // LIBJPEGNAME
+
+class JPEGDecoder::Impl : public JPEGDecoder
+{
+public:
+  static void jpeg_byte_stream_src(j_decompress_ptr, ByteStream &);
+};
 
 extern "C"
 {
@@ -51,8 +61,6 @@ struct djvu_error_mgr
 };
 
 typedef struct djvu_error_mgr * djvu_error_ptr;
-
-void jpeg_byte_stream_src(j_decompress_ptr, ByteStream *);
 
 METHODDEF(void)
 djvu_error_exit (j_common_ptr cinfo)
@@ -96,7 +104,7 @@ JPEGDecoder::decode(ByteStream & bs )
 
   jpeg_create_decompress(&cinfo);
 
-  jpeg_byte_stream_src(&cinfo, &bs);
+  Impl::jpeg_byte_stream_src(&cinfo, bs);
 
   (void) jpeg_read_header(&cinfo, TRUE);
 
@@ -228,9 +236,11 @@ term_source (j_decompress_ptr cinfo)
 {
   /* no work necessary here */
 }
-    
-GLOBAL(void)
-jpeg_byte_stream_src (j_decompress_ptr cinfo, ByteStream * bs)
+
+}
+
+void
+JPEGDecoder::Impl::jpeg_byte_stream_src(j_decompress_ptr cinfo,ByteStream &bs)
 {
   byte_stream_src_ptr src;
 
@@ -238,11 +248,11 @@ jpeg_byte_stream_src (j_decompress_ptr cinfo, ByteStream * bs)
   { /* first time for this JPEG object? */
     cinfo->src = (struct jpeg_source_mgr *)      
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-          SIZEOF(byte_stream_src_mgr));
+          sizeof(byte_stream_src_mgr));
     src = (byte_stream_src_ptr) cinfo->src;
     src->buffer = (JOCTET *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-          INPUT_BUF_SIZE * SIZEOF(JOCTET));
+          INPUT_BUF_SIZE * sizeof(JOCTET));
   }
 
   src = (byte_stream_src_ptr) cinfo->src;
@@ -251,12 +261,78 @@ jpeg_byte_stream_src (j_decompress_ptr cinfo, ByteStream * bs)
   src->pub.skip_input_data = skip_input_data;
   src->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
   src->pub.term_source = term_source;
-  src->byteStream = bs;
+  src->byteStream = &bs;
   src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
   src->pub.next_input_byte = NULL; /* until buffer loaded */
-}                                    
-
 }
 
+#ifdef LIBJPEGNAME
+void *
+JPEGDecoder::jpeg_lookup(const GUTF8String &name)
+{
+  void *sym=DjVuDynamic(GUTF8String(LIBJPEGNAME),name);
+  if(!sym)
+    G_THROW(ERR_MSG("DjVuFile.JPEG_bg2"));
+  return sym;
+}
+
+jpeg_error_mgr *
+JPEGDecoder::jpeg_std_error(jpeg_error_mgr *x)
+{
+  static void *sym=jpeg_lookup("jpeg_std_error");
+  return ((jpeg_error_mgr *(*)(jpeg_error_mgr *))sym)(x);
+}
+
+void
+JPEGDecoder::jpeg_CreateDecompress(jpeg_decompress_struct *x,int v, size_t s)
+{
+  static void *sym=jpeg_lookup("jpeg_CreateDecompress");
+  ((void (*)(jpeg_decompress_struct *,int,size_t))sym)(x,v,s);
+}
+
+void
+JPEGDecoder::jpeg_destroy_decompress(j_decompress_ptr x)
+{
+  static void *sym=jpeg_lookup("jpeg_destroy_decompress");
+  ((void (*)(j_decompress_ptr))sym)(x);
+}
+
+int
+JPEGDecoder::jpeg_read_header(j_decompress_ptr x,boolean y)
+{
+  static void *sym=jpeg_lookup("jpeg_read_header");
+  return ((int (*)(j_decompress_ptr,boolean))sym)(x,y);
+}
+
+JDIMENSION
+JPEGDecoder::jpeg_read_scanlines(j_decompress_ptr x,JSAMPARRAY y,JDIMENSION z)
+{
+  static void *sym=jpeg_lookup("jpeg_read_scanlines");
+  return ((JDIMENSION (*)(j_decompress_ptr,JSAMPARRAY,JDIMENSION))sym)(x,y,z);
+}
+
+boolean
+JPEGDecoder::jpeg_finish_decompress(j_decompress_ptr x)
+{
+  static void *sym=jpeg_lookup("jpeg_finish_decompress");
+  return ((boolean (*)(j_decompress_ptr))sym)(x);
+}
+
+boolean
+JPEGDecoder::jpeg_resync_to_restart(jpeg_decompress_struct *x,int d)
+{
+  static void *sym=jpeg_lookup("jpeg_resync_to_restart");
+  return ((boolean (*)(jpeg_decompress_struct *,int))sym)(x,d);
+}
+
+boolean
+JPEGDecoder::jpeg_start_decompress(j_decompress_ptr x)
+{
+  static void *sym=jpeg_lookup("jpeg_start_decompress");
+  return ((boolean (*)(j_decompress_ptr))sym)(x);
+}
+
+#endif // LIBJPEGNAME
 
 #endif
+

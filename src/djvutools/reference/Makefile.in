@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.15 2001-06-25 18:24:45 bcr Exp $
+# $Id: Makefile.in,v 1.16 2001-07-12 23:33:16 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -17,7 +17,7 @@ THREADS=@%threads%@
 DEFS=@%DEFS%@ @%DEFSTHREADS%@
 INCS=$(DJVUAPI_INC) $(LIBDJVUXX_INC) @%INCS%@
 LDFLAGS=
-LIBS=@%LIBS%@ @%LIBSTHREADS%@ @%LIBJPEG%@ @%libmath%@
+LIBS=@%LIBS%@ @%LIBSTHREADS%@ @%LIBJPEG%@ $(LIBDL) @%libmath%@
 MAKESTLIB=@%make_stlib%@
 LIBJPEG=@%LIBJPEG%@
 

@@ -83,6 +83,11 @@ DjVuDumpHelper.o: DjVuDumpHelper.cpp \
  GException.h GString.h GContainer.h \
  GURL.h Arrays.h DjVmDir.h DjVuInfo.h \
  GRect.h IFFByteStream.h ByteStream.h
+DjVuDynamic.o: DjVuDynamic.cpp ../../src/include/config.h \
+ GException.h DjVuGlobal.h \
+ ../../src/include/DjVu.h DjVuDynamic.h GURL.h \
+ GString.h GContainer.h GSmartPointer.h \
+ Arrays.h GThreads.h
 DjVuErrorList.o: DjVuErrorList.cpp \
  ../../src/include/config.h DjVuErrorList.h DjVuPort.h \
  GThreads.h DjVuGlobal.h \
@@ -268,7 +273,8 @@ JB2Image.o: JB2Image.cpp ../../src/include/config.h \
 JPEGDecoder.o: JPEGDecoder.cpp ../../src/include/config.h \
  JPEGDecoder.h GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ByteStream.h Arrays.h \
- GException.h GPixmap.h
+ GException.h GPixmap.h DjVuDynamic.h \
+ GString.h GContainer.h
 MMRDecoder.o: MMRDecoder.cpp ../../src/include/config.h \
  MMRDecoder.h GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h JB2Image.h GString.h \
