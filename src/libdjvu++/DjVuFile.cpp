@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.173 2001-06-11 19:26:59 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.174 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -538,16 +538,22 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       GCriticalSectionLock lock(&inc_files_lock);
       GPosition pos;
       for(pos=inc_files_list;pos;++pos)
-        if (inc_files_list[pos]->url.fname()==incl_url.fname()) break;
-        if (pos) return inc_files_list[pos];
+      {
+        if (inc_files_list[pos]->url.fname()==incl_url.fname())
+           break;
+      }
+      if (pos)
+        return inc_files_list[pos];
     }
     
     // No. We have to request a new file
     GP<DjVuFile> file;
-    G_TRY {
+    G_TRY
+    {
       file=pcaster->id_to_file(this, incl_str);
     }
-    G_CATCH(ex) {
+    G_CATCH(ex)
+    {
       unlink_file(incl_str);
       // In order to keep compatibility with the previous
       // release of the DjVu plugin, we will not interrupt

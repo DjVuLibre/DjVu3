@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.90 2001-06-26 16:14:51 bcr Exp $
+// $Id: DjVuDocument.h,v 1.91 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.90 2001-06-26 16:14:51 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.91 2001-06-28 19:42:58 bcr Exp $#
 */
 
 //@{
@@ -417,8 +417,11 @@ public:
       /// Returns the URL passed to the \Ref{init}() function
    GURL		get_init_url(void) const;
 
-      /** Returns a listing of id's used by this document. */
+      /// Returns a listing of id's used by this document.
    GList<GUTF8String> get_id_list(void);
+
+      /// Fill the id's into a GMap.
+   void map_ids( GMap<GUTF8String,void *> &map);
 
       /** Returns data corresponding to the URL passed to the \Ref{init}()
 	  function.
@@ -686,7 +689,11 @@ public:
 	  {\bf Plugin Warning}. This function will read contents of the whole
 	  document. Thus, if you call it from the main thread (the thread,
 	  which transfers data from Netscape), the plugin will block. */
-   void			write(GP<ByteStream> str, bool force_djvm=false);
+   void	write(const GP<ByteStream> &str, bool force_djvm=false);
+     /** Always save as bundled, renaming any files conflicting with the
+         the names in the supplied GMap. */
+   void	write(const GP<ByteStream> &str,
+     const GMap<GUTF8String,void *> &reserved);
       /** Saves the document in the {\em new indirect} format when every
 	  page and component are stored in separate files. This format
 	  is ideal for web publishing because it allows direct access to

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.42 2001-05-02 01:05:59 praveen Exp $
+// $Id: DjVmDir.cpp,v 1.43 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -359,7 +359,7 @@ DjVmDir::decode(const GP<ByteStream> &gstr)
 }
 
 void
-DjVmDir::encode(const GP<ByteStream> &gstr) const
+DjVmDir::encode(const GP<ByteStream> &gstr, const bool do_rename) const
 {
    ByteStream &str=*gstr;
    DEBUG_MSG("DjVmDir::encode(): encoding contents of the 'DIRM' chunk\n");
@@ -419,24 +419,15 @@ DjVmDir::encode(const GP<ByteStream> &gstr) const
         }
         bs_str.write24(file->size);
       }
-         
+      const bool xdo_rename=(do_rename||!bundled);
       DEBUG_MSG("storing and compressing flags for every record\n");
       for(pos=files_list;pos;++pos)
       {
         GP<File> file=files_list[pos];
-        if(bundled)
-        {
-          if(!file->name.length() || file->name == file->id)
-          {
-            file->flags&=~File::HAS_NAME;
-          }else
-          {
-            file->flags|=File::HAS_NAME;
-          }
-        }else
+        if(xdo_rename)
         {
           const GUTF8String new_id=
-            (!bundled && file->name.length() && file->name != file->id)
+            (file->name.length() && file->name != file->id)
               ?file->name:file->id;
           if(!file->oldname.length() || file->oldname == new_id)
           {
@@ -445,9 +436,18 @@ DjVmDir::encode(const GP<ByteStream> &gstr) const
           {
             file->flags|=File::HAS_NAME;
           }
+        }else
+        {
+          if(!file->name.length() || file->name == file->id)
+          {
+            file->flags&=~File::HAS_NAME;
+          }else
+          {
+            file->flags|=File::HAS_NAME;
+          }
         }
         if((!file->name.length() || file->name == file->id)
-          ||(!bundled&&(!file->oldname.length()||(file->oldname == file->name))))
+          ||(xdo_rename&&(!file->oldname.length()||(file->oldname == file->name))))
         {
           file->flags&=~File::HAS_NAME;
         }else
@@ -468,7 +468,7 @@ DjVmDir::encode(const GP<ByteStream> &gstr) const
       for(pos=files_list;pos;++pos)
       {
          GP<File> file=files_list[pos];
-         if(!bundled)
+         if(xdo_rename)
          {
            bs_str.writestring((file->name.length())?(file->name):(file->id));
            bs_str.write8(0);
@@ -591,7 +591,7 @@ DjVmDir::get_shared_anno_file(void) const
    return file;
 }
 
-void
+int
 DjVmDir::insert_file(const GP<File> & file, int pos_num)
 {
    DEBUG_MSG("DjVmDir::insert_file(): name='" << file->name << "', pos=" << pos_num << "\n");
@@ -658,6 +658,7 @@ DjVmDir::insert_file(const GP<File> & file, int pos_num)
       for(i=page_num;i<page2file.size();i++)
          page2file[i]->page_num=i;
    }
+   return pos_num;
 }
 
 void

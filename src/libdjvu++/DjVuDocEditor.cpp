@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.81 2001-06-26 22:45:23 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.82 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -204,7 +204,8 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
 
       // Check if we have either original data or converted (to new format),
       // if all the story is about the DjVuDocument's data
-   if (url==doc_url) return doc_pool;
+   if (url==doc_url)
+     return doc_pool;
 
       // Now see if we have any file matching the url
    const GP<DjVmDir::File> frec(djvm_dir->name_to_file(url.fname()));
@@ -403,7 +404,7 @@ DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
 
 GUTF8String
 DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
-                           int chunk_num)
+                           int chunk_num, DjVuPort *source)
       // Will open the 'file_name' and insert it into an existing DjVuFile
       // with ID 'parent_id'. Will insert the INCL chunk at position chunk_num
       // Will NOT process ANY files included into the file being inserted.
@@ -414,8 +415,21 @@ DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
    DEBUG_MAKE_INDENT(3);
    const GP<DjVmDir> dir(get_djvm_dir());
 
+   if(!source)
+     source=this;
       // Create DataPool and see if the file exists
-   GP<DataPool> file_pool(DataPool::create(file_url));
+   GP<DataPool> file_pool;
+   if(file_url.is_empty()||file_url.is_local_file_url())
+   {
+     file_pool=DataPool::create(file_url);
+   }else
+   {
+     file_pool=source->request_data(source, file_url);
+     if(source != this)
+     {
+       file_pool=DataPool::create(file_pool->get_stream()->duplicate());
+     }
+   }
    if(file_pool && file_url && DjVuDocument::djvu_import_codec)
    {
      (*DjVuDocument::djvu_import_codec)(file_pool,file_url,needs_compression_flag,can_compress_flag);
@@ -443,7 +457,8 @@ DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
    const GP<DjVmDir::File> frec(
      DjVmDir::File::create(id, id, id, DjVmDir::File::INCLUDE));
    int pos=dir->get_file_pos(parent_frec);
-   if (pos>=0) ++pos;
+   if (pos>=0)
+     ++pos;
    dir->insert_file(frec, pos);
 
       // Add it to our "cache"
@@ -479,11 +494,16 @@ DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
       // FALSE, if the file contains NDIR chunk and has been skipped.
 bool
 DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
-  int & file_pos, GMap<GUTF8String, GUTF8String> & name2id)
+  int & file_pos, GMap<GUTF8String, GUTF8String> & name2id,
+  DjVuPort *source)
 {
 
+  DEBUG_MSG("DjVuDocEditor::insert_file(): file_url='" << file_url <<
+             "', is_page='" << is_page << "'\n");
+  DEBUG_MAKE_INDENT(3);
   if (refresh_cb)
     refresh_cb(refresh_cl_data);
+
 
       // We do not want to insert the same file twice (important when
       // we insert a group of files at the same time using insert_group())
@@ -497,6 +517,21 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
     const GP<DjVmDir> dir(get_djvm_dir());
 
     GP<DataPool> file_pool(DataPool::create(file_url));
+
+    if(!source)
+      source=this;
+
+    if(file_url.is_empty()||file_url.is_local_file_url())
+    {
+      file_pool=DataPool::create(file_url);
+    }else
+    {
+      file_pool=source->request_data(source, file_url);
+      if(source != this)
+      {
+        file_pool=DataPool::create(file_pool->get_stream()->duplicate());
+      }
+    }
        // Create DataPool and see if the file exists
     if(file_pool && !file_url.is_empty() && DjVuDocument::djvu_import_codec)
     {
@@ -550,8 +585,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
         is_page ? DjVmDir::File::PAGE : DjVmDir::File::INCLUDE ));
 
          // And insert it into the directory
-      dir->insert_file(file, file_pos);
-      if (file_pos>=0) file_pos++;
+      file_pos=dir->insert_file(file, file_pos);
 
          // And add the File record (containing the file URL and DataPool)
       {
@@ -612,11 +646,11 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
             iff_in.close_chunk();
 
             G_TRY {
-               if (insert_file(full_url, false, file_pos, name2id))
+               if (insert_file(full_url, false, file_pos, name2id, source))
                {
                      // If the child file has been inserted (doesn't
                      // contain NDIR chunk), add INCL chunk.
-//                  GUTF8String id=name2id[name];
+                  GUTF8String id=name2id[name];
                   iff_out.put_chunk("INCL");
                   iff_out.writestring(id);
                   iff_out.close_chunk();
@@ -631,6 +665,9 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
          }
       } // while(iff_in.get_chunk(chkid))
       iff_out.close_chunk();
+
+      // Increment the file_pos past the page inserted.
+      if (file_pos>=0) file_pos++;
 
          // We have just inserted every included file. We may have modified
          // contents of the INCL chunks. So we need to update the DataPool...
@@ -665,83 +702,121 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
       // corresponding to page_num. If page_num is negative, concatenation
       // will occur. Included files will be processed as well
 {
-   refresh_cb=_refresh_cb;
-   refresh_cl_data=_cl_data;
+  refresh_cb=_refresh_cb;
+  refresh_cl_data=_cl_data;
 
-   G_TRY {
+  G_TRY
+  {
 
-         // First translate the page_num to file_pos.
-      const GP<DjVmDir> dir(get_djvm_dir());
-      int file_pos;
-      if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
-      else file_pos=dir->get_page_pos(page_num);
+     // First translate the page_num to file_pos.
+    const GP<DjVmDir> dir(get_djvm_dir());
+    int file_pos;
+    if (page_num<0 || page_num>=dir->get_pages_num())
+    {
+      file_pos=-1;
+    }else
+    {
+      file_pos=dir->get_page_pos(page_num);
+    }
 
-         // Now call the insert_file() for every page. We will remember the
-         // name2id translation table. Thus insert_file() will remember IDs
-         // it assigned to shared files
-      GMap<GUTF8String, GUTF8String> name2id;
+       // Now call the insert_file() for every page. We will remember the
+       // name2id translation table. Thus insert_file() will remember IDs
+       // it assigned to shared files
+    GMap<GUTF8String, GUTF8String> name2id;
 
-      GUTF8String errors;
-      for(GPosition pos=file_urls;pos;++pos)
+    GUTF8String errors;
+    for(GPosition pos=file_urls;pos;++pos)
+    {
+      const GURL &furl=file_urls[pos];
+      DEBUG_MSG( "Inserting file '" << furl << "'\n" );
+      G_TRY
       {
-         const GURL &furl=file_urls[pos];
-         DEBUG_MSG( "Inserting file '" << furl << "'\n" );
-         G_TRY {
                // Check if it's a multipage document...
-            GP<DataPool> xdata_pool(DataPool::create(furl));
-            if(xdata_pool && furl.is_valid() && furl.is_local_file_url() && DjVuDocument::djvu_import_codec)
-            {
-              (*DjVuDocument::djvu_import_codec)(xdata_pool,furl,needs_compression_flag,can_compress_flag);
-            }
-            GUTF8String chkid;
-            IFFByteStream::create(xdata_pool->get_stream())->get_chunk(chkid);
-            if (chkid=="FORM:DJVM")
-            {
-                  // Hey, it really IS a multipage document.
-                  // Open it, expand to a tmp directory and add pages
-                  // one after another
-               const GP<DjVuDocument> doc(DjVuDocument::create_wait(furl));
+        GP<DataPool> xdata_pool(DataPool::create(furl));
+        if(xdata_pool && furl.is_valid()
+           && furl.is_local_file_url() && DjVuDocument::djvu_import_codec)
+        {
+          (*DjVuDocument::djvu_import_codec)(xdata_pool,furl,needs_compression_flag,can_compress_flag);
+        }
+        GUTF8String chkid;
+        IFFByteStream::create(xdata_pool->get_stream())->get_chunk(chkid);
+        if (name2id.contains(furl.fname())||(chkid=="FORM:DJVM"))
+        {
+          GMap<GUTF8String,void *> map;
+          map_ids(map);
+          GP<DjVuDocument> doc(DjVuDocument::create_wait(furl));
+          GP<ByteStream> gbs(ByteStream::create());
+          doc->write(gbs,map);
+          gbs->seek(0L);
+          doc=DjVuDocument::create(gbs);
+          doc->wait_for_complete_init();
+          gbs=0;
+          int pages_num=doc->get_pages_num();
+          for(int page_num=0;page_num<pages_num;page_num++)
+          {
+            const GURL url(doc->page_to_url(page_num));
+            insert_file(url, true, file_pos, name2id,doc);
+          }
+#if 0
+              // Hey, it really IS a multipage document.
+              // Open it, expand to a tmp directory and add pages
+              // one after another
+          const GP<DjVuDocument> doc(DjVuDocument::create_wait(furl));
 #ifndef UNDER_CE
-	             GURL::Filename::Native dirurl(tmpnam(0));
+	  GURL::Filename::Native dirurl(tmpnam(0));
 #else
-               GURL::Filename::UTF8 dirurl("tempFileForDjVu");
+          GURL::Filename::UTF8 dirurl("tempFileForDjVu");
 #endif
-               if (dirurl.mkdir()<0)
-                  G_THROW( ERR_MSG("DjVuDocEditor.dir_fail") "\t"+dirurl.get_string());//MBCS cvt
-               G_TRY 
-               {
-                  doc->expand(dirurl, furl.fname());
-                  int pages_num=doc->get_pages_num();
-                  for(int page_num=0;page_num<pages_num;page_num++)
-                  {
-                     const GUTF8String name(doc->page_to_url(page_num).fname());
-                     const GURL::UTF8 url(name,dirurl);
-                     insert_file(url, true, file_pos, name2id);
-                  }
-                  dirurl.cleardir();
-                  dirurl.deletefile();
-               } G_CATCH_ALL {
-                  if (!dirurl.is_empty())
-                  {
-                     dirurl.cleardir();
-                     dirurl.deletefile();
-                  }
-                  G_RETHROW;
-               } G_ENDCATCH;
-            } else insert_file(furl, true, file_pos, name2id);
-         } G_CATCH(exc) {
-            if (errors.length()) errors+="\n\n";
-            errors+=exc.get_cause();
-         } G_ENDCATCH;
+          if (dirurl.mkdir()<0)
+            G_THROW( ERR_MSG("DjVuDocEditor.dir_fail") "\t"+dirurl.get_string());//MBCS cvt
+          G_TRY 
+          {
+            doc->expand(dirurl, furl.fname());
+            int pages_num=doc->get_pages_num();
+            for(int page_num=0;page_num<pages_num;page_num++)
+            {
+               const GUTF8String name(doc->page_to_url(page_num).fname());
+               const GURL::UTF8 url(name,dirurl);
+               insert_file(url, true, file_pos, name2id, this);
+            }
+            dirurl.cleardir();
+            dirurl.deletefile();
+          } G_CATCH_ALL
+          {
+            if (!dirurl.is_empty())
+            {
+               dirurl.cleardir();
+               dirurl.deletefile();
+            }
+            G_RETHROW;
+          } G_ENDCATCH;
+#endif
+        } else
+        {
+          insert_file(furl, true, file_pos, name2id, this);
+        }
+      } G_CATCH(exc)
+      {
+        if (errors.length())
+        {
+          errors+="\n\n";
+        }
+        errors+=exc.get_cause();
       }
-      if (errors.length()) G_THROW(errors);
-   } G_CATCH_ALL {
-      refresh_cb=0;
-      refresh_cl_data=0;
-      G_RETHROW;
-   } G_ENDCATCH;
-   refresh_cb=0;
-   refresh_cl_data=0;
+      G_ENDCATCH;
+    }
+    if (errors.length())
+    {
+      G_THROW(errors);
+    }
+  } G_CATCH_ALL
+  {
+    refresh_cb=0;
+    refresh_cl_data=0;
+    G_RETHROW;
+  } G_ENDCATCH;
+  refresh_cb=0;
+  refresh_cl_data=0;
 }
 
 void
@@ -1958,4 +2033,46 @@ DjVuDocEditor::create_wait(const GURL &url)
   doc->init(url);
   return retval;
 }
+
+bool
+DjVuDocEditor::inherits(const GUTF8String &class_name) const
+{
+   return (class_name == "DjVuDocEditor")||DjVuDocument::inherits(class_name);
+}
+
+int
+DjVuDocEditor::get_orig_doc_type(void) const
+{
+   return orig_doc_type;
+}
+
+bool
+DjVuDocEditor::can_be_saved(void) const
+{
+   return !(needs_rename()||needs_compression()||orig_doc_type==UNKNOWN_TYPE ||
+	    orig_doc_type==OLD_INDEXED);
+}
+
+int
+DjVuDocEditor::get_save_doc_type(void) const
+{
+   if (orig_doc_type==SINGLE_PAGE)
+      if (djvm_dir->get_files_num()==1)
+        return SINGLE_PAGE;
+      else
+        return BUNDLED;
+   else if (orig_doc_type==INDIRECT)
+     return INDIRECT;
+   else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED)
+     return BUNDLED;
+   else
+     return UNKNOWN_TYPE;
+}
+
+GURL
+DjVuDocEditor::get_doc_url(void) const
+{
+   return doc_url.is_empty() ? init_url : doc_url;
+}
+
 

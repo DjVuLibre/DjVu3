@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $
+// $Id: d44.cpp,v 1.23 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.22 2001-06-13 18:26:19 bcr Exp $# 
+    #$Id: d44.cpp,v 1.23 2001-06-28 19:42:58 bcr Exp $# 
 */
 //@{
 //@}
@@ -244,7 +244,7 @@ mymain(int argc, char **argv)
       pnmurl.deletefile();
 #else
       WCHAR tszPnmFile[MAX_PATH] ;
-      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,GOS::url_to_filename(pnmurl),GOS::url_to_filename(pnmurl).length()+1,tszPnmFile,sizeof(tszPnmFile)) ;
+      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmurl.UTF8Filename(),pnmurl.UTF8Filename().length()+1,tszPnmFile,sizeof(tszPnmFile)) ;
       DeleteFile(tszPnmFile) ;
 #endif
       GP<ByteStream> obs=ByteStream::create(pnmurl,"wb");

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.179 2001-06-25 18:24:46 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.180 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 
@@ -145,7 +145,8 @@ DjVuDocument::start_init(
    cache=xcache;
    doc_type=UNKNOWN_TYPE;
    DjVuPortcaster * pcaster=get_portcaster();
-   if (!xport) xport=simple_port=new DjVuSimplePort();
+   if (!xport)
+     xport=simple_port=new DjVuSimplePort();
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
 
@@ -985,7 +986,7 @@ DjVuDocument::get_djvu_file(const GURL& url, bool dont_create)
    if (url.is_empty())
      return 0;
 
-   GP<DjVuFile> file=url_to_file(url, dont_create);
+   const GP<DjVuFile> file(url_to_file(url, dont_create));
 
    if (file)
      get_portcaster()->add_route(file, this);
@@ -1223,6 +1224,16 @@ DjVuDocument::get_id_list(void)
   return ids;
 }
 
+void
+DjVuDocument::map_ids(GMap<GUTF8String,void *> &map)
+{
+  GList<GUTF8String> ids=get_id_list();
+  for(GPosition pos=ids;pos;++pos)
+  {
+    map[ids[pos]]=0;
+  }
+}
+
 GP<DataPool>
 DjVuDocument::get_thumbnail(int page_num, bool dont_decode)
 {
@@ -1419,7 +1430,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 		        G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"+url.get_string());
 	 
 	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.fname());
-	       if (!file) G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
+	       if (!file)
+               {
+                 G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
+               }
 	       data_pool=DataPool::create(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1430,10 +1444,16 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	    {
 	       DEBUG_MSG("The document is in new BUNDLED format\n");
 	       if (url.base()!=init_url)
-		        G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"+url.get_string());
+               {
+		 G_THROW( ERR_MSG("DjVuDocument.URL_outside") "\t"
+                   +url.get_string());
+               }
 	 
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(url.fname());
-	       if (!file) G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
+	       if (!file)
+               {
+                 G_THROW( ERR_MSG("DjVuDocument.file_outside") "\t"+url.fname());
+               }
 	       data_pool=DataPool::create(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1676,7 +1696,16 @@ DjVuDocument::get_djvm_doc()
 }
 
 void
-DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
+DjVuDocument::write( const GP<ByteStream> &gstr,
+  const GMap<GUTF8String,void *> &reserved)
+{
+  DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
+  DEBUG_MAKE_INDENT(3);
+  get_djvm_doc()->write(gstr,reserved); 
+}
+
+void
+DjVuDocument::write(const GP<ByteStream> &gstr, bool force_djvm)
 {
   DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
   DEBUG_MAKE_INDENT(3);

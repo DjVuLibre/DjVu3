@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.81 2001-05-01 15:43:50 bcr Exp $
+// $Id: DataPool.cpp,v 1.82 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 
@@ -1406,8 +1406,10 @@ DataPool::add_trigger(int tstart, int tlength,
    
    if (callback)
    {
-      if (is_eof()) call_callback(callback, cl_data);
-      else
+      if (is_eof())
+      {
+        call_callback(callback, cl_data);
+      }else
       {
 	 if (pool)
 	 {

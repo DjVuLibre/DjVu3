@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.38 2001-05-01 17:59:24 bcr Exp $
+// $Id: DjVmDir.h,v 1.39 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.38 2001-05-01 17:59:24 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.39 2001-06-28 19:42:58 bcr Exp $# */
 //@{
 
 
@@ -136,7 +136,7 @@ public:
       /** Decodes the directory from the specified stream. */
    void decode(const GP<ByteStream> &stream);
       /** Encodes the directory into the specified stream. */
-   void encode(const GP<ByteStream> &stream) const;
+   void encode(const GP<ByteStream> &stream, const bool do_rename=false) const;
       /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */
@@ -170,8 +170,9 @@ public:
       /** Changes the name of the file with ID #id#. */
    void set_file_name(const GUTF8String &id, const GUTF8String &name);
       /** Inserts the specified file record at the specified position.
-        Specifying #pos# equal to #-1# means to append. */
-   void insert_file(const GP<File> & file, int pos=-1);
+        Specifying #pos# equal to #-1# means to append.  The actual position
+        inserted is returned. */
+   int insert_file(const GP<File> & file, int pos=-1);
       /** Removes a file record with ID #id#. */
    void delete_file(const GUTF8String &id);
 private:

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.26 2001-04-30 23:30:45 bcr Exp $
+// $Id: DjVmDoc.h,v 1.27 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -53,7 +53,7 @@ class GUTF8String;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.26 2001-04-30 23:30:45 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.27 2001-06-28 19:42:58 bcr Exp $#
 */
 
 //@{
@@ -155,7 +155,11 @@ public:
       //@{
       /** Writes the multipage DjVu document in the {\em bundled} format into
 	  the stream. */
-   void		write(const GP<ByteStream> &str);
+   void	write(const GP<ByteStream> &str);
+      /** Writes the multipage DjVu document in the {\em bundled} format into
+	  the stream, reserving any of the specified names. */
+   void	write(const GP<ByteStream> &str,
+     const GMap<GUTF8String,void *>& reserved);
       /** Stored index (top-level) file of the DjVu document in the {\em
 	  indirect} format into the specified stream. */
    void		write_index(const GP<ByteStream> &str);

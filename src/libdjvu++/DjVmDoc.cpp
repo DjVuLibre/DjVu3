@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.47 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.48 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 
@@ -215,15 +215,86 @@ DjVmDoc::get_data(const GUTF8String &id) const
 void
 DjVmDoc::write(const GP<ByteStream> &gstr)
 {
+  const GMap<GUTF8String,void *> reserved;
+  write(gstr,reserved);
+}
+
+static inline GUTF8String
+get_name(const DjVmDir::File &file)
+{
+  const GUTF8String save_name(file.get_save_name());
+  return save_name.length()?save_name:(file.get_load_name());
+}
+
+void
+DjVmDoc::write(const GP<ByteStream> &gstr,
+  const GMap<GUTF8String,void *> &reserved)
+{
   DEBUG_MSG("DjVmDoc::write(): Storing document into the byte stream.\n");
   DEBUG_MAKE_INDENT(3);
 
-
-  DEBUG_MSG("pass 1: create dummy DIRM chunk and calculate offsets...\n");
-
-  GPosition pos;
-
   GPList<DjVmDir::File> files_list=dir->resolve_duplicates(true);
+  bool do_rename=false;
+  GPosition pos(reserved);
+
+  DEBUG_MSG("pass 1: looking for reserved names.");
+  if(pos)
+  {
+      // Check if there are any conflicting file names.
+    for(pos=files_list;pos;++pos)
+    {
+      GP<DjVmDir::File> file=files_list[pos];
+      if((do_rename=reserved.contains(file->get_load_name()))
+        ||(do_rename=reserved.contains(file->get_save_name())))
+      {
+        break;
+      }
+    }
+    // If there are conflicting file names, check if the save names
+    // are OK.  If not, generate new save names.
+    if(do_rename)
+    {
+      DEBUG_MSG("pass 1: renaming reserved names.");
+      for(;;files_list=dir->resolve_duplicates(true))
+      {
+        GMap<GUTF8String,void *> this_doc;
+        for(pos=files_list;pos;++pos)
+        {
+          GP<DjVmDir::File> file=files_list[pos];
+          this_doc[::get_name(*file)]=0;
+        }
+        bool need_new_list=false;
+        for(pos=files_list;pos;++pos)
+        {
+          GP<DjVmDir::File> file=files_list[pos];
+          const GUTF8String name(::get_name(*file));
+          if(reserved.contains(name))
+          {
+            GUTF8String new_name;
+            int series=0;
+            do
+            {
+              int dot=name.rsearch('.');
+              if(dot>0)
+              {
+                new_name=name.substr(0,dot)+
+                  "_"+GUTF8String(++series)+name.substr(dot,-1);
+              }else
+              {
+                new_name=name+"_"+GUTF8String(++series);
+              }
+            } while(reserved.contains(new_name)||this_doc.contains(new_name));
+            dir->set_file_name(file->get_load_name(),new_name);
+            need_new_list=true;
+          }
+        }
+        if(!need_new_list)
+          break;
+      }
+    }
+  }
+
+  DEBUG_MSG("pass 2: create dummy DIRM chunk and calculate offsets...\n");
   for(pos=files_list;pos;++pos)
   {
     GP<DjVmDir::File> file=files_list[pos];
@@ -241,7 +312,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr)
   IFFByteStream &tmp_iff=*gtmp_iff;
   tmp_iff.put_chunk("FORM:DJVM", 1);
   tmp_iff.put_chunk("DIRM");
-  dir->encode(tmp_iff.get_bytestream());
+  dir->encode(tmp_iff.get_bytestream(),do_rename);
   tmp_iff.close_chunk();
   tmp_iff.close_chunk();
   int offset=tmp_iff.tell();
@@ -256,7 +327,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr)
     offset+=file->size;	// file->size has been set in the first pass
   }
 
-  DEBUG_MSG("pass 2: store the file contents.\n");
+  DEBUG_MSG("pass 3: store the file contents.\n");
 
   GP<IFFByteStream> giff=IFFByteStream::create(gstr);
   IFFByteStream &iff=*giff;

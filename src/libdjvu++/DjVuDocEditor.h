@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.43 2001-06-26 22:45:23 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.44 2001-06-28 19:42:58 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.43 2001-06-26 22:45:23 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.44 2001-06-28 19:42:58 bcr Exp $#
 */
 
 //@{
@@ -153,7 +153,7 @@ public:
    GUTF8String	page_to_id(int page_num) const;
    
    GUTF8String	insert_file(const GURL &url, const GUTF8String &parent_id,
-			    int chunk_num=1);
+			    int chunk_num=1, DjVuPort *source=0);
       /** Inserts the referenced file into this DjVu document.
 
 	  @param fname Name of the top-level file containing the image of
@@ -369,10 +369,14 @@ private:
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
    void		clean_files_map(void);
    bool		insert_file_type(const GURL &file_url,
-                            DjVmDir::File::FILE_TYPE page_type,
-		            int & file_pos, GMap<GUTF8String, GUTF8String> & name2id);
-   bool		insert_file(const GURL &file_url, bool is_page,
-			    int & file_pos, GMap<GUTF8String, GUTF8String> & name2id);
+                  DjVmDir::File::FILE_TYPE page_type,
+		  int & file_pos,
+                  GMap<GUTF8String, GUTF8String> & name2id);
+   bool		insert_file(
+                  const GURL &file_url, bool is_page,
+		  int & file_pos,
+                  GMap<GUTF8String,GUTF8String> & name2id,
+                  DjVuPort *source=0 );
    void		remove_file(const GUTF8String &id, bool remove_unref,
 			    GMap<GUTF8String, void *> & ref_map);
    void		generate_ref_map(const GP<DjVuFile> & file,
@@ -395,51 +399,6 @@ private: //dummy stuff
    static GP<DjVuDocument> create(
      ByteStream &bs, GP<DjVuPort> xport=0, DjVuFileCache * const xcache=0);
 };
-
-inline bool
-DjVuDocEditor::inherits(const GUTF8String &class_name) const
-{
-   return
-      (GUTF8String("DjVuDocEditor") == class_name) ||
-      DjVuDocument::inherits(class_name);
-//      !strcmp("DjVuDocEditor", class_name) ||
-//      DjVuDocument::inherits(class_name);
-}
-
-inline int
-DjVuDocEditor::get_orig_doc_type(void) const
-{
-   return orig_doc_type;
-}
-
-inline bool
-DjVuDocEditor::can_be_saved(void) const
-{
-   return !(needs_rename()||needs_compression()||orig_doc_type==UNKNOWN_TYPE ||
-	    orig_doc_type==OLD_INDEXED);
-}
-
-inline int
-DjVuDocEditor::get_save_doc_type(void) const
-{
-   if (orig_doc_type==SINGLE_PAGE)
-      if (djvm_dir->get_files_num()==1)
-        return SINGLE_PAGE;
-      else
-        return BUNDLED;
-   else if (orig_doc_type==INDIRECT)
-     return INDIRECT;
-   else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED)
-     return BUNDLED;
-   else
-     return UNKNOWN_TYPE;
-}
-
-inline GURL
-DjVuDocEditor::get_doc_url(void) const
-{
-   return doc_url.is_empty() ? init_url : doc_url;
-}
 
 //@}
 
