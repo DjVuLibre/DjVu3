@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.cpp,v 1.11 2000-11-02 01:08:34 bcr Exp $
+// $Id: Arrays.cpp,v 1.12 2000-11-03 00:04:36 mchen Exp $
 // $Name:  $
 
 
@@ -219,11 +219,19 @@ ArrayRep::ins(int n, const void * what, unsigned int howmany)
 #ifndef DO_NOT_MOVE_GET_DATA_TO_ARRAYS_CPP
 #include "ByteStream.h"
 TArray<char>
-MemoryByteStream::get_data(void)
+ByteStream::get_data(void)
 {
-   TArray<char> data(0, size()-1);
-   readat((char*)data, size(), 0);
-   return data;
+   const int s=size();
+   if(s > 0)
+   {
+     TArray<char> data(0, s-1);
+     readat((char*)data, s, 0);
+     return data;
+   }else
+   {
+     TArray<char> data(0, -1);
+     return data;
+   }
 }
 #endif
 

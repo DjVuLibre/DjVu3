@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.25 2000-11-02 01:08:34 bcr Exp $
+// $Id: ByteStream.h,v 1.26 2000-11-03 00:04:36 mchen Exp $
 // $Name:  $
 
 
@@ -59,7 +59,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.25 2000-11-02 01:08:34 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.26 2000-11-03 00:04:36 mchen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -211,6 +211,12 @@ public:
       Valid offsets for function #seek# range from 0 to the value returned
       by this function. */
   virtual int size(void) const;
+  /// Use at your own risk, only guarenteed to work for MemoryByteStreams.
+  TArray<char> get_data(void);
+  /** Reads data from a random position. This function reads at most #sz#
+      bytes at position #pos# into #buffer# and returns the actual number of
+      bytes read.  The current position is unchanged. */
+  virtual size_t readat(void *buffer, size_t sz, int pos);
   //@}
 protected:
   ByteStream() {};
@@ -219,6 +225,17 @@ private:
   ByteStream(const ByteStream &);
   ByteStream & operator=(const ByteStream &);
 };
+
+inline size_t
+ByteStream::readat(void *buffer, size_t sz, int pos)
+{
+  size_t retval;
+  long tpos=tell();
+  seek(pos, SEEK_SET, true);
+  retval=readall(buffer,sz);
+  seek(tpos, SEEK_SET, true);
+  return retval;
+}
 
 inline int
 ByteStream::size(void) const
@@ -318,7 +335,6 @@ public:
       of the buffer. */
   char &operator[] (int n);
   /** Copies all internal data into \Ref{TArray} and returns it */
-  TArray<char> get_data(void);
 private:
   // Cancel C++ default stuff
   MemoryByteStream(const MemoryByteStream &);
@@ -329,7 +345,7 @@ protected:
   /** Reads data from a random position. This function reads at most #sz#
       bytes at position #pos# into #buffer# and returns the actual number of
       bytes read.  The current position is unchanged. */
-  size_t readat(void *buffer, size_t sz, int pos);
+  virtual size_t readat(void *buffer, size_t sz, int pos);
   /** Number of bytes in internal buffer. */
   int bsize;
   /** Number of 4096 bytes blocks. */

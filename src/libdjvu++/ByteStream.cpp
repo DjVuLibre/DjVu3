@@ -25,7 +25,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.32 2000-11-02 23:21:22 bcr Exp $
+// $Id: ByteStream.cpp,v 1.33 2000-11-03 00:04:36 mchen Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -561,7 +561,7 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
     to Arrays.o */
 #ifdef DO_NOT_MOVE_GET_DATA_TO_ARRAYS_CPP
 TArray<char>
-MemoryByteStream::get_data(void)
+ByteStream::get_data(void)
 {
    TArray<char> data(0, size()-1);
    readat((char*)data, size(), 0);
