@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.6 1999-11-11 15:41:41 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.7 1999-11-12 14:32:14 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.6 1999-11-11 15:41:41 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.7 1999-11-12 14:32:14 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -176,6 +176,7 @@ DjVuPalette::histogram_add(const unsigned char *bgr, int weight)
   d.p[0] += bgr[0];
   d.p[1] += bgr[1];
   d.p[2] += bgr[2];
+  if (weight>65536) weight=65536;
   d.w += weight;
 }
 
