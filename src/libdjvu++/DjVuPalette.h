@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.10 2000-01-21 19:48:42 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.11 2000-02-16 22:17:18 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.10 2000-01-21 19:48:42 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.11 2000-02-16 22:17:18 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -95,7 +95,7 @@ public:
       appear according to the histogram.  Argument #maxcolors# is the maximum
       number of colors allowed in the palette (up to 1024).  Argument
       #minboxsize# controls the minimal size of the color cube area affected
-      to a color palette entry. */
+      to a color palette entry.  Returns the index of the dominant color. */
   int compute_palette(int maxcolors, int minboxsize=0);
   // CONVERSION
   /** Returns the number of colors in the palette. */
@@ -114,7 +114,8 @@ public:
   void quantize(GPixmap &pm);
   /** Computes the optimal palette and quantize pixmap #pm#.  This function
       builds the histogram for pixmap #pm#, computes the optimal palette using
-      \Ref{compute_palette} and quantize the pixmap using \Ref{quantize}. */
+      \Ref{compute_palette} and quantize the pixmap using \Ref{quantize}. 
+      Returns the index of the dominant color. */
   int compute_palette_and_quantize(GPixmap &pm, int ncolors, int minboxsize=0);
   // COLOR CORRECTION
   /** Applies a luminance gamma correction factor of #corr# to the palette
