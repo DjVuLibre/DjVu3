@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.h,v 1.22 2000-12-06 00:30:26 fcrary Exp $
+// $Id: GString.h,v 1.23 2000-12-06 21:21:05 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.22 2000-12-06 00:30:26 fcrary Exp $# */
+    #$Id: GString.h,v 1.23 2000-12-06 21:21:05 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -116,14 +116,14 @@ class GString : protected GP<GStringRep>
 public: 
   // -- CONSTRUCTORS
   /** Null constructor. Constructs an empty string. */
-  GString()
+  GString( void )
     { } 
-  /** Copy constructor. Constructs a string by copying the string #gs#. */
+  /// Copy constructor. Constructs a string by copying the string #gs#.
   GString(const GString &gs)
     : GP<GStringRep>(gs) { } 
-  /** Constructs a string from a character. */
+  /// Constructs a string from a character.
   GString(const char dat);
-  /** Constructs a string from a null terminated character array. */ 
+  /// Constructs a string from a null terminated character array.
   GString(const char *dat);
   /** Constructs a string from a character array.  Elements of the character
       array #dat# are added into the string until the string length reaches
@@ -160,10 +160,10 @@ public:
       conversion operator is very efficient because it simply returns a
       pointer to the internal string data. The returned pointer remains valid
       as long as the string is unmodified. */
-  operator const char* () const  
+  operator const char* ( void ) const  
     { return ptr ? (*this)->data : nullstr; }
-  /** Returns the string length. */
-  unsigned int length() const 
+  /// Returns the string length.
+  unsigned int length( void ) const 
     { return ptr ? (*this)->size : 0; }
   /** Returns true if and only if the string contains zero characters.  This
       operator is useful for conditional expression in control structures.
@@ -174,7 +174,7 @@ public:
       Class #GString# does not to support syntax "#if# #(str)# #{}#" because
       the required conversion operator introduces dangerous ambiguities with
       certain compilers. */
-  int operator! () const 
+  int operator! ( void ) const 
     { return !ptr; } ;
 
   // -- INDEXING
@@ -196,9 +196,9 @@ public:
       length of the string, this function appends character #ch# to the end of
       the string. */
   void setat(int n, char ch);
-  /** Returns #TRUE# if the string contains an integer number. */
+  /// Returns #TRUE# if the string contains an integer number.
   bool is_int(void) const;
-  /** Returns #TRUE# if the string contains a float number. */
+  /// Returns #TRUE# if the string contains a float number.
   bool is_float(void) const;
   // -- DERIVED STRINGS
   /** Returns a sub-string.  The sub-string is composed by copying #len#
@@ -211,20 +211,17 @@ public:
   /** Returns an upper case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       upper case letters. */
-  GString upcase() const;
+  GString upcase( void ) const;
   /** Returns an lower case copy of this string.  The returned string
       contains a copy of the current string with all letters turned into 
       lower case letters. */
-  GString downcase() const;
+  GString downcase( void ) const;
 
-  /** Returns a copy of this string with characters used in XML escaped as follows:
-          '<'  -->  "&lt;"
-          '>'  -->  "&gt;"
-          '&'  -->  "&amp;"
-          '\'' -->  "&apos;"
-          '\"' -->  "&quot;"
-      Also escapes characters 0x00 through 0x1f should they appear.*/
-  GString toEscaped() const;
+  /** Returns a copy of this string with characters used in XML with
+      '<'  to "&lt;", '>'  to "&gt;",  '&' to "&amp;" '\'' to "&apos;",
+      and  '\"' to  "&quot;".   Characters 0x01 through 0x1f are also
+      escaped. */
+  GString toEscaped(void ) const;
 
   /** Converts strings containing HTML/XML escaped characters (e.g.,
       "&lt;" for "<") into their unescaped forms. The conversion is partially
@@ -232,15 +229,20 @@ public:
       to be recognized. The default BasicMap inverts the actions of toEscaped().
       Numeric representation of characters (e.g., "&#38;" or "&#x26;" for "*")
       are always converted. */
-  GString fromEscaped( GMap<GString,GString> ConvMap = BasicMap() );
+  GString fromEscaped( void ) const;
 
-  /** BasicMap provides a conversion map for fromEscaped that inverts the
-      action of toEscaped(). */
-  static GMap<GString,GString> BasicMap( void );
+  /** Converts strings containing HTML/XML escaped characters (e.g.,
+      "&lt;" for "<") into their unescaped forms. The conversion is partially
+      defined by the ConvMap argument which specifies the conversion strings
+      to be recognized. The default BasicMap inverts the actions of toEscaped().
+      Numeric representation of characters (e.g., "&#38;" or "&#x26;" for "*")
+      are always converted. */
+
+  GString fromEscaped( const GMap<GString,GString> ConvMap ) const;
 
   // -- ALTERING
-  /** Reinitializes a string with the null string. */
-  void empty();
+  /// Reinitializes a string with the null string.
+  void empty( void );
   /** Provides a direct access to the string buffer.  Returns a pointer for
       directly accessing the string buffer.  This pointer valid remains valid
       as long as the string is not modified by other means.  Positive values
@@ -286,9 +288,9 @@ public:
   int rsearch(const char *str, int from=-1) const;
 
   // -- CONCATENATION
-  /** Appends character #ch# to the string. */
+  /// Appends character #ch# to the string.
   GString& operator+= (char ch);
-  /** Appends the null terminated character array #str# to the string. */
+  /// Appends the null terminated character array #str# to the string.
   GString& operator+= (const char *str);
   /** Concatenates strings. Returns a string composed by concatenating
       the characters of strings #s1# and #s2#. */

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GString.cpp,v 1.30 2000-12-06 18:45:24 fcrary Exp $
+// $Id: GString.cpp,v 1.31 2000-12-06 21:21:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -141,7 +141,7 @@ GString::operator= (const char *str)
 }
 
 void
-GString::empty()
+GString::empty( void )
 {
   (*this) = (GStringRep*)0;
 }
@@ -167,7 +167,7 @@ GString::getbuf(int n)
 
 
 GString 
-GString::upcase() const
+GString::upcase( void ) const
 {
   GString ret = (*this);
   unsigned char *d = (unsigned char *)ret.getbuf(-1);
@@ -179,7 +179,7 @@ GString::upcase() const
 
 
 GString
-GString::downcase() const
+GString::downcase( void ) const
 {
   GString ret = (*this);
   unsigned char *d = (unsigned char *)ret.getbuf(-1);
@@ -190,52 +190,83 @@ GString::downcase() const
 }
 
 
-/** Returns a copy of this string with characters used in XML escaped as follows:
-        '<'  -->  "&lt;"
-        '>'  -->  "&gt;"
-        '&'  -->  "&amp;"
-        '\'' -->  "&apos;"
-        '\"' -->  "&quot;"
-    Also escapes characters 0x00 through 0x1f should they appear.*/
+// Returns a copy of this string with characters used in XML escaped as follows:
+//      '<'  -->  "&lt;"
+//      '>'  -->  "&gt;"
+//      '&'  -->  "&amp;"
+//      '\'' -->  "&apos;"
+//      '\"' -->  "&quot;"
+//  Also escapes characters 0x00 through 0x1f should they appear.
 GString
-GString::toEscaped() const
+GString::toEscaped( void ) const
 {
-  GString ret;
-  for( unsigned i = 0 ; i < length() ; i++ )
+  GString ret, special;
+  char const * const head=(*this);
+  char const *start=head;
+  char const *s=start;
+  while(*s)
   {
-    unsigned char d = (*this)->data[i];
-    switch( d )
+    char const *ss=0;
+    switch(*s)
     {
     case '<':
-      ret += "&lt;";
+      ss="&lt;";
       break;
     case '>':
-      ret += "&gt;";
+      ss="&gt;";
       break;
     case '&':
-      ret += "&amp;";
+      ss="&amp;";
       break;
-    case '\'':
-      ret += "&apos;";
+    case '\47':
+      ss="&apos;";
       break;
-    case '\"':
-      ret += "&quot;";
+    case '\42':
+      ss="&quot;";
       break;
     default:
-      if( d < ' ' )
-        ret += "&#" + GString(int( d )) + ";";
-      else
-        ret += d;
+      if((signed char)(*s) < ' ')
+      {
+        special.format("&#%d;",(unsigned char)*s);
+        ss=special;
+      }
       break;
     }
+    if(ss)
+    {
+      if(s!=start)
+      {
+        ret+=substr((size_t)start-(size_t)head,(size_t)s-(size_t)start)+ss;
+      }else
+      {
+        ret+=ss;
+      }
+      start=(++s);
+    }else
+    {
+      ++s;
+    }
   }
+  ret+=start;
   DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return ret;
 }
 
+static inline const GMap<GString,GString> &
+BasicMap( void )
+{
+  static GMap<GString,GString> Basic;
+  Basic["lt"]   = GString('<');
+  Basic["gt"]   = GString('>');
+  Basic["amp"]  = GString('&');
+  Basic["apos"] = GString('\47');
+  Basic["quot"] = GString('\42');
+  return Basic;
+}
+
 
 GString
-GString::fromEscaped( GMap<GString,GString> ConvMap )
+GString::fromEscaped( const GMap<GString,GString> ConvMap ) const
 {
 #if 0
   //  Available for debugging ConvMap arguments if needed
@@ -249,82 +280,76 @@ GString::fromEscaped( GMap<GString,GString> ConvMap )
   int start_locn = 0;           // Beginning of substring to skip
   int amp_locn;                 // Location of a found ampersand
 
-  while( (amp_locn = this->search( '&', start_locn )) > -1 )
+  while( (amp_locn = search( '&', start_locn )) > -1 )
   {                             // Found the next apostrophe
-    ret += this->substr( start_locn, amp_locn - start_locn );
+    ret += substr( start_locn, amp_locn - start_locn );
                                 // Locate the closing semicolon
-    int semi_locn = this->search( ';', amp_locn );
+    int semi_locn = search( ';', amp_locn );
     if( semi_locn < 0 ) break;  // No closing semicolon, exit and copy
                                 //  the rest of the string.
-    GString key = this->substr( amp_locn, semi_locn-amp_locn+1 );
-    //DEBUG_MSG( "key = '" << key << "'\n" );
-    GPosition map_entry = ConvMap.contains( key );
-    if( map_entry != NULL)
-    {                           // Found in the conversion map, substitute
-      ret += ConvMap[key];
-    } else {
-                                // Not found in the conversion map,
-                                //  try to do a numerical conversion.
-      int char_value = 0 ;      // Value of converted key
-      bool succeeded = false;
-      int scan_locn;
-      int c;
-      if( key.length() > 3 &&   // minimum length for a key
-          key[1] == '#' &&      // must always be present
-          ( tolower(key[2]) != 'x' || key.length() > 4 )
-                                // minimum length for a hexadecimal key
-        )
+    int const len=semi_locn-amp_locn-1;
+    if(len)
+    {
+      GString key = substr( amp_locn+1, len);
+      //DEBUG_MSG( "key = '" << key << "'\n" );
+      char const * s=key;
+      if( s[0] == '#')
       {
-        if( key[2] == 'x' || key[2] == 'X' )
-        {                       // Hexadecimal constant
-          for( scan_locn = 3 ; isxdigit(c = key[scan_locn]) ; scan_locn++ )
+        unsigned long value;
+        char *ptr=0;
+        if(s[1] == 'x' || s[1] == 'X')
+        {
+          value=strtoul((char const *)(s+2),&ptr,16);
+        }else
+        {
+          value=strtoul((char const *)(s+1),&ptr,10);
+        }
+        if(!ptr)
+        {
+          ret+=GString((char const)(value));
+        }else
+        {
+          ret += substr(amp_locn,semi_locn-amp_locn+1);
+        }
+      }else
+      {  
+        GPosition map_entry = ConvMap.contains( key );
+        if( map_entry )
+        {                           // Found in the conversion map, substitute
+          ret += ConvMap[map_entry];
+        } else
+        {
+          static const GMap<GString,GString> &Basic=BasicMap();
+          GPosition map_entry = Basic.contains( key );
+          if ( map_entry)
           {
-            if( isdigit(c) )
-              c = c - '0';
-            else
-              c = 10 + tolower(c) - 'a';
-            char_value = char_value<<4 | c;
-          }
-        } else {
-                                // Decimal constant
-          for( scan_locn = 2 ; isdigit(c = key[scan_locn]) ; scan_locn++ )
+            ret += ConvMap[map_entry];
+          }else
           {
-            char_value = char_value*10 + (c - '0');
+            ret += substr(amp_locn,len+2);
           }
         }
-                                // success if we have encountered only digits
-                                // up to the semicolon
-        succeeded = ( key[scan_locn] == ';' );
       }
-      if( succeeded )
-      {
-        ret += "?";
-        ret.setat( -1, char_value );
-      } else {
-        ret += key;
-      }
+    }else
+    {
+      ret += substr(amp_locn,len+2);
     }
     start_locn = semi_locn + 1;
     DEBUG_MSG( "ret = '" << ret << "'\n" );
   }
 
                                 // Copy the end of the string to the output
-  ret += this->substr( start_locn, this->length()-start_locn );
+  ret += substr( start_locn, length()-start_locn );
 
   DEBUG_MSG( "Unescaped string is '" << ret << "'\n" );
   return ret;
 }
 
-GMap<GString,GString>
-GString::BasicMap( void )
+GString
+GString::fromEscaped(void) const
 {
-  GMap<GString,GString> Basic;
-  Basic["&lt;"]   = GString("<");
-  Basic["&gt;"]   = GString(">");
-  Basic["&amp;"]  = GString("&");
-  Basic["&apos;"] = GString("'");
-  Basic["&quot;"] = GString("\"");
-  return Basic;
+  static const GMap<GString,GString> nill;
+  return fromEscaped(nill);
 }
 
 
