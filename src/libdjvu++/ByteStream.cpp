@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.44 2001-02-08 23:30:05 bcr Exp $
+// $Id: ByteStream.cpp,v 1.45 2001-02-08 23:58:01 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -47,6 +47,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#else
+#include <io.h>
 #endif
 #ifndef UNDER_CE
 #include <errno.h>

@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.1 2001-01-17 00:14:55 bcr Exp $
+// $Id: UnicodeByteStream.h,v 1.2 2001-02-08 23:58:01 bcr Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
@@ -29,7 +29,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.1 2001-01-17 00:14:55 bcr Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.2 2001-02-08 23:58:01 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -91,7 +91,6 @@ protected:
   GP<ByteStream> bs;
 private:
   // Cancel C++ default stuff
-  UnicodeByteStream(const UnicodeByteStream &);
   UnicodeByteStream & operator=(const UnicodeByteStream &);
 };
 
