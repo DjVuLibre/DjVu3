@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.4 2000-03-19 22:52:48 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.5 2000-03-20 22:45:30 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -177,8 +177,7 @@ DjVuToPS::store_doc_prolog(ByteStream & str, int pages, const GRect & grect)
    if (options.get_format()==Options::EPS)
       write(str,
 	    "%%!PS-Adobe-3.0 EPSF-3.0\n"
-	    "%%%%BoundingBox: %d %d %d %d\n",
-	    grect.xmin, grect.ymin,
+	    "%%%%BoundingBox: 0 0 %d %d\n",
 	    grect.width(), grect.height());
    else
       write(str, "%%!PS-Adobe-3.0\n");
@@ -575,7 +574,8 @@ clippath pathbbox\n\
 /image-height %d def\n\n",
 	    options.get_orientation()==Options::PORTRAIT ? "true" : "false",
 	    options.get_zoom()==Options::ONE_TO_ONE ? "true" : "false",
-	    dpi, grect.xmin, grect.ymin, grect.width(), grect.height());
+	    dpi, 0/*grect.xmin*/, 0/*grect.ymin*/,
+	    grect.width(), grect.height());
 
       write(str, "\
 portrait\n\
