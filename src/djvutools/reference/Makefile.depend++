@@ -206,7 +206,8 @@ djvmcvt.o: djvmcvt.cpp ../../../src/libdjvu++/debug.h \
  ../../../src/libdjvu++/GMapAreas.h \
  ../../../src/libdjvu++/DjVmDir0.h \
  ../../../src/libdjvu++/GOS.h
-djvudump.o: djvudump.cpp DjVuDumpHelper.h \
+djvudump.o: djvudump.cpp \
+ ../../../src/libdjvu++/DjVuDumpHelper.h \
  ../../../src/libdjvu++/DataPool.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/DjVuGlobal.h \
@@ -217,20 +218,6 @@ djvudump.o: djvudump.cpp DjVuDumpHelper.h \
  ../../../src/libdjvu++/Arrays.h \
  ../../../src/libdjvu++/GThreads.h \
  ../../../src/libdjvu++/GString.h
-DjVuDumpHelper.o: DjVuDumpHelper.cpp DjVuDumpHelper.h \
- ../../../src/libdjvu++/DataPool.h \
- ../../../src/libdjvu++/ByteStream.h \
- ../../../src/libdjvu++/DjVuGlobal.h \
- ../../../src/include/DjVu.h \
- ../../../src/libdjvu++/GException.h \
- ../../../src/libdjvu++/GContainer.h \
- ../../../src/libdjvu++/GSmartPointer.h \
- ../../../src/libdjvu++/Arrays.h \
- ../../../src/libdjvu++/GThreads.h \
- ../../../src/libdjvu++/GString.h \
- ../../../src/libdjvu++/DjVmDir.h \
- ../../../src/libdjvu++/DjVuInfo.h \
- ../../../src/libdjvu++/IFFByteStream.h
 djvuextract.o: djvuextract.cpp \
  ../../../src/libdjvu++/GException.h \
  ../../../src/libdjvu++/DjVuGlobal.h \

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvutxt.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $
+//C- $Id: djvutxt.cpp,v 1.2 2000-10-23 15:39:13 bcr Exp $
 
 // DJVUTXT -- DjVu TXT extractor
 
@@ -49,7 +49,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $# */
+    #$Id: djvutxt.cpp,v 1.2 2000-10-23 15:39:13 bcr Exp $# */
 //@{
 //@}
 
@@ -90,7 +90,7 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
    GP<DjVuImage> dimg=doc->get_page(page_num);
    if (!dimg)
       G_THROW("Failed to decode page.");
-   GP<MemoryByteStream> anno_str=dimg->get_anno();
+   GP<ByteStream> anno_str=dimg->get_anno();
    if (anno_str)
    {
       GP<DjVuAnno> anno=new DjVuAnno();
