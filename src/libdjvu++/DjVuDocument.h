@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.30 1999-09-20 22:05:24 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.31 1999-09-28 16:19:57 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.30 1999-09-20 22:05:24 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.31 1999-09-28 16:19:57 eaf Exp $#
 */
 
 //@{
@@ -562,6 +562,8 @@ public:
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
 						  long set_mask, long clr_mask);
+protected:
+   virtual GP<DjVuFile>	url_to_file(const GURL & url);
 private:
    class UnnamedFile : public GPEnabled
    {
@@ -608,7 +610,6 @@ private:
    void                 check() const;
 
    void			add_to_cache(const GP<DjVuFile> & f);
-   GP<DjVuFile>		url_to_file(const GURL & url);
    void			check_unnamed_files(void);
    void			set_file_name(const DjVuFile * file);
 };
