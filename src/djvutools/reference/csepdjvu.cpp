@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.30 2001-07-03 17:02:31 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.31 2001-07-11 21:08:31 lvincent Exp $
 // $Name:  $
 
 
@@ -108,11 +108,15 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.30 2001-07-03 17:02:31 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.31 2001-07-11 21:08:31 lvincent Exp $# */
 //@{
 //@}
 
 
+#ifdef WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
 #include "DjVuGlobal.h"
 #include "GException.h"
 #include "GSmartPointer.h"
@@ -1269,6 +1273,10 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
+#ifdef WIN32
+  _setmode(_fileno(stdin), _O_BINARY);
+  _setmode(_fileno(stdout), _O_BINARY);
+#endif
   setlocale(LC_ALL,"");
   djvu_programname(argv[0]);
   DArray<GUTF8String> dargv(0,argc-1);
