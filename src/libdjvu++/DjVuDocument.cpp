@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.171 2001-05-02 23:24:11 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.172 2001-05-02 23:46:13 bcr Exp $
 // $Name:  $
 
 
@@ -1201,12 +1201,20 @@ DjVuDocument::get_id_list(void)
   GList<GUTF8String> ids;
   if (is_init_complete())
   {
-    const GP<DjVmDoc> doc=get_djvm_doc();
-    const GP<DjVmDir> dir=doc->get_djvm_dir();
-    GPList<DjVmDir::File> files_list=dir->get_files_list();
-    for(GPosition pos=files_list;pos;++pos)
+    if(djvm_dir)
     {
-      ids.append(files_list[pos]->get_load_name());
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+      for(GPosition pos=files_list;pos;++pos)
+      {
+        ids.append(files_list[pos]->get_load_name());
+      }
+    }else
+    {
+      const int page_num=get_pages_num();
+      for(int page=0;page<page_num;page++)
+      { 
+        ids.append(page_to_url(page).fname());
+      }
     }
   }
   return ids;
