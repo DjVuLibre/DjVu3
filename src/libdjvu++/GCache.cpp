@@ -9,15 +9,13 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.cpp,v 1.3 1999-06-04 19:57:08 eaf Exp $
+//C- $Id: GCache.cpp,v 1.4 1999-06-08 15:00:03 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
 #endif
 
 #include "GCache.h"
-
-/*
 #include "DjVuFile.h"
 
 int
@@ -27,16 +25,5 @@ GCacheItemBase::qsort_func(const void * el1, const void * el2)
    const GCacheItemBase * item2=*(GCacheItemBase **) el2;
    time_t time1=item1->get_time();
    time_t time2=item2->get_time();
-
    return time1<time2 ? -1 : time1>time2 ? 1 : 0;
 }
-
-static GCache<GString, DjVuFile> cache;
-
-void f(void)
-{
-   cache.add_item("haha", new DjVuFile("olala", 0, 0));
-   cache.del_item("haha");
-   cache.get_item("geg");
-   cache.set_max_size(0);
-}*/
