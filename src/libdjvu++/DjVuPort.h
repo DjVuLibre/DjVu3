@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.24 1999-12-22 19:55:03 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.25 2000-01-21 00:06:47 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.24 1999-12-22 19:55:03 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.25 2000-01-21 00:06:47 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -270,14 +270,8 @@ public:
 	  be returning the #pool# */
    void		add_data(const GURL & url, const GP<DataPool> & pool);
 private:
-   class Pair : public GPEnabled
-   {
-   public:
-      GURL		url;
-      GP<DataPool>	pool;
-   };
    GCriticalSection	lock;
-   GPList<Pair>		list;
+   GPMap<GURL, DataPool>map;
 };
 
 
