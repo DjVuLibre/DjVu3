@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.3 2000-02-22 17:15:32 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.4 2000-02-24 20:01:51 leonb Exp $
 
 
 /** @name cpaldjvu
@@ -36,7 +36,7 @@
 
     {\bf Remarks}
 
-    This is a very good alternative to GIF. It performs especially well on
+    This is an interesting alternative to GIF. It performs especially well on
     screendumps.  Compression ratios can get hurt when there are continuous
     tone segment in the image.  Demoting such segments from foreground to
     background is a pretty interesting project.  Dithered segments behave
@@ -47,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.3 2000-02-22 17:15:32 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.4 2000-02-24 20:01:51 leonb Exp $# */
 //@{
 //@}
 
@@ -116,6 +116,7 @@ public:
   void make_ccs_from_ccids();
   void merge_and_split_ccs(int smallsize, int largesize);
   void sort_in_reading_order(); 
+  void erase_cc(int ccid);
 };
 
 
@@ -535,6 +536,20 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 }
 
 
+// -- Marks cc for deletion
+void 
+CCImage::erase_cc(int ccid)
+{
+  CC &cc = ccs[ccid];
+  Run *r = &runs[cc.frun];
+  int nr = cc.nrun;
+  cc.nrun = 0;
+  cc.npix = 0;
+  while (--nr >= 0)
+    (r++)->ccid = -1;  // will be deleted by make_ccs_from_ccids()
+}
+
+
 
 
 // --------------------------------------------------
@@ -542,14 +557,19 @@ CCImage::get_bitmap_for_cc(const int ccid) const
 // --------------------------------------------------
 
 
-// ISSUE: DEMOTION OF CCS
-// There are a lot of color ccs that actually belong to the background.
-// Such components could be better encoded in the background layer.
-// See USE_HIRES_BACKGROUND and USE_PROGRESSIVE_BACKGROUND below.
-// A way to achieve this could be to consider each cc and evaluate the costs
-// of coding it in the foreground (does it match other ccs, does it comes with
-// a complex geometry) versus the cost of coding it in the background (does
-// its color blend smoothly with the surrounding parts of the image).
+// ISSUE: DEMOTION OF CCS (UNIMPLEMENTED) 
+
+// The current code uses a single color for the background layer.  Many large,
+// non matching, ccs however may be better encoded as part of the background
+// layer.  A way to achieve this could be to consider each cc and evaluate the
+// costs of coding it as foreground (does it match other ccs, does it comes
+// with a complex geometry) or background (does its color blend smoothly with
+// the surrounding parts of the background image).  One just needs then to
+// remove the demoted ccs from the mask using CCImage::erase_cc() and
+// recompute the ccs using CCImage::make_ccs_from_ccids().  Defining the
+// compilation symbols BACKGROUND_SUBSAMPLING_FACTOR and
+// PROGRESSIVE_BACKGROUND will enable code for computing the background from
+// the input image and the provided mask.
 
 
 
@@ -688,15 +708,19 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   int dpi = MAX(200, MIN(900, opts.dpi));
   int largesize = MIN(500, MAX(64, dpi));
   int smallsize = MAX(2, dpi/150);
+
   // Compute optimal palette and quantize input pixmap
   DjVuPalette pal;
   int bgindex = pal.compute_pixmap_palette(input, opts.ncolors);
   if (opts.verbose)
-    fprintf(stderr,"Image %dx%d has %d colors\n", w, h, pal.size());
+    fprintf(stderr,"cpaldjvu: image %dx%d quantized to %d colors\n", 
+            w, h, pal.size());
   GPixel bgcolor;
   pal.index_to_color(bgindex, bgcolor);
   if (opts.verbose)
-    fprintf(stderr,"Background color is #%02x%02x%02x\n", bgcolor.r, bgcolor.g, bgcolor.b);
+    fprintf(stderr,"cpaldjvu: background color is #%02x%02x%02x\n", 
+            bgcolor.r, bgcolor.g, bgcolor.b);
+
   // Fill CCImage with color runs
   CCImage rimg(w, h);
   for (int y=0; y<h; y++)
@@ -712,11 +736,22 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
             rimg.add_single_run(y, x1, x-1, index);
         }
     }
+  if (opts.verbose)
+    fprintf(stderr,"cpaldjvu: found %d color runs\n", 
+            rimg.runs.size());
+
   // Perform Color Connected Component Analysis
   rimg.make_ccids_by_analysis();                  // Obtain ccids
   rimg.make_ccs_from_ccids();                     // Compute cc descriptors
+  if (opts.verbose)
+    fprintf(stderr,"cpaldjvu: found %d ccs\n", 
+            rimg.ccs.size());
   rimg.merge_and_split_ccs(smallsize,largesize);  // Eliminates gross ccs
+  if (opts.verbose)
+    fprintf(stderr,"cpaldjvu: merging/splitting yields %d ccs\n", 
+            rimg.ccs.size());
   rimg.sort_in_reading_order();                   // Sort cc descriptors
+  
   // Create JB2Image and fill colordata
   JB2Image jimg;
   jimg.set_dimension(w, h);
@@ -740,17 +775,32 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   
   // Organize JB2Image
   tune_jb2image(&jimg);
+  if (opts.verbose)
+    {
+      int nshape=0, nrefine=0;
+      for (int i=0; i<jimg.get_shape_count(); i++) {
+        if (!jimg.get_shape(i)->bits) continue;
+        if (jimg.get_shape(i)->parent >= 0) nrefine++; 
+        nshape++; 
+      }
+      fprintf(stderr,"cpaldjvu: coding %d shapes (%d are cross-coded)\n", 
+              nshape, nrefine);
+    }
+  
   // Create background image
   IWPixmap iwimage;
-#ifdef USE_HIRES_BACKGROUND
-  // -- we may create a hires background using masking ...
+#ifdef BACKGROUND_SUBSAMPLING_FACTOR
+  // -- we may create the background by masking and subsampling
+  GPixmap inputsub;
+  GP<GBitmap> mask = jimg.get_bitmap(BACKGROUND_SUBSAMPLING_FACTOR);
+  inputsub.downsample(&input, BACKGROUND_SUBSAMPLING_FACTOR);
+  iwimage.init(&inputsub, mask);
+#else
+  // -- but who cares since the background is uniform.
   GP<GBitmap> mask = jimg.get_bitmap();
   iwimage.init(&input, mask);
-  // -- but who cares when the background is uniform.
-#else
-  GPixmap bgimage((h+11)/12, (w+11)/12, &bgcolor);
-  iwimage.init(&bgimage, 0);
 #endif
+
   // Assemble DJVU file
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
@@ -774,7 +824,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iff.close_chunk();
   // -- ``BG44'' chunk
   IWEncoderParms iwparms;
-#ifdef USE_PROGRESSIVE_BACKGROUND
+#ifdef PROGRESSIVE_BACKGROUND
   // ----- we may use several chunks to enable progressive rendering ...
   iff.put_chunk("BG44");
   iwparms.slices = 74;
@@ -784,8 +834,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iwparms.slices = 87;
   iwimage.encode_chunk(iff, iwparms);
   iff.close_chunk();
-  // ----- but who cares when the background is uniform!
 #endif
+  // ----- but who cares when the background is so small.
   iff.put_chunk("BG44");
   iwparms.slices = 97;
   iwimage.encode_chunk(iff, iwparms);
