@@ -183,6 +183,6 @@ then
 
   "${rm}" -rf $temp.c $temp.o $temp.so
   CC_SET=true
-  CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL $CONFIG_VARS`
+  CONFIG_VARS=`echo CC CC_SET CCFLAGS CCOPT CCWARN CCUNROLL cc_is_gcc $CONFIG_VARS`
 fi
 
