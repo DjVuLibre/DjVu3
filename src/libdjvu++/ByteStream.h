@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.3 1999-02-24 22:08:56 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.4 1999-02-26 22:23:06 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -22,7 +22,8 @@
     files provide two subclasses. Class \Ref{StdioByteStream} provides a
     simple interface to the Ansi C buffered input/output functions. Class
     \Ref{MemoryByteStream} provides stream-like access to a dynamical array
-    maintained in memory.
+    maintained in memory. Class \Ref{StaticByteStream} provides read-only
+    stream-like access to a user allocated data buffer.
 
     {\bf Notes} --- These classes were partly written because we did not want to
     depend on the standard C++ library.  The main reason however is related to
@@ -38,7 +39,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.3 1999-02-24 22:08:56 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.4 1999-02-26 22:23:06 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -233,10 +234,10 @@ private:
 };
 
 
-/** ByteStream interface for a memory buffer.
-    Class #MemoryByteStream# manages a dynamically resizeable buffer 
-    from which data can be read or written.
- */
+/** ByteStream interface managing a memory buffer.  
+    Class #MemoryByteStream# manages a dynamically resizeable buffer from
+    which data can be read or written.  The buffer itself is organized as an
+    array of blocks of 4096 bytes.  */
 
 class MemoryByteStream : public ByteStream {
 public:
@@ -245,13 +246,13 @@ public:
       to store data into the buffer, use function #seek# to rewind the
       current position, and function #read# to read the data back. */
   MemoryByteStream();
-  /** Constructs a MemoryByteStream with initial data.  The MemoryByteStream
-      buffer is initialized with #size# bytes copied from the memory area
-      pointed to by #buffer#. */
+  /** Constructs a MemoryByteStream by copying initial data.  The
+      MemoryByteStream buffer is initialized with #size# bytes copied from the
+      memory area pointed to by #buffer#. */
   MemoryByteStream(const void *buffer, size_t size);
-  /** Constructs a MemoryByteStream with an initial string.
-      The MemoryByteStream buffer is initialized with the zero terminated
-      string #buffer#. */
+  /** Constructs a MemoryByteStream by copying an initial string.  The
+      MemoryByteStream buffer is initialized with the zero terminated string
+      #buffer#. */
   MemoryByteStream(const char *buffer);
   // Virtual functions
   ~MemoryByteStream();
@@ -273,24 +274,62 @@ private:
   MemoryByteStream(const MemoryByteStream &);
   MemoryByteStream & operator=(const MemoryByteStream &);
 private:
-  // Implementation
+  // Position
   int where;
-  GArray<char> data;
+protected:
+  /** Buffer size */
+  int bsize;
+  /** Number of blocks of 4096 bytes */
+  int nblocks;
+  /** Pointers to blocks of 4096 bytes */
+  char **blocks;
 };
 
-//@}
 
 inline int
 MemoryByteStream::size()
 {
-  return data.size();
+  return bsize;
 }
 
 inline char &
 MemoryByteStream::operator[] (int n)
 {
-  return data[n];
+  return blocks[n>>12][n&0xfff];
 }
+
+
+
+/** Read-only ByteStream interface to a memory area.  
+    Class #StaticByteStream# implements a read-only ByteStream interface for a
+    memory area specified by the user at construction time. Calls to function
+    #read# directly access this memory area.  The user must therefore make
+    sure that its content remain valid long enough.  */
+
+class StaticByteStream : public ByteStream
+{
+public:
+  /** Creates a StaticByteStream object for allocating the memory area of
+      length #sz# starting at address #buffer#. */
+  StaticByteStream(const char *buffer, size_t sz);
+  /** Creates a StaticByteStream object for allocating the zero terminated
+      memory area starting at address #buffer#. */
+  StaticByteStream(const char *buffer);  
+  // Virtual functions
+  size_t read(void *buffer, size_t sz);
+  size_t write(const void *buffer, size_t sz);
+  int is_seekable(void) const;
+  void seek(long offset, int whence = SEEK_SET);
+  long tell();
+private:
+  const char *data;
+  int bsize;
+  int where;
+};
+
+//@}
+
+
 
 // ------------ THE END
 #endif
