@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.12 2000-02-03 01:50:10 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.13 2000-02-03 02:25:58 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -570,11 +570,13 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             // -- Could be UNCOMPRESSED ``0000001111''
             //    TIFF6 says people should not do this.
             //    RFC1314 says people should do this.
-            // NOTE: THIS IS POORLY TESTED
             else if ((m & 0xffc00000) == 0x03c00000)
               {
+#ifdef MMRDECODER_REFUSES_UNCOMPRESSED
+                THROW("Cannot processed uncompressed bits in G4/MMR data");
+#else
+                // ---THE-FOLLOWING-CODE-IS-POORLY-TESTED---
                 src->shift(10);
-                // Analyze uncompressed bitstream
                 while ((m = (src->peek() & 0xfc000000)))
                   {
                     if (m == 0x04000000)       // 000001
@@ -593,6 +595,8 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                         rle += 1;
                         a0 += 1;
                       }
+                    if (a0 > width)
+                      THROW(invalid_mmr_data);
                   }
                 // Analyze uncompressed termination code.
                 m = src->peek() & 0xff000000;  
@@ -605,6 +609,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                   { *xr++ = rle; rle = 0; a0color = !a0color; }
                 // Cross fingers and proceed ...
                 break;
+#endif
               }
             // -- Unknown MMR code.
             THROW(invalid_mmr_data);
