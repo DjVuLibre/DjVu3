@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.85 1999-11-12 00:01:13 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.86 1999-11-15 23:07:22 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -782,6 +782,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
       GP<DjVuPalette> fgbc = new DjVuPalette;
       fgbc->decode(iff);
       DjVuFile::fgbc = fgbc;
+      desc.format("JB2 foreground colors (%d colors, %d ccs)", 
+                  fgbc->size(), fgbc->colordata.size());
     }
 
   // BM44/PM44 (IW44 data)
