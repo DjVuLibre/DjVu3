@@ -1,7 +1,7 @@
 # This script finds all the commands
 #   whence, true, pwdcmd, docxx, ranlib, ln, dirname, basename, mkdir, tar,
 #   make, cmp, mv, cp, rm, sed, find, chmod, cat, ar, uname, grep, latex,
-#   and tee
+#   mkdirp, and tee
 # This also sets the variable RULES_DIR
 #
 
@@ -48,7 +48,7 @@ then
     ranlib="$true"
   fi
 
-  for i in sed sort 
+  for i in sed sort mkdir
   do
     if ( ${whence} "$i" 1>>/dev/null 2>>/dev/null )
     then
@@ -58,6 +58,13 @@ then
       eval "${i}='${i}'"
     fi
   done
+
+  if [ -z "$SUPPORTS_MKDIRP" ]
+  then
+    mkdirp="${CONFIG_DIR}/mkdirp.sh"
+  else
+    mkdirp="${mkdir} -p"
+  fi
 
   RULES_DIR=`cd ${CONFIG_DIR}/../rules/ 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
   CONFIG_VARS=`echo RULES_DIR ${CONFIG_VARS}`
@@ -77,6 +84,7 @@ then
       fi
     fi
   done
+
 fi
 
  

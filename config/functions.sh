@@ -107,7 +107,7 @@ if [ -d "$temp/test/test" ] ; then
   {
     "${mkdir}" -p "$*"
   }
-  MKDIRP="'${mkdir}' -p"
+  SUPPORTS_MKDIRP=true
 else
   mkdirp()
   {
@@ -117,9 +117,7 @@ else
       "${mkdir}" "$*"
     fi
   }
-  MKDIRP="'${CONFIG_DIR}/mkdirp.sh'"
 fi
-
 
 # Make a test file with echo on CONFIG_LOG
 testfile()
@@ -170,15 +168,22 @@ get_option_value()
 process_general_option()
 {
   case "$*" in
-        --prefix=* )     
+        --prefix=* )
             prefix=`get_option_value $1`
             ;; 
         --with-debug|-g )
-            OPT='-g'
-            DEFS="$DEFS -DDEBUG"
+            C_OPT=REPLACE
+            C_CXXOPT=REPLACE
+            C_CCOPT=REPLACE
+            R_CXXOPT='-g'
+            R_CCOPT='-g'
+            R_OPT=''
+            C_DEFS=APPEND
+            A_DEFS="-DDEBUG $A_DEFS"
             ;;
         --with-flag=* )
-            DEFS="$DEFS "`get_option_value $1`
+            C_DEFS=APPEND
+            A_DEFS="`get option_value $*` $A_DEFS"
             ;;
         *)
             return 1;
@@ -229,26 +234,12 @@ check_compiler()
     if [ -n "$cc_is_gcc" -a -n "$cxx_is_gcc" ]
     then
       compiler_is_gcc=yes
-      if [ -z "$OPT" ] ; then  OPT="-O3 -funroll-loops" ; fi
+      if [ -z "$OPT" ] ; then  OPT="-funroll-loops" ; fi
       if [ -z "$WARN" ] ; then  WARN="-Wall -Wno-unused" ; fi
     else
       compiler_is_gcc=
     fi
 
-    # -----
-
-    if [ -z "$OPT" ]
-    then
-        echon "Testing optimization option ... "
-        echo 'int main(void) {return 0;}' | testfile $temp.cpp
-        if ( run $CXX $CXXFLAGS -O -c $temp.cpp -o $temp ) 
-        then
-            OPT=-O
-            echo $OPT
-        else
-            echo broken.
-        fi
-    fi
 }
 
 
@@ -263,8 +254,14 @@ check_debug_option()
 {
   if [ -z "$*" ] ; then return; fi
   # We could test that one ...
-  OPT="-g"
-  DEFS="$DEFS -DDEBUG"
+  C_CCOPT=REPLACE
+  C_CXXOPT=REPLACE
+  C_OPT=REPLACE
+  R_CCOPT="-g"
+  R_CXXOPT="-g"
+  R_OPT=""
+  C_DEFS=APPEND
+  A_DEFS="-DDEBUG $A_DEFS"
 }
 
 
@@ -288,13 +285,16 @@ check_thread_option()
        exit 1
        ;;
     no* )
-       DEFS="$DEFS -DTHREADMODEL=NOTHREADS" 
+       C_DEFS=APPEND
+       A_DEFS="$A_DEFS -DTHREADMODEL=NOTHREADS" 
        ;;       
     jri* )
-       DEFS="$DEFS -DTHREADMODEL=JRITHREADS" 
+       C_DEFS=APPEND
+       A_DEFS="$A_DEFS -DTHREADMODEL=JRITHREADS" 
        ;;       
     co* )
-       DEFS="$DEFS -DTHREADMODEL=COTHREADS" 
+       C_DEFS=APPEND
+       A_DEFS="$A_DEFS -DTHREADMODEL=COTHREADS" 
        if [ -z "$compiler_is_gcc" ] 
        then
           echo 1>&2 "${PROGRAM_NAME}: Cothreads only work with gcc."
@@ -317,7 +317,8 @@ EOF
        fi
        ;;       
     posix* | dce* )
-       DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
+       C_DEFS=APPEND
+       A_DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
        echo 'int main(void) {return 0;}' | testfile $temp.cpp
        echon "Check option -pthread ... "
        run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp
@@ -337,8 +338,10 @@ EOF
            CXX="$CXX $CXXFLAGS -threads"
          else
            echo no.
-           LIBS="$LIBS -lpthread"
-           DEFS="$DEFS -D_REENTRANT"
+           C_LIBS=APPEND
+           A_LIBS="$A_LIBS -lpthread"
+           C_DEFS=APPEND
+           A_DEFS="$A_DEFS -D_REENTRANT"
          fi
        fi
        ;;
@@ -420,7 +423,8 @@ EOF
     if ( run $CXX $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
     then
       echo $lib
-      LIBS="$LIBS $lib"
+      C_LIBS=APPEND
+      A_LIBS="$A_LIBS $lib"
       return 0
     fi
   done
@@ -483,8 +487,6 @@ generate_makefile()
 
   # make nice pathnames
   xsrcdir=`pathclean $xsrcdir`
-  xtopsrcdir=`pathclean $TOPSRCDIR`
-  xtopbuilddir=`pathclean $TOPBUILDDIR`
 
   # substitute
   mkdirp "$TOPBUILDDIR/$1"
@@ -493,23 +495,6 @@ generate_makefile()
     . "${CONFIG_DIR}/write_status.sh"
   fi
   run "${CONFIG_STATUS}" "$TOPSRCDIR/$1/Makefile.in" "$TOPBUILDDIR/$1/Makefile"
-  mv "$TOPBUILDDIR/$1/Makefile" "$temp"
-  sed < "$temp" > "$TOPBUILDDIR/$1/Makefile" \
-    -e 's!@%PROJECT_PREFIX%@!'"${PROJECT_PREFIX}"'!g' \
-    -e 's!@%MKDIRP%@!'"$MKDIRP"'!g' \
-    -e 's!@%topsrcdir%@!'"$xtopsrcdir"'!g' \
-    -e 's!@%topbuilddir%@!'"$xtopbuilddir"'!g' \
-    -e 's!@%srcdir%@!'"$xsrcdir"'!g' \
-    -e 's!@%cc%@!'"$CC $CCFLAGS"'!g' \
-    -e 's!@%cxx%@!'"$CXX $CXXFLAGS"'!g' \
-    -e 's!@%defs%@!'"$DEFS"'!g' \
-    -e 's!@%opt%@!'"$OPT"'!g' \
-    -e 's!@%warn%@!'"$WARN"'!g' \
-    -e 's!@%libs%@!'"$LIBS"'!g' \
-    -e 's!@%rpo%@!'"$RPO"'!g' \
-    -e 's!@%docxx%@!'"doc++"'!g' \
-    -e 's!@%make_stlib%@!'"$MAKE_STLIB"'!g' \
-    -e 's!@%make_shlib%@!'"$MAKE_SHLIB"'!g'
 }
 
 
@@ -612,6 +597,7 @@ fi
 if [ -z "$whence" ] ; then
   . "${CONFIG_DIR}/commands.sh"
 fi
+CONFIG_VARS=`(for i in DEFS OPT WARN LIBS RPO MAKE_STLIB MAKE_SHLIB $CONFIG_VARS; do echo $i; done)|${sort} -u`
 
 ### ------------------------------------------------------------------------
 ### General stuff

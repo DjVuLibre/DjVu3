@@ -18,6 +18,7 @@ LATEX=@%latex%@
 LN=@%ln%@
 MAKE=@%make%@
 MKDIR=@%mkdir%@
+MKDIRP=@%mkdirp%@
 MV=@%mv%@
 PWDCMD=@%pwdcmd%@
 RANLIB=@%ranlib%@

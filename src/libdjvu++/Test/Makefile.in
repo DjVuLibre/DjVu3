@@ -4,18 +4,18 @@ SHELL=/bin/sh
 prefix=@%prefix%@
 bindir=@%PROJECT_PREFIX%@/bin
 SRCDIR=@%srcdir%@
-TOPSRCDIR=@%topsrcdir%@
-TOPBUILDDIR=@%topbuilddir%@
+TOPSRCDIR=@%TOPSRCDIR%@
+TOPBUILDDIR=@%TOPBUILDDIR%@
 VPATH=@%srcdir%@
-CXX=@%cxx%@
-OPT=@%opt%@
-WARN=@%warn%@
-DEFS=@%defs%@
+CXX=@%CXX%@
+OPT=@%OPT%@
+WARN=@%WARN%@
+DEFS=@%DEFS%@
 INCS=-I$(SRCDIR) -I$(SRCDIR)/..
-CXXFLAGS= $(DEFS) $(OPT) $(WARN) $(INCS) -DUNIX
+CXXFLAGS=@%CXXFLAGS%@ @%CXXOPT%@ $(DEFS) $(OPT) $(WARN) $(INCS) -DUNIX
 LDFLAGS=
 DOCXX=@%docxx%@
-LIBS=@%libs%@
+LIBS=@%LIBS%@
 MAKESTLIB=@%make_stlib%@
 MAKESHLIB=@%make_shlib%@
 RANLIB=@%ranlib%@
@@ -35,10 +35,10 @@ all: $(TARG)
 # Generic rules
 
 clean:
-	-rm 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo ; true
+	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo ; true
 
 distclean:
-	-rm 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile ; true
+	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile ; true
 
 
 %%%include <depend>

@@ -12,7 +12,7 @@ then
   if [ ! -d "$TOPBUILDDIR" ] ; then
     mkdirp "$TOPBUILDDIR"
   fi
-  ("${sed}" -e 's,++,\\,g' -e 's,!!,#!,g' <<\EOF
+  ("${sed}" -e 's,+$,\\,g' -e 's,!!,#!,g' <<\EOF
 !!/bin/sh
 c=1;in="$1";out="$2";tmpA="$2~A";tmpB="$2~B";tmpC="$3~C"
 SRCDIR=`dirname "$1"`
@@ -21,10 +21,26 @@ BUILDDIR=`dirname "$2"`
 BUILDDIR=`cd "$BUILDDIR" 1>>/dev/null 2>>/dev/null;pwd`
 while [ $c != 0 ]
 do
-sed ++
+sed +
+  -e "s!@%srcdir%@!$SRCDIR!g" +
+  -e "s!@%builddir%@!$BUILDDIR!g" +
 EOF
   for i in $CONFIG_VARS ; do
-    s='echo $'"${i}"
+    ss='echo $'"C_${i}"
+    case "x`eval $ss`" in
+    xreplace|xREPLACE)
+      s='echo "$'"R_${i}"'"'
+      ;;
+    xprefix|xPREFIX)
+      s='echo "$'P_"${i}"'" "$'"${i}"'"'
+      ;;
+    xappend|xAPPEND)
+      s='echo "$'"${i}"'" "$'"A_${i}"'"'
+      ;;
+    *)
+      s='echo "$'"${i}"'"'
+      ;;
+    esac 
     echo "-e 's!@%${i}%@!`eval $s`!g' \\"
   done
   "${sed}" -e 's,+$,\\,g' <<EOF
