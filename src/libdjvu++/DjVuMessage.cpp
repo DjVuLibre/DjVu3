@@ -19,15 +19,18 @@ DjVuMessage::get_DjVuMessage(void)
 }
 
 //  The name of the message file
-static const char DjVuMessageFileName[] = "DjVuMessageFile.txt";
+#define DjVuMessageFileName "DjVuMessageFile"
 
 
 // Constructor
 DjVuMessage::DjVuMessage( void )
 {
-  FILE *MessageFile;
-  MessageFile = fopen(DjVuMessageFileName, "r");
-  if( ! MessageFile )
+  const char *ss;
+  struct djvu_parse opt = djvu_parse_init( "-" );
+  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
+  FILE *MessageFile = fopen( ss, "r" );
+
+  if( MessageFile == NULL )
   {
 //    fprintf( stderr, "*** Unable to find message file (%s)\n*** Expect cryptic error messages\n\n",
 //                   DjVuMessageFileName );
@@ -50,6 +53,7 @@ DjVuMessage::perror( const GString & MessageList ) const
   GString mesg=LookUp(MessageList);
   fputs((const char *)mesg,stderr);
 }
+
 
 //  Expands message lists by looking up the message IDs and inserting
 //  arguments into the retrieved messages.
@@ -148,7 +152,7 @@ DjVuMessage::LookUpID( const GString &msgID ) const
   //  Find the message file
   const char *ss;
   struct djvu_parse opt = djvu_parse_init( "-" );
-  ss = djvu_parse_configfile( opt, "DjVuMessageFile", -1 );
+  ss = djvu_parse_configfile( opt, DjVuMessageFileName, -1 );
   FILE *MessageFile = fopen( ss, "r" );
 
   GString result;
