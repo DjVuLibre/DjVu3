@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXX, CXXFLAGS, CXXSYMBOLIC, CXXPIC, CXXUNROLL, CXXWARN
-# $Id: cxx.sh,v 1.21 2000-02-06 22:51:35 bcr Exp $
+# $Id: cxx.sh,v 1.22 2000-02-21 04:45:47 bcr Exp $
 
 if [ -z "$CONFIG_DIR" ]
 then
@@ -47,62 +47,6 @@ then
     fi
     echo "$CXX"
   fi
-
-  echon "Checking ${CXX} version ... "
-  CXXVERSION=""
-  if [ "$CXX" != "$EGXX" ]
-  then
-    s=`$CXX -Vfoo 2>&1|"${grep}" 'file path prefix'|"${sed}" 's,.* .\([^ ]*/\)foo/. never.*,\1,'`
-    if [ ! -z "$s" ]
-    then
-      echo "egcs"
-    else
-      # This test fails for pre-release versions of egcs (-eaf)
-      EGCSTEST=`($CXX -v 2>&1)|"${sed}" -n -e 's,.*/egcs-.*,Is EGCS,p' -e 's,.*/pgcc-.*,Is PGCC,p'`
-      if [ ! -z "$EGCSTEST" ]
-      then
-        echo "egcs"
-      elif ( run $CXX -V2.8.1 -c $temp.cpp )
-      then
-        echo "gcc 2.8.1"
-        CXXVERSION="-V2.8.1"
-      else
-        (echo '#include <stdio.h>';\
-	 echo 'int main(void) { printf("%d", __GNUC__); }') | testfile $temp.cpp
-	if (run $CXX $temp.cpp -o $temp.exe)
-	then
-	  MAJOR=`$temp.exe`
-	fi
-	(echo '#include <stdio.h>';\
-	 echo 'int main(void) { printf("%d", __GNUC_MINOR__); }') | testfile $temp.cpp
-	if (run $CC $temp.cpp -o $temp.exe)
-	then
-	  MINOR=`$temp.exe`
-	fi
-	if [ -n "$MAJOR" -a -n "$MINOR" ]
-	then
-	  echon "$MAJOR.$MINOR"
-	  if [ $MAJOR -eq 2 -a $MINOR -ge 9 ]
-	  then
-	    echo " (egcs)"
-	  elif [ $MAJOR -ge 3 ]
-          then
-            echo " (gcc)" 
-          else
-	    echo
-            echo WARNING: DjVu needs egcs or g++ version 2.8.1 or newer 1>&2
-	  fi
-	else
-          echo "unknown"
-          echo WARNING: DjVu needs egcs or g++ version 2.8.1 or newer 1>&2
-	fi
-	rm -f $temp.exe
-      fi
-    fi
-  else
-    echo egcs
-  fi
-  CXXFLAGS="$CXXVERSION"
 
   echon "Checking if ${CXX} -pipe works ... "
   CXXPIPE=""
@@ -168,6 +112,6 @@ then
 
   CXX_SET=true
   "${rm}" -rf $temp.cpp $temp.so $temp.o
-  CONFIG_VARS=`echo CXX_SET CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC CXXPIC cxx_is_gcc $CONFIG_VARS`
+  CONFIG_VARS=`echo CXX_SET CXX CXXFLAGS CXXOPT CXXUNROLL CXXWARN CXXSYMBOLIC cxx_is_gcc $CONFIG_VARS`
 fi
 

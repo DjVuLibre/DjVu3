@@ -1,6 +1,6 @@
 # This rule sets the following variables:
 #	CXXSYMBOLIC, CXXPIC
-# $Id: cxxpic.sh,v 1.2 2000-02-06 22:26:34 bcr Exp $
+# $Id: cxxpic.sh,v 1.3 2000-02-21 04:45:47 bcr Exp $
 
 if [ -z "$CXX_SET" ] ; then
   echo "You must source cxx.sh" 1>&2
@@ -21,19 +21,19 @@ if [ -z "$CXXPIC_SET" ] ; then
       ;;
     solaris-yes)
       if [ -z "$CROSSCOMPILER" ] ; then 
-        TESTCXXSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
+        TESTCXXSYMBOLIC="-shared "
       else
-        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+        TESTCXXSYMBOLIC="-shared "
       fi
       TESTCXXPIC="-fPIC"
       ;;
     solaris-*)
       if [ -z "$CROSSCOMPILER" ] ; then 
-        TESTCXXSYMBOLIC="-G -L/usr/lib -R/usr/lib "
+        TESTCXXSYMBOLIC="-shared "
       else
-        TESTCXXSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+        TESTCXXSYMBOLIC="-shared "
       fi
-      TESTCXXPIC="-K PIC"
+      TESTCXXPIC="-fPIC"
       ;;
     irix*-*)
       TESTCXXSYMBOLIC="-shared "

@@ -67,8 +67,12 @@ cxx=`unescape "$CXX"`
 cxxsymbolic=`unescape "$CXXSYMBOLIC"`
 name=`unescape "$soname"`
 
-echo "$cxx $cxxsymbolic -o $outputname -Wl,-soname,$name $libs"
-"$cxx" "$cxxsymbolic" -o "$outputname" "-Wl,-soname,$name" $libs
+echo "" > "dummy$$.c"
+"$cxx" -c "dummy$$.c" -o "dummy$$.o" 
+echo "$cxx $cxxsymbolic -o $outputname dummy$$.o -Wl,-soname,$name $libs"
+"$cxx" "$cxxsymbolic" -o `basename "$outputname"` "dummy$$.o" "-Wl,-soname,$name" $libs
+rm -f "dummy$$.o" "dummy$$.c"
+`unescape "$mv"` `basename $outputname` "$outputname"
 
 if [ -x "$outputname" ] 
 then

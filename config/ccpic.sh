@@ -29,19 +29,19 @@ then
         ;;
       solaris-*-yes)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-shared -L/usr/lib -R/usr/lib "
+          TESTCCSYMBOLIC="-shared"
         else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+          TESTCCSYMBOLIC="-shared"
         fi
         TESTCCPIC="-fPIC"
         ;;
       solaris-*)
         if [ -z "$CROSSCOMPILER" ] ; then 
-          TESTCCSYMBOLIC="-G -L/usr/lib -R/usr/lib "
+          TESTCCSYMBOLIC="-shared"
         else
-          TESTCCSYMBOLIC="-shared -Wl,-rpath,/usr/lib:/usr/ccs/lib:/usr/openwin/lib "
+          TESTCCSYMBOLIC="-shared"
         fi
-        TESTCCPIC="-K PIC"
+        TESTCCPIC="-fPIC"
         ;;
       irix*-*) 
         TESTCCSYMBOLIC="-shared"
