@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.h,v 1.13 2000-02-24 22:23:55 haffner Exp $
+//C- $Id: GString.h,v 1.14 2000-03-15 22:03:00 eaf Exp $
 
 
 #ifndef _GSTRING_H_
@@ -36,7 +36,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.13 2000-02-24 22:23:55 haffner Exp $# */
+    #$Id: GString.h,v 1.14 2000-03-15 22:03:00 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -46,6 +46,7 @@
 #include "DjVuGlobal.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "GException.h"
 #include "GSmartPointer.h"
 
@@ -198,10 +199,17 @@ public:
   /** Initializes a string with a formatted string (as in #printf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the Ansi-C
-      function #printf()# for more information.  The current implementation
+      function #printf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
-      than 4096 characters. */
+      than 32768 characters. */
   void format(const char *fmt, ... );
+  /** Initializes a string with a formatted string (as in #vprintf#).  The
+      string is re-initialized with the characters generated according to the
+      specified format #fmt# and using the optional arguments.  See the Ansi-C
+      function #vprintf()# for more information. The current implementation
+      will cause a segmentation violation if the resulting string is longer
+      than 32768 characters. */
+  void format(const char *fmt, va_list args);
   // -- SEARCHING
   /** Searches character #c# in the string, starting at position #from# and
       scanning forward until reaching the end of the string.  This function

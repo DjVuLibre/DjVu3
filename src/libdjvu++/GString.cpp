@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GString.cpp,v 1.16 2000-03-03 06:43:59 bcr Exp $
+//C- $Id: GString.cpp,v 1.17 2000-03-15 22:03:00 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -18,14 +18,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
 #include <new.h>
 
 #include "GString.h"
 
-// File "$Id: GString.cpp,v 1.16 2000-03-03 06:43:59 bcr Exp $"
+// File "$Id: GString.cpp,v 1.17 2000-03-15 22:03:00 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 GStringRep *
@@ -197,11 +196,18 @@ GString::setat(int n, char ch)
 void
 GString::format(const char *fmt, ... )
 {
-  int buflen=32768;
-  char *buffer=new char [buflen];
-  // Format string
   va_list args;
   va_start(args, fmt);
+  format(fmt, args);
+}
+
+void
+GString::format(const char *fmt, va_list args)
+{
+  int buflen=32768;
+  char *buffer=new char [buflen];
+
+  // Format string
 #ifdef USE_VSNPRINTF
   while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
   {
