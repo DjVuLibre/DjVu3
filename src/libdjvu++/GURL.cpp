@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.56 2001-04-10 18:07:20 praveen Exp $
+// $Id: GURL.cpp,v 1.57 2001-04-11 00:46:51 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1518,6 +1518,7 @@ GURL::expand_name(const char *fname, const char *from)
         s[0]=s[1]= backslash; s[2]=0;
       } else
       { // Case "/abcd" 
+          /*
         if( _getdrive() )
         {
             if (s[0]==0 || s[1]!=colon)
@@ -1526,7 +1527,10 @@ GURL::expand_name(const char *fname, const char *from)
             }
             s[1]=colon;   
         }
+        
         s[2]= 0;
+        */
+          s[0]=s[1]= backslash; s[2]=0;
       }
     } else if (fname[0] && fname[1]==colon)
     {
