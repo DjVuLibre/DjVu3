@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.16 1999-06-04 17:35:30 leonb Exp $
+//C- $Id: GThreads.h,v 1.17 1999-06-04 21:53:24 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -74,7 +74,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.16 1999-06-04 17:35:30 leonb Exp $# */
+    #$Id: GThreads.h,v 1.17 1999-06-04 21:53:24 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -435,8 +435,8 @@ class GEvent : protected GMonitor
 private:
   int status;
 public:
-  void GEvent() : status(0)
-    { };
+  GEvent() 
+    : status(0) { };
   void set() 
     { if (!status) { enter(); status=1; signal(); leave(); } };
   void wait() 
