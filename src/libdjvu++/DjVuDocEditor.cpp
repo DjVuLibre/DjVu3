@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.33 2000-05-19 19:00:06 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.34 2000-05-22 23:58:08 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -513,7 +513,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	    while((length=iff_in.read(buffer, 1024)))
 	       name+=GString(buffer, length);
 	    while(isspace(name[0])) { GString tmp=(const char *) name+1; name=tmp; }
-	    while(isspace(name[name.length()-1])) name.setat(name.length()-1, 0);
+	    while(isspace(name[(int)name.length()-1])) name.setat(name.length()-1, 0);
 	    GString full_name=GOS::expand_name(name, GOS::dirname(file_name));
 	    iff_in.close_chunk();
 
@@ -814,18 +814,18 @@ DjVuDocEditor::remove_pages(const GList<int> & page_list, bool remove_unref)
       // First we need to translate page numbers to IDs (they will
       // obviously be changing while we're removing pages one after another)
    GP<DjVmDir> djvm_dir=get_djvm_dir();
-
+   GPosition pos ;
    if (djvm_dir)
    {
       GList<GString> id_list;
-      for(GPosition pos=page_list;pos;++pos)
+      for(pos=page_list;pos;++pos)
       {
 	 GP<DjVmDir::File> frec=djvm_dir->page_to_file(page_list[pos]);
 	 if (frec)
 	    id_list.append(frec->id);
       }
 
-      for(GPosition pos=id_list;pos;++pos)
+      for(pos=id_list;pos;++pos)
       {
 	 GP<DjVmDir::File> frec=djvm_dir->id_to_file(id_list[pos]);
 	 if (frec)
@@ -1114,7 +1114,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
 	    djvu_file->anno=0;
       }
       if (progress_cb)
-	 progress_cb(page_num/2.0/pages_num, cl_data);
+    progress_cb((float)(page_num/2.0/pages_num), cl_data);
    }
 
       // Now remove annotations from every file except for
@@ -1137,7 +1137,7 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
 	 }
       }
       if (progress_cb)
-	 progress_cb(0.5+cnt/2.0/files_list.size(), cl_data);
+	 progress_cb((float)(0.5+cnt/2.0/files_list.size()), cl_data);
    }
 }
 
