@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.78 1999-11-22 20:48:30 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.79 1999-11-22 23:59:49 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1370,11 +1370,9 @@ DjVuDocument::get_djvm_doc()
    } else if( doc_type==SINGLE_PAGE)
    {
       DEBUG_MSG("Creating: djvm for a single page document.\n");
-      for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
-      {
-        GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-        add_file_to_djvm(file, true, *doc, map_add);
-      }
+      GMap<GURL, void *> map_add;
+      GP<DjVuFile> file=url_to_file(0);
+      add_file_to_djvm(file, true, *doc, map_add);
    } else
    {
       DEBUG_MSG("Converting: the document is in an old format.\n");
