@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=libdjvu - Win32 Debug
+CFG=libdjvu - Win32 Debug_md
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,12 +13,14 @@ CFG=libdjvu - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "libdjvu.mak" CFG="libdjvu - Win32 Debug"
+!MESSAGE NMAKE /f "libdjvu.mak" CFG="libdjvu - Win32 Debug_md"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "libdjvu - Win32 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win32 Release_md" (based on "Win32 (x86) Static Library")
 !MESSAGE "libdjvu - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "libdjvu - Win32 Debug_md" (based on "Win32 (x86) Static Library")
 !MESSAGE "libdjvu - Win64 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "libdjvu - Win64 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
@@ -53,6 +55,29 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"../../Release/lib/LibDjVu.lib" /nodefaultlib
 
+!ELSEIF  "$(CFG)" == "libdjvu - Win32 Release_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "libdjvu___Win32_Release_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win32_Release_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "Release_md"
+# PROP Intermediate_Dir "Release_md"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /I "../3rd-party/libiconv-1.5.1/libcharset/include" /I "../3rd-party/libjpeg" /I "../include" /I "../3rd-party/libiconv-1.5.1/include" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "../3rd-party/libiconv-1.5.1/libcharset/include" /I "../3rd-party/libjpeg" /I "../include" /I "../3rd-party/libiconv-1.5.1/include" /D "NDEBUG" /D "NEED_JPEG_DECODER" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /c
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /out:"../../Release/lib/LibDjVu.lib" /nodefaultlib
+# ADD LIB32 /nologo /out:"../../Release_md/lib/LibDjVu.lib" /nodefaultlib
+
 !ELSEIF  "$(CFG)" == "libdjvu - Win32 Debug"
 
 # PROP BASE Use_MFC 0
@@ -75,6 +100,29 @@ BSC32=bscmake.exe
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"../../Debug/lib/LibDjVu.lib" /nodefaultlib
+
+!ELSEIF  "$(CFG)" == "libdjvu - Win32 Debug_md"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "libdjvu___Win32_Debug_md"
+# PROP BASE Intermediate_Dir "libdjvu___Win32_Debug_md"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug_md"
+# PROP Intermediate_Dir "Debug_md"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../3rd-party/libiconv-1.5.1/include" /I "../3rd-party/libiconv-1.5.1/libcharset/include" /I "../3rd-party/libjpeg" /I "../include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "../3rd-party/libiconv-1.5.1/include" /I "../3rd-party/libiconv-1.5.1/libcharset/include" /I "../3rd-party/libjpeg" /I "../include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "DJVU_STATIC_LIBRARY" /D "NEED_JPEG_DECODER" /D "GCONTAINER_NO_MEMBER_TEMPLATES" /D "NEED_DJVU_PROGRESS" /FR /YX /FD /GZ /c
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo /out:"../../Debug/lib/LibDjVu.lib" /nodefaultlib
+# ADD LIB32 /nologo /out:"../../Debug_md/lib/LibDjVu.lib" /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "libdjvu - Win64 Release"
 
@@ -127,7 +175,9 @@ LIB32=link.exe -lib
 # Begin Target
 
 # Name "libdjvu - Win32 Release"
+# Name "libdjvu - Win32 Release_md"
 # Name "libdjvu - Win32 Debug"
+# Name "libdjvu - Win32 Debug_md"
 # Name "libdjvu - Win64 Release"
 # Name "libdjvu - Win64 Debug"
 # Begin Group "Source Files"
