@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.6 1999-10-28 14:38:15 praveen Exp $
+//C- $Id: GMapAreas.h,v 1.7 2000-01-12 23:02:01 eaf Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -47,7 +47,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: GMapAreas.h,v 1.6 1999-10-28 14:38:15 praveen Exp $# */
+    #$Id: GMapAreas.h,v 1.7 2000-01-12 23:02:01 eaf Exp $# */
 //@{
 
 
@@ -232,6 +232,12 @@ public:
       /// Returns the height of the rectangle
    int		get_height(void) const;
 
+      /// Returns \Ref{GRect} describing the map area's rectangle
+   operator GRect(void);
+
+      /// Changes the #GMapRect#'s geometry
+   GMapRect & operator=(const GRect & rect);
+   
    GMapRect(void);
    GMapRect(const GRect & rect);
    virtual ~GMapRect(void);
@@ -241,7 +247,7 @@ public:
       /// Returns a copy of the rectangle
    virtual GP<GMapArea>	get_copy(void) const;
 protected:
-   int		xmin, ymin, xmax, ymax;
+   int			xmin, ymin, xmax, ymax;
    virtual int		gma_get_xmin(void);
    virtual int		gma_get_ymin(void);
    virtual int		gma_get_xmax(void);
@@ -263,6 +269,21 @@ GMapRect::GMapRect(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
 
 inline
 GMapRect::~GMapRect(void) {}
+
+inline GMapRect::operator GRect(void)
+{
+   return GRect(xmin, ymin, xmax-xmin, ymax-ymin);
+}
+
+inline GMapRect &
+GMapRect::operator=(const GRect & rect)
+{
+   xmin=rect.xmin;
+   xmax=rect.xmax;
+   ymin=rect.ymin;
+   ymax=rect.ymax;
+   return *this;
+}
 
 inline int
 GMapRect::get_width(void) const { return xmax-xmin; }
