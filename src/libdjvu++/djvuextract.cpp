@@ -9,13 +9,13 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvuextract.cpp,v 1.10 1999-05-25 19:42:30 eaf Exp $
+//C- $Id: djvuextract.cpp,v 1.11 1999-05-27 21:16:45 eaf Exp $
 
 /** @name djvuextract
 
     {\bf Synopsis}
     \begin{verbatim}
-    djvuextract <djvufile> [Sjbz=<maskout>] [FG44=<fgout>] [BG44=<bgout>]
+    djvuextract <djvufile> [-page=<page>] [Sjbz=<maskout>] [FG44=<fgout>] [BG44=<bgout>]
     \end{verbatim}
     
     {\bf Description}\\
@@ -32,14 +32,32 @@
     \item When option #BG44=<bgout># is specified, the background color image
       is saved into file #<bgout># as IW44 data.  This data file can be processed
       using programs \Ref{d44}.
+    \item Optionally one can provide a #-page# option to select a given
+      page from the document, if it's a multipage document. The page numbers
+      start from #1#. The exact behaviour of the program depends on the document
+      type:
+      \begin{itemize}
+         \item {\bf Multipage all-in-one-file DjVu documents.}
+
+	 If the option is specified, the desired page will be open. Otherwise
+	 the first page.
+
+	 \item {\bf Multipage each-page-in-separate-file DjVu documents.}
+
+	 Here, if no #-page# option is given, the page corresponding to the
+	 specified file will be considered. Otherwise the program will process
+	 the given file in search of navigation directory, will learn the name
+	 of the file containing the desired page, will open and interpret it.
+      \end{itemize}
     \end{itemize}
 
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.10 1999-05-25 19:42:30 eaf Exp $#
+    #$Id: djvuextract.cpp,v 1.11 1999-05-27 21:16:45 eaf Exp $#
     @author
-    L\'eon Bottou <leonb@research.att.com> */
+    L\'eon Bottou <leonb@research.att.com> - Initial implementation
+    Andrei Erofeev <eaf@geocities.com> - Multipage support */
 //@{
 //@}
 
@@ -47,7 +65,8 @@
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "ATTLicense.h"
-
+#include "DjVuDocument.h"
+#include "GOS.h"
 
 
 struct DejaVuInfo
@@ -71,18 +90,23 @@ struct SecondaryHeader {
 
 
 void
-djvuextract(const char *filename,
-          MemoryByteStream *pSjbz,
-          MemoryByteStream *pBG44,
-          MemoryByteStream *pFG44)
+djvuextract(const char *filename, int page_num,
+	    MemoryByteStream *pSjbz,
+	    MemoryByteStream *pBG44,
+	    MemoryByteStream *pFG44)
   
 {
+  GP<DjVuDocument> doc=new DjVuDocument(GOS::filename_to_url(filename), 1);
+  GP<DjVuFile> file=doc->get_djvu_file(page_num);
+  TArray<char> data=file->get_djvu_data(0, 0);
+  MemoryByteStream ibs(data, data.size());
+  IFFByteStream iff(ibs);
+  
   IFFByteStream BG44(*pBG44);
   IFFByteStream FG44(*pFG44); 
   int color_bg = 1;
   int color_fg = 1;
-  StdioByteStream ibs(filename,"rb");
-  IFFByteStream iff(ibs);
+  
   GString chkid;
   if (! iff.get_chunk(chkid))
     THROW("Malformed DJVU file");
@@ -144,7 +168,8 @@ djvuextract(const char *filename,
           BG44.copy(temp);
           BG44.close_chunk();
         }
-      else
+      else if (chkid!="ANTa" && chkid!="INCL" &&
+	       chkid!="INCD" && chkid!="NDIR")
         {
           fprintf(stderr, "  unrecognized chunk %s\n", (const char*)chkid);
         }
@@ -158,7 +183,9 @@ usage()
   fprintf(stderr, 
           "DJVUEXTRACT -- Extracts components of a DJVU file\n"
           "%s\n"
-          "Usage: djvuextract <djvufile> [Sjbz=file] [BG44=file] [FG44=file]\n",
+          "Usage:\n"
+	  "   djvuextract <djvufile> [-page=<page_num>] [Sjbz=file] \\\n"
+	  "               [BG44=file] [FG44=file]\n",
           ATTLicense::get_usage_text());
   exit(1);
 }
@@ -170,12 +197,43 @@ main(int argc, char **argv)
   TRY
     {
       ATTLicense::process_cmdline(argc,argv);
-      if (argc<2)
+      int page_num=0;
+      for(int i=1;i<argc;i++)
+	 if (!strncmp(argv[i], "-page=", 6))
+	 {
+	    page_num=atoi(argv[i]+6);
+	    if (page_num<=0)
+	    {
+	       fprintf(stderr, "Invalid page number '%s' specified\n\n", argv[i]+6);
+	       usage();
+	    }
+	    for(int j=i;j<argc-1;j++) argv[j]=argv[j+1];
+	    argc--;
+	    break;
+	 } else if (!strcmp(argv[i], "-page"))
+	 {
+	    if (i+1>=argc)
+	    {
+	       fprintf(stderr, "Option '-page' must be followed by a number\n\n");
+	       usage();
+	    }
+	    page_num=atoi(argv[i+1]);
+	    if (page_num<=0)
+	    {
+	       fprintf(stderr, "Invalid page number '%s' specified\n\n", argv[i+1]);
+	       usage();
+	    }
+	    for(int j=i;j<argc-2;j++) argv[j]=argv[j+2];
+	    argc-=2;
+	    break;
+	 }
+      
+      if (argc<=2)
         usage();
       MemoryByteStream Sjbz;
       MemoryByteStream BG44;
       MemoryByteStream FG44;
-      djvuextract(argv[1], &Sjbz, &BG44, &FG44);
+      djvuextract(argv[1], page_num-1, &Sjbz, &BG44, &FG44);
       for (int i=2; i<argc; i++)
         {
           Sjbz.seek(0);
