@@ -1,30 +1,52 @@
 
 update-depend: depend
-%%%BEGIN_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+%%%BEGIN_REQUIRE(@%cxx_is_gcc%@)
+	if [ -r Makefile.depend++ ] ; then \
+	  if [ -r @%srcdir%@/Makefile.depend++ ] ; then \
+	    if ( @%cmp%@ Makefile.depend++ @%srcdir%@/Makefile.depend++ ) ; then \
+	      echo No change in Makefile.depend++; \
+	    else \
+	      @%rm%@ -f @%srcdir%@/Makefile.depend++ ; @%cp%@ Makefile.depend++ @%srcdir%@/Makefile.depend++ ; \
+	    fi ; \
+	  fi ; \
+	fi
+%%%END_REQUIRE(@%cxx_is_gcc%@)
+%%%BEGIN_REQUIRE(@%cc_is_gcc%@)
 	if [ -r Makefile.depend ] ; then \
 	  if [ -r @%srcdir%@/Makefile.depend ] ; then \
 	    if ( @%cmp%@ Makefile.depend @%srcdir%@/Makefile.depend ) ; then \
-	      echo No change ; \
+	      echo No change in Makefile.depend ; \
 	    else \
 	      @%rm%@ -f @%srcdir%@/Makefile.depend ; @%cp%@ Makefile.depend @%srcdir%@/Makefile.depend ; \
 	    fi ; \
-	  else \
-	    @%rm%@ -f @%srcdir%@/Makefile.depend ; @%cp%@ Makefile.depend @%srcdir%@/Makefile.depend ; \
 	  fi ; \
 	fi
-%%%END_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+%%%END_REQUIRE(@%cc_is_gcc%@)
 	
 depend: $(SRC)
-%%%BEGIN_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
-	@%rm%@ -f Makefile.depend
-	@for n in `(echo *.c;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;done
-	@for n in `(echo *.cpp;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.cpp)|@%sort%@ -u`; do echo "@%CXX%@ -MM -I. @%CXXFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;done
+%%%BEGIN_REQUIRE(@%cxx_is_gcc%@)
+	@%rm%@ -f Makefile.depend++
+	echo '### BEGIN C++ DEPENDENCIES' > Makefile.depend++
+	@for n in `(echo *.cpp;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.cpp)|@%sort%@ -u`; do echo "@%CXX%@ -MM -I. @%CXXFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CXX%@ -MM -I. -I@%srcdir%@ @%CXXFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend++;done
+	echo '### END   C++ DEPENDENCIES' >> Makefile.depend++
 	@%rm%@ -f Makefile.new
-	@%sed%@ -e '/^### DEPENDENCIES/,$$d' Makefile > Makefile.new
+	@%sed%@ -e '/^### BEGIN [ ]*C++ [ ]*DEPENDENCIES/,/^### END [ ]*C++ [ ]*DEPENDENCIES/d' Makefile > Makefile.new
 	@%chmod%@ ugo+w Makefile
 	@%cat%@ Makefile.new  > Makefile
 	@%rm%@ -f Makefile.new
-	echo "### DEPENDENCIES" >> Makefile
-	@%cat%@ Makefile.depend >> Makefile
-%%%END_REQUIRE(@%cc_is_gcc%@&&@%cxx_is_gcc%@)
+	@%cat%@ Makefile.depend++ >> Makefile
+	if [ `@%wc%@ -l<Makefile.depend++` != 2 ] ; then @%cat%@ Makefile.depend++ >> Makefile ; else @%rm%@ Makefile.depend++; fi
+%%%END_REQUIRE(@%cxx_is_gcc%@)
+%%%BEGIN_REQUIRE(@%cc_is_gcc%@)
+	@%rm%@ -f Makefile.depend
+	echo '### BEGIN C DEPENDENCIES' > Makefile.depend
+	@for n in `(echo *.c;cd @%srcdir%@>>/dev/null 2>>/dev/null;echo *.c)|@%sort%@ -u`; do echo "@%CC%@ -MM -I. @%CCFLAGS%@ @%DEFS%@ $$n";(if [ -r "$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ $$n ; elif [ -r "@%srcdir%@/$$n" ] ; then @%CC%@ -MM -I. -I@%srcdir%@ @%CCFLAGS%@ @%DEFS%@ $(INCS) @%srcdir%@/$$n ; fi)| @%sed%@ -e 's,\([	 ]\)@%srcdir%@/,\1,g' >> Makefile.depend;done
+	echo '### END   C DEPENDENCIES' >> Makefile.depend
+	@%rm%@ -f Makefile.new
+	@%sed%@ -e '/^### BEGIN [ ]*C [ ]*DEPENDENCIES/,/^### END [ ]*C [ ]*DEPENDENCIES/d' Makefile > Makefile.new
+	@%chmod%@ ugo+w Makefile
+	@%cat%@ Makefile.new  > Makefile
+	@%rm%@ -f Makefile.new
+	if [ `@%wc%@ -l<Makefile.depend` != 2 ] ; then @%cat%@ Makefile.depend >> Makefile ; else @%rm%@ Makefile.depend; fi
+%%%END_REQUIRE(@%cc_is_gcc%@)
 

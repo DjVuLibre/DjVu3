@@ -65,7 +65,7 @@ fi
 ### ---------------------------
 ### Proceed
 
-check_compiler
+require_compiler c++
 check_debug_option $debug
 check_thread_option $threads
 check_library math log -lm

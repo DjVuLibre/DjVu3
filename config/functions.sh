@@ -241,22 +241,78 @@ EOF
 # Usage: check_compiler
 # Side effect:  $CC              <-- name of a working C compiler
 #               $CXX             <-- name of a working C++ compiler
-#               $OPT             <-- initial guess for optimization options
-#               $WARN            <-- initial guess for warning options
-#               $LIBS            <-- empty
-
 
 check_compiler()
 {
-    if [ -z "$CXX" -o -z "$CC" ]
+  if [ -z "$CC$CXX" ]
+  then
+    compilers="$*"
+    if [ -z "$compilers" ]
     then
-      . ${CONFIG_DIR}/cc.sh
-      . ${CONFIG_DIR}/cxx.sh
-      LIBS=
-      CONFIG_VARS=`echo LIBS $CONFIG_VARS`
+      compilers="cc cxx"
     fi
+    LIBS=
+    CONFIG_VARS=`echo LIBS $CONFIG_VARS`
+    for i in $compilers
+    do
+      case $i in 
+      cxx|CXX|c++|C++)
+        if [ -z "$CXX" ]
+        then
+          . ${CONFIG_DIR}/cxx.sh
+        fi
+        ;;
+      c|C|cc|CC)
+        if [ -z "$CC" ]
+        then
+          . ${CONFIG_DIR}/cc.sh
+        fi
+        ;;
+      esac
+    done
+  fi
 }
 
+require_compiler()
+{
+  if [ -z "$CC$CXX" ]
+  then
+    compilers="$*"
+    if [ -z "$compilers" ]
+    then
+      compilers="cc cxx"
+    fi
+    LIBS=
+    CONFIG_VARS=`echo LIBS $CONFIG_VARS`
+    for i in $compilers
+    do
+      case $i in 
+      cxx|CXX|c++|C++)
+        if [ -z "$CXX" ]
+        then
+          . ${CONFIG_DIR}/cxx.sh
+          if [ -z "$CXX" ]
+          then
+            echo 1>&2 "${PROGRAM_NAME}: C++ compiler not found.""
+            exit 1
+          fi
+        fi
+        ;;
+      c|C|cc|CC)
+        if [ -z "$CC" ]
+        then
+          . ${CONFIG_DIR}/cc.sh
+          if [ -z "$CC" ]
+          then
+            echo 1>&2 "${PROGRAM_NAME}: C compiler not found.""
+            exit 1
+          fi
+        fi
+        ;;
+      esac
+    done
+  fi
+}
 
 ### ------------------------------------------------------------------------
 ### Check debug option
@@ -486,11 +542,21 @@ EOF
 
 check_make_stlib()
 {
+  if [ ! -z "$CC$CXX" ]
+  then
     echon Searching how to build a static library ...
-    testfile $temp.c <<EOF
+    if [ -z "$CC" ]
+    then
+      testfile $temp.cpp <<EOF
 int main(void) { return 1; }
 EOF
-    run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+      run "$CXX" $CCFLAGS $OPT $DEFS $WARN -c $temp.cpp
+    else
+      testfile $temp.c <<EOF
+int main(void) { return 1; }
+EOF
+      run "$CC" $CCFLAGS $OPT $DEFS $WARN -c $temp.c
+    fi
     if [ -z "$MAKE_STDLIB" ]
     then
       make_stlib="${ar} cq"
@@ -505,6 +571,7 @@ EOF
         exit 1
     fi
     CONFIG_VARS=`echo make_stlib $CONFIG_VARS`
+  fi
 }
 
 
@@ -579,7 +646,7 @@ html:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) html ) ; done
 
 update-depend:
-	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done
+	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) update-depend ) ; done
 
 depend:
 	for n in $(SUBDIRS) ; do ( cd $$n ; $(MAKE) depend ) ; done

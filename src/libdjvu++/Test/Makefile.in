@@ -38,7 +38,7 @@ clean:
 	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo ; true
 
 distclean:
-	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile ; true
+	-$(RM) 2>>/dev/null -rf $(TARG) *.o *.out ii_files *.rpo Makefile Makefile.depend ; true
 
 
 %%%include <depend>
@@ -73,6 +73,5 @@ TestThreads: $(LIB)
 	   else echo -- $@ compiled ;\
 	 fi
 
-### DEPENDENCIES
-%%%include "Makefile.depend"
+%%%include "Makefile.depend+++"
 

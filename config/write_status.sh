@@ -77,6 +77,13 @@ EOF
   -e '/^%%%[ 	]*BEGIN_SYS!=(${SYS})/,/^%%%[ 	]*END_SYS!=(${SYS})/d' +
   -e '/^%%%[ 	]*BEGIN_SYS!=(/d' +
   -e '/^%%%[ 	]*END_SYS!=(/d' +
+  -e '/^%%%[ 	]*BEGIN_IFDEF([^@]*$/,/^%%%[ 	]*END_IFDEF([^@]*$/d' +
+  -e '/^%%%[ 	]*BEGIN_IFNDEF(.*@%.*)/,/^%%%[ 	]*END_IFNDEF(.*@%.*)/d' +
+  -e '/^%%%[ 	]*BEGIN_IFDEF/d' +
+  -e '/^%%%[ 	]*END_IFDEF/d' +
+  -e '/^%%%[ 	]*BEGIN_IFNDEF/d' +
+  -e '/^%%%[ 	]*END_IFNDEF/d' +
+  -e 's,@%[^@]*%@,,g' +
   -e '/^%%%[ 	]*BEGIN_REQUIRE()/,/^%%%[ 	]*END_REQUIRE()/d' +
   -e '/^%%%[ 	]*BEGIN_REQUIRE([&][&]/,/^%%%[ 	]*END_REQUIRE([&][&]/d' +
   -e '/^%%%[ 	]*BEGIN_REQUIRE([^)]*[&][&])/,/^%%%[ 	]*END_REQUIRE([^)]*[&][&])/d' +
