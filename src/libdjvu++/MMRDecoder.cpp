@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: MMRDecoder.cpp,v 1.23 2000-12-22 04:15:39 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.24 2000-12-22 05:31:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -531,20 +531,20 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             // First run
             VLTable *table = (a0color ? btable : wtable);
             do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
-            *xr++ = rle; rle = 0;
+            *xr = rle; xr++; rle = 0;
             // Second run
             table = (!a0color ? btable : wtable);
             do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
-            *xr++ = rle; rle = 0;
+            *xr = rle; xr++; rle = 0;
             break;
           }
           /* Vertical Modes */
         case V0:
           inc = b1-a0;
         vertical_r:
-          b1 += *pr++;
+          b1 += *pr; pr++;
         vertical_l:
-          *xr++ = inc+rle; a0 += inc; rle = 0;
+          *xr = inc+rle; xr++; a0 += inc; rle = 0;
           a0color = !a0color;
           break;
         case VR3:
@@ -596,7 +596,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                       {
                         src->shift(6);
                         if (a0color)
-                          { *xr++ = rle; rle = 0; a0color = !a0color; }
+                          { *xr = rle; xr++; rle = 0; a0color = !a0color; }
                         rle += 5;
                         a0 += 5;
                       }
@@ -604,9 +604,9 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                       { 
                         src->shift(1);
                         if (a0color == !(m & 0x80000000))
-                          { *xr++ = rle; rle = 0; a0color = !a0color; }
-                        rle += 1;
-                        a0 += 1;
+                          { *xr = rle; xr++; rle = 0; a0color = !a0color; }
+                        rle++;
+                        a0++;
                       }
                     if (a0 > width)
                       G_THROW(invalid_mmr_data);
@@ -617,9 +617,9 @@ MMRDecoder::scanruns(const unsigned short **endptr)
                 if ( (m & 0xfe000000) != 0x02000000 )
                   G_THROW(invalid_mmr_data);
                 if (rle!=0)
-                  { *xr++ = rle; rle = 0; a0color = !a0color; }                  
+                  { *xr = rle; xr++; rle = 0; a0color = !a0color; }                  
                 if (a0color == !(m & 0x01000000))
-                  { *xr++ = rle; rle = 0; a0color = !a0color; }
+                  { *xr = rle; xr++; rle = 0; a0color = !a0color; }
                 // Cross fingers and proceed ...
                 break;
 #endif
@@ -640,11 +640,14 @@ MMRDecoder::scanruns(const unsigned short **endptr)
   {
     if (mrtable->decode(src) != V0)
     {
-      G_THROW(invalid_mmr_data);
+      G_THROW("3");
+//      G_THROW(invalid_mmr_data);
     }
   }
   if (rle > 0)
-    *xr++ = rle;
+  {
+    *xr = rle; xr++;
+  }
   // At this point we should have A0 equal to WIDTH
   // But there are buggy files around (Kofax!)
   // and we are not the CCITT police.
@@ -653,15 +656,17 @@ MMRDecoder::scanruns(const unsigned short **endptr)
       while (a0 > width && xr > lineruns)
         a0 -= *--xr;
       if (a0 < width)
-        *xr++ = width-a0;
+      {
+        *xr = width-a0; xr++;
+      }
     }
   /* Increment and return */
   if (endptr) 
     *endptr = xr;
-  *xr++ = 0;
-  *xr++ = 0;
-  lineno += 1;
-  striplineno += 1;
+  xr[0] = 0;
+  xr[1] = 0;
+  lineno ++;
+  striplineno ++;
   return lineruns;
 }
 
@@ -677,10 +682,12 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
   // Process inversion
   if (invert)
     {
-      if (*xr == 0) 
+      if (! *xr) 
         xr++;
       else
-        *p++ = 0;
+      {
+        *p = 0; p++;
+      }
     }
   // Encode lenghts using the RLE format
   int a0 = 0;
@@ -692,8 +699,8 @@ MMRDecoder::scanrle(int invert, const unsigned char **endptr)
     }
   if (endptr)
     *endptr = p;
-  *p++ = 0;
-  *p++ = 0;
+  p[0] = 0;
+  p[1] = 0;
   return line;
 }
 
@@ -796,7 +803,7 @@ MMRDecoder::decode(ByteStream &inp)
                   if (xend < lastx)
                     break;
                   firstx = lastx;
-                  b += 1;
+                  b ++;
                 }
               x = xend;
               c = !c; 
