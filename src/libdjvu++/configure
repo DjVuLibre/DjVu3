@@ -9,7 +9,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: configure,v 1.24 1999-09-07 20:34:55 leonb Exp $
+# C- $Id: configure,v 1.25 1999-09-08 21:39:50 leonb Exp $
 
 
 ### ------------------------------------------------------------------------
@@ -17,7 +17,8 @@
 
 prefix=/usr/local
 topsrcdir=.
-CXX=${CXX-eg++}
+CXX=${CXX-g++}
+CC=${CC-gcc}
 OPT=${OPT}
 WARN=${WARN}
 RANLIB=${RANLIB-ranlib}
