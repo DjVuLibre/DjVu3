@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.21 1999-11-04 20:32:18 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.22 2000-01-12 21:21:14 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -36,7 +36,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVuAnno.h,v 1.21 1999-11-04 20:32:18 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.22 2000-01-12 21:21:14 eaf Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -134,12 +134,14 @@ public:
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    unsigned int get_memory_usage() const;
+
+      /// Converts color from string in #RRGGBB notation to an unsigned integer
+   static u_int32	cvt_color(const char * color, u_int32 def);
 private:
    void			decode(class GLParser & parser);
    
    static GString	read_raw(ByteStream & str);
    
-   static u_int32	cvt_color(const char * color, u_int32 def);
    static unsigned char	decode_comp(char ch1, char ch2);
    static u_int32	get_bg_color(class GLParser & parser);
    static int		get_zoom(class GLParser & parser);
