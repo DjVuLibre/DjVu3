@@ -7,11 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DejaVuDecoder.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
-
-// File "$Id: DejaVuDecoder.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
-// - Author: Leon Bottou, 07/1997
-
+//C-  $Id: DejaVuDecoder.cpp,v 1.2 1999-01-22 20:49:13 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation "DejaVuCodec.h"
@@ -22,11 +18,11 @@
 #include "GString.h"
 #include "GPixmap.h"
 #include "GBitmap.h"
+#include "GScaler.h"
 #include "JB2Codec.h"
 #include "ByteStream.h"
 #include "IFFByteStream.h"
 #include "DejaVuCodec.h"
-#include "GScaler.h"
 #ifdef HANDLE_JPEG_PIXMAP
 #include "JPEGCodec.h"
 #endif
@@ -59,7 +55,10 @@ DejaVuImage::get_dpi() const
 double
 DejaVuImage::get_target_gamma() const
 {
-  return (double)info.gamma10 / 10.0;
+  if (info.gamma10)
+    return (double)info.gamma10 / 10.0;
+  else
+    return 2.2;
 }
 
 
@@ -67,7 +66,6 @@ unsigned int
 DejaVuImage::get_memory_usage() const
 {
   unsigned int usage = sizeof(DejaVuImage);
-  // Components
   if (bgpm) 
     usage += bgpm->get_memory_usage();
   if (bg44) 
@@ -76,71 +74,36 @@ DejaVuImage::get_memory_usage() const
     usage += fgpm->get_memory_usage();
   if (jb2stencil)
     usage += jb2stencil->get_memory_usage();
-  // Strings
   usage += annotation.length();
-  usage += mimetype.length();
   usage += desc.length();
   return usage;
 }
 
-int
-DejaVuImage::get_suggested_scales(int maxscales, GRatio *scales)
-{
-  // Returns scales that are suggested for this image.
-  // i.e. they are supported and quite efficient.
-  int n = -1;
-  // This is quite crude at the moment.
-  if (mimetype == "image/iw44")
-    {
-      // Upsampling values
-      if (++n<maxscales) scales[n]=GRatio(1,3);       
-      if (++n<maxscales) scales[n]=GRatio(1,2);
-      if (++n<maxscales) scales[n]=GRatio(2,3);
-      if (++n<maxscales) scales[n]=GRatio(1); 
-      if (++n<maxscales) scales[n]=GRatio(4,3); 
-      if (++n<maxscales) scales[n]=GRatio(2); 
-      if (++n<maxscales) scales[n]=GRatio(4);
-      if (++n<maxscales) scales[n]=GRatio(6);
-    }
-  else
-    {
-      // Standard supsampling values
-      if (++n<maxscales) scales[n]=GRatio(1); 
-      if (++n<maxscales) scales[n]=GRatio(2); 
-      if (++n<maxscales) scales[n]=GRatio(3); 
-      if (++n<maxscales) scales[n]=GRatio(4);
-      if (++n<maxscales) scales[n]=GRatio(6);
-      if (++n<maxscales) scales[n]=GRatio(12);
-    }
-  return ++n;
-}
-
 
 GP<GBitmap>
-DejaVuImage::get_bitmap(GRatio scale, int align)
+DejaVuImage::get_bitmap(int subsample, int align)
 {
-  int supsample = scale.get_q();
-  int subsample = scale.get_p();
-  int swidth = (width*supsample+subsample-1)/subsample;
-  int sheight = (height*supsample+subsample-1)/subsample;
+  int swidth = (width+subsample-1)/subsample;
+  int sheight = (height+subsample-1)/subsample;
   GRect rect(0,0,swidth,sheight);
-  return get_bitmap(rect, scale, align);
+  return get_bitmap(rect, subsample, align);
 }
-
+  
 
 GP<GBitmap>
-DejaVuImage::get_bitmap(const GRect &rect, GRatio scale, int align)
+DejaVuImage::get_bitmap(const GRect &rect, int subsample, int align)
 {
-  if (jb2stencil && scale.get_q()==1)
-    return jb2stencil->get_bitmap(rect, scale.get_p(), align);
+  if (jb2stencil)
+    return jb2stencil->get_bitmap(rect, subsample, align);
   return 0;
 }
 
 
 GP<GPixmap>
-DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma)
+DejaVuImage::get_background_pixmap(const GRect &rect, int subsample, double gamma)
 {
   GP<GPixmap> pm = 0;
+
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -165,22 +128,17 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
           break;
       if (red>12)
         return 0;
-      // Unpack ratio
-      // Compute scaling information
-      int supsample = scale.get_q();
-      int subsample = scale.get_p();
-      int redsup = red*supsample;
       // Handle pure downsampling cases
-      if (subsample == redsup)
+      if (subsample == red)
         pm = bg44->get_pixmap(1,rect);
-      else if (subsample == 2*redsup)
+      else if (subsample == 2*red)
         pm = bg44->get_pixmap(2,rect);    
-      else if (subsample == 4*redsup)
+      else if (subsample == 4*red)
         pm = bg44->get_pixmap(4,rect); 
-      else if (subsample == 8*redsup)
+      else if (subsample == 8*red)
         pm = bg44->get_pixmap(8,rect); 
       // Handle fractional downsampling case
-      else if (redsup*4 == subsample*3)
+      else if (red*4 == subsample*3)
         {
           GRect nrect = rect;
           GRect xrect = rect;
@@ -199,9 +157,9 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
         }
 #ifdef FIXED_SCALING
       // Handle pure upsampling cases
-      else if (redsup % subsample == 0)
+      else if (red % subsample == 0)
         {
-          int ups = redsup/subsample;
+          int ups = red/subsample;
           GRect nrect = rect;
           GRect xrect = rect;
           xrect.xmin = xrect.xmin/ups;
@@ -218,7 +176,7 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
           pm->upsample(ipm, ups, &nrect);
         }
       // Handle fractional upsampling case
-      else if (redsup*2 == subsample*3)
+      else if (red*2 == subsample*3)
         {
           GRect nrect = rect;
           GRect xrect = rect;
@@ -241,16 +199,16 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
         {
           // find suitable power of two
           int po2 = 16;
-          while (po2>1 && subsample<po2*redsup)
+          while (po2>1 && subsample<po2*red)
             po2 >>= 1;
           // setup pixmap scaler
           int inw = (w+po2-1)/po2;
           int inh = (h+po2-1)/po2;
-          int outw = (width*supsample+subsample-1)/subsample;
-          int outh = (height*supsample+subsample-1)/subsample;
+          int outw = (width+subsample-1)/subsample;
+          int outh = (height+subsample-1)/subsample;
           GPixmapScaler ps(inw, inh, outw, outh);
-          ps.set_horz_ratio(redsup*po2, subsample);
-          ps.set_vert_ratio(redsup*po2, subsample);
+          ps.set_horz_ratio(red*po2, subsample);
+          ps.set_vert_ratio(red*po2, subsample);
           // run pixmap scaler
           GRect xrect;
           ps.get_input_rect(rect,xrect);
@@ -281,28 +239,24 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
       if (red>12)
         return 0;
       pm = new GPixmap;
-      // Compute scaling information
-      int supsample = scale.get_q();
-      int subsample = scale.get_p();
-      int redsup = red*supsample;
       // Handle pure downsampling cases
-      if (subsample == redsup)
+      if (subsample == red)
         pm->init(*bgpm, rect);
-      else if (subsample == 2*redsup)
+      else if (subsample == 2*red)
         pm->downsample(bgpm, 2, &rect);
-      else if (subsample == 4*redsup)
+      else if (subsample == 4*red)
         pm->downsample(bgpm, 4, &rect);
-      else if (subsample == 8*redsup)
+      else if (subsample == 8*red)
         pm = bg44->get_pixmap(8,rect); 
       // Handle fractional downsampling cases
-      else if (redsup*4 == subsample*3)
+      else if (red*4 == subsample*3)
         pm->downsample43(bgpm, &rect);
 #ifdef FIXED_SCALING
       // Handle pure upsampling cases
-      else if (redsup % subsample == 0)
+      else if (red % subsample == 0)
         pm->upsample(bgpm, red/subsample, &rect);
       // Handle fractional upsampling
-      else if (redsup*2 == subsample*3)
+      else if (red*2 == subsample*3)
         pm->upsample23(bgpm, &rect);
       else
         return 0;
@@ -311,11 +265,11 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
       else
         {
           // setup pixmap scaler
-          int outw = (width*supsample+subsample-1)/subsample;
-          int outh = (height*supsample+subsample-1)/subsample;
+          int outw = (width+subsample-1)/subsample;
+          int outh = (height+subsample-1)/subsample;
           GPixmapScaler ps(w, h, outw, outh);
-          ps.set_horz_ratio(redsup, subsample);
-          ps.set_vert_ratio(redsup, subsample);
+          ps.set_horz_ratio(red, subsample);
+          ps.set_vert_ratio(red, subsample);
           // run pixmap scaler
           pm = new GPixmap();
           GRect xrect(0,0,w,h);
@@ -334,12 +288,8 @@ DejaVuImage::get_background_pixmap(const GRect &rect, GRatio scale, double gamma
 
 
 int  
-DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double gamma)
+DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, int subsample, double gamma)
 {
-  // Compute scaling information
-  int subsample = scale.get_p();
-  int supsample = scale.get_q();
-  if (supsample != 1) return 0;
   // Compute gamma_correction
   double gamma_correction = 1.0;
   if (gamma > 0)
@@ -353,7 +303,7 @@ DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double 
   if (jb2stencil && fgpm)
     {
       GP<GPixmap> fg = fgpm;
-      GP<GBitmap> bm = get_bitmap(rect, scale);
+      GP<GBitmap> bm = get_bitmap(rect, subsample);
       if (bm && pm)
         {
           int red;
@@ -365,7 +315,6 @@ DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double 
               break;
           if (red>12)
             return 0;
-          // Refuse
           // Perform further reduction if necessary
           if (red+red<subsample)
             {
@@ -407,14 +356,14 @@ DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double 
   // CASE2: JB2 stencil but no color
   if (jb2stencil)
     {
-      GP<GBitmap> bm = get_bitmap(rect, scale);
+      GP<GBitmap> bm = get_bitmap(rect, subsample);
       if (bm && pm)
-        {
-          GPixmap black(1, 1, &GPixel::BLACK);
-          int pms = pm->rows() + pm->columns();
-          pm->stencil(bm, &black, pms, 0, gamma_correction);
-          return 1;
-        }
+      {
+        GPixmap black(1, 1, &GPixel::BLACK);
+        int pms = pm->rows() + pm->columns();
+        pm->stencil(bm, &black, pms, 0, gamma_correction);
+        return 1;
+      }
     }
   // FAILURE
   return 0;
@@ -422,29 +371,29 @@ DejaVuImage::apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double 
 
 
 GP<GPixmap>
-DejaVuImage::get_foreground_pixmap(const GRect &rect, GRatio scale, double gamma)
+DejaVuImage::get_foreground_pixmap(const GRect &rect, int subsample, double gamma)
 {
   // Obtain white background pixmap
   GP<GPixmap> pm = 0;
   if (width && height)
     pm = new GPixmap(rect.height(),rect.width(), &GPixel::WHITE);
   // Apply stencil
-  if (apply_stencil(pm, rect, scale, gamma))
+  if (apply_stencil(pm, rect, subsample, gamma))
     return pm;
   return 0;
 }
 
 
 GP<GPixmap>
-DejaVuImage::get_color_pixmap(const GRect &rect, GRatio scale, double gamma)
+DejaVuImage::get_color_pixmap(const GRect &rect, int subsample, double gamma)
 {
   // Straightforward
-  GP<GPixmap> pm = get_background_pixmap(rect, scale, gamma);
+  GP<GPixmap> pm = get_background_pixmap(rect, subsample, gamma);
   // Avoid ugly intermediate display
   if (jb2stencil && !fgpm)
     return 0;
   // Superimpose foreground
-  apply_stencil(pm, rect, scale, gamma);
+  apply_stencil(pm, rect, subsample, gamma);
   return pm;
 }
 
@@ -636,8 +585,6 @@ DejaVuDecoder::decode_iw44(DejaVuImage *dimg, GString * chunk_name,
               dimg->info.version_lo = (DEJAVUVERSION & 0xff);
               dimg->info.version_hi = ((DEJAVUVERSION >> 8) & 0xff);
               dimg->info.gamma10 = 22;
-              dimg->info.dpi_hi = 0;
-              dimg->info.dpi_lo = 100;
               desc.format("IW44 Image (%dx%d) :\n\n", 
                           img44->get_width(), img44->get_height() );
               dimg->add_description(desc);
@@ -655,7 +602,7 @@ DejaVuDecoder::decode_iw44(DejaVuImage *dimg, GString * chunk_name,
           GString ant;
           char buffer[1024];
           int length;
-          while ((length=iff->readall(buffer, 1024)))
+          while ((length=iff->read(buffer, 1024)))
             ant += (const char *) GString(buffer, length);
           dimg->annotation=ant;
           // Add description
@@ -719,7 +666,7 @@ DejaVuDecoder::decode_djvu(DejaVuImage *dimg, GString * chunk_name,
             THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)"); 
           // Read chunk data into info field
           memset((void*)&dimg->info, 0, sizeof(dimg->info));
-          int size = iff->readall((void*)&dimg->info, sizeof(dimg->info));
+          int size = iff->read((void*)&dimg->info, sizeof(dimg->info));
           // Interpret size information
           if (size < 4)
             THROW("DjVu Decoder: Corrupted file (Truncated INFO chunk)");
@@ -731,14 +678,11 @@ DejaVuDecoder::decode_djvu(DejaVuImage *dimg, GString * chunk_name,
             THROW("DjVu Decoder: Corrupted file (No version number in INFO chunk)");
           // Fixup leftovers from the past
           if (dimg->info.version_hi == 0xff)
-            { dimg->info.version_hi = 0; }
+            dimg->info.version_hi = 0;
           if (dimg->info.dpi_hi == 0xff)
-            { dimg->info.dpi_lo = dimg->info.dpi_hi = 0; }
-          // Setup default values
-          if (dimg->info.dpi_lo == 0 && dimg->info.dpi_hi == 0)
-            { dimg->info.dpi_hi = 1;  dimg->info.dpi_lo = 300-256; }
+            dimg->info.dpi_lo = dimg->info.dpi_hi = 0;
           if (dimg->info.gamma10 < 3 || dimg->info.gamma10 > 50)
-            { dimg->info.gamma10 = 22; }
+            dimg->info.gamma10 = 0;
           // Refuse to decode files that are much more modern than the library
           if (dimg->get_version() >= DEJAVUVERSION_TOO_NEW)
             return;
@@ -759,7 +703,7 @@ DejaVuDecoder::decode_djvu(DejaVuImage *dimg, GString * chunk_name,
           GString ant;
           char buffer[1024];
           int length;
-          while ((length=iff->readall(buffer, 1024)))
+          while ((length=iff->read(buffer, 1024)))
             ant += (const char *) GString(buffer, length);
           dimg->annotation=ant;
           // Add description
@@ -1005,4 +949,3 @@ DejaVuDecoder::decode_djvu(DejaVuImage *dimg, GString * chunk_name,
   *do_redraw=0;
   *call_again=0;
 }
-

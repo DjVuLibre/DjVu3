@@ -7,13 +7,12 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DejaVuCodec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
-
+//C-  $Id: DejaVuCodec.h,v 1.2 1999-01-22 20:49:13 leonb Exp $
 
 #ifndef _DEJAVUCODEC_H
 #define _DEJAVUCODEC_H
 
-//**** File "$Id: DejaVuCodec.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//**** File "$Id: DejaVuCodec.h,v 1.2 1999-01-22 20:49:13 leonb Exp $
 // - Performs DEJAVU decode
 // - Author: Leon Bottou, 07/1997
 
@@ -22,7 +21,6 @@
 #pragma interface
 #endif
 
-#include "DjVuGlobal.h"
 #include "GString.h"
 #include "GSmartPointer.h"
 #include "ByteStream.h"
@@ -70,26 +68,29 @@ public:
   int          get_dpi() const;
   double       get_target_gamma() const;
   unsigned int get_memory_usage() const;
-  int          get_suggested_scales(int maxscales, GRatio *scales);
-  int	       is_color(void);
   // Get pixmap
-  GP<GBitmap>   get_bitmap(GRatio scale=1, int align=1);
-  GP<GBitmap>   get_bitmap(const GRect &rect, GRatio scale=1, int align = 1);
-  GP<GPixmap>   get_background_pixmap(const GRect &rect, GRatio scale=1, double gamma=0);
-  GP<GPixmap>   get_foreground_pixmap(const GRect &rect, GRatio scale=1, double gamma=0);
-  GP<GPixmap>   get_color_pixmap(const GRect &rect, GRatio scale=1, double gamma=0);
+  GP<GBitmap>  get_bitmap(int subsample = 1, int align = 1);
+  GP<GBitmap>  get_bitmap(const GRect &rect, int subsample = 1, int align = 1);
+  GP<GPixmap>  get_background_pixmap(const GRect &rect, int subsample = 1,
+                                     double gamma=0);
+  GP<GPixmap>  get_foreground_pixmap(const GRect &rect, int subsample = 1,
+                                     double gamma=0);
+  GP<GPixmap>  get_color_pixmap(const GRect &rect, int subsample = 1,
+                                double gamma=0);
   GString      get_short_description();
   GString      get_long_description();
+  // Info
+  int	       is_color(void);
 public:
   // Page Information
   DejaVuInfo   info;
   // DjVu Components
   int          width;
   int          height;
-  GP<GPixmap>   bgpm;
+  GP<GPixmap>  bgpm;
   GP<IWPixmap> bg44;
   GP<JB2Image> jb2stencil;
-  GP<GPixmap>   fgpm;
+  GP<GPixmap>  fgpm;
   GString      annotation;
   GString      mimetype;
   // Plugin stuff ???
@@ -103,7 +104,7 @@ private:
   long deltasize;
   // Helpers
   void add_description(const char *s);
-  int apply_stencil(GPixmap *pm, const GRect &rect, GRatio scale, double gamma);
+  int apply_stencil(GPixmap *pm, const GRect &rect, int subsample, double gamma);
 };
 
 
