@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.28 2001-07-24 17:52:03 bcr Exp $
+// $Id: Arrays.h,v 1.29 2001-09-21 20:15:05 leonb Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -83,15 +83,18 @@
     that there is no really good reason why arrays should be derived from
     containers. It was also suggested to create separate arrays implementation
     for simple classes and do the copy-on-demand strategy, which would allow
-    to assign array objects without immediate copying of their elements. At
-    this point \Ref{GArray} has been superseded by \Ref{DArray} and \Ref{TArray}.
+    to assign array objects without immediate copying of their elements. 
+
+    At this point \Ref{DArray} and \Ref{TArray} should only be used when
+    it is critical to have the copy-on-demand feature.  The \Ref{GArray}
+    implementation is a lot more efficient.
     
     @memo Template array classes.
     @author 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.28 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: Arrays.h,v 1.29 2001-09-21 20:15:05 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
