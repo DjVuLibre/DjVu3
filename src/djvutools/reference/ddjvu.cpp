@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.15 2001-04-09 20:49:39 chrisp Exp $
+// $Id: ddjvu.cpp,v 1.16 2001-04-16 19:25:51 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.15 2001-04-09 20:49:39 chrisp Exp $# */
+    #$Id: ddjvu.cpp,v 1.16 2001-04-16 19:25:51 bcr Exp $# */
 //@{
 //@}
 
@@ -286,23 +286,28 @@ usage()
 
 
 void
-geometry(const char *s, GRect &rect)
+geometry(const GUTF8String &s, GRect &rect)
 {
   int w,h;
   rect.xmin = rect.ymin = 0;
-  w = strtol((char *)s,(char **) &s,10);
-  if (w<=0 || *s++!='x') goto error;
-  h = strtol((char *)s,(char **)&s,10);
-  if (h<=0 || (*s && *s!='+' && *s!='-')) goto error;
-  if (*s) 
-    rect.xmin = strtol((char *)s,(char **)&s,10);
-  if (*s)
-    rect.ymin = strtol((char *)s,(char **)&s,10);
-  if (*s) 
-    {
+  GUTF8String ss;
+  bool isLong;
+  w = s.toLong(ss,isLong);
+  if (w<=0 || ss[0] !='x')
+    goto error;
+  ss=ss.substr(1,(unsigned int)(-1));
+  h = ss.toLong(ss,isLong);
+  if (h<=0 || (ss.length() && ss[0] != '+' && ss[0] !='-'))
+    goto error;
+  if (ss.length()) 
+    rect.xmin = ss.toLong(ss,isLong);
+  if (ss.length()) 
+    rect.ymin = ss.toLong(ss,isLong);
+  if (ss.length()) 
+  {
     error:
       G_THROW("Syntax error in geometry specification");
-    }
+  }
   rect.xmax = rect.xmin + w;
   rect.ymax = rect.ymin + h;
 }
@@ -346,25 +351,31 @@ main(int argc, char **argv)
       int page_num=-1;
       while (argc>1 && dargv[1][0]=='-' && dargv[1][1])
         {
-          const char *s = dargv[1];
+          GUTF8String s(dargv[1]);
           if (dargv[1] == GString("-v"))
             {
               flag_verbose = 1;
             }
-          else if (s == GString("-scale"))
+          else if (s == "-scale")
             {
               if (argc<=2)
                 G_THROW("No argument for option '-scale'");
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW("Duplicate scaling specification");
-              argc -=1; dargv.shift(-1); s = dargv[1];
-              flag_scale = strtod((char *)s,(char **)&s);
-              if (*s == '%') 
-                s++;
-              if (*s)
+              argc -=1;
+              dargv.shift(-1);
+              s = dargv[1];
+              GUTF8String ss;
+              bool isDouble;
+              flag_scale = s.toDouble(ss,isDouble);
+              if (ss[0] == '%') 
+              {
+                s=ss.substr(1,(unsigned int)(-1));
+              }
+              if (ss.length())
                 G_THROW("Illegal argument for option '-scale'");
             }
-          else if ( s == GString("-size"))
+          else if ( s == "-size")
             {
               if (argc<=2)
                 G_THROW("No argument for option '-size'");
@@ -376,7 +387,7 @@ main(int argc, char **argv)
               if (fullrect.xmin || fullrect.ymin)
                 G_THROW("Illegal size specification");
             }
-          else if (s == GString("-segment"))
+          else if (s == "-segment")
             {
               if (argc<=2)
                 G_THROW("No argument for option '-segment'");
@@ -386,39 +397,45 @@ main(int argc, char **argv)
               geometry(s, segmentrect);
               flag_segment = 1;
             }
-          else if (s == GString("-black"))
+          else if (s == "-black")
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 's';
             }
-          else if (s == GString("-foreground"))
+          else if (s == "-foreground")
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 'f';
             }
-          else if (s == GString("-background"))
+          else if (s == "-background")
             {
               if (flag_mode)
                 G_THROW("Duplicate rendering mode specification");
               flag_mode = 'b';
             }
-	  else if (s == GString("-page"))
+	  else if (s == "-page")
 	    {
 	      if (argc<=2)
                 G_THROW("No argument for option '-page'");
               if (page_num>=0)
                 G_THROW("Duplicate page specification");
-              argc -=1; dargv.shift(-1); s = dargv[1];
-              page_num=GString::toInt(s); // atoi(s);
-	      if (page_num<=0) G_THROW("Page number must be positive.");
+              argc -=1;
+              dargv.shift(-1);
+              s = dargv[1];
+              page_num=s.toInt(); // atoi(s);
+	      if (page_num<=0)
+                G_THROW("Page number must be positive.");
 	      page_num--;
 	    }
           else if (s[1]>='1' && s[1]<='9')
             {
-              int arg = strtol((char *)s+1,(char **)&s,10);
-              if (arg<0 || *s) usage();
+              GUTF8String ss;
+              bool isULong;
+              int arg = s.substr(1,(unsigned int)(-1)).toULong(ss,isULong);
+              if (arg<0 || !isULong || ss.length())
+                usage();
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW("Duplicate scaling specification");
               flag_subsample = arg;
