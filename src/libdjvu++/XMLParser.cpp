@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.7 2001-05-16 18:32:59 bcr Exp $
+// $Id: XMLParser.cpp,v 1.8 2001-05-16 21:27:06 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -619,12 +619,15 @@ template<class TYPE>
 static inline TYPE min(TYPE a,TYPE b) { return (a<b)?a:b; }
 
 // used to build the zone tree
-void
-make_next_layer(
+// true is returned if the GRect is known for this object,
+// and false, if the rectangle's size is just the parent size.
+static bool
+make_child_layer(
   DjVuTXT::Zone &parent,
   const lt_XMLTags &tag, ByteStream &bs,
-  const int height)
+  const int height, const double ws, const double hs)
 {
+  bool retval=true;
   // the plugin thinks there are only Pages, Lines and Words
   // so we don't make Paragraphs, Regions and Columns zones
   // if we did the plugin is not able to search the text but 
@@ -664,77 +667,119 @@ make_next_layer(
   }
   DjVuTXT::Zone &self = *self_ptr;
   self.text_start = bs.tell();
-  int &xmin=self.rect.xmin;
-  int &ymin=self.rect.ymin;
-  int &xmax=self.rect.xmax;
-  int &ymax=self.rect.ymax;
-  xmin=parent.rect.xmax;
-  ymin=parent.rect.ymax;
-  xmax=parent.rect.xmin;
-  ymax=parent.rect.ymin;
-  GPosition pos=tag.args.contains("coords");
+  int &xmin=self.rect.xmin, &ymin=self.rect.ymin, 
+    &xmax=self.rect.xmax, &ymax=self.rect.ymax;
+  GRect default_rect;
+  default_rect.xmin=max(parent.rect.xmax,parent.rect.xmin);
+  default_rect.xmax=min(parent.rect.xmax,parent.rect.xmin);
+  default_rect.ymin=max(parent.rect.ymax,parent.rect.ymin);
+  default_rect.ymax=min(parent.rect.ymax,parent.rect.ymin);
+  // Now if there are coordinates, use those.
+  GPosition pos(tag.args.contains("coords"));
   if(pos)
   {
     GList<int> rectArgs;
     lt_XMLParser::intList(tag.args[pos], rectArgs);
     if((pos=rectArgs))
     {
-      xmin=rectArgs[pos];
+      xmin=(int)(ws*(double)rectArgs[pos]);
       if(++pos)
       {
-        ymin=(height-1)-rectArgs[pos];
+        ymin=(height-1)-(int)(hs*(double)rectArgs[pos]);
         if(++pos)
         {
-          xmax=rectArgs[pos];
+          xmax=(int)(ws*(double)rectArgs[pos]);
           if(++pos)
           {
-            ymax=(height-1)-rectArgs[pos];
-          }else
-          {
-            ymax=parent.rect.xmax;
+            ymax=(height-1)-(int)(hs*(double)rectArgs[pos]);
+            if(xmin>xmax) // Make sure xmin is really minimum
+            {
+              const int t=xmin;
+              xmin=xmax;
+              xmax=t;
+            }
+            if(ymin>ymax) // Make sure ymin is really minimum
+            {
+              const int t=ymin;
+              ymin=ymax;
+              ymax=t;
+            }
           }
         }
-      }
-      if(pos)
-      {
-        if(xmin>xmax)
-        {
-          const int t=xmin;
-          xmin=xmax;
-          xmax=t;
-        }
-        if(ymin>ymax)
-        {
-          const int t=ymin;
-          ymin=ymax;
-          ymax=t;
-        }
-      }else
-      {
-        xmin=parent.rect.xmax;
-        ymin=parent.rect.ymax;
-        xmax=parent.rect.xmin;
-        ymax=parent.rect.ymin;
       }
     }
   }
   if(self.ztype == DjVuTXT::WORD)
   {
-    bs.writestring(tag.raw.substr(0,tag.raw.firstEndSpace()));
-//    DjVuPrintMessage("<<<%s>>>\n",
-//      (const char *)tag.raw.substr(0,tag.raw.firstEndSpace()));
+    if(! pos)
+    {
+      self.rect=default_rect;
+      retval=false;
+    }
+    const int i=tag.raw.nextNonSpace(0);
+    bs.writestring(tag.raw.substr(i,tag.raw.firstEndSpace()-i));
     if(sepchar)
       bs.write8(sepchar);
     self.text_length = bs.tell() - self.text_start;
-  }else
+  }else if(pos)
   {
-    for(GPosition pos = tag.content; pos; ++pos)
+    pos=tag.content;
+    if(pos)
     {
-      GP<lt_XMLTags> t = tag.content[pos].tag;
-      make_next_layer(self, *t, bs, height);
+      for(pos=tag.content; pos; ++pos)
+      {
+        GP<lt_XMLTags> t = tag.content[pos].tag;
+        make_child_layer(self, *t, bs, height,ws,hs);
+        if(sepchar)
+          bs.write8(sepchar);
+        self.text_length = bs.tell() - self.text_start;
+      }
+    }else
+    {
+      const int i=tag.raw.nextNonSpace(0);
+      bs.writestring(tag.raw.substr(i,tag.raw.firstEndSpace()-i));
       if(sepchar)
         bs.write8(sepchar);
       self.text_length = bs.tell() - self.text_start;
+    }
+  }else
+  {
+    self.rect=default_rect;
+    if((pos=tag.content))
+    {
+      for(; pos; ++pos)
+      {
+        GP<lt_XMLTags> t = tag.content[pos].tag;
+        const GRect save_rect(self.rect);
+        self.rect=default_rect;
+        if(retval=make_child_layer(self, *t, bs, height,ws,hs))
+        {
+          xmin=min(save_rect.xmin,xmin);
+          xmax=max(save_rect.xmax,xmax);
+          ymin=min(save_rect.ymin,ymin);
+          ymax=max(save_rect.ymax,ymax);
+          if(sepchar)
+            bs.write8(sepchar);
+          self.text_length = bs.tell() - self.text_start;
+        }else
+        {
+          // If the child doesn't have coordinates, we need to use a box
+          // at least as big as the parent's coordinates.
+          xmin=min(save_rect.xmin,default_rect.xmax);
+          xmax=max(save_rect.xmax,default_rect.xmin);
+          ymin=min(save_rect.ymin,default_rect.ymax);
+          ymax=max(save_rect.ymax,default_rect.ymin);
+          for(; pos; ++pos)
+          {
+            GP<lt_XMLTags> t = tag.content[pos].tag;
+            make_child_layer(self, *t, bs, height,ws,hs);
+            if(sepchar)
+              bs.write8(sepchar);
+            self.text_length = bs.tell() - self.text_start;
+          }
+          break;
+        }
+      }
     }
   }
   parent.rect.xmin=min(xmin,parent.rect.xmin);
@@ -755,19 +800,8 @@ make_next_layer(
   }
 //  DjVuPrintMessage("(%d,%d)(%d,%d)<<<\\%o>>>\n",
 //    xmin,ymin,xmax,ymax, sepchar);
+  return retval;
 }
-
-#if 0
-// used in debugging to see if the zone tree is built right       
-void step_down(DjVuTXT::Zone &parent)
-{
-  if(parent)
-  {
-    for(GPosition i = parent.children; i; ++i)
-      step_down(*parent.children[i]);
-  }
-}
-#endif
 
 void 
 lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,
@@ -788,6 +822,8 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,
   {
     G_THROW( ERR_MSG("XMLAnno.bad_page") );
   }
+  dfile->start_decode();
+  dfile->wait_for_finish();
   
   GP<DjVuText> text = DjVuText::create();
   GP<DjVuTXT> txt = text->txt = DjVuTXT::create();
@@ -795,14 +831,34 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,
   // to store the new text
   GP<ByteStream> textbs = ByteStream::create(); 
   
+  const GP<DjVuInfo> info=(dfile->info);
+  const int h=info->height;
+  const int w=info->width;
   txt->page_zone.text_start = 0;
   DjVuTXT::Zone &parent=txt->page_zone;
   parent.rect.xmin=0;
   parent.rect.ymin=0;
-  parent.rect.xmax=width.toInt();
-  parent.rect.ymax=height.toInt();
-  make_next_layer(parent,
-    tags, *textbs, parent.rect.ymax);
+  parent.rect.ymax=h;
+  parent.rect.xmax=w;
+  double ws=1.0;
+  if(width.length())
+  {
+    const int ww=width.toInt();
+    if(ww && ww != w)
+    {
+      ws=((double)w)/((double)ww);
+    }
+  }
+  double hs=1.0;
+  if(height.length())
+  {
+    const int hh=height.toInt();
+    if(hh && hh != h)
+    {
+      hs=((double)h)/((double)hh);
+    }
+  }
+  make_child_layer(parent, tags, *textbs, h, ws,hs);
   textbs->write8(0);
   long len = textbs->tell();
   txt->page_zone.text_length = len;
@@ -946,12 +1002,13 @@ lt_XMLParser::Text::parse(const lt_XMLTags &tags)
           // loop through the hidden text - there should only be one 
           // if there are more ??only the last one will be saved??
           GPList<lt_XMLTags> textTags = (*(GObject))[textPos];
-          for(GPosition i = textTags; i; ++i)
+          for(GPosition pos = textTags; pos; ++pos)
           {
-            ChangeText(*textTags[i], url, page, width, height);
+            ChangeText(*textTags[pos], url, page, width, height);
           } // for(i)
         } // if(dataPos) 
       } // if(textPos)
     } // if(GObject)
   } // for(Object)
 }
+
