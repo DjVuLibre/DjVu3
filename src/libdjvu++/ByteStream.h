@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.2 1999-02-01 18:32:31 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.3 1999-02-24 22:08:56 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -38,7 +38,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.2 1999-02-01 18:32:31 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.3 1999-02-24 22:08:56 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -264,14 +264,6 @@ public:
       offsets for function #seek# range from 0 to the value returned by this
       function. */
   int size();
-  /** Converts the MemoryByteStream into a character pointer.
-      The returned pointer points to the internal buffer. It remains valid
-      as long as nothing is written into the MemoryByteStream. */
-  operator char*();
-  /** Converts the MemoryByteStream into a void pointer.
-      The returned pointer points to the internal buffer. It remains valid
-      as long as nothing is written into the MemoryByteStream. */
-  operator void*();
   /** Returns a reference to the byte at offset #n#. This reference can be
       used to read (as in #mbs[n]#) or modify (as in #mbs[n]=c#) the contents
       of the buffer. */
@@ -292,18 +284,6 @@ inline int
 MemoryByteStream::size()
 {
   return data.size();
-}
-
-inline
-MemoryByteStream::operator char*()
-{
-  return (char*)data;
-}
-
-inline
-MemoryByteStream::operator void*()
-{
-  return (void*)(char*)data;
 }
 
 inline char &
