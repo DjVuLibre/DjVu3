@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.5 1999-06-04 15:55:17 leonb Exp $
+//C- $Id: DjVuDocument.h,v 1.6 1999-06-29 20:28:08 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -31,7 +31,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.5 1999-06-04 15:55:17 leonb Exp $#
+    @version #$Id: DjVuDocument.h,v 1.6 1999-06-29 20:28:08 eaf Exp $#
 */
 
 //@{
@@ -233,8 +233,6 @@ DjVuDocument::inherits(const char * class_name) const
 inline bool
 DjVuDocument::is_djvm(void) const
 {
-   if (!readonly)
-      THROW("The document is being modified. Request for type is irrelevant.");
    return djvm;
 }
 
