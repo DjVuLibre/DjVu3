@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: ByteStream.cpp,v 1.38 2001-01-03 19:39:09 bcr Exp $
+// $Id: ByteStream.cpp,v 1.37 2001-01-03 19:38:40 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -335,12 +335,14 @@ StdioByteStream::read(void *buffer, size_t size)
     {
 #ifdef EINTR
       if (errno!=EINTR)
+      {
 #endif
 #ifndef UNDER_CE
         G_THROW(strerror(errno));                     //  (No error in the DjVuMessageFile)
 #else
         G_THROW("ByteStream.read_error2");            //  StdioByteStream::read, read error.
 #endif
+      }
     }else
     {
       break;

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DataPool.cpp,v 1.57 2000-11-09 20:15:05 jmw Exp $
+// $Id: DataPool.cpp,v 1.58 2001-01-03 19:41:17 bcr Exp $
 // $Name:  $
 
 
@@ -39,19 +39,18 @@
 #pragma implementation
 #endif
 
-#if defined(macintosh) //MCW can't compile
-#else
-#ifndef UNDER_CE 
-#include <sys/types.h>
-//#else
-//#include <types.h>
-#endif
-#endif
 #include "DataPool.h"
 #include "IFFByteStream.h"
 #include "GString.h"
 #include "GOS.h"
 #include "debug.h"
+
+#if defined(macintosh) //MCW can't compile
+#else
+#ifndef UNDER_CE 
+#include <sys/types.h>
+#endif
+#endif
 
 static void
 call_callback(void (* callback)(void *), void * cl_data)
@@ -145,7 +144,8 @@ int
 DataPool::OpenFiles::File::add_pool(DataPool * pool)
 {
    GCriticalSectionLock lock(&pools_lock);
-   if (!pools_list.contains(pool)) pools_list.append(pool);
+   if (!pools_list.contains(pool))
+     pools_list.append(pool);
    return pools_list.size();
 }
 
@@ -280,8 +280,10 @@ FCPools::add_pool(const char * name_in, DataPool * pool)
       GString name=GOS::expand_name(name_in, GOS::cwd());
       GList<void *> * list;
       GPosition pos;
-      if (map.contains(name, pos)) list=(GList<void *> *) map[pos];
-      else map[name]=list=new GList<void *>();
+      if (map.contains(name, pos))
+        list=(GList<void *> *) map[pos];
+      else
+        map[name]=list=new GList<void *>();
       if (!list->contains(pool)) list->append(pool);
    }
 }
@@ -335,7 +337,8 @@ FCPools	* FCPools::global_ptr;
 inline FCPools *
 FCPools::get(void)
 {
-   if (!global_ptr) global_ptr=new FCPools();
+   if (!global_ptr)
+     global_ptr=new FCPools();
    return global_ptr;
 }
 
@@ -556,15 +559,31 @@ public:
 void
 DataPool::init(void)
 {
-   DEBUG_MSG("DataPool::init(): Initializing\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   active_readers=new Counter;
-   block_list=new BlockList;
-   MemoryByteStream *mbs=new MemoryByteStream;
-   data=mbs;
-}
+  DEBUG_MSG("DataPool::init(): Initializing\n");
+  DEBUG_MAKE_INDENT(3);
+  start=0; length=-1; add_at=0;
+  eof_flag=false;
+  stop_flag=false;
+  stop_blocked_flag=false;
 
+  active_readers=new Counter;
+  block_list=0;
+  G_TRY
+  {   
+    block_list=new BlockList;
+    MemoryByteStream *mbs=new MemoryByteStream;
+    data=mbs;
+  }
+  G_CATCH_ALL
+  {
+    delete block_list;
+    block_list=0;
+    delete active_readers;
+    active_readers=0;
+    G_RETHROW;
+  }
+  G_ENDCATCH;
+}
 
 DataPool::DataPool(void) : DATAPOOL_INIT
 {
@@ -767,8 +786,7 @@ DataPool::get_size(int dstart, int dlength) const
 	 GCriticalSectionLock lock((GCriticalSection *) &data_lock);
 	 dlength=data->size()-dstart;
       }
-      if (dlength<0) return 0;
-      else return block_list->get_bytes(dstart, dlength);
+      return (dlength<0)?0:(block_list->get_bytes(dstart, dlength));
    }
 }
 
@@ -843,12 +861,12 @@ DataPool::add_data(const void * buffer, int offset, int size)
 bool
 DataPool::has_data(int dstart, int dlength)
 {
-   if (dlength<0 && length>0) dlength=length-dstart;
-
-   if (pool) return pool->has_data(start+dstart, dlength);
-   else if (fname.length()) return start+dstart+dlength<=length;
-   else if (dlength<0) return is_eof();
-   else return block_list->get_bytes(dstart, dlength)==dlength;
+   if (dlength<0 && length>0)
+     dlength=length-dstart;
+   return (pool?(pool->has_data(start+dstart, dlength))
+     :((fname.length())?(start+dstart+dlength<=length)
+       :((dlength<0)?is_eof()
+         :(block_list->get_bytes(dstart, dlength)==dlength))));
 }
 
 int
