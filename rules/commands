@@ -12,6 +12,7 @@ CMP=@%cmp%@
 CP=@%cp%@
 DIRNAME=@%dirname%@
 DOCXX=@%docxx%@
+DOCXXCLEAN=@%docxxclean%@
 FIND=@%find%@
 GREP=@%grep%@
 LATEX=@%latex%@

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.11 2000-03-01 18:33:42 haffner Exp $
+ *C- $Id: DjVuOptions.h,v 1.12 2000-03-03 22:17:12 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -32,7 +32,7 @@ extern const char djvu_hflip_string[];
 extern const char djvu_invert_string[];
 extern const char djvu_help_string[];
 #define djvu_config_option {djvu_config_string+2,1,0,'f'}
-#define djvu_verbose_option {djvu_verbose_string+2,2,0,'v'}
+#define djvu_verbose_option {djvu_verbose_string+2,0,0,'v'}
 #define djvu_filelist_option {djvu_filelist_string+2,1,0,'T'}
 #define djvu_force_option {djvu_force_string+2,0,0,'F'}
 #define djvu_dpi_option {djvu_dpi_string+2,1,0,'d'}
