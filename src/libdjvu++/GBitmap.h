@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.12 1999-06-02 23:33:53 leonb Exp $
+//C- $Id: GBitmap.h,v 1.13 1999-11-13 18:43:06 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -44,7 +44,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.12 1999-06-02 23:33:53 leonb Exp $#
+    #$Id: GBitmap.h,v 1.13 1999-11-13 18:43:06 leonb Exp $#
 
  */
 //@{
@@ -182,6 +182,9 @@ public:
       encoded representation.  Functions that need to access the pixel array
       will decompress the image on demand. */
   void compress();
+  /** Decodes run-length encoded bitmaps and recreate the pixel array.
+      This function is usually called by #operator[]# when needed. */
+  void uncompress();
   /** Returns the number of bytes allocated for this image. */
   unsigned int get_memory_usage() const;
   //@}
@@ -427,8 +430,7 @@ GBitmap::get_grays() const
 inline unsigned char *
 GBitmap::operator[](int row) 
 {
-  if (!bytes)
-    decode(rle);
+  if (!bytes) uncompress();
   if (row<0 || row>=nrows) {
 #ifdef DEBUG
     if (zerosize < bytes_per_row + border)
@@ -442,8 +444,7 @@ GBitmap::operator[](int row)
 inline const unsigned char *
 GBitmap::operator[](int row) const
 {
-  if (!bytes) 
-    ((GBitmap*)this)->decode(rle);
+  if (!bytes) ((GBitmap*)this)->uncompress();
   if (row<0 || row>=nrows) {
 #ifdef DEBUG
     if (zerosize < bytes_per_row + border)
@@ -461,23 +462,6 @@ GBitmap::operator=(const GBitmap &ref)
   return *this;
 }
 
-inline void 
-GBitmap::minborder(int minimum)
-{
-  if (border < minimum)
-    {
-      if (bytes)
-        {
-          GBitmap tmp(*this, minimum);
-          delete [] bytes_data;
-          bytes_per_row = tmp.bytes_per_row;
-          bytes = bytes_data = tmp.bytes_data;
-          tmp.bytes = tmp.bytes_data = 0;
-        }
-      border = minimum;
-      zeroes(border + ncolumns + border);
-    }
-}
 
 inline void 
 GBitmap::euclidian_ratio(int a, int b, int &q, int &r)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.14 1999-09-27 15:25:31 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.15 1999-11-13 18:43:12 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -21,11 +21,15 @@
 #include "ByteStream.h"
 #include "GRect.h"
 #include "GString.h"
-#include "Arrays.h"
+#include "GThreads.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.14 1999-09-27 15:25:31 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.15 1999-11-13 18:43:12 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
+
+
+
+
 
 // ----- constructor and destructor
 
@@ -273,23 +277,41 @@ GBitmap::take_data(size_t &offset)
 
 // ----- compression
 
+
+static GMonitor bitmap_monitor;
+
 void 
 GBitmap::compress()
 {
   if (grays > 2)
     THROW("Cannot compress gray level bitmap");
-  if (!bytes)
-    return;
-  delete [] rle;
-  delete [] rlerows;
-  rle = 0;
-  rlerows = 0;
-  rlelength = encode(&rle);
-  if (! rlelength)
-    return;
-  delete [] bytes_data;
-  bytes = bytes_data = 0;
+  // Critical section
+  GMonitorLock lock(&bitmap_monitor);
+  if (bytes)
+    {
+      delete [] rle;
+      delete [] rlerows;
+      rle = 0;
+      rlerows = 0;
+      rlelength = encode(&rle);
+      if (rlelength)
+        {
+          delete [] bytes_data;
+          bytes = bytes_data = 0;
+        }
+    }
 }
+
+void
+GBitmap::uncompress()
+{
+  // Critical section
+  GMonitorLock lock(&bitmap_monitor);
+  if (!bytes && rle)
+    decode(rle);
+}
+
+
 
 unsigned int 
 GBitmap::get_memory_usage() const
@@ -303,6 +325,27 @@ GBitmap::get_memory_usage() const
 }
 
 
+void 
+GBitmap::minborder(int minimum)
+{
+  if (border < minimum)
+    {
+      // Critical section
+      GMonitorLock lock(&bitmap_monitor);
+      if (bytes)
+        {
+          GBitmap tmp(*this, minimum);
+          delete [] bytes_data;
+          bytes_per_row = tmp.bytes_per_row;
+          bytes = bytes_data = tmp.bytes_data;
+          tmp.bytes = tmp.bytes_data = 0;
+        }
+      border = minimum;
+      zeroes(border + ncolumns + border);
+    }
+}
+
+
 // ----- gray levels
 
 void
@@ -313,7 +356,7 @@ GBitmap::set_grays(int ngrays)
   // set gray levels
   grays = ngrays;
   if (ngrays>2 && !bytes)
-    decode(rle);
+    uncompress();
 }
 
 void 
@@ -387,7 +430,7 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
   if (bm->bytes)
     {
       if (!bytes_data)
-        decode(rle);
+        uncompress();
       // Blit from bitmap
       const unsigned char *srow = bm->bytes + bm->border;
       unsigned char *drow = bytes_data + border + y*bytes_per_row + x;
@@ -410,7 +453,7 @@ GBitmap::blit(const GBitmap *bm, int x, int y)
   else if (bm->rle)
     {
       if (!bytes_data)
-        decode(rle);
+        uncompress();
       // Blit from rle
       const unsigned char *runs = bm->rle;
       unsigned char *drow = bytes_data + border + y*bytes_per_row + x;
@@ -471,7 +514,7 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
   if (bm->bytes)
     {
       if (!bytes_data)
-        decode(rle);
+        uncompress();
       // Blit from bitmap
       int dr, dr1, zdc, zdc1;
       euclidian_ratio(yh, subsample, dr, dr1);
@@ -509,7 +552,7 @@ GBitmap::blit(const GBitmap *bm, int xh, int yh, int subsample)
   else if (bm->rle)
     {
       if (!bytes_data)
-        decode(rle);
+        uncompress();
       // Blit from rle
       int dr, dr1, zdc, zdc1;
       euclidian_ratio(yh+bm->nrows-1, subsample, dr, dr1);
@@ -727,7 +770,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
   if (grays > 2)
     THROW("Cannot make PBM file with a gray level bitmap");
   if (!bytes)
-    decode(rle);
+    uncompress();
   // header
   GString head;
   head.format("P%c\n%d %d\n", (raw ? '4' : '1'), ncolumns, nrows);
@@ -781,7 +824,7 @@ GBitmap::save_pgm(ByteStream &bs, int raw)
 {
   // checks
   if (!bytes)
-    decode(rle);
+    uncompress();
   // header
   GString head;
   head.format("P%c\n%d %d\n%d\n", (raw ? '5' : '2'), ncolumns, nrows, grays-1);
