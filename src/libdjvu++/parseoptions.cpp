@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.38 2000-02-11 17:08:34 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.39 2000-02-16 01:32:05 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -113,8 +113,11 @@ djvu_parse_number(struct djvu_parse opts,const char name[],const int errval)
 
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
 int
-djvu_parse_arguments
-(struct djvu_parse opts,int argc,const char * const argv[],const struct djvu_option lopts[])
+djvu_parse_arguments(
+  struct djvu_parse opts,
+  int argc, 
+  const char * const argv[],
+  const struct djvu_option lopts[] )
 {
   return ((DjVuParseOptions *)(opts.Private))->ParseArguments(argc,argv,lopts);
 }
@@ -212,8 +215,8 @@ DjVuParseOptions::DjVuParseOptions (
 
 // This is a simple copy constructor.
 //
-DjVuParseOptions::DjVuParseOptions
-(DjVuParseOptions &Original)
+DjVuParseOptions::DjVuParseOptions(
+  DjVuParseOptions &Original)
 : defaultProfile(Original.defaultProfile),
   currentProfile(Original.currentProfile),
   VarTokens(Original.VarTokens),
@@ -324,8 +327,8 @@ DjVuParseOptions::ChangeProfile(const char prog[])
 // This should be the most frequently used function of this class.
 // This could be made inline...
 const char * const
-DjVuParseOptions::GetValue
-(const int token) const 
+DjVuParseOptions::GetValue(
+  const int token ) const 
 {
   const char *retval;
   if(!(retval=Arguments->GetValue(token)))
@@ -339,8 +342,8 @@ DjVuParseOptions::GetValue
 }
 
 void
-DjVuParseOptions::AmbiguousOptions
-(const int token1,const char value1[],const int token2,const char value2[])
+DjVuParseOptions::AmbiguousOptions(
+  const int token1, const char value1[], const int token2, const char value2[] )
 {
   if(token1 != token2)
   {
@@ -362,8 +365,8 @@ DjVuParseOptions::AmbiguousOptions
 // Command line arguments have higher priority than current profile values,
 // which are higher priority than default profile values.
 int
-DjVuParseOptions::GetBest
-(const int listsize,const int tokens[],bool requiretrue)
+DjVuParseOptions::GetBest(
+  const int listsize, const int tokens[], bool requiretrue )
 {
   const char *r=0;
   int retval=(-1);
@@ -455,8 +458,8 @@ DjVuParseOptions::GetBest
 // Command line arguments have higher priority than current profile values,
 // which are higher priority than default profile values.
 int
-DjVuParseOptions::GetBest
-(const int listsize,const char * const xname[],bool requiretrue)
+DjVuParseOptions::GetBest(
+  const int listsize, const char * const xname[], bool requiretrue )
 {
   int retval=(-1);
   if(xname && listsize > 0)
@@ -479,8 +482,8 @@ DjVuParseOptions::GetBest
 // In the even of failure, the errval is returned.
 //
 int
-DjVuParseOptions::GetInteger
-(const int token,const int errval) const 
+DjVuParseOptions::GetInteger(
+  const int token,const int errval) const 
 {
   const char * const str=GetValue(token);
   int retval;
@@ -539,8 +542,7 @@ DjVuParseOptions::GetNumber(
 // This function parses the command line arguments
 //
 int
-DjVuParseOptions::ParseArguments
-(
+DjVuParseOptions::ParseArguments(
   const int xargc,
   const char * const xargv[],
   const djvu_option opts[],
@@ -604,8 +606,7 @@ DjVuParseOptions::ParseArguments
 
 
 int
-DjVuParseOptions::HasError
-() const 
+DjVuParseOptions::HasError() const 
 {
   return Errors->HasError();
 }
@@ -641,8 +642,8 @@ void DjVuParseOptions::perror(const char *mesg)
 // of profile and variable tokens.
 //
 void
-DjVuParseOptions::Add
-(const int line,const int profile,const int var,const char value[])
+DjVuParseOptions::Add(
+  const int line,const int profile,const int var,const char value[])
 {
   if(var<0)
   {
@@ -729,8 +730,8 @@ DjVuParseOptions::ReadConfig(const char prog[],
 // Again this is private, since we don't want to read files multiple times.
 // 
 int
-DjVuParseOptions::ReadNextConfig
-(int &line,const char prog[],FILE *f)
+DjVuParseOptions::ReadNextConfig (
+  int &line, const char prog[], FILE *f )
 {
   const char *xname=strrchr(prog,'/');
   xname=xname?(xname+1):prog;
@@ -1015,8 +1016,8 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,const int profile)
 
 // This is a private constructor, for adding elements to the linked
 // list.
-DjVuParseOptions::ErrorList::ErrorList
-(ErrorList *old,const char mesg[]) : next(0),prev(old),retvalue(0) 
+DjVuParseOptions::ErrorList::ErrorList(
+  ErrorList *old,const char mesg[]) : next(0),prev(old),retvalue(0) 
 {
   old->next=this;
   strcpy(value=new char [strlen(mesg)+1],mesg);
@@ -1039,8 +1040,7 @@ DjVuParseOptions::ErrorList::~ErrorList()
 // prev pointer of the first element.
 //
 const char *
-DjVuParseOptions::ErrorList::AddError
-(const char mesg[])
+DjVuParseOptions::ErrorList::AddError(const char mesg[])
 {
   char *retval;
   if(value)
@@ -1093,8 +1093,7 @@ DjVuParseOptions::ProfileList::~ProfileList()
 // Returns 1 if this is a new profile, and 0 if it is an existing one.
 //
 int
-DjVuParseOptions::ProfileList::Grow
-(const int newsize)
+DjVuParseOptions::ProfileList::Grow(const int newsize)
 {
   int retval=0;
   if(newsize > size)
@@ -1122,8 +1121,7 @@ DjVuParseOptions::ProfileList::Grow
 }
 
 void
-DjVuParseOptions::Profiles::Add
-(const int var,const char value[])
+DjVuParseOptions::Profiles::Add(const int var,const char value[])
 {
   if(var >= 0)
   {
@@ -1151,8 +1149,8 @@ DjVuParseOptions::Profiles::Add
 }
 
 void
-DjVuParseOptions::ProfileList::Add
-(const int profile,const int var,const char value[])
+DjVuParseOptions::ProfileList::Add(
+  const int profile,const int var,const char value[])
 {
   if((profile>=0) && (var>=0))
   {
@@ -1327,8 +1325,7 @@ DjVuParseOptions::ConfigFilename(const char config[],int level)
 }
 
 static int
-ReadEscape
-(FILE *f,int &line)
+ReadEscape(FILE *f,int &line)
 {
   int c;
   for((c=getc(f));(!c)||(c=='\r');c=getc(f));
@@ -1614,8 +1611,7 @@ DjVuTokenList::~DjVuTokenList()
 // it, inserts it into the list with a new token value...
 //
 int
-DjVuTokenList::GetToken
-(const char name[]) const
+DjVuTokenList::GetToken( const char name[] ) const
 {
   int MaxGuess=NextToken;
   int MinGuess=0;
@@ -1640,8 +1636,7 @@ DjVuTokenList::GetToken
 DjVuTokenList::Entries::~Entries() {}
 
 int
-DjVuTokenList::SetToken
-(const char name[])
+DjVuTokenList::SetToken( const char name[] )
 {
   int retval;
   if((retval=GetToken(name))<0)
