@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.31 2001-04-16 18:58:15 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.32 2001-04-19 21:07:29 bcr Exp $
 // $Name:  $
 
 
@@ -542,8 +542,10 @@ DjVuMessage::LookUpID( const GUTF8String &msgID,
 void
 DjVuMessage::InsertArg( GUTF8String &message, int ArgId, GUTF8String arg ) const
 {
-  GUTF8String target = GUTF8String("%#") + GUTF8String(ArgId) + "#";           // argument target string
-  int format_start = message.search( target );            // location of target string
+    // argument target string
+  GUTF8String target = GUTF8String("%") + GUTF8String(ArgId) + "!s!";
+    // location of target string
+  const int format_start = message.search( target );
   if( format_start >= 0 )
   {
     int format_end = format_start;

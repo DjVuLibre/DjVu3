@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.70 2001-04-19 20:42:21 bcr Exp $
+// $Id: GString.cpp,v 1.71 2001-04-19 21:07:29 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1731,7 +1731,6 @@ GStringRep::Native::toDouble(
   return retval;
 }
 
-#if 0
 int 
 GStringRep::getUCS4(unsigned long &w, const int from) const
 {
@@ -1756,14 +1755,13 @@ GStringRep::getUCS4(unsigned long &w, const int from) const
 unsigned long
 GStringRep::getValidUCS4(const char *&source) const
 {
-  return data[source++];
+  return (unsigned long)(source++[0]);
 }
 
 unsigned long
 GStringRep::UTF8::getValidUCS4(const char *&source) const
 {
-  const char *source=data+from;
-  return UTF8toUCS4(source,data+size);
+  return GStringRep::UTF8toUCS4((const unsigned char *&)source,data+size);
 }
 
 unsigned long
@@ -1810,8 +1808,6 @@ GStringRep::Native::getValidUCS4(const char *&source) const
   }
   return retval;
 }
-
-#endif
 
 static int
 Csscanf1(const char src[],const char fmt[], void *arg)
