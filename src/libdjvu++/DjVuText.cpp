@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.12 2001-03-21 20:08:08 praveen Exp $
+// $Id: DjVuText.cpp,v 1.10.4.1 2001-05-10 22:38:43 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -417,7 +417,6 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
       // same type and will return it
 {
   GList<Zone *> zone_list;
-  GList<Zone *> temp_list;
 
   int text_start = 0;
   int text_end = 0;
@@ -426,7 +425,6 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
   int zone_type=CHARACTER;
   while(zone_type>=PAGE)
   {
-      
     int start=0;
     int end=textUTF8.length();
 
@@ -436,7 +434,6 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
     
     while(found_status!=found)
     {
-        
       if (start==end) 
 		break;
       
@@ -445,10 +442,6 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
       {
 		  if(target_rect.contains(zone->rect))
 		  {
-            for(GPosition pos=temp_list; pos; ++pos)
-                zone_list.append(temp_list[pos]);
-            temp_list.empty();
-            /////
 			zone_list.append(zone);
 			if( found_status == notfound )
 				text_start = start;
@@ -466,21 +459,19 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
 		  }
 		  else if( found_status == finding )
 		  {
-			  //zone_list.append(zone);
-              temp_list.append(zone);
+			  zone_list.append(zone);
 			  text_end = end;
 		  }
 
 
-		  
+		  start=end;
+		  end=textUTF8.length();
       } else
       {
         //zone_type--;
         //zone_list.empty();
-        //break;
+        break;
       }
-      start=end;
-	  end=textUTF8.length();
     }
     if (zone_list.size()) 
 	{
@@ -492,7 +483,6 @@ DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
 
 
   }
-  
   return zone_list;
 }
 
@@ -670,16 +660,16 @@ DjVuText::decode(GP<ByteStream> gbs)
     {
       if (txt)
         G_THROW("DjVuText.dupl_text");
-      txt = DjVuTXT::create();
+      txt = new DjVuTXT;
       txt->decode(iff);
     }
     else if (chkid == "TXTz")
     {
       if (txt)
         G_THROW("DjVuText.dupl_text");
-      txt = DjVuTXT::create();
-      GP<ByteStream> gbsiff=BSByteStream::create(gbs);
-      txt->decode(*gbsiff);
+      txt = new DjVuTXT;
+      BSByteStream bsiff(gbs);
+      txt->decode(bsiff);
     }
     // Add decoding of other chunks here
     iff.close_chunk();
@@ -695,8 +685,8 @@ DjVuText::encode(GP<ByteStream> gbs)
     IFFByteStream &iff=*giff;
     iff.put_chunk("TXTz");
     {
-      GP<ByteStream> gbsiff=BSByteStream::create(gbs,50);
-      txt->encode(*gbsiff);
+      BSByteStream bsiff(iff.get_bytestream(),50);
+      txt->encode(bsiff);
     }
     iff.close_chunk();
   }
