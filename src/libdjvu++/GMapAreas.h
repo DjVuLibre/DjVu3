@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.7 2000-01-12 23:02:01 eaf Exp $
+//C- $Id: GMapAreas.h,v 1.8 2000-01-19 23:46:15 leonb Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -47,7 +47,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: GMapAreas.h,v 1.7 2000-01-12 23:02:01 eaf Exp $# */
+    #$Id: GMapAreas.h,v 1.8 2000-01-19 23:46:15 leonb Exp $# */
 //@{
 
 
@@ -141,8 +141,8 @@ public:
    int		border_width;
       /** Specified a color for highlighting the internal area of the map
 	  area. Will work with rectangular map areas only. The color is
-	  specified in #00RRGGBB format. A special value of #FFFFFFFF disables
-      highlighting and #FF000000 is for XOR highlighting. */
+	  specified in \#00RRGGBB format. A special value of \#FFFFFFFF disables
+          highlighting and \#FF000000 is for XOR highlighting. */
    u_int32	hilite_color;
 
       /// Default constructor
