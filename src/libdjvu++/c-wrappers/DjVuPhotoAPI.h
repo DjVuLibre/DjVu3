@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.12 2000-01-28 19:23:04 haffner Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.13 2000-02-26 18:53:20 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -15,7 +15,7 @@
 
 #include "DjVuDecodeAPI.h"
 
-/** @name djvuphoto.h
+/** @name DjVuPhotoAPI.h
       functions used to convert multiple photo images to DjVu multipage 
       photo files.
 */

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.43 2000-02-24 22:24:52 haffner Exp $
+ *C- $Id: DjVuAPI.h,v 1.44 2000-02-26 18:53:20 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,77 +17,8 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.43  2000-02-24 22:24:52  haffner
- * speel check
- *
- * Revision 1.42  2000/02/24 19:30:37  parag
- * EXPS dependency removed.
- *
- * Revision 1.41  2000/02/24 15:30:03  parag
- * PS and PDF input implementation
- *
- * Revision 1.40  2000/02/17 23:49:44  bcr
- * Adding the DjVu_CallbackStream class.
- *
- * Revision 1.39  2000/02/16 00:44:08  bcr
- * Commented out an unimplemented method.
- *
- * Revision 1.38  2000/02/15 20:59:21  haffner
- * Spell check.
- * Improved Mhistogrid to avoid bug reported in forbes/medieval2, buyback3
- *
- * Revision 1.37  2000/02/02 04:56:06  bcr
- * Fixed the Crop and rotate options.
- *
- * Revision 1.36  2000/02/01 19:11:37  bcr
- * Replaced RotateCW and RotateCCW with a DoRotate method.  I also fixed various memory leaks.
- *
- * Revision 1.35  2000/01/31 21:30:19  bcr
- * Added new callbacks.
- *
- * Revision 1.34  2000/01/31 17:02:20  bcr
- * Converted the RawStream into a separate class.  I will be adding callbacks
- * to this class next.
- *
- * Revision 1.33  2000/01/31 06:52:20  bcr
- * Added an djvu_export_image() function, to allow decoding images to memory.
- *
- * Revision 1.32  2000/01/30 02:41:04  praveen
- * updated and fixed bugs
- *
- * Revision 1.31  2000/01/30 01:18:42  bcr
- * Added import and export streams to the Process options.
- *
- * Revision 1.30  2000/01/27 20:36:18  haffner
- * Spell check.
- *
- * Reimplemented with Bill BitonalToDjVu.cpp
- *
- * Revision 1.29  2000/01/27 00:46:56  bcr
- * Added the *arg argument, I forgot.
- *
- * Revision 1.28  2000/01/26 23:30:21  bcr
- * Added remaining functions definitions needed for the API.
- *
- * Revision 1.27  2000/01/26 04:40:46  bcr
- * Began splitting PhotoToDjVu.
- *
- * Revision 1.26  2000/01/24 22:19:10  bcr
- * Completely replaced the libddjvu with libdjvudecode.
- *
- * Revision 1.25  2000/01/23 22:01:34  bcr
- * Add djvu_import_buffer().
- *
- * Revision 1.24  2000/01/23 03:16:39  bcr
- * Cleaned up the header files a bit more.  Eventually we'll reach something
- * that is understandable.
- *
- * Revision 1.23  2000/01/22 07:10:14  bcr
- * Fixed serious bug in djvutobitonal, with all output being bogus.  Fixed the
- * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
- * 
- * I found the orientation flags is ignored by most unix programs, so the
- * tiff images are now  oriented manually.
+ * Revision 1.44  2000-02-26 18:53:20  bcr
+ * Changes to the DOC++ comments.
  *
  */
 
@@ -885,7 +816,11 @@ DJVUAPI djvu_export
 djvu_export_streams( void *arg, djvu_export_sub * );
 
 
+
 #ifdef __cplusplus
+#ifndef __cplusplus
+{
+#endif
 }
 #endif /* __cplusplus */
 

@@ -7,72 +7,30 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.16 2000-01-27 20:36:18 haffner Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.17 2000-02-26 18:53:20 bcr Exp $
  */
 
 
 #ifndef __DJVUMULTIAPI_H__
 #define __DJVUMULTIAPI_H__
+
 /** @name DjVuMultiAPI.h
-    File #"DjVuMultiAPI.h"# contains the main API for assembling multipage DjVu documents.
-    This API allows you to assemble already compressed pages and to
-    create multipage DjVu documents.  It does not describe how to compress 
-    single pages.    
+    File #"DjVuMultiAPI.h"# contains the main API for assembling multipage
+    DjVu documents.  This API allows you to assemble already compressed pages
+    and to create multipage DjVu documents.  It does not describe how to
+    compress single pages.    
     @author
     Dr Bill C Riemers <bcr@att.com>
-    @version
 */
+
 #ifdef DOCXX_CODE
 //@{
 #endif
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.16  2000-01-27 20:36:18  haffner
- * Spell check.
- *
- * Reimplemented with Bill BitonalToDjVu.cpp
- *
- * Revision 1.15  2000/01/24 21:30:44  parag
- * "C" compatibility added
- *
- * Revision 1.14  2000/01/22 07:10:14  bcr
- * Fixed serious bug in djvutobitonal, with all output being bogus.  Fixed the
- * page ranges in PhotoToDjVu and DjVuToPhoto.  Updated comments.
- *
- * Revision 1.13  2000/01/22 00:15:04  bcr
- * Removed "backwards compatibility macros".  We shouldn't use such hacks while
- * still in beta.  Corrected the author field.
- *
- * Revision 1.12  2000/01/21 21:09:52  leonb
- * Replaced initial comment (copyright notice).
- *
- * Revision 1.11  2000/01/21 14:46:29  leonb
- * Reinserted #ifdef DOCXX_CODE etc.
- *
- * Revision 1.10  2000/01/21 14:24:56  leonb
- * BCR suggested changes
- *
- * Revision 1.9  2000/01/20 23:27:45  leonb
- * Added cosmetic changes for doc++
- *
- * Revision 1.8  2000/01/20 23:15:46  leonb
- * Rationalized libmulti++ and its documentation.
- *
- * Revision 1.7  2000/01/07 21:46:47  bcr
- * Switched to fileno instead of FILE * in the C structures.
- *
- * Revision 1.6  2000/01/07 19:40:33  bcr
- * We can't pass FILE handles in Windows.
- *
- * Revision 1.5  2000/01/07 16:58:50  praveen
- * updated
- *
- * Revision 1.4  2000/01/07 00:28:07  bcr
- * Fixed bugs in parseoptions, and added usage instructions to executables.
- *
- * Revision 1.3  2000/01/06 20:10:44  praveen
- * added DjVu decode interface file
+ * Revision 1.17  2000-02-26 18:53:20  bcr
+ * Changes to the DOC++ comments.
  *
  */
 

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.22 2000-02-14 23:05:40 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.23 2000-02-26 18:53:20 bcr Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -37,8 +37,8 @@
 #endif /*DJVUAPI*/
 
 
-/** @name djvudecode.h
-      Functions used to decode multiple page DjVu documents...
+/** @name DjVuDecodeAPI.h
+      functions used to decode multiple page DjVu documents...
 */
 
 #ifdef __cplusplus

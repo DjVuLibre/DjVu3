@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.21 2000-02-21 22:47:11 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.22 2000-02-26 18:53:20 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -16,7 +16,7 @@
 #include "DjVuBitonalAPI.h"
 #include "DjVuPhotoAPI.h"
 
-/** @name djvudocument.h
+/** @name DjVuDocumentAPI.h
       functions used to convert multiple documents (contains color text or
       images with text) to DjVu multipage documents.
 */
@@ -410,13 +410,6 @@ typedef struct djvu_segmenter_options_struct
 
 #ifdef __cplusplus 
   inline djvu_segmenter_options_struct();
-  inline void standard(void);
-  inline void dpi600(void);
-  inline void dpi200(void);
-  inline void dpi100(void);
-  inline void comic(void);
-  inline void ancient(void);
-  inline void very_clean(void);
 #endif 
 
 } djvu_segmenter_options;
@@ -535,202 +528,6 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   mask_upsample(3),
   resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true), masksub_sub_chrom(false) {}
 
-// These examples will be modified to show configuration file examples,
-// instead of inline functions at a future date.
-
-
-  /** @name Profiles examples */
-  /*@{*/
-
-  /** Standard profile
-   */
-  inline void djvu_segmenter_options_struct::standard(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      /* must be conservative here, other characters are lost on 200dpi
-         images, or documents with small low-contrast fonts. */
-      pix_filter_level= 25;
-      inversion_level= 25;
-
-      /* this parameters has very little influence on most images,
-         but may be very dramatic on few */
-      inhibit_foreback_level=40;
-
-      edge_size= 3;
-      render_size= 3;
-      blurring_size= 3;
-      fg_subsample= 12; 
-      bg_subsample= 3; 
-      mask_upsample= 1; 
-      resolution_multiplier=1;
-
-      
-      high_variation_foreground= false;
-      masksub_refine= true;
-    }
-  
-  /** Dpi600 profile */
-  inline void djvu_segmenter_options_struct::dpi600(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      pix_filter_level= 50;
-      inversion_level= 25;
-      inhibit_foreback_level=40;
-      
-      edge_size= 3;
-      render_size= 3;
-      blurring_size= 3;
-      fg_subsample= 12; 
-      bg_subsample= 4; 
-      resolution_multiplier=2;
-
-      
-      high_variation_foreground= false;
-      masksub_refine= true;
-    }
-  
-
-  /** Dpi200 profile */
-  inline void djvu_segmenter_options_struct::dpi200(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 25;
-      pix_filter_level= 25;
-      inversion_level= 25;
-      inhibit_foreback_level=40;
-      
-      edge_size= 2;
-      render_size= 3;
-      blurring_size= 3;
-      fg_subsample= 8; 
-      bg_subsample= 2; 
-      resolution_multiplier=1;
-
-      
-      high_variation_foreground= false;
-      masksub_refine= true;
-    }
-  
-  /** Dpi100 screen dump profile */
-  inline void djvu_segmenter_options_struct::dpi100(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      pix_filter_level= 50;
-      inversion_level= 25;
-      
-      edge_size= 1;
-      render_size= 1;
-      blurring_size= 2;
-      fg_subsample= 6; 
-      bg_subsample= 1; 
-      resolution_multiplier=1;
-      inhibit_foreback_level=40;
-
-      
-      high_variation_foreground= true;
-      masksub_refine= true;
-    }
-  
-  /** Comics profile.
-      
-      Is is necessary to avoid excessive inversion.
-
-      What differs from standard is:
-      
-      \begin{verbatim}
-      pix_filter_level= 50
-      inversion_level=25
-      bg_subsample=1
-      high_variation_foreground= true
-      \end{verbatim}
-  */
-  inline void djvu_segmenter_options_struct::comic(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      pix_filter_level= 50;
-      inversion_level= 25;
-      inhibit_foreback_level=40;
-      
-      edge_size= 3;
-      render_size= 3;
-      blurring_size= 3;
-      fg_subsample= 12; 
-      bg_subsample= 3; 
-      resolution_multiplier=1;
-      
-      
-      high_variation_foreground= false;
-      masksub_refine= true;
-    }
-  
-  /** Ancient document profile.
-
-      The ink may  have become very pale, so the segmenter must be more
-      sensitive. As there are no photos, ugly artifacts due to
-      over-segmentation are less likely.
-
-      What differs from standard is:
-      
-      \begin{verbatim}
-      pix_filter_level= 10
-      threshold_level= 50
-      \end{verbatim}
-  */
-  inline void djvu_segmenter_options_struct::ancient(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      pix_filter_level= 50;
-      inversion_level= 25;
-      inhibit_foreback_level=40;
-      
-      edge_size= 3;
-      render_size= 3;
-      blurring_size= 3;
-      fg_subsample= 12; 
-      bg_subsample= 3; 
-      resolution_multiplier=1;
-      
-      
-      high_variation_foreground= false;
-      masksub_refine= true;
-    }
-  
-  /** "very clean" profile for 300dpi screen dumps.
-      What differs from standard is:
-      
-      \begin{verbatim}
-      edge_size= 1;
-      render_size= 1;
-      blurring_size= 1;
-      high_variation_foreground= true;
-      masksub_refine= false;
-      \end{verbatim}
-  */
-  inline void djvu_segmenter_options_struct::very_clean(void)
-    {
-      threshold_level= 75;
-      shape_filter_level= 50;
-      pix_filter_level= 50;
-      inversion_level= 25;
-      inhibit_foreback_level=40;
-     
-      edge_size= 1;
-      render_size= 1;
-      blurring_size= 1;
-      fg_subsample= 12; 
-      bg_subsample= 3; 
-      resolution_multiplier=1;
-      
-      
-      high_variation_foreground= true;
-      masksub_refine= false;
-    }
-  /*@}*/
 #endif
   /*@}*/
 

@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.8 2000-02-03 19:17:51 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.9 2000-02-26 18:53:20 bcr Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -15,7 +15,7 @@
 
 #include "DjVuDecodeAPI.h"
 
-/** @name djvubitonal.h
+/** @name DjVuBitonalAPI.h
       functions used to convert multiple bitonal images to DjVu multipage 
       documents.
 */
