@@ -1,6 +1,6 @@
 /*C- -*- C -*-
  *C-
- *C- DjVu® Reference Library (v. 3.0)
+ *C- DjVu® Reference Library (v. 3.5)
  *C- 
  *C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
  *C- 
@@ -26,7 +26,7 @@
  *C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
  *C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVu.h,v 1.22 2001-08-02 21:38:02 bcr Exp $
+ * $Id: DjVu.h,v 1.23 2001-08-02 21:41:24 bcr Exp $
  * $Name:  $
  */
 

@@ -1,6 +1,6 @@
 /*C- -*- C -*-
  *C-
- *C- DjVu® Reference Library (v. 3.0)
+ *C- DjVu® Reference Library (v. 3.5)
  *C- 
  *C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
  *C- 
@@ -26,13 +26,13 @@
  *C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
  *C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * $Id: DjVuVersion.h,v 1.5 2001-08-02 21:38:02 bcr Exp $
+ * $Id: DjVuVersion.h,v 1.6 2001-08-02 21:41:24 bcr Exp $
  * $Name:  $
  */
 
 #define DJVU_VERSION   "3.5"
-#define DJVU_CVS_DATE  "$Date: 2001-08-02 21:38:02 $"
+#define DJVU_CVS_DATE  "$Date: 2001-08-02 21:41:24 $"
 #define DJVU_CVS_NAME  ""
-#define DJVU_CVS_REV   "$Revision: 1.5 $"
+#define DJVU_CVS_REV   "$Revision: 1.6 $"
 #define DJVU_CVS_STATE "$State: Exp $"
 
