@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.19 1999-09-22 18:06:06 eaf Exp $
+//C- $Id: DataPool.h,v 1.20 1999-09-22 19:34:19 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.19 1999-09-22 18:06:06 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.20 1999-09-22 19:34:19 eaf Exp $#
 */
 
 //@{
@@ -236,6 +236,13 @@ public:
 	  functions if you want to map this #DataPool# to another or
 	  to a file. */
    DataPool(void);
+
+      /** Creates and initialized the #DataPool# with data from stream #str#.
+	  The constructor will read the stream's contents and add them
+	  to the pool using the \Ref{add_data}() function. Afterwards it
+	  will call \Ref{set_eof}() function, and no other data will be
+	  allowed to be added to the pool. */
+   DataPool(ByteStream & str);
 
       /** Initializes the #DataPool# in slave mode and connects it
 	  to the specified offsets range of the specified master #DataPool#.

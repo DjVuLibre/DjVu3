@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.23 1999-09-22 18:06:06 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.24 1999-09-22 19:34:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -353,6 +353,20 @@ DataPool::DataPool(void)
       // If we maintain the data ourselves, we want to interpret its
       // IFF structure to predict its length
    add_trigger(0, 32, static_trigger_cb, this);
+}
+
+DataPool::DataPool(ByteStream & str)
+{
+   init();
+
+      // It's nice to have IFF data analyzed in this case too.
+   add_trigger(0, 32, static_trigger_cb, this);
+   
+   char buffer[1024];
+   int length;
+   while((length=str.read(buffer, 1024)))
+      add_data(buffer, length);
+   set_eof();
 }
 
 DataPool::DataPool(const GP<DataPool> & pool, int start, int length)
