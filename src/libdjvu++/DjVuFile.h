@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.52 1999-12-02 22:37:31 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.53 2000-01-26 23:59:32 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.52 1999-12-02 22:37:31 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.53 2000-01-26 23:59:32 eaf Exp $#
 */
 
 //@{
@@ -424,7 +424,8 @@ public:
       // Internal. Used by DjVuDocument. May block for data.
    void			move(const GURL & dir_url);
 
-      // Internal. Used by DjVuDocument
+      /** Internal. Used by DjVuDocument. The #name# should {\bf not}
+	  be encoded with \Ref{GOS::encode_reserved}(). */
    void			set_name(const char * name);
 
       // Internal. Used by DjVuDocument

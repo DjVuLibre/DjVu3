@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.24 2000-01-25 22:17:31 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.25 2000-01-26 23:59:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -144,7 +144,7 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
    if (url==doc_url) return doc_pool;
 
       // Now see if we have any file matching the url
-   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.name());
+   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.fname());
    if (frec)
    {
       GCriticalSectionLock lock(&files_lock);
@@ -214,7 +214,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create)
    
       // Check if have a DjVuFile with this url cached (created before
       // and either still active or left because it has been modified)
-   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.name());
+   GP<DjVmDir::File> frec=djvm_dir->name_to_file(url.fname());
    if (frec)
    {
       GCriticalSectionLock lock(&files_lock);
@@ -587,7 +587,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
 	       int pages_num=doc->get_pages_num();
 	       for(int page_num=0;page_num<pages_num;page_num++)
 	       {
-		  GString name=doc->page_to_url(page_num).name();
+		  GString name=doc->page_to_url(page_num).fname();
 		  name=GOS::expand_name(name, dirname);
 		  insert_file(name, true, file_pos, name2id);
 	       }
@@ -633,7 +633,7 @@ DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
       // *((GMap<GString, void *> *) ref_map[id])
 {
    GURL url=file->get_url();
-   GString id=djvm_dir->name_to_file(url.name())->id;
+   GString id=djvm_dir->name_to_file(url.fname())->id;
    if (!visit_map.contains(url))
    {
       visit_map[url]=0;
@@ -645,7 +645,7 @@ DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
 	    // First: add the current file to the list of parents for
 	    // the child being processed
 	 GURL child_url=child_file->get_url();
-	 GString child_id=djvm_dir->name_to_file(child_url.name())->id;
+	 GString child_id=djvm_dir->name_to_file(child_url.fname())->id;
 	 GMap<GString, void *> * parents=0;
 	 if (ref_map.contains(child_id))
 	    parents=(GMap<GString, void *> *) ref_map[child_id];
@@ -699,7 +699,7 @@ DjVuDocEditor::remove_file(const char * id, bool remove_unref,
 	 {
 	    GP<DjVuFile> child_file=files_list[pos];
 	    GURL child_url=child_file->get_url();
-	    GString child_id=djvm_dir->name_to_file(child_url.name())->id;
+	    GString child_id=djvm_dir->name_to_file(child_url.fname())->id;
 	    GMap<GString, void *> * parents=(GMap<GString, void *> *) ref_map[child_id];
 	    if (parents) parents->del(id);
 
@@ -804,7 +804,7 @@ DjVuDocEditor::move_file(const char * id, int & file_pos,
 	       GPList<DjVuFile> files_list=djvu_file->get_included_files(false);
 	       for(GPosition pos=files_list;pos;++pos)
 	       {
-		  GString name=files_list[pos]->get_url().name();
+		  GString name=files_list[pos]->get_url().fname();
 		  GP<DjVmDir::File> child_frec=djvm_dir->name_to_file(name);
 
 		     // If the child is positioned in DjVmDir AFTER the
@@ -1107,8 +1107,7 @@ DjVuDocEditor::generate_thumbnails(int thumb_size,
       GString id=page_to_id(page_num);
       if (!thumb_map.contains(id))
       {
-	 GP<DjVuImage> dimg=get_page(page_num);
-	 dimg->wait_for_complete_decode();
+	 GP<DjVuImage> dimg=get_page(page_num, true);
       
 	 GRect rect(0, 0, thumb_size, dimg->get_height()*thumb_size/dimg->get_width());
 	 GP<GPixmap> pm=dimg->get_pixmap(rect, rect, get_thumbnails_gamma());

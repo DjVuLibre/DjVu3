@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.6 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.7 2000-01-26 23:59:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,6 +18,7 @@
 #include "DjVuNavDir.h"
 #include "debug.h"
 #include "GException.h"
+#include "GOS.h"
 #include <ctype.h>
 
 DjVuNavDir::DjVuNavDir(const char * dirURL)
@@ -69,8 +70,8 @@ DjVuNavDir::decode(ByteStream & str)
    for(cnt=0;cnt<pages;cnt++)
    {
       name2page[page2name[cnt]]=cnt;
-      url2page[baseURL+page2name[cnt]]=cnt;
-   };
+      url2page[baseURL+GOS::encode_reserved(page2name[cnt])]=cnt;
+   }
 }
 
 #ifndef NEED_DECODER_ONLY
@@ -130,7 +131,7 @@ DjVuNavDir::page_to_url(int page) const
 {
    GCriticalSectionLock lk((GCriticalSection *)&lock);
    
-   return baseURL+page_to_name(page);
+   return baseURL+GOS::encode_reserved(page_to_name(page));
 }
 
 void
@@ -146,7 +147,7 @@ DjVuNavDir::insert_page(int where, const char * name)
       page2name[i]=page2name[i-1];
    page2name[where]=name;
    name2page[name]=where;
-   url2page[baseURL+name]=where;
+   url2page[baseURL+GOS::encode_reserved(name)]=where;
 }
 
 #ifndef NEED_DECODER_ONLY

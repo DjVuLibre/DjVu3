@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.105 2000-01-21 20:27:04 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.106 2000-01-26 23:59:32 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "DjVuFile.h"
 #include "BSByteStream.h"
+#include "GOS.h"
 #include "MMRDecoder.h"
 #ifdef NEED_JPEG_DECODER
 #include "JPEGDecoder.h"
@@ -461,14 +462,14 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 
       GURL incl_url=pcaster->id_to_url(this, incl_str);
       if (incl_url.is_empty())	// Fallback. Should never be used.
-	 incl_url=url.base()+incl_str;
+	 incl_url=url.base()+GOS::encode_reserved(incl_str);
 
 	 // Now see if there is already a file with this *name* created
       {
 	 GCriticalSectionLock lock(&inc_files_lock);
 	 GPosition pos;
 	 for(pos=inc_files_list;pos;++pos)
-	    if (inc_files_list[pos]->url.name()==incl_url.name()) break;
+	    if (inc_files_list[pos]->url.fname()==incl_url.fname()) break;
 	 if (pos) return inc_files_list[pos];
       }
       
@@ -495,7 +496,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 	 GCriticalSectionLock lock(&inc_files_lock);
 	 GPosition pos;
 	 for(pos=inc_files_list;pos;++pos)
-	    if (inc_files_list[pos]->url.name()==incl_url.name()) break;
+	    if (inc_files_list[pos]->url.fname()==incl_url.fname()) break;
 	 if (pos) file=inc_files_list[pos];
 	 else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
 	    inc_files_list.append(file);
@@ -718,7 +719,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
               else if (file->is_decode_failed())
                 get_portcaster()->notify_file_flags_changed(file, DECODE_FAILED, 0);
             }
-	  desc.format("Indirection chunk ("+file->get_url().name()+")");
+	  desc.format("Indirection chunk ("+file->get_url().fname()+")");
         } else desc.format("Indirection chunk");
     }
 
@@ -1416,7 +1417,7 @@ DjVuFile::set_name(const char * name)
 {
    DEBUG_MSG("DjVuFile::set_name(): name='" << name << "'\n");
    DEBUG_MAKE_INDENT(3);
-   url=url.base()+name;
+   url=url.base()+GOS::encode_reserved(name);
 }
 
 //*****************************************************************************
@@ -1844,7 +1845,7 @@ DjVuFile::unlink_file(const char * id)
       // Remove the file from the list of included files
    {
       GURL url=DjVuPort::get_portcaster()->id_to_url(this, id);
-      if (url.is_empty()) url=DjVuFile::url.base()+id;
+      if (url.is_empty()) url=DjVuFile::url.base()+GOS::encode_reserved(id);
       GCriticalSectionLock lock(&inc_files_lock);
       for(GPosition pos=inc_files_list;pos;)
 	 if (inc_files_list[pos]->get_url()==url)

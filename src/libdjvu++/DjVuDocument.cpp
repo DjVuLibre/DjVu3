@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.106 2000-01-25 00:44:59 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.107 2000-01-26 23:59:31 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -293,7 +293,7 @@ DjVuDocument::init_thread(void)
 	 {
 	    doc_type=SINGLE_PAGE;
 	    ndir=new DjVuNavDir(init_url.base()+"directory");
-	    ndir->insert_page(-1, init_url.name());
+	    ndir->insert_page(-1, init_url.fname());
 	 }
       }
       flags|=DOC_NDIR_KNOWN;
@@ -461,7 +461,7 @@ DjVuDocument::check_unnamed_files(void)
 	       ufile->data_pool->connect(new_pool);
 	    }
 
-	    ufile->file->set_name(new_url.name());
+	    ufile->file->set_name(new_url.fname());
 	    ufile->file->move(new_url.base());
 	    set_file_aliases(ufile->file);
 	 } else break;
@@ -514,7 +514,7 @@ DjVuDocument::page_to_url(int page_num) const
 	 {
 	    if (page_num<0) page_num=0;
 	    if (page_num==0 && (flags & DOC_DIR_KNOWN))
-	       url=init_url+first_page_name;
+	       url=init_url+GOS::encode_reserved(first_page_name);
 	    else if (flags & DOC_NDIR_KNOWN)
 	       url=ndir->page_to_url(page_num);
 	    break;
@@ -526,7 +526,7 @@ DjVuDocument::page_to_url(int page_num) const
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
 	       if (!file) THROW("Page number is too big.");
-	       url=init_url+file->name;
+	       url=init_url+GOS::encode_reserved(file->name);
 	    }
 	    break;
 	 }
@@ -537,7 +537,7 @@ DjVuDocument::page_to_url(int page_num) const
 	    {
 	       GP<DjVmDir::File> file=djvm_dir->page_to_file(page_num);
 	       if (!file) THROW("Page number is too big.");
-	       url=init_url.base()+file->name;
+	       url=init_url.base()+GOS::encode_reserved(file->name);
 	    }
 	    break;
 	 }
@@ -570,7 +570,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url) file=djvm_dir->name_to_file(url.name());
+	       if (url.base()==init_url) file=djvm_dir->name_to_file(url.fname());
 	       if (file) page_num=file->get_page_num();
 	    }
 	    break;
@@ -580,7 +580,7 @@ DjVuDocument::url_to_page(const GURL & url) const
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir::File> file;
-	       if (url.base()==init_url.base()) file=djvm_dir->name_to_file(url.name());
+	       if (url.base()==init_url.base()) file=djvm_dir->name_to_file(url.fname());
 	       if (file) page_num=file->get_page_num();
 	    }
 	    break;
@@ -607,7 +607,7 @@ DjVuDocument::id_to_url(const char * id) const
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
 	       if (!file) file=djvm_dir->name_to_file(id);
 	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return init_url+file->name;
+	       if (file) return init_url+GOS::encode_reserved(file->name);
 	    }
 	    break;
 	 case INDIRECT:
@@ -616,19 +616,19 @@ DjVuDocument::id_to_url(const char * id) const
 	       GP<DjVmDir::File> file=djvm_dir->id_to_file(id);
 	       if (!file) file=djvm_dir->name_to_file(id);
 	       if (!file) file=djvm_dir->title_to_file(id);
-	       if (file) return init_url.base()+file->name;
+	       if (file) return init_url.base()+GOS::encode_reserved(file->name);
 	    }
 	    break;
 	 case OLD_BUNDLED:
 	    if (flags & DOC_DIR_KNOWN)
 	    {
 	       GP<DjVmDir0::FileRec> frec=djvm_dir0->get_file(id);
-	       if (frec) return init_url+id;
+	       if (frec) return init_url+GOS::encode_reserved(id);
 	    }
 	    break;
 	 case OLD_INDEXED:
 	 case SINGLE_PAGE:
-	    return init_url.base()+id;
+	    return init_url.base()+GOS::encode_reserved(id);
 	    break;
       }
    return GURL();
@@ -824,7 +824,7 @@ DjVuDocument::get_djvu_file(const char * id, bool dont_create)
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(int page_num, DjVuPort * port)
+DjVuDocument::get_page(int page_num, bool sync, DjVuPort * port)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): request for page " << page_num << "\n");
@@ -843,13 +843,14 @@ DjVuDocument::get_page(int page_num, DjVuPort * port)
 	  !file->is_decode_ok() &&
 	  !file->is_decode_failed())
 	 file->start_decode();
-
    }
+   if (dimg && sync)
+      dimg->wait_for_complete_decode();
    return dimg;
 }
 
 GP<DjVuImage>
-DjVuDocument::get_page(const char * id, DjVuPort * port)
+DjVuDocument::get_page(const char * id, bool sync, DjVuPort * port)
 {
    check();
    DEBUG_MSG("DjVuDocument::get_page(): ID='" << id << "'\n");
@@ -869,7 +870,8 @@ DjVuDocument::get_page(const char * id, DjVuPort * port)
 	  !file->is_decode_failed())
 	 file->start_decode();
    }
-
+   if (dimg && sync)
+      dimg->wait_for_complete_decode();
    return dimg;
 }
 
@@ -1193,8 +1195,8 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	       if (url.base()!=init_url)
 		  THROW("URL '"+url+"' points outside of the bundled document.");
 	 
-	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.name());
-	       if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
+	       GP<DjVmDir0::FileRec> file=djvm_dir0->get_file(url.fname());
+	       if (!file) THROW("File '"+url.fname()+"' is not in this bundle.");
 	       data_pool=new DataPool(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1207,8 +1209,8 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	       if (url.base()!=init_url)
 		  THROW("URL '"+url+"' points outside of the bundled document.");
 	 
-	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.name());
-	       if (!file) THROW("File '"+url.name()+"' is not in this bundle.");
+	       GP<DjVmDir::File> file=djvm_dir->name_to_file(url.fname());
+	       if (!file) THROW("File '"+url.fname()+"' is not in this bundle.");
 	       data_pool=new DataPool(init_data_pool, file->offset, file->size);
 	    }
 	    break;
@@ -1216,10 +1218,10 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
 	 case SINGLE_PAGE:
 	 case OLD_INDEXED:
 	 case INDIRECT:
-           {
-             DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
-             if (flags & DOC_DIR_KNOWN)
-	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.name()))
+	 {
+	    DEBUG_MSG("The document is in SINGLE_PAGE or OLD_INDEXED or INDIRECT format\n");
+	    if (flags & DOC_DIR_KNOWN)
+	       if (doc_type==INDIRECT && !djvm_dir->name_to_file(url.fname()))
 		  THROW("URL '"+url+"' points outside of the INDIRECT document.");
 	 
 	    if (url.is_local_file_url())
@@ -1260,11 +1262,11 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
 	 {
 	    GP<DjVuFile> f=files_list[pos];
 	    if (f->contains_chunk("NDIR"))
-	       data=DjVuFile::unlink_file(data, f->get_url().name());
+	       data=DjVuFile::unlink_file(data, f->get_url().fname());
 	 }
 	 
 	    // Finally add it to the document
-	 GString name=file->get_url().name();
+	 GString name=file->get_url().fname();
 	 GP<DjVmDir::File> file_rec=new DjVmDir::File(name, name, name,
 						      page ? DjVmDir::File::PAGE :
 						      DjVmDir::File::INCLUDE);

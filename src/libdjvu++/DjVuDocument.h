@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.55 2000-01-21 02:16:56 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.56 2000-01-26 23:59:32 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.55 2000-01-21 02:16:56 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.56 2000-01-26 23:59:32 eaf Exp $#
 */
 
 //@{
@@ -431,12 +431,13 @@ public:
    GURL		id_to_url(const char * id) const;
 
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to page
-          #page_num#. If caching is enabled and there is a {\em fully decoded}
+          #page_num#. If caching is enabled, and there is a {\em fully decoded}
 	  \Ref{DjVuFile} in the cache, the image will be reused and will
 	  be returned fully decoded. Otherwise, if multithreaded behaviour
-	  is allowed, the decoding will be started in a separate thread,
-	  which enables to do progressive redisplay. Thus, in this case
-	  the image returned may be partially decoded.
+	  is allowed, and #sync# is set to #FALSE#, the decoding will be
+	  started in a separate thread, which enables to do progressive
+	  redisplay. Thus, in this case the image returned may be partially
+	  decoded.
 
 	  Negative #page_num# has a special meaning for the {\em old indexed}
 	  multipage documents: the #DjVuDocument# will start decoding of the
@@ -462,8 +463,19 @@ public:
 	  {\bf Note:} To wait for the initialization to complete use
 	  \Ref{wait_for_complete_init}(). For single threaded applications
 	  the initialization completes before the \Ref{init}() function
-	  returns. */
-   GP<DjVuImage>get_page(int page_num, DjVuPort * port=0);
+	  returns.
+
+	  @param page_num Number of the page to be decoded
+	  @param sync When set to #TRUE# the function will not return
+	  	      until the page is completely decoded. Otherwise,
+		      in a multithreaded program, this function will
+		      start decoding in a new thread and will return
+		      a partially decoded image. Refer to
+		      \Ref{DjVuImage::wait_for_complete_decode}() and
+		      \Ref{DjVuFile::is_decode_ok}().
+	  @param port A pointer to \Ref{DjVuPort}, that the created image
+	  	      will be connected to. */
+   GP<DjVuImage>get_page(int page_num, bool sync=true, DjVuPort * port=0);
       /** Returns \Ref{GP} pointer to \Ref{DjVuImage} corresponding to the
 	  specified ID. This function behaves exactly as the #get_page()#
 	  function above. The only thing worth mentioning here is how the #ID#
@@ -473,7 +485,7 @@ public:
 	  If so, it just calls the #get_page()# function above. If ID is
 	  #ZERO# or just empty, page number #-1# is assumed. Otherwise
 	  the ID is translated to the URL using \Ref{id_to_url}(). */
-   GP<DjVuImage>get_page(const char * id, DjVuPort * port=0);
+   GP<DjVuImage>get_page(const char * id, bool sync=true, DjVuPort * port=0);
    
       /** Returns \Ref{DjVuFile} corresponding to the specified page.
 	  Normally it translates the page number to the URL using
