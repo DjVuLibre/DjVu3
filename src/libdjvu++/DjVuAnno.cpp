@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.14 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.15 1999-09-29 21:52:44 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -519,8 +519,7 @@ DjVuAnno::decode(ByteStream & str)
 {
    GCriticalSectionLock lock(&class_lock);
 
-   raw=read_raw(str);
-   GLParser parser(raw);
+   GLParser parser(read_raw(str));
    decode(parser);
 }
 
@@ -538,26 +537,25 @@ DjVuAnno::merge(ByteStream & str)
 {
    GCriticalSectionLock lock(&class_lock);
    
-   GString raw1=encode_raw();
-   GLParser parser(raw);
-   GString raw2=read_raw(str);
-   parser.parse(raw2);
+   GLParser parser(encode_raw());
+   GString add_raw=read_raw(str);
+   parser.parse(add_raw);
    decode(parser);
-   raw=encode_raw();
 }
 
 void
 DjVuAnno::encode(ByteStream &bs)
 {
   GCriticalSectionLock lock(&class_lock);
-  raw=encode_raw();
-  bs.writall((const char*)raw, raw.length());
+  
+  GString raw=encode_raw();
+  bs.writall((const char*) raw, raw.length());
 }
 
 unsigned int 
 DjVuAnno::get_memory_usage() const
 {
-  return sizeof(DjVuAnno) + raw.length();
+  return sizeof(DjVuAnno);
 }
 
 unsigned char
@@ -866,7 +864,7 @@ DjVuAnno::encode_raw(void) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    
    char buffer[512];
-   GLParser parser(raw);
+   GLParser parser;
 
       //*** Background color
    del_all_items(BACKGROUND_TAG, parser);

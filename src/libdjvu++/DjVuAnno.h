@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.h,v 1.5 1999-09-28 16:19:13 eaf Exp $
+//C- $Id: DjVuAnno.h,v 1.6 1999-09-29 21:52:44 eaf Exp $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
@@ -38,7 +38,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.5 1999-09-28 16:19:13 eaf Exp $# */
+    #$Id: DjVuAnno.h,v 1.6 1999-09-29 21:52:44 eaf Exp $# */
 //@{
 
 
@@ -112,9 +112,6 @@ public:
       /** List of elliptical hyperlinks. Refer to the description of
 	  \Ref{GHLOval} class for details. */
    GPList<GHLOval>	oval_hlinks;
-      /** Raw (not decoded) contents of the annotation chunk as they've been
-	  read from the file. */
-   GString raw;
    
       /// Constructs an empty annotation object.
    DjVuAnno();
