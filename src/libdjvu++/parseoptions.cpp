@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.15 1999-12-08 03:39:31 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.16 1999-12-15 21:03:02 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -94,6 +94,13 @@ int
 djvu_parse_integer(struct djvu_parse opts,const char name[],const int errval)
 {
   return ((DjVuParseOptions *)(opts.Private))->GetInteger(name,errval);
+}
+
+  /* This is a wrapper for the DjVuParseOptions::GetNumber function */
+int
+djvu_parse_number(struct djvu_parse opts,const char name[],const int errval)
+{
+  return ((DjVuParseOptions *)(opts.Private))->GetNumber(name,errval);
 }
 
   /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
@@ -459,6 +466,39 @@ DjVuParseOptions::GetInteger
     retval=(int)strtol(str,&endptr,10);
     if(errval&&(!retval)&&(*endptr)&&((endptr==str)||!isdigit(*(endptr-1))))
       retval=(errval);
+  }
+  return retval;
+}
+
+// This does a simple strtol() conversion.  If the string contains a legal
+// number value, that value will be returned.  If the string contains anything
+// else, excluding white space, the errval supplied will be returned.
+//
+int
+DjVuParseOptions::GetNumber
+(const int token,const int errval) const 
+{
+  const char mesg[]="'%1.10s' is not a number";
+  const char * endptr=mesg;
+  int retval=errval;
+  const char * const str=GetValue(token);
+  if(str)
+  {
+    const char *s=str;
+    if(s[0])
+    {
+      for(;isspace(s);s++);
+      if(s[0] == '+')
+        s++;
+      for(retval=(int)strtol(s,&(char *)endptr,10);isspace(*endptr);endptr++);
+    }
+  }
+  if(*endptr)
+  {
+    char sbuf[sizeof(mesg)+10];
+    sprintf(sbuf,mesg,str?str:"(NULL)");
+    Errors->AddError(sbuf);
+    retval=errval;
   }
   return retval;
 }

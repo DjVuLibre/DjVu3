@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.11 1999-12-08 03:22:54 bcr Exp $
+//C- $Id: parseoptions.h,v 1.12 1999-12-15 21:03:02 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -83,7 +83,7 @@
    		// We can also read in integers, and specify a default value
    		// to return in case the value is not an integer.  In this
    		// case I specified -1.
-   	  bignumber=MyOptions.GetInteger(long_options[2].name,-1);
+   	  bignumber=MyOptions.GetNumber(long_options[2].name,-1);
    		// We can also check true/false type values.
    	  redo=MyOptions.GetInteger(long_options[2].name,0);
    		// Now before we do anything with these values we might
@@ -181,7 +181,7 @@
    Be very careful of missing quotes...  */  
 
 /**  @memo parseoptions header file
-     @version $Id: parseoptions.h,v 1.11 1999-12-08 03:22:54 bcr Exp $
+     @version $Id: parseoptions.h,v 1.12 1999-12-15 21:03:02 bcr Exp $
      @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -237,6 +237,10 @@ extern "C" {
   int
   djvu_parse_integer(struct djvu_parse,const char [],const int);
 
+    /* This is a wrapper for the DjVuParseOptions::GetInteger function */
+  int
+  djvu_parse_number(struct djvu_parse,const char [],const int);
+
     /* This is a wrapper for the DjVuParseOptions::ParseArguments function */
   int
   djvu_parse_arguments
@@ -288,8 +292,8 @@ private:
   int optind;
 
 public:
-  /// Normal Destructor.  This uses reference counts to decide when        
-  /// references should be destroyed.                                      
+  /** Normal Destructor.  This uses reference counts to decide when        
+      references should be destroyed. */
   ~DjVuParseOptions();
 
   /// This is the normal constructor.  A profile name must be specified.   
@@ -301,101 +305,110 @@ public:
   /// This reinitallizes with the above constructor 
   void init(const char [],const char []);
 
-  /// This is a copy constructor.  Arguments, and ErrorLists are not       
-  /// copied.   VarTokens, ProfileTokens, and Configuration are copied by  
-  /// reference, not value.                                                
-  DjVuParseOptions(DjVuParseOptions &); // This is the copy constructor.
+  /** This is a copy constructor.  Arguments, and ErrorLists are not       
+      copied.   VarTokens, ProfileTokens, and Configuration are copied by  
+      reference, not value. */
+  DjVuParseOptions(DjVuParseOptions &);
 
-  /// This is the only method of reading a new profile, and changing it to 
-  /// the current profile that will be used with the Get*() methods.       
+  /** This is the only method of reading a new profile, and changing it to 
+      the current profile that will be used with the Get*() methods. */
   void ChangeProfile(const char []);
 
-  /// If you wish to retrieve the same variable multiple times, or from    
-  /// multiple profiles, we recommend retrieving the token value for that  
-  /// variable, to avoid repeated lookups of the string.                   
-  /// Negative values are returned for an unregistered variable name.      
+  /** If you wish to retrieve the same variable multiple times, or from    
+      multiple profiles, we recommend retrieving the token value for that  
+      variable, to avoid repeated lookups of the string.                   
+      Negative values are returned for an unregistered variable name. */
   inline int GetVarToken(const char xname[]) const;
 
-  /// This is the same as GetVarToken() except if a variable name is NOT    
-  /// currently tokenized, a new token is created and returned.  If you are 
-  /// Use of this is recommended when the token value is to be stored       
-  /// statically.                                                           
+  /** This is the same as GetVarToken() except if a variable name is NOT    
+      currently tokenized, a new token is created and returned.  If you are 
+      Use of this is recommended when the token value is to be stored       
+      statically. */
   inline int SetVarToken(const char xname[]) const;
 
-  /// This is simular to GetVarToken(), but it looks up the token for       
-  /// profile name instead.                                                 
+  /** This is simular to GetVarToken(), but it looks up the token for       
+      profile name instead. */
   inline int GetProfileToken(const char xname[]) const;
 
-  /// This is simular to SetVarToken(), but it looks up the token for      
-  /// profile name instead.   Care should be used when using this method.  
-  /// Once a token is assigned to a profile, then the profile is assumed   
-  /// to have been read.  Consequently, if you use this function, and the  
-  /// profile did not exist.  An empty profile will be created...          
-  /// Perhaps this method should be private instead.                       
+  /** This is simular to SetVarToken(), but it looks up the token for      
+      profile name instead.   Care should be used when using this method.  
+      Once a token is assigned to a profile, then the profile is assumed   
+      to have been read.  Consequently, if you use this function, and the  
+      profile did not exist.  An empty profile will be created...          
+      Perhaps this method should be private instead. */
   inline int SetProfileToken(const char xname[]) const;
 
-  /// This is the reverse transform of the GetVarToken() routine.   
-  /// Given the token, it returns the var name.  This is handy for  
-  /// creating readable messages for log files and such.            
+  /** This is the reverse transform of the GetVarToken() routine.   
+      Given the token, it returns the var name.  This is handy for  
+      creating readable messages for log files and such. */
   inline const char * const GetVarName(const int token) const;
   
-  /// This is the reverse transform of the GetProfileToken() routine.   
-  /// Given the token, it returns the profile name.  This is handy for  
-  /// creating readable messages for log files and such.                
+  /** This is the reverse transform of the GetProfileToken() routine.   
+      Given the token, it returns the profile name.  This is handy for  
+      creating readable messages for log files and such. */
   inline const char * const GetProfileName(const int token) const;
 
-  /// This is the primary lookup routine.  Input is the token as returned by 
-  /// GetToken(), and the return value is the string associated with the     
-  /// token.  Multiple tokens may be in an array of the specified listsize.  
+  /** This is the primary lookup routine.  Input is the token as returned by 
+      GetToken(), and the return value is the string associated with the     
+      token.  Multiple tokens may be in an array of the specified listsize. */
   const char * const GetValue(const int token) const;
 
-  /// Multiple tokens may be in an array of the specified listsize.  The   
-  /// index of the token with a value of the highest presidence will be    
-  /// is returned.  Command line arguments have the highest presidence.    
-  /// Default profile values have the lowest presidence.  It is an error   
-  /// to have two values f the same presedence. 
+  /** Multiple tokens may be in an array of the specified listsize.  The   
+      index of the token with a value of the highest presidence will be    
+      is returned.  Command line arguments have the highest presidence.    
+      Default profile values have the lowest presidence.  It is an error   
+      to have two values f the same presedence. */
   int GetBest(const int listsize,const int tokens[]);
 
   /// Same as above, but -1 terminated 
   inline int GetBest(const int tokens[]);
 
-  /// This is just a short cut, when a token value is only needed for one 
-  /// lookup.  A list of tokens may be specified as well.                 
+  /** This is just a short cut, when a token value is only needed for one 
+      lookup.  A list of tokens may be specified as well. */
   inline const char * const GetValue(const char xname[]) const;
 
-  /// Multiple names may be in an array of the specified listsize.  The    
-  /// index of the name with a value of the highest presidence will be     
-  /// is returned.  Command line arguments have the highest presidence.    
-  /// Default profile values have the lowest presidence.  It is an error   
-  /// to have two values f the same presedence. 
+  /** Multiple names may be in an array of the specified listsize.  The    
+      index of the name with a value of the highest presidence will be     
+      is returned.  Command line arguments have the highest presidence.    
+      Default profile values have the lowest presidence.  It is an error   
+      to have two values f the same presedence. */
   int GetBest(const int listsize,const char * const[]);
 
   /// Same as above, but NULL terminated 
   inline int GetBest(const char * const names[]);
 
-  /// This just checks for TRUE, and if not does an atoi() conversion. 
-  /// Anything beginning with [Tt] is returned as 1, [Ff\0] is returned 
-  /// as 0, and anything else that is not a legal integer is returned 
-  /// as errval.                                                       
+  /** This just checks for TRUE, and if not does an atoi() conversion. 
+      Anything beginning with [Tt] is returned as 1, [Ff\0] is returned 
+      as 0, and anything else that is not a legal integer is returned 
+      as errval. */
   int GetInteger(const int token,const int errval=0) const;
 
-  /// This is just a short cut, when a token value is only needed for one 
-  /// lookup.                                                             
+  /** This is just a short cut, when a token value is only needed for one 
+      lookup. */
   inline int GetInteger(const char xname[],const int errval=0) const;
+
+  /** This just checks for valid integer numbers only.  If the string
+      contains something other than [-0-9] the supplied errval is returned.
+      Otherwise an integer is returned. */
+  int GetNumber(const int token,const int errval=0) const;
+
+  /** This is just a short cut, when a token value is only needed for one 
+      lookup. */
+  inline int GetNumber(const char xname[],const int errval=0) const;
 
   /// This method allows us to check if any errors occurred.           
   int HasError() const;
 
-  /// This allows us to retrieve and clear errors one at a time.  A NULL is 
-  /// returned when all errors have been cleared.                           
+  /** This allows us to retrieve and clear errors one at a time.  A NULL is 
+      returned when all errors have been cleared. */
   const char *GetError();
 
-  /// This deletes and recreates the Errors object, to clear all errors    
-  /// without the need to do a GetError() loop.                            
+  /** This deletes and recreates the Errors object, to clear all errors    
+      without the need to do a GetError() loop. */
   void ClearError();
 
-  /// This simple perror() type function prints all errors to stderr, with 
-  /// a GetError() loop, so the errors are cleared.                        
+  /** This simple perror() type function prints all errors to stderr, with 
+      a GetError() loop, so the errors are cleared. */
   void perror(const char *mesg=0);
 
   /// This is the primary function for reading command  line arguments.  
@@ -526,6 +539,11 @@ inline int
 DjVuParseOptions::GetInteger
 (const char xname[],const int errval=0) const
 { return GetInteger(GetVarToken(xname),errval); }
+
+inline int
+DjVuParseOptions::GetNumber
+(const char xname[],const int errval=0) const
+{ return GetNumber(GetVarToken(xname),errval); }
 
 inline const char * const
 DjVuTokenList::GetString
