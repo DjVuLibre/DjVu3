@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2utf16.cpp,v 1.1 2001-07-24 00:15:12 bcr Exp $
+// $Id: xml2utf16.cpp,v 1.2 2001-07-24 15:48:25 bcr Exp $
 // $Name:  $
 
 /** @name xml2utf16
@@ -43,7 +43,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2utf16.cpp,v 1.1 2001-07-24 00:15:12 bcr Exp $# */
+    #$Id: xml2utf16.cpp,v 1.2 2001-07-24 15:48:25 bcr Exp $# */
 //@{
 //@}
 
@@ -112,7 +112,6 @@ main(int argc, char **argv)
               if(count > 1)
               {
                 bs->writall(&w2,sizeof(w2));
-                ++ptr;
               }
             }
           }
