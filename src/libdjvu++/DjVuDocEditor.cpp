@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.78 2001-05-03 02:07:40 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.79 2001-05-31 16:25:42 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -141,7 +141,7 @@ DjVuDocEditor::init(void)
 void
 DjVuDocEditor::init(const GURL &url)
 {
-   DEBUG_MSG("DjVuDocEditor::init() called: fname='" << url << "'\n");
+   DEBUG_MSG("DjVuDocEditor::init() called: url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
       // If you remove this check be sure to delete thumb_map
@@ -709,14 +709,15 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
                   // one after another
                const GP<DjVuDocument> doc(DjVuDocument::create_wait(furl));
 #ifndef UNDER_CE
-	       GURL::Filename::Native dirurl(tmpnam(0));
+	             GURL::Filename::Native dirurl(tmpnam(0));
 #else
                GURL::Filename::UTF8 dirurl("tempFileForDjVu");
 #endif
                if (dirurl.mkdir()<0)
                   G_THROW( ERR_MSG("DjVuDocEditor.dir_fail") "\t"+dirurl.get_string());//MBCS cvt
-               G_TRY {
-                  doc->expand(tmp_doc_url, furl.fname());
+               G_TRY 
+               {
+                  doc->expand(dirurl, furl.fname());
                   int pages_num=doc->get_pages_num();
                   for(int page_num=0;page_num<pages_num;page_num++)
                   {
