@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.67 2001-04-12 17:05:31 fcrary Exp $
+// $Id: ByteStream.cpp,v 1.68 2001-04-13 23:32:19 fcrary Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -301,7 +301,7 @@ ByteStream::seek(long offset, int whence, bool nothrow)
       {
         if (nothrow)
           return -1;
-        G_THROW( ERR_MSG("ByteStream.backwards") );
+        G_THROW( ERR_MSG("ByteStream.backward") );
       }
       char buffer[1024];
       int bytes;

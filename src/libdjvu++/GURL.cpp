@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.60 2001-04-12 18:50:51 fcrary Exp $
+// $Id: GURL.cpp,v 1.61 2001-04-13 23:32:19 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1359,7 +1359,7 @@ GURL::listdir(void) const
     }
 #else
     // WCE and MAC is missing
-    G_THROW( ERR_MSG("GURL.cleardir") );
+    G_THROW( ERR_MSG("GURL.listdir") );
 #endif
   }
   return retval;
