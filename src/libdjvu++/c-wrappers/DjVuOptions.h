@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.8 2000-02-18 17:28:40 haffner Exp $
+ *C- $Id: DjVuOptions.h,v 1.9 2000-02-21 22:47:11 haffner Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -134,9 +134,10 @@ extern const char djvu_inhibit_foreback_level_string[];
 extern const char djvu_edge_size_string[];
 extern const char djvu_render_size_string[];
 extern const char djvu_blurring_size_string[];
-extern const char djvu_fg_subsampling_string[];
-extern const char djvu_bg_subsampling_string[];
-extern const char djvu_target_subsampling_string[];
+extern const char djvu_fg_subsample_string[];
+extern const char djvu_bg_subsample_string[];
+extern const char djvu_mask_upsample_string[];
+extern const char djvu_target_subsample_string[];
 extern const char djvu_resolution_multiplier_string[];
 extern const char djvu_high_variation_foreground_string[];
 extern const char djvu_refine_string[];
@@ -154,9 +155,10 @@ extern const char djvu_limit_mem_usage_string[];
 #define djvu_edge_size_option {djvu_edge_size_string+2,1,0,0xf0}
 #define djvu_segm_render_size_option {djvu_render_size_string+2,1,0,0xef}
 #define djvu_blurring_size_option {djvu_blurring_size_string+2,1,0,0xee}
-#define djvu_fg_subsampling_option {djvu_fg_subsampling_string+2,1,0,0xec}
-#define djvu_bg_subsampling_option {djvu_bg_subsampling_string+2,1,0,0xeb}
-#define djvu_target_subsampling_option {djvu_bg_subsampling_string+2,1,0,0xe7}
+#define djvu_fg_subsample_option {djvu_fg_subsample_string+2,1,0,0xec}
+#define djvu_bg_subsample_option {djvu_bg_subsample_string+2,1,0,0xeb}
+#define djvu_mask_upsample_option {djvu_mask_upsample_string+2,1,0,0xeb}
+#define djvu_target_subsample_option {djvu_bg_subsample_string+2,1,0,0xe7}
 #define djvu_resolution_multiplier_option {djvu_resolution_multiplier_string+2,1,0,0xea}
 #define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,2,0,0xe9}
 #define djvu_refine_option {djvu_refine_string+2, 2, 0, 0xe8}
