@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.2 1999-01-25 21:11:05 leonb Exp $
+//C-  $Id: GThreads.h,v 1.3 1999-01-25 21:21:06 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -25,42 +25,38 @@
     The value of compiler symbol #THREADMODEL# selects an appropriate
     implementation for these classes. The current implementation supports
     the following values:
-    \begin{itemize}
-    \item #-DTHREADMODEL=NOTHREADS# selects a dummy implementation. 
-          This is a good choice when the multithreading features are
-          not required, because it minimizes the portability problems.
-          This is currently the default when compiling under Unix.
-    \item #-DTHREADMODEL=WINTHREADS# selects the Windows implementation.
+    \begin{description}
+    \item[-DTHREADMODEL=NOTHREADS] Dummy implementation.  This is a
+          good choice when the multithreading features are not required,
+          because it minimizes the portability problems.  This is currently
+          the default when compiling under Unix.
+    \item[-DTHREADMODEL=WINTHREADS] Windows implementation.
           This is the default when compiling under Windows.
-    \item #-DTHREADMODEL=MACTHREADS# selects the Macintosh implementation,
+    \item[-DTHREADMODEL=MACTHREADS] Macintosh implementation,
           which is based on the MacOS cooperative model. The current code
           does not fully support synchronization (ooops).
           This is the default when compiling under MacOS.
-    \item #-DTHREADMODEL=POSIXTHREADS# selects the Posix implementation.
+    \item[-DTHREADMODEL=POSIXTHREADS] Posix implementation.
           This implementation also supports DCE threads. The behavior of
           the code is subject to the quality of the system implementation of
           Posix threads.
-    \item #-DTHREADMODEL=COTHREADS# selects a home-made cooperative
-          multithreading implementation. No system functions are redefined:
-          before executing a potentially blocking system function, each thread
-          must explicitely check whether it is going to block and yield
-          control explicitely if this is the case.  This code must be compiled
-          with a patched version of egcs-1.1.1 or better (see
-          \URL{http://egcs.cygnus.com}). The patch addresses exception
-          thread-safety and is provided in #"@Gcc/libgcc2.c.diff"#.  We have sent
-          this patch to the egcs people but did not hear from them so far.  
-          Defining symbol #-DNO_LIBGCC_HOOKS# allows you to compile without 
-          the patch, although the code may just crash immediatly.  
-          Once you get the right compiler, this implementation is
-          remarkably compact and portable. A variety of processors are
-          supported, including mips, intel, sparc, hppa, and alpha.
-    \item #-DTHREADMODEL=JRITHREADS# is actually not currently implemented.
+    \item[-DTHREADMODEL=COTHREADS] Custom cooperative threads.
+          These custom threads do not redefine system calls. Before executing
+          a potentially blocking system function, each thread must explicitely
+          check whether it is going to block and yield control explicitely if
+          this is the case.  This code must be compiled with a patched version
+          of egcs-1.1.1 \URL{http://egcs.cygnus.com}. The patch addresses
+          exception thread-safety and is provided in #"@Gcc/libgcc2.c.diff"#.
+          Once you get the right compiler, this implementation is remarkably
+          compact and portable. A variety of processors are supported,
+          including mips, intel, sparc, hppa, and alpha.
+    \item[-DTHREADMODEL=JRITHREADS] Java implementation hooks.
           Multi-threading within a Netscape plugin can be tricky.  A simple
           idea however consists of implementing the threading primitives in
           Java and to access them using JRI.  The classes just contain a
-          JRIGlobalRef.  Everything (including exception thread safety) should
-          be implemented by the plugin source code.  Performance may be an
-          issue.
+          JRIGlobalRef.  This is not a real implementation since everything
+          (Java code, native functions, stubs, exception thread safety) must
+          be addressed by the plugin source code. Performance may be an issue.
     \end{itemize}
     
     {\bf Portability}: The simultaneous use of threads and exceptions caused a
@@ -71,9 +67,8 @@
     releases.
 
     {\bf ToDo}: For historical reasons, the interface is modeled after the
-    Win32 model.  This is unfortunate because more and more systems (Java,
-    NSPR, pthreads) adopt the simpler monitor approach.  It would be nice to
-    change that some day.
+    Win32 model.  This is unfortunate because more and more systems adopt the
+    simpler monitor approach.  It would be nice to change that some day.
 
     @memo
     Portable threads
@@ -81,7 +76,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.2 1999-01-25 21:11:05 leonb Exp $# */
+    #$Id: GThreads.h,v 1.3 1999-01-25 21:21:06 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
