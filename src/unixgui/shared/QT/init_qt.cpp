@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.6.2.1 2001-10-19 00:59:18 leonb Exp $
+// $Id: init_qt.cpp,v 1.6.2.2 2001-10-19 01:02:38 leonb Exp $
 // $Name:  $
 
 #ifdef HAVE_CONFIG_H
@@ -192,6 +192,7 @@ InstallErrorHandlers(void)
 static bool
 InstallLangTranslator(void)
 {
+#ifndef QT1
    static QTranslator *translator = 0;      
    
    if ( translator ) return TRUE;
@@ -219,6 +220,7 @@ InstallLangTranslator(void)
       return FALSE;
    
    // load locale sepcific font 
+#ifdef QT2
    QFont font;
    font.setCharSet(char_set);
    // for testing only 
@@ -234,7 +236,7 @@ InstallLangTranslator(void)
       //cout << "loading new font\n";
       QApplication::setFont( font, TRUE );
    }
-
+#endif
    if ( translator )
    {
       qApp->removeTranslator( translator );
@@ -243,7 +245,7 @@ InstallLangTranslator(void)
    translator = new QTranslator(0);
    translator->load(lang);
    qApp->installTranslator(translator);
-
+#endif
    return TRUE;
 }
 
