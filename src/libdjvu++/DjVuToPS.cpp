@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.3 2000-03-19 22:37:59 eaf Exp $
+//C- $Id: DjVuToPS.cpp,v 1.4 2000-03-19 22:52:48 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -51,7 +51,10 @@ DjVuToPS::Options::set_format(Format _format)
    
    format=_format;
    if (format==EPS)
+   {
       orientation=PORTRAIT;
+      copies=1;
+   }
 }
 
 void
@@ -111,6 +114,9 @@ DjVuToPS::Options::set_copies(int _copies)
 {
    if (_copies<=0)
       THROW("The number of copies must be positive.");
+   if (format==EPS && _copies!=1)
+      THROW("Only one copy can be printed in EPS format.");
+   
    copies=_copies;
 }
 
