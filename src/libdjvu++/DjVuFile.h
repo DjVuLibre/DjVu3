@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.38 1999-09-22 19:35:52 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.39 1999-09-23 22:19:50 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.38 1999-09-22 19:35:52 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.39 1999-09-23 22:19:50 eaf Exp $#
 */
 
 //@{
@@ -369,6 +369,14 @@ public:
 		 the decoding procedure. */
    GPList<DjVuFile>	get_included_files(bool only_created=true);
 
+      /** Includes a #DjVuFile# with the specified #id# into this one.
+	  This function will also insert an #INCL# chunk at position
+	  #chunk_num#. The function will request data for the included
+	  file and will create it before returning. */
+   void		insert_file(const char * id, int chunk_num=1);
+      /// Will get rid of included file with the given #id#
+   void		unlink_file(const char * id);
+
       /// Returns the number of chunks in the IFF file data
    int		get_chunks_number(void);
       /// Returns the name of chunk number #chunk_num#
@@ -438,7 +446,7 @@ private:
    bool		wait_for_finish(bool self);
 
       // INCL chunk processor
-   GP<DjVuFile>	process_incl_chunk(ByteStream & str);
+   GP<DjVuFile>	process_incl_chunk(ByteStream & str, int file_num=-1);
 
       // Trigger: called when DataPool has all data
    static void	static_trigger_cb(void *);

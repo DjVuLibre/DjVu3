@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.59 1999-09-22 19:35:52 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.60 1999-09-23 22:19:50 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -98,13 +98,10 @@ DjVuFile::init(ByteStream & str)
    decode_thread=0;
 
       // Read the data from the stream
-   data_pool=new DataPool();
-   char buffer[1024];
-   int length;
-   while((length=str.read(buffer, 1024)))
-      data_pool->add_data(buffer, length);
+   data_pool=new DataPool(str);
 
       // Construct some dummy URL
+   char buffer[1024];
    sprintf(buffer, "djvufile:/%p.djvu", this);
    url=buffer;
 
@@ -420,7 +417,7 @@ DjVuFile::decode_func(void)
 }
 
 GP<DjVuFile>
-DjVuFile::process_incl_chunk(ByteStream & str)
+DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
 {
    check();
    DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL chunk...\n");
@@ -479,7 +476,10 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 	 for(pos=inc_files_list;pos;++pos)
 	    if (inc_files_list[pos]->url.name()==incl_url.name()) break;
 	 if (pos) file=inc_files_list[pos];
-	 else inc_files_list.append(file);
+	 else if (file_num<0 || !(pos=inc_files_list.nth(file_num)))
+	    inc_files_list.append(file);
+	 else inc_files_list.insert_before(pos, file);
+		
       }
       return file;
    }
@@ -489,8 +489,13 @@ DjVuFile::process_incl_chunk(ByteStream & str)
 void
 DjVuFile::process_incl_chunks(void)
       // This function may block for data
+      // NOTE: It may be called again when INCL_FILES_CREATED is set.
+      // It happens in insert_file() when it has modified the data
+      // and wants to create the actual file
 {
    check();
+
+   int incl_cnt=0;
    
    GP<ByteStream> str=data_pool->get_stream();
    int chksize;
@@ -500,7 +505,7 @@ DjVuFile::process_incl_chunks(void)
    {
       while((chksize=iff.get_chunk(chkid)))
       {
-	 if (chkid=="INCL") process_incl_chunk(iff);
+	 if (chkid=="INCL") process_incl_chunk(iff, incl_cnt++);
 	 iff.close_chunk();
       }
    }
@@ -670,8 +675,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
               else if (file->is_decode_failed())
                 get_portcaster()->notify_file_flags_changed(file, DECODE_FAILED, 0);
             }
-        }
-      desc.format("Indirection chunk");
+	  desc.format("Indirection chunk ("+file->get_url().name()+")");
+        } else desc.format("Indirection chunk");
     }
 
   // Djbz (JB2 Dictionary)
@@ -1267,10 +1272,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       } else if (!no_ndir || chkid!="NDIR")
       {
 	 ostr.put_chunk(chkid);
-	 char buffer[1024];
-	 int length;
-	 while((length=iff.read(buffer, 1024)))
-	    ostr.writall(buffer, length);
+	 ostr.copy(iff);
 	 ostr.close_chunk();
       }
       iff.close_chunk();
@@ -1305,4 +1307,130 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
    iff.flush();
    str.seek(0, SEEK_SET);
    return new DataPool(str);
+}
+
+//****************************************************************************
+//******************************* Modifying **********************************
+//****************************************************************************
+
+void
+DjVuFile::insert_file(const char * id, int chunk_num)
+{
+   DEBUG_MSG("DjVuFile::insert_file(): id='" << id << "', chunk_num="
+	     << chunk_num << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // First: create new data
+   GP<ByteStream> str_in=data_pool->get_stream();
+   IFFByteStream iff_in(*str_in);
+
+   MemoryByteStream str_out;
+   IFFByteStream iff_out(str_out);
+
+   int chunk_cnt=0;
+   bool done=false;
+   int chksize;
+   GString chkid;
+   if (iff_in.get_chunk(chkid))
+   {
+      iff_out.put_chunk(chkid);
+      while((chksize=iff_in.get_chunk(chkid)))
+      {
+	 if (chunk_cnt++==chunk_num)
+	 {
+	    iff_out.put_chunk("INCL");
+	    iff_out.writall(id, strlen(id));
+	    iff_out.close_chunk();
+	    done=true;
+	 }
+	 iff_out.put_chunk(chkid);
+	 iff_out.copy(iff_in);
+	 iff_out.close_chunk();
+	 iff_in.close_chunk();
+      }
+      if (!done)
+      {
+	 iff_out.put_chunk("INCL");
+	 iff_out.writall(id, strlen(id));
+	 iff_out.close_chunk();
+      }
+      iff_out.close_chunk();
+   }
+   str_out.seek(0, SEEK_SET);
+   data_pool=new DataPool(str_out);
+
+      // Second: create missing DjVuFiles
+   process_incl_chunks();
+
+   flags|=MODIFIED;
+}
+
+void
+DjVuFile::unlink_file(const char * id)
+{
+   DEBUG_MSG("DjVuFile::insert_file(): id='" << id << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+      // Remove the file from the list of included files
+   {
+      GCriticalSectionLock lock(&inc_files_lock);
+      for(GPosition pos=inc_files_list;pos;)
+	 if (inc_files_list[pos]->get_url()==url)
+	 {
+	    GPosition this_pos=pos;
+	    ++pos;
+	    inc_files_list.del(this_pos);
+	 } else ++pos;
+   }
+
+      // And update the data.
+   GP<ByteStream> str_in=data_pool->get_stream();
+   IFFByteStream iff_in(*str_in);
+
+   MemoryByteStream str_out;
+   IFFByteStream iff_out(str_out);
+
+   int chksize;
+   GString chkid;
+   if (iff_in.get_chunk(chkid))
+   {
+      iff_out.put_chunk(chkid);
+      while((chksize=iff_in.get_chunk(chkid)))
+      {
+	 if (chkid!="INCL")
+	 {
+	    iff_out.put_chunk(chkid);
+	    iff_out.copy(iff_in);
+	    iff_out.close_chunk();
+	 } else
+	 {
+	    GString incl_str;
+	    char buffer[1024];
+	    int length;
+	    while((length=iff_in.read(buffer, 1024)))
+	       incl_str+=GString(buffer, length);
+
+	       // Eat '\n' in the beginning and at the end
+	    while(incl_str.length() && incl_str[0]=='\n')
+	    {
+	       GString tmp=((const char *) incl_str)+1; incl_str=tmp;
+	    }
+	    while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
+	       incl_str.setat(incl_str.length()-1, 0);
+	    if (incl_str!=id)
+	    {
+	       iff_out.put_chunk("INCL");
+	       iff_out.writall((const char *) incl_str, incl_str.length());
+	       iff_out.close_chunk();
+	    }
+	 }
+	 iff_in.close_chunk();
+      }
+      iff_out.close_chunk();
+   }
+
+   str_out.seek(0, SEEK_SET);
+   data_pool=new DataPool(str_out);
+
+   flags|=MODIFIED;
 }
