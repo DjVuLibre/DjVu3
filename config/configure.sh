@@ -91,7 +91,7 @@ run()
 
 get_option_value()
 {
-    if [ `expr "$1" : '^[-A-Za-z_]*='` = 0 ]
+    if [ `expr "$1" : '[-A-Za-z_]*='` = 0 ]
     then
       echo yes
     else
