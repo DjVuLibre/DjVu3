@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.pl,v 1.7 2001-05-16 16:11:51 debs Exp $
+# $Id: pdftodjvu.pl,v 1.8 2001-05-17 00:16:24 debs Exp $
 # $Name:  $
 
 # Perl libs to use
@@ -313,6 +313,8 @@ if ( $type eq ".ps" ) {
   $outputstr = `$cmdstr`;
   $outputstr =~ s/\*+Unknown operator: ri\n//g;
   if ( $verbose ) { print $outputstr; }
+  $_ = $outputstr;
+  /Error:/ && die "Error creating interim PDF file:\n$outputstr\n";
 } else {
   $pdffile = $input;
 }
@@ -330,12 +332,19 @@ while ( $do_next ) {
   if ( $verbose ) { print "$cmdstr\n"; }
   $outputstr=`$cmdstr`;
   $outputstr =~ s/\*+Unknown operator: ri\n//g;
-  @lines = split /\n/, $outputstr;
-  if ( $lines[0] eq  "Error: /rangecheck in --get--" ) { 
+  $_ = $outputstr;
+  if ( /^Error: \/rangecheck in --get--/ ) { 
     $do_next = 0; 
-  } elsif ( substr($lines[0], 0, 5) eq "Error" ) {
+  } elsif ( /Error:/ ) {
     if ( $verbose ) { print "$outputstr\n"; }
-    die "Ghostscript command failed for page $pg of $input.\n";
+    @tmpdirlist=();
+    find(\&wanted2, $tmpdir);
+    foreach $file ( @tmpdirlist ) { 
+      if ( $file ne $tmpdir ) { unlink $file; }
+    }
+    rmdir $tmpdir;
+    die "Ghostscript command failed for page $pg of $input with the following" .
+      " error:\n$outputstr\n";
   } else {
     if ( $verbose ) { print "$outputstr\n"; }
     $cmdstr="$djvucommand $args " . '"' . $gsname . '" "' . $djname . 
