@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.19 2001-03-13 01:34:50 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.20 2001-03-13 01:43:11 bcr Exp $
 // $Name:  $
 
 
@@ -133,11 +133,12 @@ GetModulePath( void )
 }
 #else
 #ifdef UNIX
+extern char **environ;
+static char **e=environ-1;
 static GString 
 GetModulePath( void )
 {
-  extern char **environ;
-  char **argv=environ-1;
+  char **argv=e;
   int argc;
   for(argc=0;*(int *)&(argv[-1]) != argc;argc++,argv--)
     EMPTY_LOOP;
@@ -570,54 +571,4 @@ GetModulePath( void )
   return GOS::expand_name(LocalDjVuDir,GOS::dirname(retval));
 }
 #endif
-
-static GList<GString> &
-GetProfilePaths(void)
-{
-  static bool first=true;
-  static GList<GString> paths;
-  if(first)
-  {
-    first=false;
-#if !defined(UNDER_CE)
-    const char *envp=getenv(DjVuEnv);
-    if(envp)
-      paths.append(envp);
-#endif
-#ifdef WIN32
-    GString path(GetModulePath());
-    if(path.length() && GOS::is_dir(path))
-      paths.append(path);
-    path=RegOpenReadConfig (HKEY_CURRENT_USER);
-    if(path.length() && GOS::is_dir(path))
-      paths.append(path);
-    path=(RegOpenReadConfig (HKEY_LOCAL_MACHINE));
-    if(path.length() && GOS::is_dir(path))
-      paths.append(path);
-#else
-    GString path;
-    const char* home=getenv("HOME");
-    struct passwd *pw=0;
-    if(!home)
-    {
-      pw=getpwuid(getuid());
-      if(pw)
-        home=pw->pw_dir;
-    }
-    if(home)
-    {
-      path=GOS::expand_name(LocalDjVuDir,home);
-      if(path.length() && GOS::is_dir(path))
-        paths.append(path);
-    }
-    if(pw)
-    {
-      free(pw);
-    }
-#endif
-    if(GOS::is_dir(RootDjVuDir))
-      paths.append(RootDjVuDir);
-  }
-  return paths;
-}
 
