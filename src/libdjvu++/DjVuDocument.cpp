@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.21 1999-08-27 22:33:02 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.22 1999-08-31 18:56:54 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -398,7 +398,7 @@ DjVuDocument::get_cached_file(const DjVuPort * source, const GURL & url)
       GCriticalSectionLock lock(&active_files_lock);
       if (!active_files.contains(file->get_url()))
       {
-	 file->set_destroy_cb(static_destroy_cb, this);
+	 file->add_destroy_cb(static_destroy_cb, this);
 	 active_files[file->get_url()]=file;
       }
    }
@@ -414,7 +414,7 @@ DjVuDocument::cache_djvu_file(const DjVuPort * source, DjVuFile * file)
    GCriticalSectionLock lock(&active_files_lock);
    if (!active_files.contains(file->get_url()))
    {
-      file->set_destroy_cb(static_destroy_cb, this);
+      file->add_destroy_cb(static_destroy_cb, this);
       active_files[file->get_url()]=file;
    }
 }
@@ -558,13 +558,14 @@ DjVuDocument::get_page(int page_num)
 void
 DjVuDocument::static_destroy_cb(const DjVuFile * file, void * cl_data)
 {
-   ((DjVuDocument *) cl_data)->destroy_cb(file);
+   DjVuDocument * th=(DjVuDocument *) cl_data;
+   if (get_portcaster()->is_port_alive(th)) th->file_destroyed(file);
 }
 
 void
-DjVuDocument::destroy_cb(const DjVuFile * file)
+DjVuDocument::file_destroyed(const DjVuFile * file)
 {
-   DEBUG_MSG("DjVuDocument::destroy_cb(): file '" << file->get_url() << "' is about to destroy\n");
+   DEBUG_MSG("DjVuDocument::file_destroyed(): file '" << file->get_url() << "' is about to destroy\n");
    DEBUG_MAKE_INDENT(3);
 
    GCriticalSectionLock lock(&active_files_lock);
