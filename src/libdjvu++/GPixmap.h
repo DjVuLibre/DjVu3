@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.10 1999-11-16 02:05:57 leonb Exp $
+//C- $Id: GPixmap.h,v 1.11 1999-11-16 02:24:12 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -30,7 +30,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.10 1999-11-16 02:05:57 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.11 1999-11-16 02:24:12 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -213,43 +213,45 @@ public:
   void upsample23(const GPixmap *src, const GRect *rect=0);
   //@}
 
-  /** @name Blitting and applying stencils. 
-      These function is essential for rendering DjVu images. */
+  /** @name Blitting and applying stencils.  
+      These function is essential for rendering DjVu images.  The elementary
+      functions are \Ref{attenuate} and \Ref{blit}.  The combined functions
+      \Ref{blend} and \Ref{stencil} should be viewed as optimizations.  */
   //@{
-  /** Paints the color image #pm# through the stencil #bm# into this image.
-      This function conceptually computes an intermediate color image by first
-      upsampling the GPixmap #pm# by a factor #pms:1# (see \Ref{upsample}),
-      extracting the sub-image designated by rectangle #pmr# if such a
-      rectangle is specified, and applying color correction #corr# (see
-      \Ref{color_correct}).  This intermediate color image is then blended
-      into the current GPixmap using the corresponding gray levels in GBitmap
-      #bm#.  All these four functions are however performed together for
-      efficiency reasons.
-      
-      {\bf Example}: Assume that the current GPixmap already contains the
-      color corrected background layer of a particular rectangle #pmr# for a
-      DjVu image at a given target resolution.  Assume that the GBitmap #bm#
-      contains the corresponding region of the gray level mask layer at the
-      same resolution.  Assume finally that the GPixmap #pm# contains the low
-      resolution foreground color layer for the complete DjVu image.  This
-      foreground color layer needs to be enlarged #pms# times to reach the
-      target resolution.  A single call to function #stencil# will render the
-      DjVu image. */
-  void stencil(const GBitmap *bm, const GPixmap *pm, int pms=1, 
-               const GRect *pmr=0, double corr=1.0);
-
-
-
+  /** Attenuates the color image in preparation for a blit.  
+      Bitmap #bm# is positionned at location #x#,#y# over this color image.
+      The matching color image pixels are then multiplied by #1.0-Alpha# where
+      #Alpha# denotes the gray value, in range #[0,1]#, represented by the
+      corresponding pixel of bitmap #bm#. */
   void attenuate(const GBitmap *bm, int x, int y);
+  /** Blits solid color #color# through transparency mask #bm#.  
+      Bitmap #bm# is positionned at location #x#,#y# over this color image.
+      The matching color image pixels are then modified by adding color
+      #color# multiplied by #Alpha#, where #Alpha# denotes the gray value, in
+      range #[0,1]#, represented by the corresponding pixel of bitmap #bm#. */
   void blit(const GBitmap *bm, int x, int y, const GPixel *color);
+  /** Blits pixmap #color# through transparency mask #bm#.
+      Bitmap #bm# is positionned at location #x#,#y# over this color image.
+      The matching color image pixels are then modified by adding the
+      corresponding pixel color in pixmap #color#, multiplied by #Alpha#,
+      where #Alpha# denotes the gray value, in range #[0,1]#, represented by
+      the corresponding pixel of bitmap #bm#. */
   void blit(const GBitmap *bm, int x, int y, const GPixmap *color);
+  /** Performs alpha blending. This function is similar to first calling
+      \Ref{attenuate} with alpha map #bm# and then calling \Ref{blit} with
+      alpha map #bm# and color map #color#. Both operations are performed
+      together for efficiency reasons. */
   void blend(const GBitmap *bm, int x, int y, const GPixmap *color);
-  
-
-
-
-
-
+  /** Resample color pixmap and performs color corrected alpha blending.  This
+      function conceptually computes an intermediate color image by first
+      upsampling the GPixmap #pm# by a factor #pms:1# (see \Ref{upsample}),
+      extracting the sub-image designated by rectangle #pmr# and applying
+      color correction #corr# (see \Ref{color_correct}).  This intermediate
+      color image is then blended into this pixel map according to the alpha
+      map #bm# (see \Ref{blend}). */
+  void stencil(const GBitmap *bm, 
+               const GPixmap *pm, int pms, 
+               const GRect *pmr, double corr=1.0);
   //@}
   
   /** @name Manipulating colors. */
@@ -287,7 +289,8 @@ public:
       ad-hoc formula which limits this effect.  The resulting image is less
       accurate but more pleasant! */
   void color_correct(double corr);
-  /** Applies color correction to an array of pixels. */
+  /** Applies a luminance gamma correction to an array of pixels. 
+      This function is {\em static} and does not modify this pixmap. */
   static void color_correct(double corr, GPixel *pixels, int npixels);
 
   //@}
