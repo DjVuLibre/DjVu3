@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.33.2.1 2001-03-28 01:04:27 bcr Exp $
+// $Id: GURL.h,v 1.33.2.2 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
@@ -49,7 +49,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.33.2.1 2001-03-28 01:04:27 bcr Exp $#
+    @version #$Id: GURL.h,v 1.33.2.2 2001-03-29 00:49:59 bcr Exp $#
 */
 
 //@{
@@ -311,7 +311,9 @@ public:
                 file:/<path>
 
       which are accepted because various browsers recognize them.*/
-   GString filename(void) const;
+   GString UTF8Filename(void) const;
+   /// Same but returns a native string.
+   GString NativeFilename(void) const;
 
       /** Hashing function.
 	  @return hash suitable for usage in \Ref{GMap} */

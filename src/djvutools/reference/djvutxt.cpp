@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.12.2.1 2001-03-28 01:04:25 bcr Exp $
+// $Id: djvutxt.cpp,v 1.12.2.2 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.12.2.1 2001-03-28 01:04:25 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.12.2.2 2001-03-29 00:49:59 bcr Exp $# */
 //@{
 //@}
 
@@ -141,10 +141,10 @@ main(int argc, char ** argv)
    
 #ifdef DEBUG
    {
-      const char * debug=getenv("DEBUG");
-      if (debug)
+      const GString debug(GOS::getenv("DEBUG"));
+      if (debug.length())
       {
-	 int level=atoi(debug);
+	 int level=debug.is_int()?atoi((const char *)debug):0;
 	 if (level<1) level=1;
 	 if (level>32) level=32;
 //	 DEBUG_SET_LEVEL(level);

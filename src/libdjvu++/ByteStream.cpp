@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.54.2.4 2001-03-28 01:04:26 bcr Exp $
+// $Id: ByteStream.cpp,v 1.54.2.5 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -549,13 +549,13 @@ ByteStream::Stdio::init(const char mode[])
 static FILE *
 urlfopen(const GURL &url,const char mode[])
 {
-  return fopen((const char *)url.filename().getUTF82Native(),mode);
+  return fopen((const char *)url.NativeFilename(),mode);
 }
 
 static int
 urlopen(const GURL &url, const int mode, const int perm)
 {
-  return open((const char *)url.filename().getUTF82Native(),mode,perm);
+  return open((const char *)url.NativeFilename(),mode,perm);
 }
 
 GString

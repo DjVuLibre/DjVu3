@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.23.2.2 2001-03-28 01:04:27 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.23.2.3 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 
@@ -156,13 +156,11 @@ GetProfilePaths(void)
   {
     first=false;
     GURL path;
-#ifdef WINCE
-    const char *envp=0;
-#else
-    const char *envp=getenv(DjVuEnv);
+#ifndef WINCE
+    const GString envp(GOS::getenv(DjVuEnv));
+    if(envp.length())
+      paths.append((path=GURL::Filename::UTF8(envp)));
 #endif
-    if(envp && strlen(envp))
-      paths.append((path=GURL::Filename::Native(envp)));
 #if defined(WIN32) || (defined(UNIX) && !defined(NO_DEBUG))
     GURL mpath(GetModulePath());
     if(!mpath.is_empty() && mpath.is_dir())
@@ -192,15 +190,15 @@ GetProfilePaths(void)
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
 #else
-    const char* home=getenv("HOME");
+    GString home=GOS::getenv("HOME");
     struct passwd *pw=0;
-    if(!home)
+    if(home.length())
     {
       pw=getpwuid(getuid());
       if(pw)
-        home=pw->pw_dir;
+        home=GString(pw->pw_dir).getNative2UTF8();
     }
-    if(home)
+    if(home.length())
     {
       path=GURL::UTF8(LocalDjVuDir,GURL::Filename::UTF8(home));
       if(!path.is_empty() && path.is_dir())

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.50.2.1 2001-03-28 01:04:27 bcr Exp $
+// $Id: GURL.cpp,v 1.50.2.2 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -299,7 +299,7 @@ GURL::init(const bool nothrow)
          }
 
             // Do double conversion
-         GString tmp=filename();
+         GString tmp=UTF8Filename();
          if (!tmp.length())
          {
            validurl=false;
@@ -770,7 +770,7 @@ GString
 GURL::pathname(void) const
 {
   return (is_local_file_url())
-    ?GURL::encode_reserved(filename()) 
+    ?GURL::encode_reserved(UTF8Filename()) 
     :url.search(slash);
 }
 
@@ -1033,7 +1033,7 @@ GURL::get_string(const char *useragent) const
     const GString agent(useragent);
     if(agent.search("MSIE") >= 0 || agent.search("Microsoft")>=0)
     {
-      retval=filespecslashes + expand_name(filename());
+      retval=filespecslashes + expand_name(UTF8Filename());
     }
   }
   return retval;
@@ -1083,7 +1083,7 @@ GURL::Filename::UTF8::UTF8(const GString &gfilename)
 // -- Applies heuristic rules to convert a url into a valid file name.  
 //    Returns a simple basename in case of failure.
 GString 
-GURL::filename(void) const
+GURL::UTF8Filename(void) const
 {
   GString retval;
   if(! is_empty())
@@ -1182,11 +1182,17 @@ GURL::filename(void) const
   return retval;
 }
 
+GString 
+GURL::NativeFilename(void) const
+{
+  return UTF8Filename().getUTF82Native();
+}
+
 #if defined(UNIX) || defined(macintosh)
 static int
 urlstat(const GURL &url,struct stat &buf)
 {
-  return stat(url.filename().getUTF82Native(),&buf);
+  return stat(url.NativeFilename(),&buf);
 }
 #endif
 
@@ -1207,7 +1213,7 @@ GURL::is_file(void) const
 #elif defined(WIN32)
     DWORD           dwAttrib;       ;
     USES_CONVERSION ;
-    dwAttrib = GetFileAttributes(A2CT(filename().getUTF82Native())) ;//MBCS cvt
+    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
     retval=!((dwAttrib == 0xFFFFFFFF)
      ||( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
@@ -1229,7 +1235,7 @@ GURL::is_local_path(void) const
 #else
     DWORD           dwAttrib;       ;
     USES_CONVERSION ;
-    dwAttrib = GetFileAttributes(A2CT(filename().getUTF82Native())) ;//MBCS cvt
+    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
     retval=!(dwAttrib == 0xFFFFFFFF);
 #endif
   }
@@ -1254,7 +1260,7 @@ GURL::is_dir(void) const
 #elif defined(WIN32)   // (either Windows or WCE)
     USES_CONVERSION ;
     DWORD           dwAttrib;       ;
-    dwAttrib = GetFileAttributes(A2CT(((GString)filename).getUTF82Native())) ;//MBCS cvt
+    dwAttrib = GetFileAttributes(A2CT(NativeFilename())) ;//MBCS cvt
     retval=((dwAttrib != 0xFFFFFFFF)&&( dwAttrib & FILE_ATTRIBUTE_DIRECTORY ));
 #else
 #error "Define something here for your operating system"
@@ -1283,9 +1289,9 @@ GURL::mkdir() const
       retval=is_dir();
 #ifdef WIN32
       USES_CONVERSION;
-      retval =(is_dir()?0:CreateDirectory(A2CT(filename().getUTF82Native()), NULL));//MBCS cvt
+      retval =(is_dir()?0:CreateDirectory(A2CT(NativeFilename()), NULL));//MBCS cvt
 #else
-      retval=(is_dir()?0:(::mkdir(filename().getUTF82Native(), 0755)));//MBCS cvt
+      retval=(is_dir()?0:(::mkdir(NativeFilename(), 0755)));//MBCS cvt
 #endif
     }
   }
@@ -1304,12 +1310,12 @@ GURL::deletefile(void) const
 #ifdef WIN32
     USES_CONVERSION;
     retval=is_dir()
-      ?RemoveDirectory(A2CT(filename().getUTF82Native()))
+      ?RemoveDirectory(A2CT(NativeFilename()))
       :DeleteFile(A2CT(ilename().getUTF82Native())); //MBCS cvt
 #else
     retval=is_dir()
-      ?rmdir(filename().getUTF82Native())
-      :unlink(filename().getUTF82Native());//MBCS cvt
+      ?rmdir(NativeFilename())
+      :unlink(NativeFilename());//MBCS cvt
 #endif
   }
   return retval;
@@ -1322,7 +1328,7 @@ GURL::listdir(void) const
   if(is_dir())
   {
 #if defined(UNIX)
-    DIR * dir=opendir(filename().getUTF82Native());//MBCS cvt
+    DIR * dir=opendir(NativeFilename());//MBCS cvt
     for(dirent *de=readdir(dir);de;de=readdir(dir))
     {
       const int len = NAMLEN(de);
@@ -1336,7 +1342,7 @@ GURL::listdir(void) const
 #elif defined (WIN32) && !defined (UNDER_CE)
     GURL::UTF8 wildcard("*.*",*this);
     WIN32_FIND_DATA finddata;
-    HANDLE handle = FindFirstFile(wildcard.filename().getUTF82Native(), &finddata);//MBCS cvt
+    HANDLE handle = FindFirstFile(wildcard.NativeFilename(), &finddata);//MBCS cvt
     const GString gpathname=pathname();
     const GString gbase=base().pathname();
     if( handle != INVALID_HANDLE_VALUE)
@@ -1392,7 +1398,7 @@ int
 GURL::renameto(const GURL &newurl) const
 {
   return (is_local_file_url() && newurl.is_local_file_url())
-    ?rename(filename().getUTF82Native(),newurl.filename().getUTF82Native())
+    ?rename(NativeFilename(),newurl.NativeFilename())
     :(-1);
 }
 
@@ -1408,31 +1414,32 @@ GURL::expand_name(const char *fname, const char *from)
   // UNIX implementation
 #ifdef UNIX
   // Perform tilde expansion
+  GString senv;
   if (fname && fname[0]==tilde)
   {
     int n;
     for(n=1;fname[n] && fname[n]!= slash;n++) 
       EMPTY_LOOP;
     struct passwd *pw=0;
-    char const *s;
     if (n!=1)
     {
       GString user(fname+1, n-1);
       pw=getpwnam(user);
-    }else if ((s=getenv("HOME")))
+    }else if ((senv=GOS::getenv("HOME")).length())
     {
-      from=(const char *)((GString)s).getNative2UTF8();//MBCS cvt
+      from=(const char *)senv;
       fname = fname + n;
-    }else if ((s=getenv("LOGNAME")))
+    }else if ((senv=GOS::getenv("LOGNAME")).length())
     {
-      pw = getpwnam(s);
+      pw = getpwnam((const char *)senv.getUTF82Native());
     }else
     {
       pw=getpwuid(getuid());
     }
     if (pw)
     {
-      from = (const char *)((GString)pw->pw_dir).getNative2UTF8();//MBCS cvt;
+      senv=GString(pw->pw_dir).getNative2UTF8();
+      from = (const char *)senv;
       fname = fname + n;
     }
     for(;fname[0] == slash; fname++)

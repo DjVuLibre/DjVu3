@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.18.4.3 2001-03-28 01:04:27 bcr Exp $
+// $Id: GOS.h,v 1.18.4.4 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.18.4.3 2001-03-28 01:04:27 bcr Exp $#
+    #$Id: GOS.h,v 1.18.4.4 2001-03-29 00:49:59 bcr Exp $#
 */
 //@{
 
@@ -98,6 +98,8 @@ class GOS
       Other threads can run while the calling thread sleeps. */
   static void sleep(int milliseconds);
 
+  /// Read the named variable from the environment, and converts it to UTF8.
+  static GString getenv(const GString &name);
 
 
   // -------------------------------------------
@@ -110,7 +112,6 @@ class GOS
       Use \Ref{decode_reserved}() to convert the URL back to the filename. */
 //  static GString encode_reserved(const char * filename);
   static GString encode_mbcs_reserved(const char * filename);/*MBCS*/
-
 
 };
 

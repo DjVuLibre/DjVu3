@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.154.2.1 2001-03-28 01:04:27 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.154.2.2 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -618,10 +618,10 @@ DjVuFile::report_error
   {
     GURL url=get_url();
     GString url_str=(const char *) url;
-    if (url.is_local_file_url())
-      url_str=url.filename();
+//    if (url.is_local_file_url())
+//      url_str=url.filename();
     
-    GString msg = "DjVuFile.EOF\t" + url_str;
+    GString msg = GString("DjVuFile.EOF\t") + url;
     if(throw_errors)
     {
       G_EXTHROW(ex, msg);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.47.2.3 2001-03-28 01:04:27 bcr Exp $
+// $Id: GOS.cpp,v 1.47.2.4 2001-03-29 00:49:59 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -398,6 +398,23 @@ GOS::cwd(const char *dirname)
 #endif 
 }
 
+GString
+GOS::getenv(const GString &name)
+{
+  GString retval;
+#ifndef UNDER_CE
+  if(name.length())
+  {
+    const char *env=::getenv(name.getUTF82Native());
+    if(env)
+    {
+      retval=GString(env).getNative2UTF8();
+    }
+  }
+#endif
+  return retval;
+}
+
 // -----------------------------------------
 // Testing
 // -----------------------------------------
@@ -455,8 +472,6 @@ int main(int argc, char **argv)
   fprintf(stderr,"syntax error\n");
   return 10;
 }
-
-
 
 #endif
 
