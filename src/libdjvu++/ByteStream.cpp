@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and can not use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.22 2000-02-10 19:24:49 eaf Exp $
+//C- $Id: ByteStream.cpp,v 1.23 2000-02-23 18:34:29 eaf Exp $
 
-// File "$Id: ByteStream.cpp,v 1.22 2000-02-10 19:24:49 eaf Exp $"
+// File "$Id: ByteStream.cpp,v 1.23 2000-02-23 18:34:29 eaf Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include "ByteStream.h"
+#include "GOS.h"
 
 //// CLASS BYTESTREAM
 
@@ -246,14 +247,14 @@ StdioByteStream::StdioByteStream(const char *filename, const char *mode)
       }
   if (strcmp(filename,"-") != 0) 
     {
-      fp = fopen(filename, mode);
+      fp = fopen(GOS::expand_name(filename), mode);
       if (!fp)
       {
 	 char buffer[4096];
 	 sprintf(buffer, "Failed to open '%s': %s",
 		 filename, strerror(errno));
 	 THROW(buffer);
-      };
+      }
     } 
   else 
     {
