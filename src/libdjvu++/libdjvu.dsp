@@ -125,10 +125,6 @@ SOURCE=.\DjVuDocEditor.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\DjVuDocEditor.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\DjVuDocument.cpp
 # End Source File
 # Begin Source File
