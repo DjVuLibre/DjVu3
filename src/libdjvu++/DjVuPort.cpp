@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.1.2.1 1999-04-12 16:48:22 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.1.2.2 1999-04-20 18:44:02 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -432,16 +432,20 @@ DjVuPort::notify_all_data_received(const DjVuPort *) {}
 GP<DataRange>
 DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
 {
-   StdioByteStream str(GOS::url_to_filename(url), "r");
-   GP<DataPool> pool=new DataPool();
+   TRY {
+      StdioByteStream str(GOS::url_to_filename(url), "r");
+      GP<DataPool> pool=new DataPool();
 
-   char buffer[1024];
-   int length;
-   while((length=str.read(buffer, 1024)))
-      pool->add_data(buffer, length);
+      char buffer[1024];
+      int length;
+      while((length=str.read(buffer, 1024)))
+	 pool->add_data(buffer, length);
    
-   pool->set_eof();
-   return new DataRange(pool);
+      pool->set_eof();
+      return new DataRange(pool);
+   } CATCH(exc) {
+   } ENDCATCH;
+   return 0;
 }
 
 bool
