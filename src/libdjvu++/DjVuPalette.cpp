@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.20 2001-02-08 23:30:05 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.21 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -445,8 +445,9 @@ DjVuPalette::encode_rgb_entries(ByteStream &bs) const
 }
 
 void 
-DjVuPalette::encode(ByteStream &bs) const
+DjVuPalette::encode(GP<ByteStream> gbs) const
 {
+  ByteStream &bs=*gbs;
   const int palettesize = palette.size();
   const int datasize = colordata.size();
   // Code version number
@@ -467,7 +468,7 @@ DjVuPalette::encode(ByteStream &bs) const
   if (datasize > 0)
     {
       bs.write24(datasize);
-      BSByteStream bsb(bs, 50);
+      BSByteStream bsb(gbs, 50);
       for (int d=0; d<datasize; d++)
         bsb.write16(colordata[d]);
     }
@@ -489,8 +490,9 @@ DjVuPalette::decode_rgb_entries(ByteStream &bs, const int palettesize)
 }
 
 void 
-DjVuPalette::decode(ByteStream &bs)
+DjVuPalette::decode(GP<ByteStream> gbs)
 {
+  ByteStream &bs=*gbs;
   // Make sure that everything is clear
   if (hcube) 
     delete [] hcube;
@@ -523,7 +525,7 @@ DjVuPalette::decode(ByteStream &bs)
       if (datasize<0)
         G_THROW("DjVuPalette.bad_palette");
       colordata.resize(0,datasize-1);
-      BSByteStream bsb(bs);
+      BSByteStream bsb(gbs);
       for (int d=0; d<datasize; d++)
         {
           short s = bsb.read16();

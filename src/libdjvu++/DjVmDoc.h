@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.20 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDoc.h,v 1.21 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -51,7 +51,7 @@ class DataPool;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.20 2001-01-04 22:04:54 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.21 2001-02-15 01:12:22 bcr Exp $#
 */
 
 //@{
@@ -152,10 +152,10 @@ public:
       //@{
       /** Writes the multipage DjVu document in the {\em bundled} format into
 	  the stream. */
-   void		write(ByteStream & str);
+   void		write(GP<ByteStream> str);
       /** Stored index (top-level) file of the DjVu document in the {\em
 	  indirect} format into the specified stream. */
-   void		write_index(ByteStream & str);
+   void		write_index(GP<ByteStream> str);
       /** Writes the multipage DjVu document in the {\em indirect} format
 	  into the given directory. Every page and included file will be
           stored as a separate file. Besides, one top-level file with

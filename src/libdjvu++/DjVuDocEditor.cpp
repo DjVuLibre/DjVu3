@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.59 2001-02-14 19:49:01 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.60 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -123,7 +123,7 @@ DjVuDocEditor::init(void)
    DjVmDoc doc;
    GP<ByteStream> gstr=ByteStream::create();
    ByteStream &str=*gstr;
-   doc.write(str);
+   doc.write(gstr);
    str.seek(0, SEEK_SET);
    doc_pool=new DataPool(str);
 
@@ -168,7 +168,7 @@ DjVuDocEditor::init(const char * fname)
 #endif
       GP<ByteStream> gstr=ByteStream::create(tmp_doc_name, "wb");
       ByteStream &str=*gstr;
-      tmp_doc->write(str, true);        // Force DJVM format
+      tmp_doc->write(gstr, true);        // Force DJVM format
       str.flush();
       doc_pool=new DataPool(tmp_doc_name);
    }
@@ -366,11 +366,10 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
    DEBUG_MAKE_INDENT(3);
 
    GP<ByteStream> str_in=pool_in->get_stream();
-   IFFByteStream iff_in(*str_in);
+   IFFByteStream iff_in(str_in);
 
    GP<ByteStream> gstr_out=ByteStream::create();
-   ByteStream &str_out=*gstr_out;
-   IFFByteStream iff_out(str_out);
+   IFFByteStream iff_out(gstr_out);
 
    bool have_incl=false;
 
@@ -394,6 +393,7 @@ DjVuDocEditor::strip_incl_chunks(GP<DataPool> & pool_in)
 
    if (have_incl)
    {
+      ByteStream &str_out=*gstr_out;
       str_out.seek(0, SEEK_SET);
       return new DataPool(str_out);
    } else return pool_in;
@@ -497,9 +497,8 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
          // Oh. It does exist... Check that it has IFF structure
       {
-         GP<ByteStream> str;
-         str=file_pool->get_stream();
-         IFFByteStream iff(*str);
+         GP<IFFByteStream> giff=IFFByteStream::create(file_pool->get_stream());
+         IFFByteStream &iff=*giff;
          GString chkid;
          int length;
          length=iff.get_chunk(chkid);
@@ -559,10 +558,9 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
          // if it exists.
       GString chkid;
       GP<ByteStream> str_in=file_pool->get_stream();
-      IFFByteStream iff_in(*str_in);
+      IFFByteStream iff_in(str_in);
       GP<ByteStream> gstr_out=ByteStream::create();
-      ByteStream &str_out=*gstr_out;
-      IFFByteStream iff_out(str_out);
+      IFFByteStream iff_out(gstr_out);
 
       GP<DjVmDir::File> shared_frec=djvm_dir->get_shared_anno_file();
 
@@ -617,6 +615,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 
          // We have just inserted every included file. We may have modified
          // contents of the INCL chunks. So we need to update the DataPool...
+      ByteStream &str_out=*gstr_out;
       str_out.seek(0);
       GP<DataPool> new_file_pool=new DataPool(str_out);
       {
@@ -675,12 +674,8 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
             {
               (*DjVuDocument::djvu_import_codec)(xdata_pool,(const char *)fname,needs_compression_flag,can_compress_flag);
             }
-            GP<ByteStream> str;
-            str=xdata_pool->get_stream();
-            IFFByteStream iff(*str);
             GString chkid;
-            iff.get_chunk(chkid);
-            str=0;
+            IFFByteStream::create(xdata_pool->get_stream())->get_chunk(chkid);
             if (chkid=="FORM:DJVM")
             {
                   // Hey, it really IS a multipage document.
@@ -1229,11 +1224,10 @@ DjVuDocEditor::simplify_anno(void (* progress_cb)(float progress, void *),
         
             // Merge all chunks in one by decoding and encoding DjVuAnno
          GP<DjVuAnno> dec_anno=new DjVuAnno;
-         dec_anno->decode(*anno);
+         dec_anno->decode(anno);
          GP<ByteStream> new_anno=ByteStream::create();
-         ByteStream &mbs=*new_anno;
-         dec_anno->encode(mbs);
-         mbs.seek(0);
+         dec_anno->encode(new_anno);
+         new_anno->seek(0);
 
             // And store it in the file
          djvu_file->anno=new_anno;
@@ -1280,12 +1274,12 @@ DjVuDocEditor::create_shared_anno_file(void (* progress_cb)(float progress, void
 
       // Prepare file with ANTa chunk inside
    GP<ByteStream> gstr=ByteStream::create();
-   ByteStream &str=*gstr;
-   IFFByteStream iff(str);
+   IFFByteStream iff(gstr);
    iff.put_chunk("FORM:DJVI");
    iff.put_chunk("ANTa");
    iff.close_chunk();
    iff.close_chunk();
+   ByteStream &str=*gstr;
    str.flush();
    str.seek(0);
    GP<DataPool> file_pool=new DataPool(str);
@@ -1472,7 +1466,7 @@ DjVuDocEditor::file_thumbnails(void)
    int page_num=0, pages_num=djvm_dir->get_pages_num();
    GP<ByteStream> str=ByteStream::create();
    ByteStream *mbs=str;
-   GP<IFFByteStream> iff=new IFFByteStream(*mbs);
+   GP<IFFByteStream> iff=new IFFByteStream(str);
    iff->put_chunk("FORM:THUM");
    while(true)
    {
@@ -1523,7 +1517,7 @@ DjVuDocEditor::file_thumbnails(void)
 
             // And create new streams
          mbs=str=ByteStream::create();
-         iff=new IFFByteStream(*mbs);
+         iff=new IFFByteStream(str);
          iff->put_chunk("FORM:THUM");
          image_num=0;
 
@@ -1615,7 +1609,7 @@ store_file(const GP<DjVmDir> & src_djvm_dir, const GP<DjVmDoc> & djvm_doc,
 }
 
 void
-DjVuDocEditor::save_pages_as(ByteStream & str, const GList<int> & _page_list)
+DjVuDocEditor::save_pages_as(GP<ByteStream> str, const GList<int> & _page_list)
 {
    GList<int> page_list=sortList(_page_list);
 
@@ -1697,7 +1691,7 @@ DjVuDocEditor::save_file(const char * file_id, const char * save_dir,
          str_out.copy(*str_in);
 
          GP<ByteStream> str=file_pool->get_stream();
-         IFFByteStream iff(*str);
+         IFFByteStream iff(str);
          GString chkid;
          if (iff.get_chunk(chkid))
          {
@@ -1800,7 +1794,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
      }
      GP<DjVmDoc> doc=get_djvm_doc();
      GP<ByteStream> mbs=ByteStream::create();
-     doc->write(*mbs);
+     doc->write(mbs);
      mbs->flush();
      mbs->seek(0,SEEK_SET);
      djvu_compress_codec(mbs,save_doc_name,(!(const DjVmDir *)djvm_dir)||(djvm_dir->get_files_num()==1)||(save_doc_type!=INDIRECT));
@@ -1841,8 +1835,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
          // Update the document's DataPool (to save memory)
         GP<DjVmDoc> doc=get_djvm_doc();
         GP<ByteStream> gstr=ByteStream::create();// One page: we can do it in the memory
+        doc->write(gstr);
         ByteStream &str=*gstr;
-        doc->write(str);
         str.seek(0, SEEK_SET);
         GP<DataPool> pool=new DataPool(str);
         doc_pool=pool;
@@ -1878,12 +1872,11 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         }
         DataPool::load_file(save_doc_name);
         GP<ByteStream> gstr=ByteStream::create(save_doc_name, "wb");
-        ByteStream &str=*gstr;
-        IFFByteStream iff(str);
+        IFFByteStream iff(gstr);
 
         iff.put_chunk("FORM:DJVM", 1);
         iff.put_chunk("DIRM");
-        djvm_dir->encode(iff);
+        djvm_dir->encode(gstr);
         iff.close_chunk();
         iff.close_chunk();
         iff.flush();
@@ -1902,9 +1895,8 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
         GP<DjVmDoc> doc=get_djvm_doc();
         DataPool::load_file(save_doc_name);
         GP<ByteStream> gstr=ByteStream::create(save_doc_name, "wb");
-        ByteStream &str=*gstr;
-        doc->write(str);
-        str.flush();
+        doc->write(gstr);
+        gstr->flush();
 
          // Update the document data pool (not required, but will save memory)
         doc_pool=new DataPool(save_doc_name);

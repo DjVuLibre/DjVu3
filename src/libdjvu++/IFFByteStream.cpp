@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.22 2001-01-04 22:04:55 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.23 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -47,12 +47,11 @@
 
 
 // Constructor
-IFFByteStream::IFFByteStream(ByteStream &xbs)
-  : has_magic(false), ctx(0), bs(&xbs), dir(0)
+IFFByteStream::IFFByteStream(GP<ByteStream> &xbs)
+: has_magic(false), ctx(0), gbs(xbs), bs(xbs), dir(0)
 {
   offset = seekto = bs->tell();
 }
-
 
 // Destructor
 IFFByteStream::~IFFByteStream()
@@ -60,8 +59,6 @@ IFFByteStream::~IFFByteStream()
   while (ctx)
     close_chunk();
 }
-
-
 
 // IFFByteStream::ready
 // -- indicates if bytestream is ready for reading

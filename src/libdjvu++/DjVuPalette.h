@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.h,v 1.24 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuPalette.h,v 1.25 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUPALETTE_H_
@@ -52,7 +52,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.24 2001-01-04 22:04:55 bcr Exp $#
+    #$Id: DjVuPalette.h,v 1.25 2001-02-15 01:12:22 bcr Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -164,12 +164,12 @@ public:
       the a version byte, the palette size, the palette colors and the color
       index sequence into bytestream #bs#.  Note that the color histogram is
       never saved. */
-  void encode(ByteStream &bs) const;
+  void encode(GP<ByteStream> bs) const;
   /** Initializes the object by reading data from bytestream #bs#.  This
       function reads a version byte, the palette size, the palette and the
       color index sequence from bytestream #bs#.  Note that the color
       histogram is never saved. */
-  void decode(ByteStream &bs);
+  void decode(GP<ByteStream> bs);
 
 private:
   int color_to_index_slow(const unsigned char *bgr);

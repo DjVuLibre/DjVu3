@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.9 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuText.cpp,v 1.10 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -649,10 +649,11 @@ DjVuTXT::get_memory_usage() const
 //***************************************************************************
 
 void
-DjVuText::decode(ByteStream &bs)
+DjVuText::decode(GP<ByteStream> gbs)
 {
   GString chkid;
-  IFFByteStream iff(bs);
+  GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+  IFFByteStream &iff=*giff;
   while( iff.get_chunk(chkid) )
   {
     if (chkid == "TXTa")
@@ -667,7 +668,7 @@ DjVuText::decode(ByteStream &bs)
       if (txt)
         G_THROW("DjVuText.dupl_text");
       txt = new DjVuTXT;
-      BSByteStream bsiff(iff);
+      BSByteStream bsiff(gbs);
       txt->decode(bsiff);
     }
     // Add decoding of other chunks here
@@ -676,18 +677,19 @@ DjVuText::decode(ByteStream &bs)
 }
 
 void
-DjVuText::encode(ByteStream &bs)
+DjVuText::encode(GP<ByteStream> gbs)
 {
-  IFFByteStream iff(bs);
   if (txt)
+  {
+    GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+    IFFByteStream &iff=*giff;
+    iff.put_chunk("TXTz");
     {
-      iff.put_chunk("TXTz");
-      {
-	BSByteStream bsiff(iff,50);
-	txt->encode(bsiff);
-      }
-      iff.close_chunk();
+      BSByteStream bsiff(gbs,50);
+      txt->encode(bsiff);
     }
+    iff.close_chunk();
+  }
   // Add encoding of other chunks here
 }
 

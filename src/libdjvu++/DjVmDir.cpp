@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.33 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.34 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -101,8 +101,9 @@ DjVmDir::File::get_str_type(void) const
 const int DjVmDir::version=1;
 
 void 
-DjVmDir::decode(ByteStream & str)
+DjVmDir::decode(GP<ByteStream> gstr)
 {
+   ByteStream &str=*gstr;
    DEBUG_MSG("DjVmDir::decode(): decoding contents of 'DIRM' chunk...\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -151,7 +152,7 @@ DjVmDir::decode(ByteStream & str)
          }
       }
 
-      BSByteStream bs_str(str);
+      BSByteStream bs_str(gstr);
       if (ver>0)
       {
 	 DEBUG_MSG("reading and decompressing sizes...\n");
@@ -280,8 +281,9 @@ DjVmDir::decode(ByteStream & str)
 }
 
 void
-DjVmDir::encode(ByteStream & str) const
+DjVmDir::encode(GP<ByteStream> gstr) const
 {
+   ByteStream &str=*gstr;
    DEBUG_MSG("DjVmDir::encode(): encoding contents of the 'DIRM' chunk\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -324,7 +326,7 @@ DjVmDir::encode(ByteStream & str) const
 	       }
       }
 
-      BSByteStream bs_str(str, 50);
+      BSByteStream bs_str(gstr, 50);
       DEBUG_MSG("storing and compressing sizes for every record\n");
       for(pos=files_list;pos;++pos)
       {

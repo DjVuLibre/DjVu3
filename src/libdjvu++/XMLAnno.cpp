@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.4 2001-02-10 01:16:57 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.5 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -138,7 +138,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
     GP<ByteStream> annobs=dfile->get_merged_anno();
     if(annobs)
     {
-      anno.decode(*annobs);
+      anno.decode(annobs);
     }
 //  dfile->remove_anno();
   }
@@ -382,7 +382,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
   dfile->set_modified(true);
   dfile->reset();
   dfile->anno=ByteStream::create();
-  anno.encode(*(dfile->anno));
+  anno.encode(dfile->anno);
   files.append(dfile);
 }
 

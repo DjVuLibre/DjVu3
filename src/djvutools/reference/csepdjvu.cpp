@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $# */
 //@{
 //@}
 
@@ -123,7 +123,7 @@
 #include "GBitmap.h"
 #include "JB2Image.h"
 #include "DjVuPalette.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "DjVuInfo.h"
 #include "DjVmDoc.h"
 
@@ -1014,7 +1014,7 @@ struct csepdjvuopts
 //    - bytestream bs contains the input separated file.
 //    - bytestream obs will receive the output djvu file.
 void 
-csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
+csepdjvu_page(BufferByteStream &bs, GP<ByteStream> obs, const csepdjvuopts &opts)
 {
   // Read rle data from separation file
   CRLEImage rimg(bs);
@@ -1127,7 +1127,8 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
     }
   
   // Assemble DJVU file
-  IFFByteStream iff(obs);
+  GP<IFFByteStream> giff=IFFByteStream::create(obs);
+  IFFByteStream &iff=*giff;
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
@@ -1147,7 +1148,7 @@ csepdjvu_page(BufferByteStream &bs, ByteStream &obs, const csepdjvuopts &opts)
     {
       // -- ``FGbz'' chunk
       iff.put_chunk("FGbz");
-      rimg.pal->encode(iff);
+      rimg.pal->encode(obs);
       iff.close_chunk();
       // -- ``BG44'' chunk
       IWEncoderParms iwparms;
@@ -1313,7 +1314,7 @@ main(int argc, const char **argv)
                 // Compress page 
                 goutputpage=ByteStream::create();
                 ByteStream &outputpage=*goutputpage;
-                csepdjvu_page(ibs, outputpage, opts);
+                csepdjvu_page(ibs, goutputpage, opts);
                 if (opts.verbose) {
                   fprintf(stderr,"csepdjvu: %d bytes for page %d",
                           outputpage.size(), pageno);
@@ -1334,14 +1335,12 @@ main(int argc, const char **argv)
           ByteStream &outputpage=*goutputpage;
           // Save as a single page 
           outputpage.seek(0);
-          GP<ByteStream> obs=ByteStream::create(outputfile,"wb");
-          obs->copy(outputpage);
+          ByteStream::create(outputfile,"wb")->copy(outputpage);
         }
       else if (pageno > 1)
         {
           // Save as a bundled file
-          GP<ByteStream> obs=ByteStream::create(outputfile,"wb");
-          doc.write(*obs);
+          doc.write(ByteStream::create(outputfile,"wb"));
         }
       else 
         usage();

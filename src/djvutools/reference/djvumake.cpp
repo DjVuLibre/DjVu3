@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.11 2001-02-14 02:30:56 bcr Exp $
+// $Id: djvumake.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.11 2001-02-14 02:30:56 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.12 2001-02-15 01:12:21 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -116,7 +116,7 @@
 #include "MMRDecoder.h"
 #include "IFFByteStream.h"
 #include "JB2Image.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 
 #include "GPixmap.h"
 #include "GBitmap.h"
@@ -204,7 +204,8 @@ analyze_mmr_chunk(char *filename)
           // Search Smmr chunk
           bs.seek(0);
           GString chkid;
-          IFFByteStream iff(bs);
+          GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+          IFFByteStream &iff=*giff;
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
             G_THROW("Expecting a DjVu file!");
           for(; iff.get_chunk(chkid); iff.close_chunk())
@@ -253,7 +254,8 @@ analyze_jb2_chunk(char *filename)
           // Search Sjbz chunk
           bs.seek(0);
           GString chkid;
-          IFFByteStream iff(bs);
+          GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+          IFFByteStream &iff=*giff;
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
             G_THROW("Expecting a DjVu file!");
           for(; iff.get_chunk(chkid); iff.close_chunk())
@@ -416,8 +418,8 @@ void
 create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
 {
   GP<ByteStream> gbs=ByteStream::create(filename,"rb");
-  ByteStream &bs=*gbs;
-  IFFByteStream bsi(bs);
+  GP<IFFByteStream> gbsi=IFFByteStream::create(gbs);
+  IFFByteStream &bsi=*gbsi;
   GString chkid;
   bsi.get_chunk(chkid);
   if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
@@ -471,9 +473,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       if (!s)
         s = filespec + strlen(filespec);
       GString filename(filespec, s-filespec);
-      static GP<ByteStream> pbs;
-      pbs=ByteStream::create(filename,"rb");
-      bg44iff = new IFFByteStream(*pbs);
+      bg44iff = IFFByteStream::create(ByteStream::create(filename,"rb"));
       GString chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
@@ -607,9 +607,8 @@ main(int argc, char **argv)
         usage();
       // Open djvu file
       remove(argv[1]);
-      GP<ByteStream> gobs=ByteStream::create(argv[1],"wb");
-      ByteStream &obs=*gobs;
-      IFFByteStream iff(obs);
+      GP<IFFByteStream> giff=IFFByteStream::create(ByteStream::create(argv[1],"wb"));
+      IFFByteStream &iff=*giff;
       // Create header
       iff.put_chunk("FORM:DJVU", 1);
       // Create information chunk

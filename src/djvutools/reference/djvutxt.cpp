@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $
+// $Id: djvutxt.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $# */
 //@{
 //@}
 
@@ -118,7 +118,7 @@ doPage(const GP<DjVuDocument> & doc, int page_num,
    if (text_str)
    {
       GP<DjVuText> text=new DjVuText();
-      text->decode(*text_str);
+      text->decode(text_str);
       GP<DjVuTXT> txt=text->txt;
       if (txt)
       {

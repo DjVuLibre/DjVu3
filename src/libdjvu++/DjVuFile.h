@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.72 2001-02-14 02:30:56 bcr Exp $
+// $Id: DjVuFile.h,v 1.73 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.72 2001-02-14 02:30:56 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.73 2001-02-15 01:12:22 bcr Exp $#
 */
 
 //@{
@@ -556,8 +556,8 @@ private:
       // Functions called when the decoding thread starts
    static void	static_decode_func(void *);
    void	decode_func(void);
-   void	decode(ByteStream & str);
-   GString decode_chunk(const char *chkid, ByteStream & str, 
+   void	decode(GP<ByteStream> str);
+   GString decode_chunk(const char *chkid, GP<ByteStream> str, 
                         bool djvi, bool djvu, bool iw44);
    int		get_dpi(int w, int h);
 
@@ -579,12 +579,12 @@ private:
       // Progress callback: called from time to time
    static void	progress_cb(int pos, void *);
    static void	get_merged_anno(const GP<DjVuFile> & file,
-				ByteStream & str_out,
+				GP<ByteStream> str_out,
 				const GList<GURL> & ignore_list,
 				int level, int & max_level,
 				GMap<GURL, void *> & map);
    static void	get_text(const GP<DjVuFile> & file,
-				ByteStream & str_out);
+				GP<ByteStream> str_out);
 
    void          check() const;
    GP<DjVuNavDir>find_ndir(GMap<GURL, void *> & map);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $
+// $Id: djvuextract.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.9 2001-02-10 01:16:56 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -101,9 +101,9 @@ struct SecondaryHeader {
 
 
 void
-display_info_chunk(ByteStream& ibs, const char *filename)
+display_info_chunk(GP<ByteStream> ibs, const char *filename)
 {
-  ibs.seek(0);
+  ibs->seek(0);
   IFFByteStream iff(ibs);
   GString chkid;
   if (! iff.get_chunk(chkid))
@@ -129,9 +129,9 @@ display_info_chunk(ByteStream& ibs, const char *filename)
 
 
 void
-extract_chunk(ByteStream& ibs, const char *id, ByteStream &out)
+extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
 {
-  ibs.seek(0);
+  ibs->seek(0);
   IFFByteStream iff(ibs);
   GString chkid;
   if (! iff.get_chunk(chkid))
@@ -179,7 +179,7 @@ extract_chunk(ByteStream& ibs, const char *id, ByteStream &out)
       while (iff.get_chunk(chkid))
         {
           if (chkid == id)
-            out.copy(iff);
+            out->copy(iff);
           iff.close_chunk();
         }
     }
@@ -237,14 +237,14 @@ main(int argc, char **argv)
       GP<DjVuFile> file=doc->get_djvu_file(page_num);
       GP<ByteStream> pibs = file->get_djvu_bytestream(false, false);
       // Search info chunk
-      display_info_chunk(*pibs, argv[1]);
+      display_info_chunk(pibs, argv[1]);
       // Extract required chunks
       for (i=2; i<argc; i++)
         {
           GP<ByteStream> gmbs=ByteStream::create();
-          ByteStream &mbs=*gmbs;
           argv[i][4] = 0;
-          extract_chunk(*pibs, argv[i], mbs);
+          extract_chunk(pibs, argv[i], gmbs);
+          ByteStream &mbs=*gmbs;
           if (mbs.size() == 0)
             {
               fprintf(stderr, "  %s --> not found!\n", argv[i]);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.67 2001-02-10 01:16:57 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.68 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -985,10 +985,11 @@ DjVuANT::copy(void) const
 //***************************************************************************
 
 void
-DjVuAnno::decode(ByteStream &bs)
+DjVuAnno::decode(GP<ByteStream> gbs)
 {
   GString chkid;
-  IFFByteStream iff(bs);
+  GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+  IFFByteStream &iff=*giff;
   while( iff.get_chunk(chkid) )
   {
     if (chkid == "ANTa")
@@ -1002,7 +1003,7 @@ DjVuAnno::decode(ByteStream &bs)
     }
     else if (chkid == "ANTz")
     {
-      BSByteStream bsiff(iff);
+      BSByteStream bsiff(gbs);
       if (ant) {
         ant->merge(bsiff);
       } else {
@@ -1016,9 +1017,10 @@ DjVuAnno::decode(ByteStream &bs)
 }
 
 void
-DjVuAnno::encode(ByteStream &bs)
+DjVuAnno::encode(GP<ByteStream> gbs)
 {
-  IFFByteStream iff(bs);
+  GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+  IFFByteStream &iff=*giff;
   if (ant)
     {
 #ifndef NO_DEBUG
@@ -1028,7 +1030,7 @@ DjVuAnno::encode(ByteStream &bs)
 #else
       iff.put_chunk("ANTz");
       {
-	BSByteStream bsiff(iff, 50);
+	BSByteStream bsiff(gbs, 50);
 	ant->encode(bsiff);
       }
       iff.close_chunk();
@@ -1055,11 +1057,10 @@ DjVuAnno::merge(const GP<DjVuAnno> & anno)
    if (anno)
    {
       GP<ByteStream> gstr=ByteStream::create();
-      ByteStream &str=*gstr;
-      encode(str);
-      anno->encode(str);
-      str.seek(0);
-      decode(str);
+      encode(gstr);
+      anno->encode(gstr);
+      gstr->seek(0);
+      decode(gstr);
    }
 }
 

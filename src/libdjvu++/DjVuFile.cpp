@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.148 2001-02-14 19:49:01 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.149 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -38,7 +38,6 @@
 #endif
 
 #include "DjVuFile.h"
-#include "BSByteStream.h"
 #include "IFFByteStream.h"
 #include "GOS.h"
 #include "MMRDecoder.h"
@@ -411,10 +410,11 @@ DjVuFile::decode_func(void)
   
   G_TRY {
     GP<ByteStream> decode_stream=decode_data_pool->get_stream();
-    GP<ProgressByteStream> pstr=new ProgressByteStream(decode_stream);
+    ProgressByteStream *pstr=new ProgressByteStream(decode_stream);
+    GP<ByteStream> gpstr=pstr;
     pstr->set_progress_cb(progress_cb, this);
     
-    decode(*pstr);
+    decode(gpstr);
     
     // Wait for all child files to finish
     while(wait_for_finish(0))
@@ -621,7 +621,8 @@ DjVuFile::process_incl_chunks(void)
   
   GP<ByteStream> str=data_pool->get_stream();
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (iff.get_chunk(chkid))
   {
     int chunks=0;
@@ -757,8 +758,9 @@ is_text(GString chkid)
 
 
 GString
-DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
+DjVuFile::decode_chunk(const char *id, GP<ByteStream> gbs, bool djvi, bool djvu, bool iw44)
 {
+  ByteStream &iff=*gbs;
   check();
   
   // If this object is referenced by only one GP<> pointer, this
@@ -976,7 +978,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     if (fgpm || fgbc)
       G_THROW("DjVuFile.dupl_foregrnd");
     GP<DjVuPalette> fgbc = new DjVuPalette;
-    fgbc->decode(iff);
+    fgbc->decode(gbs);
     DjVuFile::fgbc = fgbc;
     desc.format("JB2 foreground colors (%d colors, %d ccs)", 
       fgbc->size(), fgbc->colordata.size());
@@ -1061,7 +1063,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         anno->write((const void*)"", 1);
       }
       // Recreate chunk header
-      IFFByteStream iffout(*anno);
+      GP<IFFByteStream> giffout=IFFByteStream::create(anno);
+      IFFByteStream &iffout=*giffout;
       iffout.put_chunk(id);
       iffout.copy(achunk);
       iffout.close_chunk();
@@ -1085,7 +1088,8 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         text->write((const void*)"", 1);
       }
       // Recreate chunk header
-      IFFByteStream iffout(*text);
+      GP<IFFByteStream> giffout=IFFByteStream::create(text);
+      IFFByteStream &iffout=*giffout;
       iffout.put_chunk(id);
       iffout.copy(achunk);
       iffout.close_chunk();
@@ -1104,7 +1108,7 @@ DjVuFile::set_decode_codec(GP<GPixmap> (*codec)(ByteStream &bs))
 }
 
 void
-DjVuFile::decode(ByteStream & str)
+DjVuFile::decode(GP<ByteStream> gbs)
 {
   check();
   DEBUG_MSG("DjVuFile::decode(), url='" << url << "'\n");
@@ -1113,7 +1117,8 @@ DjVuFile::decode(ByteStream & str)
   
   // Get form chunk
   GString chkid;
-  IFFByteStream iff(str);
+  GP<IFFByteStream> giff=IFFByteStream::create(gbs);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid)) 
     REPORT_EOF(true)
     
@@ -1140,7 +1145,7 @@ DjVuFile::decode(ByteStream & str)
     {
       chunks++;
       // Decode
-      GString str = decode_chunk(chkid, iff, djvi, djvu, iw44);
+      GString str = decode_chunk(chkid, iff.get_bytestream(), djvi, djvu, iw44);
       // Update description and notify
       GString desc;
       desc.format(" %0.1f Kb\t'%s'\t%s.\n", chksize/1024.0, 
@@ -1362,7 +1367,8 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     GP<ByteStream> str=data_pool->get_stream();
     
     GString chkid;
-    IFFByteStream iff(*str);
+    GP<IFFByteStream> giff=IFFByteStream::create(str);
+    IFFByteStream &iff=*giff;
     if (!iff.get_chunk(chkid)) 
       REPORT_EOF(true)
       
@@ -1423,7 +1429,7 @@ DjVuFile::decode_ndir(void)
 
 void
 DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
-                          ByteStream & str_out,
+                          GP<ByteStream> gstr_out,
                           const GList<GURL> & ignore_list,
                           int level, int & max_level,
                           GMap<GURL, void *> & map)
@@ -1431,6 +1437,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
   GURL url=file->get_url();
   if (!map.contains(url))
   {
+    ByteStream &str_out=*gstr_out;
     map[url]=0;
     
     // Do the included files first (To make sure that they have
@@ -1440,7 +1447,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
     // those that have already been created
     GPList<DjVuFile> list=file->get_included_files(!file->is_data_present());
     for(GPosition pos=list;pos;++pos)
-      get_merged_anno(list[pos], str_out, ignore_list, level+1, max_level, map);
+      get_merged_anno(list[pos], gstr_out, ignore_list, level+1, max_level, map);
     
     // Now process the DjVuFile's own annotations
     if (!ignore_list.contains(file->get_url()))
@@ -1464,7 +1471,8 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	       // Copy all annotations chunks, but do NOT modify
 	       // DjVuFile::anno (to avoid correlation with DjVuFile::decode())
         GP<ByteStream> str=file->data_pool->get_stream();
-        IFFByteStream iff(*str);
+        GP<IFFByteStream> giff=IFFByteStream::create(str);
+        IFFByteStream &iff=*giff;
         GString chkid;
         if (iff.get_chunk(chkid))
           while(iff.get_chunk(chkid))
@@ -1487,7 +1495,8 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
               {
                 str_out.write((void *) "", 1);
               }
-              IFFByteStream iff_out(str_out);
+              GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+              IFFByteStream &iff_out=*giff_out;
               iff_out.put_chunk(chkid);
               iff_out.copy(iff);
               iff_out.close_chunk();
@@ -1510,7 +1519,7 @@ DjVuFile::get_merged_anno(const GList<GURL> & ignore_list,
   ByteStream &str=*gstr;
   GMap<GURL, void *> map;
   int max_level=0;
-  get_merged_anno(this, str, ignore_list, 0, max_level, map);
+  get_merged_anno(this, gstr, ignore_list, 0, max_level, map);
   if (max_level_ptr)
     *max_level_ptr=max_level;
   if (!str.tell()) 
@@ -1544,8 +1553,9 @@ DjVuFile::get_merged_anno(int * max_level_ptr)
 
 void
 DjVuFile::get_text(const GP<DjVuFile> & file,
-                          ByteStream & str_out)
+                          GP<ByteStream> gstr_out)
 {
+  ByteStream &str_out=*gstr_out;
   if (!file->is_data_present() ||
     file->is_modified() && file->text)
   {
@@ -1565,7 +1575,8 @@ DjVuFile::get_text(const GP<DjVuFile> & file,
 	       // Copy all text chunks, but do NOT modify
 	       // DjVuFile::text (to avoid correlation with DjVuFile::decode())
     GP<ByteStream> str=file->data_pool->get_stream();
-    IFFByteStream iff(*str);
+    GP<IFFByteStream> giff=IFFByteStream::create(str);
+    IFFByteStream &iff=*giff;
     GString chkid;
     if (iff.get_chunk(chkid))
     {
@@ -1577,7 +1588,8 @@ DjVuFile::get_text(const GP<DjVuFile> & file,
           {
             str_out.write((void *) "", 1);
           }
-          IFFByteStream iff_out(str_out);
+          GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+          IFFByteStream &iff_out=*giff_out;
           iff_out.put_chunk(chkid);
           iff_out.copy(iff);
           iff_out.close_chunk();
@@ -1594,7 +1606,7 @@ DjVuFile::get_text(void)
 {
   GP<ByteStream> gstr=ByteStream::create();
   ByteStream &str=*gstr;
-  get_text(this, str);
+  get_text(this, gstr);
   if (!str.tell())
   { 
     gstr=0;
@@ -1722,7 +1734,8 @@ DjVuFile::get_chunks_number(void)
   {
     GP<ByteStream> str=data_pool->get_stream();
     GString chkid;
-    IFFByteStream iff(*str);
+    GP<IFFByteStream> giff=IFFByteStream::create(str);
+    IFFByteStream &iff=*giff;
     if (!iff.get_chunk(chkid))
       REPORT_EOF(true)
       
@@ -1765,7 +1778,8 @@ DjVuFile::get_chunk_name(int chunk_num)
   GString name;
   GP<ByteStream> str=data_pool->get_stream();
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid)) 
     REPORT_EOF(true)
     
@@ -1807,7 +1821,8 @@ DjVuFile::contains_chunk(const char * chunk_name)
   bool contains=0;
   GP<ByteStream> str=data_pool->get_stream();
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid)) 
     REPORT_EOF((recover_errors<=SKIP_PAGES))
     
@@ -1842,7 +1857,8 @@ DjVuFile::contains_anno(void)
   GP<ByteStream> str=data_pool->get_stream();
   
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
     G_THROW("EOF");
   
@@ -1863,7 +1879,8 @@ DjVuFile::contains_text(void)
   GP<ByteStream> str=data_pool->get_stream();
   
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid))
     G_THROW("EOF");
   
@@ -1883,10 +1900,11 @@ DjVuFile::contains_text(void)
 //*****************************************************************************
 
 static void
-copy_chunks(ByteStream *from, IFFByteStream &ostr)
+copy_chunks(GP<ByteStream> from, IFFByteStream &ostr)
 {
   from->seek(0);
-  IFFByteStream iff(*from);
+  GP<IFFByteStream> giff=IFFByteStream::create(from);
+  IFFByteStream &iff=*giff;
   GString chkid;
   int chksize;
   while ((chksize=iff.get_chunk(chkid)))
@@ -1916,7 +1934,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
   
   GP<ByteStream> str=data_pool->get_stream();
   GString chkid;
-  IFFByteStream iff(*str);
+  GP<IFFByteStream> giff=IFFByteStream::create(str);
+  IFFByteStream &iff=*giff;
   if (!iff.get_chunk(chkid)) 
     REPORT_EOF(true)
     
@@ -2027,12 +2046,12 @@ DjVuFile::get_djvu_bytestream(bool included_too, bool no_ndir)
    DEBUG_MSG("DjVuFile::get_djvu_bytestream(): creating DjVu raw file\n");
    DEBUG_MAKE_INDENT(3);
    GP<ByteStream> pbs=ByteStream::create();
-   ByteStream &mbs=*pbs;
-   IFFByteStream iff(mbs);
+   GP<IFFByteStream> giff=IFFByteStream::create(pbs);
+   IFFByteStream &iff=*giff;
    GMap<GURL, void *> map;
    add_djvu_data(iff, map, included_too, no_ndir);
    iff.flush();
-   mbs.seek(0, SEEK_SET);
+   pbs->seek(0, SEEK_SET);
    return pbs;
 }
 
@@ -2094,11 +2113,13 @@ DjVuFile::remove_anno(void)
   ByteStream &str_out=*gstr_out;
   
   GString chkid;
-  IFFByteStream iff_in(*str_in);
+  GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+  IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
     G_THROW("EOF");
   
-  IFFByteStream iff_out(str_out);
+  GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+  IFFByteStream &iff_out=*giff_out;
   iff_out.put_chunk(chkid);
   
   while(iff_in.get_chunk(chkid))
@@ -2132,11 +2153,13 @@ DjVuFile::remove_text(void)
   ByteStream &str_out=*gstr_out;
   
   GString chkid;
-  IFFByteStream iff_in(*str_in);
+  GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+  IFFByteStream &iff_in=*giff_in;
   if (!iff_in.get_chunk(chkid))
     G_THROW("EOF");
   
-  IFFByteStream iff_out(str_out);
+  GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+  IFFByteStream &iff_out=*giff_out;
   iff_out.put_chunk(chkid);
   
   while(iff_in.get_chunk(chkid))
@@ -2180,10 +2203,12 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const char * name)
 {
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
-  IFFByteStream iff_out(str_out);
+  GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+  IFFByteStream &iff_out=*giff_out;
   
   GP<ByteStream> str_in=data->get_stream();
-  IFFByteStream iff_in(*str_in);
+  GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+  IFFByteStream &iff_in=*giff_in;
   
   int chksize;
   GString chkid;
@@ -2243,11 +2268,13 @@ DjVuFile::insert_file(const char * id, int chunk_num)
   
   // First: create new data
   GP<ByteStream> str_in=data_pool->get_stream();
-  IFFByteStream iff_in(*str_in);
+  GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+  IFFByteStream &iff_in=*giff_in;
   
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
-  IFFByteStream iff_out(str_out);
+  GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+  IFFByteStream &iff_out=*giff_out;
   
   int chunk_cnt=0;
   bool done=false;
@@ -2312,11 +2339,13 @@ DjVuFile::unlink_file(const char * id)
   
   // And update the data.
   GP<ByteStream> str_in=data_pool->get_stream();
-  IFFByteStream iff_in(*str_in);
+  GP<IFFByteStream> giff_in=IFFByteStream::create(str_in);
+  IFFByteStream &iff_in=*giff_in;
   
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
-  IFFByteStream iff_out(str_out);
+  GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
+  IFFByteStream &iff_out=*giff_out;
   
   GString chkid;
   if (iff_in.get_chunk(chkid))
@@ -2377,7 +2406,7 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
     GP<ByteStream> file_text=get_text();
     if(file_text)
     {
-      text_c.decode(*file_text);
+      text_c.decode(file_text);
     }
   }
   // Mark this as modified
@@ -2386,7 +2415,7 @@ DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
     reset();
   text_c.txt = txt;
   text=ByteStream::create();
-  text_c.encode(*text);
+  text_c.encode(text);
 }
 #endif
 

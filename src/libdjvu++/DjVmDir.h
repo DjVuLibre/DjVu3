@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.30 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVmDir.h,v 1.31 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
@@ -84,7 +84,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.30 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.31 2001-02-15 01:12:22 bcr Exp $# */
 //@{
 
 
@@ -128,9 +128,9 @@ public:
           managed by class \Ref{DjVmDir}. */
    DjVmDir(void) { } ;
       /** Decodes the directory from the specified stream. */
-   void decode(ByteStream & stream);
+   void decode(GP<ByteStream> stream);
       /** Encodes the directory into the specified stream. */
-   void encode(ByteStream & stream) const;
+   void encode(GP<ByteStream> stream) const;
       /** Tests if directory defines an {\em indirect} document. */
    bool is_indirect(void) const;
       /** Tests if the directory defines a {\em bundled} document. */

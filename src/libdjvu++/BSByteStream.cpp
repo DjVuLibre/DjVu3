@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.cpp,v 1.25 2001-01-04 22:04:54 bcr Exp $
+// $Id: BSByteStream.cpp,v 1.26 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 07/1998
@@ -1086,9 +1086,9 @@ BSByteStream::decode()
 
 
 
-BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
+BSByteStream::BSByteStream(GP<ByteStream> xbs, int encoding)
   : encoding(encoding), offset(0), bptr(0), blocksize(0), 
-    gdata(data,0), size(0), eof(0), bs(&xbs),
+    gdata(data,0), size(0), eof(0), gbs(xbs), bs(xbs),
     zp(*bs, encoding?true:false, true)
 {
   if (encoding)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.h,v 1.13 2001-01-04 22:04:55 bcr Exp $
+// $Id: GIFFManager.h,v 1.14 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _GIFFMANAGER_H
@@ -62,7 +62,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.13 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: GIFFManager.h,v 1.14 2001-02-15 01:12:22 bcr Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed
@@ -295,11 +295,11 @@ public:
       /** Loads the composite {\em chunk}'s contents from stream {\em istr}. */
    void		load_chunk(IFFByteStream & istr, GP<GIFFChunk> chunk);
       /** Loads the file contents from stream {\em str} */
-   void		load_file(ByteStream & str);
+   void		load_file(GP<ByteStream> str);
       /** Loads the file contents from the data array {\em data} */
    void		load_file(const TArray<char> & data);
       /** Saves all the chunks into stream {\em str} */
-   void		save_file(ByteStream & str);
+   void		save_file(GP<ByteStream> str);
       /** Saves all the chunks into the data array {\em data} */
    void		save_file(TArray<char> & data);
 

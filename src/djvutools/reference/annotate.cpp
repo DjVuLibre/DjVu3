@@ -7,17 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: annotate.cpp,v 1.5 2001-02-09 01:06:42 bcr Exp $
+//C-  $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $
 
 /*****************************************************************************
  *
- *   $Revision: 1.5 $
- *   $Date: 2001-02-09 01:06:42 $
- *   @(#) $Id: annotate.cpp,v 1.5 2001-02-09 01:06:42 bcr Exp $
+ *   $Revision: 1.6 $
+ *   $Date: 2001-02-15 01:12:21 $
+ *   @(#) $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $
  *
  *****************************************************************************/
 
-static char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.5 2001-02-09 01:06:42 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.6 2001-02-15 01:12:21 bcr Exp $";
 
 #include "GIFFManager.h"
 #include <stdio.h>
@@ -47,7 +47,7 @@ static void remove_djvu(int argc, char ** argv)
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
    GIFFManager mng;
-   mng.load_file(*src);
+   mng.load_file(src);
    
    del_anno(mng);
       
@@ -58,7 +58,7 @@ static void remove_djvu(int argc, char ** argv)
    else *last_dot++=0;
    GP<ByteStream> dst=ByteStream::create(argc>3 ? GString(argv[3]) :
 		       GString(argv[2])+"_ant."+last_dot, "wb");
-   mng.save_file(*dst);
+   mng.save_file(dst);
 }
 
 static void extract_djvu(int argc, char ** argv)
@@ -68,7 +68,7 @@ static void extract_djvu(int argc, char ** argv)
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
    GIFFManager mng;
-   mng.load_file(*src);
+   mng.load_file(src);
 
    GP<GIFFChunk> chunk=mng.get_chunk(ascii_ant);
    if (!chunk)
@@ -87,7 +87,7 @@ static void extract_djvu(int argc, char ** argv)
    {
       del_anno(mng);
       GP<ByteStream> dst=ByteStream::create(argv[4], "wb");
-      mng.save_file(*dst);
+      mng.save_file(dst);
    }
 }
 
@@ -98,7 +98,7 @@ static void insert_djvu(int argc, char ** argv)
    
    GP<ByteStream> src=ByteStream::create(argv[2], "rb");
    GIFFManager mng;
-   mng.load_file(*src);
+   mng.load_file(src);
    
    struct stat st;
    if (stat(argv[3], &st)<0)
@@ -126,7 +126,7 @@ static void insert_djvu(int argc, char ** argv)
    else *last_dot++=0;
    GP<ByteStream> dst=ByteStream::create(argc>4 ? GString(argv[4]) :
 		       GString(argv[2])+"_ant."+last_dot, "wb");
-   mng.save_file(*dst);
+   mng.save_file(dst);
 }
 
 int main(int argc, char ** argv)

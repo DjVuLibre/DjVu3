@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $# */
 //@{
 //@}
 
@@ -84,7 +84,7 @@
 #include "GBitmap.h"
 #include "JB2Image.h"
 #include "DjVuPalette.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "DjVuInfo.h"
 
 
@@ -823,7 +823,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 
   // Assemble DJVU file
   GP<ByteStream> obs=ByteStream::create(fileout, "wb");
-  IFFByteStream iff(*obs);
+  GP<IFFByteStream> giff=IFFByteStream::create(obs);
+  IFFByteStream &iff=*giff;
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
@@ -840,7 +841,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   iff.close_chunk();
   // -- ``FGbz'' chunk
   iff.put_chunk("FGbz");
-  pal.encode(iff);
+  pal.encode(obs);
   iff.close_chunk();
   // -- ``BG44'' chunk
   IWEncoderParms iwparms;

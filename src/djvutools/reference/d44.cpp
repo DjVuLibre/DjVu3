@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $
+// $Id: d44.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,14 +84,14 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.9 2001-02-14 02:30:56 bcr Exp $# 
+    #$Id: d44.cpp,v 1.10 2001-02-15 01:12:21 bcr Exp $# 
 */
 //@{
 //@}
 
 #include "GString.h"
 #include "GException.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "GOS.h"
 #include "IFFByteStream.h"
 #include "GPixmap.h"
@@ -189,7 +189,8 @@ mymain(int argc, char **argv)
       GString chkid;
       // Determine file type
       { 
-        IFFByteStream iff(ibs);
+        GP<IFFByteStream> giff=IFFByteStream::create(gibs);
+        IFFByteStream &iff=*giff;
         if (! iff.get_chunk(chkid))
           G_THROW("d44: malformed IW4 file");
         ibs.seek(0);
@@ -202,7 +203,8 @@ mymain(int argc, char **argv)
       {
         G_THROW("d44: expected BM44 or PM44 chunk in IW4 file");
       }
-      IFFByteStream iff(ibs);
+      GP<IFFByteStream> giff=IFFByteStream::create(gibs);
+      IFFByteStream &iff=*giff;
       GP<IW44Image> iw=IW44Image::create_decode(color);
       const int stime = GOS::ticks();
       iw->decode_iff(iff, flag_chunks);

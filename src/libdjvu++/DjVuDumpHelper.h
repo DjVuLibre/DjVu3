@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.h,v 1.10 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDumpHelper.h,v 1.11 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDUMPHELPER_H
@@ -48,7 +48,7 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.10 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.11 2001-02-15 01:12:22 bcr Exp $# */
 //@{
 
 
@@ -78,7 +78,7 @@ public:
    GP<ByteStream>	dump(const GP<DataPool> & pool);
       /** Interprets the file passed in the \Ref{ByteStream}, and returns
 	  the results in \Ref{ByteStream}. */
-   GP<ByteStream>	dump(ByteStream & str);
+   GP<ByteStream>	dump(GP<ByteStream> str);
 };
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: BSByteStream.h,v 1.23 2001-02-08 23:30:04 bcr Exp $
+// $Id: BSByteStream.h,v 1.24 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _BSBYTESTREAM_H
@@ -115,7 +115,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.23 2001-02-08 23:30:04 bcr Exp $# */
+    #$Id: BSByteStream.h,v 1.24 2001-02-15 01:12:22 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -139,14 +139,14 @@
     Program \Ref{bzz} demonstrates how to use this class.  All the hard work
     is achieved by a simple ByteStream to ByteStream copy, as shown below.
     \begin{verbatim}
-      StdioByteStream in(infile,"rb");
-      StdioByteStream out(outfile,"wb");
+      GP<ByteStream> in=ByteStream::create(infile,"rb");
+      GP<ByteStream> out=ByteStream::create(outfile,"wb");
       if (encoding) {
-          BSByteStream bsb(&out, blocksize);
-          bsb.copy(in);
+          BSByteStream bsb(out, blocksize);
+          bsb.copy(*in);
       } else {
-          BSByteStream bsb(&in);
-          out.copy(bsb);
+          BSByteStream bsb(in);
+          out->copy(bsb);
       }
     \end{verbatim}
     Due to the block oriented nature of the Burrows-Wheeler transform, there
@@ -187,7 +187,7 @@ public:
       Setting #blocksize# to #1024# is a good starting point.  A minimal block
       size of 10 is silently enforced.
       \end{description} */
-  BSByteStream(ByteStream &bs, int blocksize=0);
+  BSByteStream(GP<ByteStream> bs, int blocksize=0);
   // ByteStream Interface
   ~BSByteStream();
   virtual size_t read(void *buffer, size_t size);
@@ -204,7 +204,8 @@ private:
   GPBuffer<unsigned char> gdata;
   int             size;
   int             eof;
-  ByteStream	 *bs;
+  GP<ByteStream> gbs;
+  ByteStream *bs;
   // Coder
   ZPCodec           zp;
   BitContext        ctx[300];

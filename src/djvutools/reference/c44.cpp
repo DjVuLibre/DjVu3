@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $
+// $Id: c44.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 
@@ -184,13 +184,13 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.10 2001-02-14 02:30:56 bcr Exp $# */
+    #$Id: c44.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $# */
 //@{
 //@}
 
 #include "GString.h"
 #include "GException.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "DjVuInfo.h"
 #include "IFFByteStream.h"
 #include "GOS.h"
@@ -685,7 +685,8 @@ main(int argc, char **argv)
       else if (!strncmp(prefix,"AT&TFORM",8) || !strncmp(prefix,"FORM",4))
         {
           char *s = (prefix[0]=='F' ? prefix+8 : prefix+12);
-          IFFByteStream iff(ibs);
+          GP<IFFByteStream> giff=IFFByteStream::create(gibs);
+          IFFByteStream &iff=*giff;
           const bool color=!strncmp(s,"PM44",4);
           if (color || !strncmp(s,"BM44",4))
             {
@@ -712,7 +713,7 @@ main(int argc, char **argv)
         {
           remove(iw4file);
           GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
-          IFFByteStream iff(*obs);
+          IFFByteStream iff(obs);
           if (flag_crcbdelay >= 0)
             iw->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)

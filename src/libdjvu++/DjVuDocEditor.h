@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.30 2001-01-04 22:04:54 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.31 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.30 2001-01-04 22:04:54 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.31 2001-02-15 01:12:22 bcr Exp $#
 */
 
 //@{
@@ -136,7 +136,7 @@ public:
    virtual void	save_as(const char * where, bool bundled);
 
       /** Saves the specified pages in DjVu #BUNDLED# multipage document. */
-   void		save_pages_as(ByteStream & str, const GList<int> & page_list);
+   void		save_pages_as(GP<ByteStream> str, const GList<int> & page_list);
 
       /** Translates page number #page_num# to ID. If #page_num# is invalid,
 	  an exception is thrown. */

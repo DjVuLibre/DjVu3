@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.143 2001-02-14 19:49:01 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.144 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 
@@ -269,7 +269,8 @@ DjVuDocument::init_thread(void)
       
    GP<ByteStream> stream=init_data_pool->get_stream();
 
-   IFFByteStream iff(*stream);
+   GP<IFFByteStream> giff=IFFByteStream::create(stream);
+   IFFByteStream &iff=*giff;
    GString chkid;
    int size=iff.get_chunk(chkid);
    if (!size)
@@ -289,7 +290,7 @@ DjVuDocument::init_thread(void)
       if (chkid=="DIRM")
       {
 	 djvm_dir=new DjVmDir();
-	 djvm_dir->decode(iff);
+	 djvm_dir->decode(stream);
 	 iff.close_chunk();
 	 if (djvm_dir->is_bundled())
 	 {
@@ -1033,7 +1034,8 @@ DjVuDocument::process_threqs(void)
         {
           // Cool we can extract the thumbnail now
           GP<ByteStream> str=req->thumb_file->get_init_data_pool()->get_stream();
-          IFFByteStream iff(*str);
+          GP<IFFByteStream> giff=IFFByteStream::create(str);
+          IFFByteStream &iff=*giff;
           GString chkid;
           if (!iff.get_chunk(chkid) || chkid!="FORM:THUM")
             G_THROW("DjVuDocument.bad_thumb");
@@ -1638,7 +1640,7 @@ DjVuDocument::get_djvm_doc()
 }
 
 void
-DjVuDocument::write(ByteStream & str, bool force_djvm)
+DjVuDocument::write(GP<ByteStream> gstr, bool force_djvm)
 {
    DEBUG_MSG("DjVuDocument::write(): storing DjVmDoc into ByteStream\n");
    DEBUG_MAKE_INDENT(3);
@@ -1647,12 +1649,13 @@ DjVuDocument::write(ByteStream & str, bool force_djvm)
    GP<DjVmDir> dir=doc->get_djvm_dir();
    if (force_djvm || dir->get_files_num()>1)
    {
-     doc->write(str);
+     doc->write(gstr);
    }else
    {
       GPList<DjVmDir::File> files_list=dir->get_files_list();
       GP<DataPool> pool=doc->get_data(files_list[files_list]->id);
       GP<ByteStream> pool_str=pool->get_stream();
+      ByteStream &str=*gstr;
       str.writall(octets,4);
       str.copy(*pool_str);
    }
@@ -1684,16 +1687,15 @@ DjVuDocument::save_as(const char where[], const bool bundled)
        G_THROW("DjVuDocument.comp_codec");
      }
      GP<ByteStream> gmbs=ByteStream::create();
+     write(gmbs);
      ByteStream &mbs=*gmbs;
-     write(mbs);
      mbs.flush();
      mbs.seek(0,SEEK_SET);
      (*djvu_compress_codec)(gmbs,where,bundled);
    }else if (bundled)
    {
       DataPool::load_file(full_name);
-      GP<ByteStream> str=ByteStream::create(full_name, "wb");
-      write(*str);
+      write(ByteStream::create(full_name, "wb"));
    } else 
    {
      expand(GOS::dirname(full_name), GOS::basename(full_name));

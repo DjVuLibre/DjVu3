@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.9 2001-02-15 01:12:21 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -154,7 +154,7 @@ do_bundled(int argc, char ** argv)
    GP<DjVuDocument> doc = new DjVuDocument;
    doc->init(GOS::filename_to_url(argv[2]));
    GP<ByteStream> str=ByteStream::create(argv[3], "wb");
-   doc->write(*str);
+   doc->write(str);
 }
 
 static void

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GIFFManager.cpp,v 1.14 2001-02-10 01:16:57 bcr Exp $
+// $Id: GIFFManager.cpp,v 1.15 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -490,16 +490,17 @@ void
 GIFFManager::load_file(const TArray<char> & data)
 {
    GP<ByteStream> str=ByteStream::create((const char *)data, data.size());
-   load_file(*str);
+   load_file(str);
 }
 
 void
-GIFFManager::load_file(ByteStream & str)
+GIFFManager::load_file(GP<ByteStream> str)
 {
    DEBUG_MSG("GIFFManager::load_file(): Loading IFF file.\n");
    DEBUG_MAKE_INDENT(3);
    
-   IFFByteStream istr(str);
+   GP<IFFByteStream> gistr=IFFByteStream::create(str);
+   IFFByteStream &istr=*gistr;
    GString chunk_id;
    if (istr.get_chunk(chunk_id))
    {
@@ -515,15 +516,14 @@ void
 GIFFManager::save_file(TArray<char> & data)
 {
    GP<ByteStream> gstr=ByteStream::create();
-   ByteStream &str=*gstr;
-   save_file(str);
-   data=str.get_data();
+   save_file(gstr);
+   data=gstr->get_data();
 }
 
 void
-GIFFManager::save_file(ByteStream & str)
+GIFFManager::save_file(GP<ByteStream> str)
 {
-   IFFByteStream istr(str);
-   
-   top_level->save(istr, 1);
+   GP<IFFByteStream> istr=IFFByteStream::create(str);
+   top_level->save(*istr, 1);
 }
+

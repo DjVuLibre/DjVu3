@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.65 2001-02-10 01:16:57 bcr Exp $
+// $Id: DataPool.cpp,v 1.66 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 
@@ -1473,7 +1473,8 @@ DataPool::analyze_iff(void)
 
    GP<ByteStream> str=get_stream();
    
-   IFFByteStream iff(*str);
+   GP<IFFByteStream> giff=IFFByteStream::create(str);
+   IFFByteStream &iff=*giff;
    GString chkid;
    int size;
    if ((size=iff.get_chunk(chkid)) && size>=0)

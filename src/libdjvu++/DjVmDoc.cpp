@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.36 2001-02-10 01:16:57 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.37 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 
@@ -118,7 +118,7 @@ DjVmDoc::get_data(const char * id)
 }
 
 void
-DjVmDoc::write(ByteStream & str)
+DjVmDoc::write(GP<ByteStream> gstr)
 {
    DEBUG_MSG("DjVmDoc::write(): Storing document into the byte stream.\n");
    DEBUG_MAKE_INDENT(3);
@@ -142,10 +142,11 @@ DjVmDoc::write(ByteStream & str)
    }
    
    GP<ByteStream> tmp_str=ByteStream::create();
-   IFFByteStream tmp_iff(*tmp_str);
+   GP<IFFByteStream> gtmp_iff=IFFByteStream::create(tmp_str);
+   IFFByteStream &tmp_iff=*gtmp_iff;
    tmp_iff.put_chunk("FORM:DJVM", 1);
    tmp_iff.put_chunk("DIRM");
-   dir->encode(tmp_iff);
+   dir->encode(tmp_str);
    tmp_iff.close_chunk();
    tmp_iff.close_chunk();
    int offset=tmp_iff.tell();
@@ -161,10 +162,10 @@ DjVmDoc::write(ByteStream & str)
 
    DEBUG_MSG("pass 2: store the file contents.\n");
 
-   IFFByteStream iff(str);
+   IFFByteStream iff(gstr);
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
-   dir->encode(iff);
+   dir->encode(gstr);
    iff.close_chunk();
 
    for(pos=files_list;pos;++pos)
@@ -176,7 +177,7 @@ DjVmDoc::write(ByteStream & str)
 
 	 // First check that the file is in IFF format
       G_TRY {
-	       IFFByteStream iff_in(*str_in);
+	       IFFByteStream iff_in(str_in);
 	       int size;
 	       GString chkid;
 	       size=iff_in.get_chunk(chkid);
@@ -206,7 +207,7 @@ DjVmDoc::read(const GP<DataPool> & pool)
    
    GP<ByteStream> str=pool->get_stream();
    
-   IFFByteStream iff(*str);
+   IFFByteStream iff(str);
    GString chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
@@ -215,7 +216,7 @@ DjVmDoc::read(const GP<DataPool> & pool)
    iff.get_chunk(chkid);
    if (chkid!="DIRM")
       G_THROW("DjVmDoc.no_dirm_chunk");     //  The first chunk of a DJVM document must be DIRM: must be an old format.
-   dir->decode(iff);
+   dir->decode(iff.get_bytestream());
    iff.close_chunk();
 
    data.empty();
@@ -257,7 +258,7 @@ DjVmDoc::read(const char * name)
 
    GP<DataPool> pool=new DataPool(name);
    GP<ByteStream> str=pool->get_stream();
-   IFFByteStream iff(*str);
+   IFFByteStream iff(str);
    GString chkid;
    iff.get_chunk(chkid);
    if (chkid!="FORM:DJVM")
@@ -266,7 +267,7 @@ DjVmDoc::read(const char * name)
    iff.get_chunk(chkid);
    if (chkid!="DIRM")
       G_THROW("DjVmDoc.no_dirm_chunk");       //  The first chunk of a DJVM document must be DIRM: must be an old format.
-   dir->decode(iff);
+   dir->decode(str);
    iff.close_chunk();
 
    if (dir->is_bundled()) read(pool);
@@ -290,7 +291,7 @@ DjVmDoc::read(const char * name)
 }
 
 void
-DjVmDoc::write_index(ByteStream & str)
+DjVmDoc::write_index(GP<ByteStream> str)
 {
    DEBUG_MSG("DjVmDoc::write_index(): Storing DjVm index file\n");
    DEBUG_MAKE_INDENT(3);
@@ -312,7 +313,7 @@ DjVmDoc::write_index(ByteStream & str)
 
    iff.put_chunk("FORM:DJVM", 1);
    iff.put_chunk("DIRM");
-   dir->encode(iff);
+   dir->encode(str);
    iff.close_chunk();
    iff.close_chunk();
    iff.flush();
@@ -354,6 +355,6 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
 
       DataPool::load_file(idx_full_name);
       GP<ByteStream> str=ByteStream::create(idx_full_name, "wb");
-      write_index(*str);
+      write_index(str);
    }
 }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $
+// $Id: bzz.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $ */
+    $Id: bzz.cpp,v 1.11 2001-02-15 01:12:21 bcr Exp $ */
 //@{
 //@}
 
@@ -134,12 +134,12 @@ main(int argc, char **argv)
       GP<ByteStream> out=ByteStream::create(outfile,"wb");
       if (blocksize)
         {
-          BSByteStream bsb(*out, blocksize);
+          BSByteStream bsb(out, blocksize);
           bsb.copy(*in);
         }
       else 
         {
-          BSByteStream bsb(*in);
+          BSByteStream bsb(in);
           out->copy(bsb);
         }
     }

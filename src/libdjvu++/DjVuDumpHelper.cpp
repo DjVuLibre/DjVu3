@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.15 2001-02-10 01:16:57 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.16 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -151,7 +151,7 @@ display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
 		  GString head, size_t, DjVmInfo& djvminfo, int)
 {
   GP<DjVmDir> dir = new DjVmDir();
-  dir->decode(iff);
+  dir->decode(iff.get_bytestream());
   GPList<DjVmDir::File> list = dir->get_files_list();
   if (dir->is_indirect())
   {
@@ -315,16 +315,15 @@ display_chunks(ByteStream & out_str, IFFByteStream &iff,
 GP<ByteStream>
 DjVuDumpHelper::dump(const GP<DataPool> & pool)
 {
-   GP<ByteStream> str=pool->get_stream();
-   return dump(*str);
+   return dump(pool->get_stream());
 }
 
 GP<ByteStream>
-DjVuDumpHelper::dump(ByteStream & str)
+DjVuDumpHelper::dump(GP<ByteStream> gstr)
 {
    GP<ByteStream> out_str=ByteStream::create();
    GString head="  ";
-   IFFByteStream iff(str);
+   IFFByteStream iff(gstr);
    DjVmInfo djvminfo;
    display_chunks(*out_str, iff, head, djvminfo);
    return out_str;

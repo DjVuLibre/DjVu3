@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.7 2001-01-04 22:04:55 bcr Exp $
+// $Id: DjVuText.h,v 1.8 2001-02-15 01:12:22 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -55,7 +55,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.7 2001-01-04 22:04:55 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.8 2001-02-15 01:12:22 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -200,11 +200,11 @@ public:
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
 	  to data from #FORM:TEXT#. */
-   void decode(ByteStream & bs);
+   void decode(GP<ByteStream> bs);
 
       /** Encodes all annotations back into a sequence of chunks to be put
 	  inside a #FORM:TEXT#. */
-   void	encode(ByteStream & bs);
+   void	encode(GP<ByteStream> bs);
 
       /// Returns a copy of this object
    GP<DjVuText>	copy(void) const;
