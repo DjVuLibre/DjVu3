@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.4 2001-04-30 23:30:46 bcr Exp $
+// $Id: XMLParser.cpp,v 1.5 2001-05-15 23:00:25 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -183,21 +183,15 @@ lt_XMLParser::Anno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GUTF8
 {
   const GUTF8String url_string((const char *)url);
   DjVuDocument &doc=*(m_docs[url_string]);
-  bool const is_int=id.is_int();
-  GUTF8String xid;
-  if(is_int)
+  int pagenum=(-1);
+  if(id.is_int())
   {
-    const int page=id.toInt(); //atoi((char const *)id);
-    xid = page > 0 ? GUTF8String(page - 1) : GUTF8String("0");
-  }else if(!id.length()
-    ||( doc.get_doc_type()==DjVuDocument::SINGLE_PAGE ))
-  {
-    xid="0";
-  }else
-  {
-    xid=id;
+    const int page=id.toInt(); //atoi((char const *)id); 
+    if(page>0)
+      pagenum=page-1;
   }
-  GP<DjVuFile> dfile=doc.get_djvu_file(xid,true);
+  GP<DjVuFile> dfile=((pagenum>=0)||!id.length())
+    ?doc.get_djvu_file(pagenum,false):doc.get_djvu_file(id,false);
   if(!dfile)
   {
     G_THROW( ERR_MSG("XMLAnno.bad_page") );
@@ -725,28 +719,19 @@ lt_XMLParser::Text::ChangeText(const lt_XMLTags &tags, const GURL &url,const GUT
 {
   const GUTF8String url_string((const char *)url);
   DjVuDocument &doc = *(m_docs[url_string]);
-  GUTF8String xid;
-  
+  int pagenum=(-1); 
   if(id.is_int())
   {
-    const int page = id.toInt();
-    xid = page > 0 ? GUTF8String(page - 1) : GUTF8String("0");
+    const int page=id.toInt(); //atoi((char const *)id); 
+    if(page>0)
+      pagenum=page-1;
   }
-  else if(!id.length() || (doc.get_doc_type() == DjVuDocument::SINGLE_PAGE))
-  {
-    xid = "0";
-  }
-  else
-  {
-    xid=id;
-  }
-  
-  GP<DjVuFile> dfile = doc.get_djvu_file(xid,true);
+  GP<DjVuFile> dfile=((pagenum>=0)||!id.length())
+    ?doc.get_djvu_file(pagenum,false):doc.get_djvu_file(id,false);
   if(!dfile)
   {
-    G_THROW("Failed to get specified page");
+    G_THROW( ERR_MSG("XMLAnno.bad_page") );
   }
-  
   
   GP<DjVuText> text = DjVuText::create();
   GP<DjVuTXT> txt = text->txt = DjVuTXT::create();
