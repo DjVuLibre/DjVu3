@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.10 2000-01-31 21:14:45 leonb Exp $
+//C- $Id: MMRDecoder.cpp,v 1.11 2000-02-01 16:29:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -24,7 +24,7 @@
 // ----------------------------------------
 // MMR CODEBOOKS
 
-static const char invalid_mmr_data[]="Invalid MMR Data";
+static const char invalid_mmr_data[]="Invalid G4/MMR Data";
 
 struct VLCode 
 {
@@ -450,15 +450,22 @@ MMRDecoder::~MMRDecoder()
   delete btable;
   delete mrtable;
   delete src;
-  delete [] refline;
+  delete [] line;
+  delete [] lineruns;
+  delete [] prevruns;
 }
+
+
 
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
   : width(width), height(height), lineno(0), 
-    striplineno(0), rowsperstrip(0)
+    striplineno(0), rowsperstrip(0),
+    line(0), lineruns(0), prevruns(0)
 {
-  refline = new unsigned char [width+5];
-  memset(refline, 0, width);
+  lineruns = new unsigned short[width+2];
+  prevruns = new unsigned short[width+2];
+  lineruns[0] = width;
+  prevruns[0] = width;
   rowsperstrip = (striped ? bs.read16() : height);
   src = new VLSource(bs, striped);
   mrtable = new VLTable(mrcodes, 7);
@@ -467,167 +474,135 @@ MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int striped)
 }
 
 
-const unsigned char *
-MMRDecoder::scanline()
+const unsigned short *
+MMRDecoder::scanruns(const unsigned short **endptr)
 {
   // Check if all lines have been returned
   if (lineno >= height)
     return 0;
+  // Check end of stripe
   if ( striplineno == rowsperstrip )
     {
       striplineno=0;
-      memset(refline, 0, width);
+      lineruns[0] = prevruns[0] = width;
       src->nextstripe();
     }
+  // Swap run buffers
+  unsigned short *pr = lineruns;
+  unsigned short *xr = prevruns;
+  prevruns = pr;
+  lineruns = xr;
   // Loop until scanline is complete
-  unsigned char CurColor=0;
-  unsigned char *ptr=refline,*StartRun=refline,*EndRun;
-  unsigned char *endptr=refline+width;
-  for (EndRun=ptr;(EndRun<endptr)&&(EndRun[0]==CurColor); EndRun++);
-  while (ptr < endptr)
+  char a0color = 0;
+  int a0 = 0;
+  int inc = 0;
+  int rle = 0;
+  int b1 = *pr++;
+  while (a0 < width)
     {
-      // (Optimization idea: Make #refline# an array of run lengths.)
       // Process MMR codes
       switch ( mrtable->decode(src) )
         {
           /* Pass Mode */
         case P: 
           { 
-            while(ptr<StartRun) // extend left side of run to ptr
-              (ptr++)[0] = CurColor;
-            for(ptr=EndRun;(ptr<endptr)&&(ptr[0]!=CurColor);(ptr++)[0]=CurColor);
+            b1 += *pr++;
+            rle += b1 - a0;
+            a0 = b1;
+            b1 += *pr++;
             break;
           }
           /* Horizontal Mode */
         case H: 
           { 
-            int len;
-            VLTable *table;
             // First run
-            unsigned char *NewEndRun= ptr;
-            table = (CurColor ? btable : wtable);
-            do
-            {
-              NewEndRun += (len = table->decode(src));
-            } while (len >= 64);
-            if (len<0 || NewEndRun>endptr) 
-              THROW(invalid_mmr_data);
-            if(NewEndRun > StartRun)
-            {
-              while (ptr < StartRun)  // extend left side of run to ptr
-                *(ptr++) = CurColor;
-              if(NewEndRun>EndRun)
-              {
-                for(ptr=EndRun;ptr<NewEndRun;*(ptr++)=CurColor);
-              }else
-              {
-                ptr=NewEndRun;
-              }
-            }else
-            {
-              while (ptr < NewEndRun) 
-                *(ptr++) = CurColor;
-            }
+            VLTable *table = (a0color ? btable : wtable);
+            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
+            *xr++ = rle; rle = 0;
             // Second run
-            table = (!CurColor ? btable : wtable);
-            do
-            { 
-              NewEndRun += (len = table->decode(src));
-            } while (len >= 64);
-            if (len<0 || NewEndRun>endptr) 
-              THROW(invalid_mmr_data);
-            while (ptr < NewEndRun)
-              *(ptr++) = !CurColor;
+            table = (!a0color ? btable : wtable);
+            do { inc=table->decode(src); a0+=inc; rle+=inc; } while (inc>=64);
+            *xr++ = rle; rle = 0;
             break;
           }
           /* Vertical Modes */
         case V0:
-          while (ptr<StartRun)  // extend left side of run to ptr
-            (ptr++)[0] = CurColor;
-          ptr=EndRun;
-          CurColor = !CurColor;
+          inc = b1-a0;
+        vertical_r:
+          b1 += *pr++;
+        vertical_l:
+          *xr++ = inc+rle; a0 += inc; rle = 0;
+          a0color = !a0color;
           break;
         case VR3:
-          (EndRun++)[0]=CurColor;
+          inc = b1-a0+3;
+          goto vertical_r;
         case VR2:
-          (EndRun++)[0]=CurColor;
+          inc = b1-a0+2; 
+          goto vertical_r;
         case VR1:
-          (EndRun++)[0]=CurColor;
-          if (EndRun > endptr)
-            THROW(invalid_mmr_data);
-          while (ptr < StartRun)  // extend left side of run to ptr
-            (ptr++)[0] = CurColor;
-          ptr=EndRun;
-          CurColor = !CurColor;
-          break;
-          /* Uncommon modes */
+          inc = b1-a0+1; 
+          goto vertical_r;
         case VL3:
-          --EndRun;
+          inc = b1-a0-3;
+          b1 -= *--pr;
+          goto vertical_l;
         case VL2:
-          --EndRun;
+          inc = b1-a0-2;
+          b1 -= *--pr;
+          goto vertical_l;
         case VL1:
-          --EndRun;
-          if(EndRun<=StartRun) // extend left side of run to ptr
-          {
-            while (ptr<EndRun) // extend right side of run to new EndRun
-              (ptr++)[0] = CurColor;
-          }else
-          {
-            while (ptr<StartRun)  // extend left side of run to ptr
-              (ptr++)[0] = CurColor;
-            ptr=EndRun;
-          }
-          CurColor = !CurColor;
-          break;
+          inc = b1-a0-1;
+          b1 -= *--pr;
+          goto vertical_l;
           /* Uncommon modes */
         default: 
           {
             src->preload();
             unsigned int m = src->peek();
             // -- Could be EOFB ``000000000001000000000001''
-            //    TIFF6 says remaining lines are white
-            //    What about the current line ?
+            //    TIFF6 says that all remaining lines are white
             if ((m & 0xffffff00) == 0x00100100)
               {
-                lineno += rowsperstrip - striplineno;
-                striplineno = rowsperstrip;
+                lineno = height;
                 return 0;
               }
             // -- Could be UNCOMPRESSED ``0000001111''
             //    TIFF6 says people should not do this.
             //    RFC1314 says people should do this.
+            // NOTE: THIS IS POORLY TESTED
             else if ((m & 0xffc00000) == 0x03c00000)
               {
                 src->shift(10);
+                // Analyze uncompressed bitstream
                 while ((m = (src->peek() & 0xfc000000)))
                   {
                     if (m == 0x04000000)       // 000001
                       {
                         src->shift(6);
-                        if (ptr+4 >= endptr)
-                          THROW(invalid_mmr_data);
-                        (ptr++)[0] = 0;
-                        (ptr++)[0] = 0;
-                        (ptr++)[0] = 0;
-                        (ptr++)[0] = 0;
-                        (ptr++)[0] = 0;
-                      } 
+                        if (a0color)
+                          { *xr++ = rle; rle = 0; a0color = !a0color; }
+                        rle += 5;
+                        a0 += 5;
+                      }
                     else                       // 000010 to 111111 
-                      {
+                      { 
                         src->shift(1);
-                        if (ptr >= endptr)
-                          THROW(invalid_mmr_data);
-                        (ptr++)[0] = ((m & 0x80000000) ? 1 : 0);
+                        if (a0color == !(m & 0x80000000))
+                          { *xr++ = rle; rle = 0; a0color = !a0color; }
+                        rle += 1;
+                        a0 += 1;
                       }
                   }
                 // Analyze uncompressed termination code.
                 m = src->peek() & 0xff000000;  
                 src->shift(8);
-                if((CurColor=!(m==0x02000000))  // 00000010
-                  &&(m!=0x03000000))           // 00000011
-                {
+                if ( (m & 0xfe000000) != 0x02000000 )
                   THROW(invalid_mmr_data);
-                }
+                if (rle!=0)
+                  { *xr++ = rle; rle = 0; a0color = !a0color; }                  
+                if (a0color == !(m & 0x01000000))
+                  { *xr++ = rle; rle = 0; a0color = !a0color; }
                 // Cross fingers and proceed ...
                 break;
               }
@@ -635,15 +610,84 @@ MMRDecoder::scanline()
             THROW(invalid_mmr_data);
           }
         }
-      // Compute EndRun
-      for(StartRun=ptr;(StartRun<endptr)&&(StartRun[0]!=CurColor);StartRun++);
-      for(EndRun=StartRun;(EndRun<endptr)&&(EndRun[0]==CurColor);++EndRun);
+      // Next reference run
+      while (b1<=a0 && b1<width)
+        {
+          b1 += pr[0]+pr[1];
+          pr += 2;
+        }
     }
+  if (a0 > width)
+    THROW(invalid_mmr_data);
   /* Increment and return */
+  if (endptr) 
+    *endptr = xr;
+  *xr++ = 0;
+  *xr++ = 0;
   lineno += 1;
   striplineno += 1;
-  return refline;
+  return lineruns;
 }
+
+
+
+const unsigned char *
+MMRDecoder::scanrle(int invert, const unsigned char **endptr)
+{
+  // Obtain run lengths
+  const unsigned short *xr = scanruns();
+  if (!xr) return 0;
+  // Allocate data buffer if needed
+  unsigned char *p = line;
+  if (!p)  line = p = new unsigned char[width+8];
+  // Process inversion
+  if (invert)
+    {
+      if (*xr == 0) 
+        xr++;
+      else
+        *p++ = 0;
+    }
+  // Encode lenghts using the RLE format
+  int a0 = 0;
+  while (a0 < width)
+    {
+      int count = *xr++;
+      a0 += count;
+      GBitmap::append_run(p, count);
+    }
+  if (endptr)
+    *endptr = p;
+  *p++ = 0;
+  *p++ = 0;
+  return line;
+}
+
+
+
+const unsigned char *
+MMRDecoder::scanline()
+{
+  // Obtain run lengths
+  const unsigned short *xr = scanruns();
+  if (!xr) return 0;
+  // Allocate data buffer if needed
+  unsigned char *p = line;
+  if (!p)  line = p = new unsigned char[width+8];
+  // Decode run lengths
+  int a0 = 0;
+  int a0color = 0;
+  while (a0 < width)
+    {
+      int a1 = a0 + *xr++;
+      while (a0<a1 && a0<width)
+        line[a0++] = a0color;
+      a0color = !a0color;
+    }
+  return line;
+}
+
+
 
 
 // ----------------------------------------
@@ -671,8 +715,8 @@ GP<JB2Image>
 MMRDecoder::decode(ByteStream &inp)
 {
   // Read header
-  int width, height, invert, rowsperstripe;
-  decode_header(inp, width, height, invert, rowsperstripe);
+  int width, height, invert, striped;
+  decode_header(inp, width, height, invert, striped);
   // Prepare image
   GP<JB2Image> jimg = new JB2Image();
   jimg->set_dimension(width, height);
@@ -680,7 +724,7 @@ MMRDecoder::decode(ByteStream &inp)
   int blocksize = MIN(500,MAX(64,MAX(width/17,height/22)));
   int blocksperline = (width+blocksize-1)/blocksize;
   // Prepare decoder
-  MMRDecoder dcd(inp, width, height, rowsperstripe);
+  MMRDecoder dcd(inp, width, height, striped);
   // Loop on JB2 bands
   int line = height-1;
   while (line >= 0)
@@ -691,35 +735,37 @@ MMRDecoder::decode(ByteStream &inp)
       for(; bandline >= 0; bandline--,line--)
 	{
 	  // Decode one scanline
-	  const unsigned char *s = dcd.scanline();
+	  const unsigned short *s = dcd.scanruns();
           if (s == 0)
             continue;
 	  // Loop on blocks
           int x = 0;
-          for (int b=0; b<blocksperline; b++)
+          int b = 0;
+          int firstx = 0;
+          int c = (invert ? 1 : 0);
+          while (x < width)
             {
-              unsigned char *bptr = 0;
-              int firstx = x;
-              int lastx = MIN(x+blocksize,width);
-              for(; x<lastx; x++)
+              int xend = x + *s++;
+              while (b<blocksperline)
                 {
-                  if (s[x] ^ invert)
+                  int lastx = MIN(firstx+blocksize,width);
+                  if (c)
                     {
-                      // Get pointer to line if needed
-                      if (! bptr)
-                        {
-                          // Create block if needed
-                          if (! blocks[b])
-                            {
-                              int w = lastx - firstx;
-                              int h = bandline + 1;
-                              blocks[b] = new GBitmap(h,w);
-                            }
-                          bptr = (*blocks[b])[bandline] - firstx;
-                        }
-                      bptr[x] = 1;
+                      if (!blocks[b])
+                        blocks[b] = new GBitmap(bandline+1, lastx-firstx);
+                      unsigned char *bptr = (*blocks[b])[bandline] - firstx;
+                      int x1 = MAX(x,firstx);
+                      int x2 = MIN(xend,lastx);
+                      while (x1 < x2)
+                        bptr[x1++] = 1;
                     }
+                  if (xend < lastx)
+                    break;
+                  firstx = lastx;
+                  b += 1;
                 }
+              x = xend;
+              c = !c; 
             }
 	}
       // Insert blocks into JB2Image
