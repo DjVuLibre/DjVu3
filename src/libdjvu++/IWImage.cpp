@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.41 2001-01-19 01:16:21 bcr Exp $
+// $Id: IWImage.cpp,v 1.42 2001-01-19 01:38:58 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1481,39 +1481,6 @@ _IWMap::image(int subsample, const GRect &rect,
 
 
 //-----------------------------------------------
-// This subclass reproduces a bug in the ZPCodec passthru functions.  The bug
-// was discovered long after the initial release of DjVu.  After comparing the
-// performances with and without the bug, we renamed it a feature.
-
-class _ZPCodecBias : public ZPCodec // DJVU_CLASS
-{
-public:
-  _ZPCodecBias(ByteStream &bs, bool encoding) : ZPCodec(bs, encoding, true) {}
-  void encoder(int bit, BitContext &ctx) { ZPCodec::encoder(bit,ctx); }
-  int decoder(BitContext &ctx) { return ZPCodec::decoder(ctx); }
-  void encoder(int bit);
-  int decoder();
-};
-
-inline void 
-_ZPCodecBias::encoder(int bit)
-{
-  int z = 0x8000 + ((a+a+a) >> 3);
-  if (bit)
-    encode_lps_simple(z);
-  else
-    encode_mps_simple(z);
-}
-
-inline int 
-_ZPCodecBias::decoder()
-{
-  int z = 0x8000 + ((a+a+a) >> 3);
-  return decode_sub_simple(0, z);
-}
-
-
-//-----------------------------------------------
 // Class _IWCodec [declaration+implementation]
 // Maintains information shared while encoding or decoding
 
@@ -1525,7 +1492,7 @@ public:
   _IWCodec(_IWMap &map, int encoding=0);
   ~_IWCodec();
   // Coding
-  int code_slice(_ZPCodecBias &zp);
+  int code_slice(ZPCodec &zp);
   float estimate_decibel(float frac);
   // Data
   _IWMap &map;                  // working map
@@ -1553,9 +1520,9 @@ public:
   int is_null_slice(int bit, int band);
   int encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk);
   int decode_prepare(int fbucket, int nbucket, _IWBlock &blk);
-  void encode_buckets(_ZPCodecBias &zp, int bit, int band,
+  void encode_buckets(ZPCodec &zp, int bit, int band,
                       _IWBlock &blk, _IWBlock &eblk, int fbucket, int nbucket);
-  void decode_buckets(_ZPCodecBias &zp, int bit, int band,
+  void decode_buckets(ZPCodec &zp, int bit, int band,
                       _IWBlock &blk, int fbucket, int nbucket);
 };
 
@@ -1661,7 +1628,7 @@ _IWCodec::is_null_slice(int bit, int band)
 // -- read/write a slice of datafile
 
 int
-_IWCodec::code_slice(_ZPCodecBias &zp)
+_IWCodec::code_slice(ZPCodec &zp)
 {
   // Check that code_slice can still run
   if (curbit < 0)
@@ -1789,7 +1756,7 @@ _IWCodec::encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWB
 // -- code a sequence of buckets in a given block
 #ifndef NEED_DECODER_ONLY
 void
-_IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band, 
+_IWCodec::encode_buckets(ZPCodec &zp, int bit, int band, 
                          _IWBlock &blk, _IWBlock &eblk,
                          int fbucket, int nbucket)
 {
@@ -1890,7 +1857,7 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
                     if (cstate[i] & NEW)
                       {
                         // Code sign
-                        zp.encoder( (pcoeff[i]<0) ? 1 : 0 );
+                        zp.IWencoder( (pcoeff[i]<0) ? 1 : 0 );
                         // Set encoder state
                         if (band==0)
                           thres = quant_lo[i];
@@ -1940,7 +1907,7 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
                   if (ecoeff <= 3*thres)
                     zp.encoder(pix, ctxMant);                      
                   else
-                    zp.encoder(pix);
+                    zp.IWencoder(pix);
                   // adjust epcoeff
                   epcoeff[i] = ecoeff - (pix ? 0 : thres) + (thres>>1);
                 }
@@ -2021,7 +1988,7 @@ _IWCodec::decode_prepare(int fbucket, int nbucket, _IWBlock &blk)
 // -- code a sequence of buckets in a given block
 
 void
-_IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band, 
+_IWCodec::decode_buckets(ZPCodec &zp, int bit, int band, 
                          _IWBlock &blk,
                          int fbucket, int nbucket)
 {
@@ -2141,7 +2108,7 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
                         cstate[i] |= NEW;
                         int halfthres = thres>>1;
                         int coeff = thres+halfthres-(halfthres>>2);
-                        if (zp.decoder())
+                        if (zp.IWdecoder())
                           pcoeff[i] = -coeff;
                         else
                           pcoeff[i] = coeff;
@@ -2191,7 +2158,7 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
                     }
                   else
                     {
-                      if (zp.decoder())
+                      if (zp.IWdecoder())
                         coeff = coeff + (thres>>1);
                       else
                         coeff = coeff - thres + (thres>>1);
@@ -2596,7 +2563,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
   assert(ymap);
   assert(ycodec);
 #endif
-  _ZPCodecBias zp(bs, false);
+  ZPCodec zp(bs, false);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -2637,7 +2604,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk,"encode chunk",parm.slices-cslice);
   {
     float estdb = -1.0;
-    _ZPCodecBias zp(mbs, true);
+    ZPCodec zp(mbs, true);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)
@@ -3073,7 +3040,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
   assert(ymap);
   assert(ycodec);
 #endif
-  _ZPCodecBias zp(bs, false);
+  ZPCodec zp(bs, false);
   int flag = 1;
   while (flag && cslice<nslices)
     {
@@ -3123,7 +3090,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   DJVU_PROGRESS_TASK(chunk, "encode pixmap chunk", parm.slices-cslice);
   {
     float estdb = -1.0;
-    _ZPCodecBias zp(mbs, true);
+    ZPCodec zp(mbs, true);
     while (flag)
       {
         if (parm.decibels>0  && estdb>=parm.decibels)

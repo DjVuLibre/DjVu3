@@ -197,15 +197,10 @@ IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h \
  GSmartPointer.h ByteStream.h Arrays.h
 IWImage.o: IWImage.cpp IWImage.h \
  GSmartPointer.h DjVuGlobal.h \
- ../../src/include/DjVu.h ZPCodec.h \
- IWTransform.h GPixmap.h GBitmap.h \
- GException.h IFFByteStream.h GString.h \
- GContainer.h ByteStream.h Arrays.h \
- GRect.h
-IWTransform.o: IWTransform.cpp DjVuGlobal.h \
- ../../src/include/DjVu.h IWTransform.h \
- GPixmap.h GSmartPointer.h GException.h \
- MMX.h
+ ../../src/include/DjVu.h ZPCodec.h GBitmap.h \
+ GException.h GPixmap.h IFFByteStream.h \
+ GString.h GContainer.h ByteStream.h \
+ Arrays.h GRect.h MMX.h
 JB2EncodeCodec.o: JB2EncodeCodec.cpp JB2Image.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
