@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.27 2000-01-25 05:26:31 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.28 2000-01-25 05:56:20 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -299,9 +299,8 @@ DjVuParseOptions::init
     Errors->AddError(s);
   }
     // Now we copy all the new profiles
-  int i;
-  const int i_max=ProfileTokens->NextToken;
-  for(i=0;i<i_max;i++)
+  const int i_max=tmp.ProfileTokens->NextToken;
+  for(int i=0;i<i_max;i++)
   {
     s=tmp.ProfileTokens->Entry[i].Name;
     int j=ProfileTokens->GetToken(s);
