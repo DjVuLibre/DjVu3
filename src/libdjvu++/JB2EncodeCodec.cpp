@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.7 2001-03-08 21:30:28 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.8 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -157,7 +157,7 @@ void
 JB2Dict::JB2Codec::Encode::CodeNum(int num, int low, int high, NumContext &ctx)
 {
   if (num < low || num > high)
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   JB2Codec::CodeNum(low,high,&ctx,num);
 }
 
@@ -230,7 +230,7 @@ JB2Dict::JB2Codec::Encode::code_absolute_location(JB2Blit *jblt, int rows, int c
 {
   // Check start record
   if (!gotstartrecordp)
-    G_THROW("JB2Image.no_start");
+    G_THROW( ERR_MSG("JB2Image.no_start") );
   // Code TOP and LEFT
   CodeNum(jblt->left+1, 1, image_columns, abs_loc_x);
   CodeNum(jblt->bottom+rows-1+1, 1, image_rows, abs_loc_y);
@@ -312,7 +312,7 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Dict> gjim)
 {
   if(!gjim)
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Dict &jim=*gjim;
       // -------------------------
@@ -363,7 +363,7 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Image> gjim)
 {
   if(!gjim)
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Image &jim=*gjim;
       // -------------------------
@@ -484,7 +484,7 @@ JB2Dict::JB2Codec::Encode::encode_libonly_shape(GP<JB2Image> gjim, int shapeno )
 {
   if(!gjim)
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Image &jim=*gjim;
   // Recursively encode parent shape

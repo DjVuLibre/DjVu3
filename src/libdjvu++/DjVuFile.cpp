@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.160 2001-04-12 18:50:50 fcrary Exp $
+// $Id: DjVuFile.cpp,v 1.161 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -453,7 +453,7 @@ DjVuFile::decode_func(void)
     {
       GP<DjVuFile> & f=inc_files_list[pos];
       if (f->is_decode_failed()) G_THROW( ERR_MSG("DjVuFile.decode_fail") );
-      if (f->is_decode_stopped()) G_THROW("STOP");
+      if (f->is_decode_stopped()) G_THROW( ERR_MSG("STOP") );
       if (!f->is_decode_ok())
       {
         DEBUG_MSG("this_url='" << url << "'\n");
@@ -748,7 +748,7 @@ DjVuFile::get_fgjd(int block)
     G_RETHROW;
   } G_ENDCATCH;
   chunk_mon.leave();
-  if (is_decode_stopped()) G_THROW("STOP");
+  if (is_decode_stopped()) G_THROW( ERR_MSG("STOP") );
   return 0;
 }
 
@@ -795,7 +795,7 @@ DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, boo
   // pointer should be the "life_saver" created by the decoding thread.
   // If it is the only GP<> pointer, then nobody is interested in the
   // results of the decoding and we can abort now with "STOP"
-  if (get_count()==1) G_THROW("STOP");
+  if (get_count()==1) G_THROW( ERR_MSG("STOP") );
   
   GUTF8String desc = "Unrecognized chunk";
   GUTF8String chkid = id;

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.74 2001-04-12 17:05:31 fcrary Exp $
+// $Id: DataPool.cpp,v 1.75 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 
@@ -992,10 +992,10 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
    Incrementor inc(*active_readers);
    
    if (stop_flag)
-     G_THROW("STOP");
+     G_THROW( ERR_MSG("STOP") );
    if (stop_blocked_flag && !is_eof() &&
        !has_data(offset, sz))
-     G_THROW("STOP");
+     G_THROW( ERR_MSG("STOP") );
    
    if (sz < 0)
      G_THROW( ERR_MSG("DataPool.bad_size") );
@@ -1024,7 +1024,7 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 G_TRY
          {
 	    if(stop_flag||stop_blocked_flag&&!is_eof()&&!has_data(offset, sz))
-              G_THROW("STOP");
+              G_THROW( ERR_MSG("STOP") );
 	    retval=pool->get_data(buffer, start+offset, sz, level+1);
 	 } G_CATCH(exc) {
             pool->clear_stream();
@@ -1144,7 +1144,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
    for(;;)
    {
       if (stop_flag)
-        G_THROW("STOP");
+        G_THROW( ERR_MSG("STOP") );
       if (reader->reenter_flag)
         G_THROW( ERR_MSG("DataPool.reenter") );
       if (eof_flag || block_list->get_bytes(reader->offset, 1))
@@ -1153,7 +1153,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
         return;
 
       if (stop_blocked_flag)
-        G_THROW("STOP");
+        G_THROW( ERR_MSG("STOP") );
 
       DEBUG_MSG("calling event.wait()...\n");
       reader->event.wait();

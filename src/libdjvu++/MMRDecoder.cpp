@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMRDecoder.cpp,v 1.34 2001-03-07 00:33:32 bcr Exp $
+// $Id: MMRDecoder.cpp,v 1.35 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -46,7 +46,7 @@
 // ----------------------------------------
 // MMR CODEBOOKS
 
-static const char invalid_mmr_data[]="MMRDecoder.bad_data";
+static const char invalid_mmr_data[]= ERR_MSG("MMRDecoder.bad_data");
 
 struct VLCode 
 {
@@ -490,7 +490,7 @@ MMRDecoder::VLTable::init(const int nbits)
     int n = c + (1<<(nbits-b));
     while ( --n >= c ) {
       if(index[n] != ncodes)
-       G_THROW("MMRDecoder.bad_codebook");
+       G_THROW( ERR_MSG("MMRDecoder.bad_codebook") );
       index[n] = i;
     }
   }
@@ -651,7 +651,7 @@ MMRDecoder::scanruns(const unsigned short **endptr)
             else if ((m & 0xffc00000) == 0x03c00000)
               {
 #ifdef MMRDECODER_REFUSES_UNCOMPRESSED
-                G_THROW("MMRDecoder.cant_process");
+                G_THROW( ERR_MSG("MMRDecoder.cant_process") );
 #else
                 // ---THE-FOLLOWING-CODE-IS-POORLY-TESTED---
                 src->shift(10);
@@ -825,13 +825,13 @@ MMRDecoder::decode_header(
 {
   unsigned long int magic = inp.read32();
   if((magic&0xfffffffc) != 0x4d4d5200)
-    G_THROW("MMRDecoder.unrecog_header"); 
+    G_THROW( ERR_MSG("MMRDecoder.unrecog_header") ); 
   invert = ((magic & 0x1) ? 1 : 0);
   const bool strip =  ((magic & 0x2) ? 1 : 0);
   width = inp.read16();
   height = inp.read16();
   if (width<=0 || height<=0)
-    G_THROW("MMRDecoder.bad_header");
+    G_THROW( ERR_MSG("MMRDecoder.bad_header") );
   return strip;
 }
 

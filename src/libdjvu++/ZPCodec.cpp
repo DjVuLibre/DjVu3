@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.cpp,v 1.19 2001-04-12 17:05:32 fcrary Exp $
+// $Id: ZPCodec.cpp,v 1.20 2001-04-12 22:40:15 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -970,9 +970,9 @@ ZPCodec::outbit(int bit)
       if (++scount == 8)
         {
           if (!encoding)
-            G_THROW("ZPCodec.no_encoding");
+            G_THROW( ERR_MSG("ZPCodec.no_encoding") );
           if (bs->write((void*)&byte, 1) != 1)
-            G_THROW("ZPCodec.write_error");
+            G_THROW( ERR_MSG("ZPCodec.write_error") );
           scount = 0;
           byte = 0;
         }

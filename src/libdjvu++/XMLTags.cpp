@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.12 2001-04-12 00:25:00 bcr Exp $
+// $Id: XMLTags.cpp,v 1.13 2001-04-12 22:40:15 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -183,7 +183,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
 {
   if(!get_count())
   {
-    G_THROW("XMLTags.no_GP");
+    G_THROW( ERR_MSG("XMLTags.no_GP") );
   }
   GPList<lt_XMLTags> level;
   GMap<GUTF8String,GPList<lt_XMLTags> > allTags;
@@ -192,7 +192,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
   if(!isspaces((unsigned long const *)raw))
   {
     GUTF8String mesg;
-    mesg.format("XMLTags.raw_string\t%s",(const char *)raw);
+    mesg.format( ERR_MSG("XMLTags.raw_string") "\t%s",(const char *)raw);
     G_THROW(mesg);
   }
   while((tag=xmlbs.gets(0,'>',true))[0])
@@ -201,7 +201,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     while(tag[len-1] != '>')
     {
       GUTF8String mesg;
-      mesg.format("XMLTags.bad_tag\t%s",(const char *)tag);
+      mesg.format( ERR_MSG("XMLTags.bad_tag") "\t%s",(const char *)tag);
       G_THROW(mesg);
     }
     switch(tag[1])
@@ -214,7 +214,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           if(!cont[0])
           { 
             GUTF8String mesg;
-            mesg.format("XMLTags.bad_PI\t%s",(const char *)tag);
+            mesg.format( ERR_MSG("XMLTags.bad_PI") "\t%s",(const char *)tag);
             G_THROW(mesg);
           }
           len=((tag+=cont).length());
@@ -240,7 +240,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
             if(!cont[0])
             { 
               GUTF8String mesg;
-              mesg.format("XMLTags.bad_comment\t%s",(const char *)tag);
+              mesg.format( ERR_MSG("XMLTags.bad_comment") "\t%s",(const char *)tag);
               G_THROW(mesg);
             }
             len=((tag+=cont).length());
@@ -262,7 +262,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.del(last);
         }else
         {
-          GUTF8String mesg("XMLTags.bad_form");
+          GUTF8String mesg( ERR_MSG("XMLTags.bad_form") );
           G_THROW(mesg);
         }
         break;
@@ -290,7 +290,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.append(t);
         }else
         {
-          GUTF8String mesg("XMLTags.no_body");
+          GUTF8String mesg( ERR_MSG("XMLTags.no_body") );
           G_THROW(mesg);
         }
         allTags[t->name].append(t);
@@ -311,7 +311,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       }else if(!isspaces((unsigned long const *)raw))
       {
         GUTF8String mesg;
-        mesg.format("XMLTags.raw_string\t%s", (const char *)raw);
+        mesg.format( ERR_MSG("XMLTags.raw_string") "\t%s", (const char *)raw);
         G_THROW(mesg);
       }
     }

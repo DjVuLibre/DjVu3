@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.24 2001-01-04 22:04:54 bcr Exp $
+// $Id: Arrays.h,v 1.25 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
@@ -91,7 +91,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.24 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: Arrays.h,v 1.25 2001-04-12 22:40:14 fcrary Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects
@@ -520,7 +520,7 @@ ArrayBaseT<TYPE>::operator[](int n)
    
    ArrayRep * rep=(ArrayRep *) get();
    if (n<rep->lobound || n>rep->hibound)
-      G_THROW("arrays.ill_sub");              //  Illegal DArray subscript
+      G_THROW( ERR_MSG("arrays.ill_sub") );
    return ((TYPE *) rep->data)[n - rep->minlo];
 }
 
@@ -529,7 +529,7 @@ ArrayBaseT<TYPE>::operator[](int n) const
 {
    const ArrayRep * rep=(const ArrayRep *) get();
    if (n<rep->lobound || n>rep->hibound)
-      G_THROW("arrays.ill_sub");              //  Illegal DArray subscript
+      G_THROW( ERR_MSG("arrays.ill_sub") );
    return ((const TYPE *) rep->data)[n - rep->minlo];
 }
 

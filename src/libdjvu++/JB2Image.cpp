@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.56 2001-03-06 19:55:42 bcr Exp $
+// $Id: JB2Image.cpp,v 1.57 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -122,7 +122,7 @@ JB2Dict::get_shape(const int shapeno)
     retval=&(inherited_dict->get_shape(shapeno));
   }else
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   return *retval;
 }
@@ -139,7 +139,7 @@ JB2Dict::get_shape(const int shapeno) const
     retval=&(inherited_dict->get_shape(shapeno));
   }else
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   return *retval;
 }
@@ -148,9 +148,9 @@ void
 JB2Dict::set_inherited_dict(GP<JB2Dict> dict)
 {
   if (shapes.size() > 0)
-    G_THROW("JB2Image.cant_set");
+    G_THROW( ERR_MSG("JB2Image.cant_set") );
   if (inherited_dict)
-    G_THROW("JB2Image.cant_change");
+    G_THROW( ERR_MSG("JB2Image.cant_change") );
   inherited_dict = dict; 
   inherited_shapes = dict->get_shape_count();
   // Make sure that inherited bitmaps are marked as shared
@@ -183,7 +183,7 @@ int
 JB2Dict::add_shape(const JB2Shape &shape)
 {
   if (shape.parent >= get_shape_count())
-    G_THROW("JB2Image.bad_parent_shape");
+    G_THROW( ERR_MSG("JB2Image.bad_parent_shape") );
   int index = shapes.size();
   shapes.touch(index);
   shapes[index] = shape;
@@ -240,7 +240,7 @@ int
 JB2Image::add_blit(const JB2Blit &blit)
 {
   if (blit.shapeno >= (unsigned int)get_shape_count())
-    G_THROW("JB2Image.bad_shape");
+    G_THROW( ERR_MSG("JB2Image.bad_shape") );
   int index = blits.size();
   blits.touch(index);
   blits[index] = blit;
@@ -251,7 +251,7 @@ GP<GBitmap>
 JB2Image::get_bitmap(int subsample, int align) const
 {
   if (width==0 || height==0)
-    G_THROW("JB2Image.cant_create");
+    G_THROW( ERR_MSG("JB2Image.cant_create") );
   int swidth = (width + subsample - 1) / subsample;
   int sheight = (height + subsample - 1) / subsample;
   int border = ((swidth + align - 1) & ~(align - 1)) - swidth;
@@ -271,7 +271,7 @@ GP<GBitmap>
 JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) const
 {
   if (width==0 || height==0)
-    G_THROW("JB2Image.cant_create");
+    G_THROW( ERR_MSG("JB2Image.cant_create") );
   int rxmin = rect.xmin * subsample;
   int rymin = rect.ymin * subsample;
   int swidth = rect.width();
@@ -433,7 +433,7 @@ JB2Dict::JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
   int cutoff;
   // Check
   if (pctx && ((int)*pctx >= cur_ncell))
-    G_THROW("JB2Image.bad_numcontext");
+    G_THROW( ERR_MSG("JB2Image.bad_numcontext") );
   // Start all phases
   cutoff = 0;
   for(int phase=1,range=0xffffffff;range != 1;)
@@ -614,9 +614,9 @@ JB2Dict::JB2Codec::Decode::code_inherited_shape_count(JB2Dict &jim)
             jim.set_inherited_dict(dict);
         }
       if (!dict && size>0)
-        G_THROW("JB2Image.need_dict");
+        G_THROW( ERR_MSG("JB2Image.need_dict") );
       if (dict && size!=dict->get_shape_count())
-        G_THROW("JB2Image.bad_dict");
+        G_THROW( ERR_MSG("JB2Image.bad_dict") );
     }
 }
 
@@ -626,7 +626,7 @@ JB2Dict::JB2Codec::Decode::code_image_size(JB2Dict &jim)
   int w=CodeNum(0, BIGPOSITIVE, image_size_dist);
   int h=CodeNum(0, BIGPOSITIVE, image_size_dist);
   if (w || h)
-    G_THROW("JB2Image.bad_dict2");
+    G_THROW( ERR_MSG("JB2Image.bad_dict2") );
   JB2Codec::code_image_size(jim);
 }
 
@@ -647,7 +647,7 @@ JB2Dict::JB2Codec::Decode::code_image_size(JB2Image &jim)
   image_columns=CodeNum(0, BIGPOSITIVE, image_size_dist);
   image_rows=CodeNum(0, BIGPOSITIVE, image_size_dist);
   if (!image_columns || !image_rows)
-    G_THROW("JB2Image.zero_dim");
+    G_THROW( ERR_MSG("JB2Image.zero_dim") );
   jim.set_dimension(image_columns, image_rows);
   JB2Codec::code_image_size(jim);
 }
@@ -674,7 +674,7 @@ JB2Dict::JB2Codec::code_relative_location(JB2Blit *jblt, int rows, int columns)
 {
   // Check start record
   if (!gotstartrecordp)
-    G_THROW("JB2Image.no_start");
+    G_THROW( ERR_MSG("JB2Image.no_start") );
   // Find location
   int bottom=0, left=0, top=0, right=0;
   int x_diff, y_diff;
@@ -733,7 +733,7 @@ JB2Dict::JB2Codec::Decode::code_absolute_location(JB2Blit *jblt, int rows, int c
 {
   // Check start record
   if (!gotstartrecordp)
-    G_THROW("JB2Image.no_start");
+    G_THROW( ERR_MSG("JB2Image.no_start") );
   int left=CodeNum(1, image_columns, abs_loc_x);
   int top=CodeNum(1, image_rows, abs_loc_y);
   jblt->bottom = top - rows + 1 - 1;
@@ -895,7 +895,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
       {
         if(!xjshp)
         {
-          G_THROW("JB2Image.bad_number");
+          G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Shape &jshp=*xjshp;
         if (!encoding) 
@@ -914,7 +914,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
       {
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Dict &jim=*gjim;
         code_image_size (jim);
@@ -933,7 +933,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
       {
         if(!xjshp||!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Dict &jim=*gjim;
         JB2Shape &jshp=*xjshp;
@@ -948,7 +948,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
       {
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Dict &jim=*gjim;
         code_comment(jim.comment);
@@ -961,7 +961,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
 	  // Indicates need for a shape dictionary
           if(!gjim)
           {
-             G_THROW("JB2Image.bad_number");
+             G_THROW( ERR_MSG("JB2Image.bad_number") );
           }
 	  code_inherited_shape_count(*gjim);
         }else
@@ -975,7 +975,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
       }
     default:
       {
-        G_THROW("JB2Image.bad_type");
+        G_THROW( ERR_MSG("JB2Image.bad_type") );
       }
     }
   // Post-coding action
@@ -989,7 +989,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Dict> gjim, JB2Shape *xjshp)
           {
             if(!xjshp||!gjim)
             {
-               G_THROW("JB2Image.bad_number");
+               G_THROW( ERR_MSG("JB2Image.bad_number") );
             }
             JB2Shape &jshp=*xjshp;
             shapeno = gjim->add_shape(jshp);
@@ -1012,7 +1012,7 @@ JB2Dict::JB2Codec::Decode::code(GP<JB2Dict> gjim)
 {
   if(!gjim)
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Dict &jim=*gjim;
       // -------------------------
@@ -1026,7 +1026,7 @@ JB2Dict::JB2Codec::Decode::code(GP<JB2Dict> gjim)
         } 
       while(rectype != END_OF_DATA);
       if (!gotstartrecordp)
-        G_THROW("JB2Image.no_start");
+        G_THROW( ERR_MSG("JB2Image.no_start") );
       jim.compress();
 }
 
@@ -1058,7 +1058,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!xjshp)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Shape &jshp=*xjshp;
         if (!encoding) 
@@ -1079,7 +1079,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         code_image_size (jim);
@@ -1112,7 +1112,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!xjshp || !gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Shape &jshp=*xjshp;
         JB2Image &jim=*gjim;
@@ -1128,7 +1128,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!xjshp||!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         JB2Shape &jshp=*xjshp;
@@ -1142,7 +1142,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!xjshp||!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         JB2Shape &jshp=*xjshp;
@@ -1160,7 +1160,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
         if (encoding) temp = jblt->shapeno;
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         match = code_match_index (temp, jim);
@@ -1188,7 +1188,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         code_comment(jim.comment);
@@ -1198,7 +1198,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       {
         if(!gjim)
         {
-           G_THROW("JB2Image.bad_number");
+           G_THROW( ERR_MSG("JB2Image.bad_number") );
         }
         JB2Image &jim=*gjim;
         if (! gotstartrecordp)
@@ -1215,7 +1215,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
       }
     default:
       {
-        G_THROW("JB2Image.unknown_type");
+        G_THROW( ERR_MSG("JB2Image.unknown_type") );
       }
     }
   
@@ -1235,7 +1235,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
           {
             if(!xjshp||!gjim)
             {
-              G_THROW("JB2Image.bad_number");
+              G_THROW( ERR_MSG("JB2Image.bad_number") );
             }
             JB2Shape &jshp=*xjshp;
             shapeno = gjim->add_shape(jshp);
@@ -1253,7 +1253,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
         case MATCHED_REFINE_LIBRARY_ONLY:
           if(!xjshp)
           {
-            G_THROW("JB2Image.bad_number");
+            G_THROW( ERR_MSG("JB2Image.bad_number") );
           }
           add_library(shapeno, *xjshp);
           break;
@@ -1274,7 +1274,7 @@ JB2Dict::JB2Codec::code_record(int &rectype, GP<JB2Image> gjim, JB2Shape *xjshp,
         case MATCHED_COPY:
           if(!gjim)
           {
-            G_THROW("JB2Image.bad_number");
+            G_THROW( ERR_MSG("JB2Image.bad_number") );
           }
           gjim->add_blit(* jblt);
           break;
@@ -1290,7 +1290,7 @@ JB2Dict::JB2Codec::Decode::code(GP<JB2Image> gjim)
 {
   if(!gjim)
   {
-    G_THROW("JB2Image.bad_number");
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   }
   JB2Image &jim=*gjim;
       // -------------------------
@@ -1305,7 +1305,7 @@ JB2Dict::JB2Codec::Decode::code(GP<JB2Image> gjim)
         } 
       while(rectype!=END_OF_DATA);
       if (!gotstartrecordp)
-        G_THROW("JB2Image.no_start");
+        G_THROW( ERR_MSG("JB2Image.no_start") );
       jim.compress();
 }
 

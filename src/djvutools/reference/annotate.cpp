@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.9 2001-04-04 22:12:10 bcr Exp $
+// $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.9 $
- *   $Date: 2001-04-04 22:12:10 $
- *   @(#) $Id: annotate.cpp,v 1.9 2001-04-04 22:12:10 bcr Exp $
+ *   $Revision: 1.10 $
+ *   $Date: 2001-04-12 22:40:14 $
+ *   @(#) $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.9 2001-04-04 22:12:10 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
@@ -53,7 +53,7 @@ static const char ascii_ant[]="ANTa";
 static const char binary_ant[]="ANTz";
 inline static void WrongParams(void)
 {
-   G_THROW("annotate.usage");
+   G_THROW( ERR_MSG("annotate.usage") );
 }
 
 static inline void del_anno(GIFFManager &mng)
@@ -114,7 +114,7 @@ static void extract_djvu(DArray<GString> & argv)
      chunk=mng.get_chunk(binary_ant);
      if(!chunk)
      {
-       G_THROW(GString("annotate.failed_chunk\t")+ascii_ant);
+       G_THROW(GString( ERR_MSG("annotate.failed_chunk") "\t")+ascii_ant);
      }
    }
    TArray<char> ant_contents=chunk->get_data();
@@ -142,7 +142,7 @@ static void insert_djvu(DArray<GString> & argv)
    
    struct stat st;
    if (stat(argv[3], &st)<0)
-      G_THROW("annotate.failed_stat");
+      G_THROW( ERR_MSG("annotate.failed_stat") );
    TArray<char> ant_contents(st.st_size-1);
    GP<ByteStream> ant=ByteStream::create(GURL::Filename::UTF8(argv[3]), "rb");
    ant->read(ant_contents, ant_contents.size());

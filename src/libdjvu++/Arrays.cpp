@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.cpp,v 1.17 2001-01-04 22:04:54 bcr Exp $
+// $Id: Arrays.cpp,v 1.18 2001-04-12 22:40:14 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -111,7 +111,7 @@ ArrayRep::resize(int lo, int hi)
   int nsize = hi - lo + 1;
   // Validation
   if (nsize < 0)
-    G_THROW("arrays.resize");     //  Invalid low and high bounds in DArray resize
+    G_THROW( ERR_MSG("arrays.resize") );
   // Destruction
   if (nsize == 0)
     {
@@ -184,7 +184,7 @@ ArrayRep::del(int n, unsigned int howmany)
    if (howmany == 0)
       return;
    if ((int)(n + howmany) > hibound +1)
-      G_THROW("arrays.ill_arg");      //  Illegal arguments in DArray::del
+      G_THROW( ERR_MSG("arrays.ill_arg") );
    copy(data, n-minlo, hibound-howmany-minlo,
 	data, n+howmany-minlo, hibound-minlo);
    destroy(data, hibound+1-howmany-minlo, hibound-minlo);

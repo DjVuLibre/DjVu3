@@ -87,7 +87,7 @@ main(int argc, char **argv)
                 GP<ByteStream> output=ByteStream::Create(argv[2],"wb");
                 image->encode(*output);
               } else {
-                G_THROW("TestJB2.bad_suffix");
+                G_THROW( ERR_MSG("TestJB2.bad_suffix") );
               }
             }
         }
