@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.83 2001-04-25 22:58:51 bcr Exp $
+// $Id: GString.cpp,v 1.84 2001-04-26 01:10:47 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -409,7 +409,7 @@ GStringRep::tocase(
   char const *ptr=data;
   while(ptr<eptr)
   {
-    char const * const xptr=isCharType(xiswcase,ptr,true);
+    char const * const xptr=isCharType(xiswcase,ptr,false);
     if(ptr == xptr)
       break;
     ptr=xptr;
