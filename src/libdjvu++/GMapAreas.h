@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.1 1999-09-30 19:15:28 eaf Exp $
+//C- $Id: GMapAreas.h,v 1.2 1999-09-30 20:15:54 eaf Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -41,7 +41,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.1 1999-09-30 19:15:28 eaf Exp $# */
+    #$Id: GMapAreas.h,v 1.2 1999-09-30 20:15:54 eaf Exp $# */
 //@{
 
 /****************************************************************************
@@ -164,8 +164,9 @@ public:
       /** Transforms the hyperlink to be within the specified rectangle */
    void		transform(const GRect & grect);
       /** Checks if the object is OK. Especially useful with \Ref{GMapPoly}
-	  where edges may intersect. */
-   bool		check_object(void);
+	  where edges may intersect. If there is a problem it returns a
+	  string describing it. */
+   GString	check_object(void);
       /** Stores the contents of the hyperlink object in a lisp-like format
 	  for sving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GString	print(void);
@@ -173,16 +174,16 @@ public:
       /// Virtual function returning the shape name.
    virtual GString	get_shape_name(void) const=0;
 protected:
-   virtual int	gma_get_xmin(void)=0;
-   virtual int	gma_get_ymin(void)=0;
-   virtual int	gma_get_xmax(void)=0;
-   virtual int	gma_get_ymax(void)=0;
-   virtual void	gma_move(int dx, int dy)=0;
-   virtual void	gma_resize(int new_width, int new_height)=0;
-   virtual void	gma_transform(const GRect & grect)=0;
-   virtual bool	gma_is_point_inside(int x, int y)=0;
-   virtual bool	gma_check_object(void)=0;
-   virtual GString gma_print(void)=0;
+   virtual int		gma_get_xmin(void)=0;
+   virtual int		gma_get_ymin(void)=0;
+   virtual int		gma_get_xmax(void)=0;
+   virtual int		gma_get_ymax(void)=0;
+   virtual void		gma_move(int dx, int dy)=0;
+   virtual void		gma_resize(int new_width, int new_height)=0;
+   virtual void		gma_transform(const GRect & grect)=0;
+   virtual bool		gma_is_point_inside(int x, int y)=0;
+   virtual GString	gma_check_object(void)=0;
+   virtual GString	gma_print(void)=0;
    
    void		clear_bounds(void);
 private:
@@ -202,94 +203,6 @@ GMapArea::~GMapArea(void) {}
 
 inline void
 GMapArea::clear_bounds(void) { bounds_initialized=0; }
-
-inline void
-GMapArea::initialize_bounds(void)
-{
-   xmin=gma_get_xmin(); xmax=gma_get_xmax();
-   ymin=gma_get_ymin(); ymax=gma_get_ymax();
-   bounds_initialized=1;
-}
-
-inline int
-GMapArea::get_xmin(void)
-{
-   if (!bounds_initialized) initialize_bounds();
-   return xmin;
-}
-
-inline int
-GMapArea::get_ymin(void)
-{
-   if (!bounds_initialized) initialize_bounds();
-   return ymin;
-}
-
-inline int
-GMapArea::get_xmax(void)
-{
-   if (!bounds_initialized) initialize_bounds();
-   return xmax;
-}
-
-inline int
-GMapArea::get_ymax(void)
-{
-   if (!bounds_initialized) initialize_bounds();
-   return ymax;
-}
-
-inline GRect
-GMapArea::get_bound_rect(void)
-{
-   return GRect(get_xmin(), get_ymin(), get_xmax()-get_xmin(),
-		get_ymax()-get_ymin());
-}
-
-inline void
-GMapArea::move(int dx, int dy)
-{
-   if (!dx && !dy) return;
-   if (bounds_initialized)
-   {
-      xmin+=dx; ymin+=dy; xmax+=dx; ymax+=dy;
-   }
-   gma_move(dx, dy);
-}
-
-inline void
-GMapArea::resize(int new_width, int new_height)
-{
-   if (get_xmax()-get_xmin()==new_width &&
-       get_ymax()-get_ymin()==new_height) return;
-   gma_resize(new_width, new_height);
-   bounds_initialized=0;
-}
-
-inline void
-GMapArea::transform(const GRect & grect)
-{
-   if (grect.xmin==get_xmin() && grect.ymin==get_ymin() &&
-       grect.xmax==get_xmax() && grect.ymax==get_ymax())
-      return;
-   gma_transform(grect);
-   bounds_initialized=0;
-}
-
-inline bool
-GMapArea::check_object(void)
-{
-   return (get_xmax()==get_xmin() || get_ymax()==get_ymin()) ? 0 :
-	  gma_check_object();
-}
-
-inline bool
-GMapArea::is_point_inside(int x, int y)
-{
-   if (!bounds_initialized) initialize_bounds();
-   return (x>=xmin && x<xmax && y>=ymin && y<ymax) ?
-	      gma_is_point_inside(x, y) : 0;
-}
 
 /****************************************************************************
 **************************** GMapRect declaration ***************************
@@ -315,16 +228,16 @@ public:
    virtual GString	get_shape_name(void) const;
 protected:
    int		xmin, ymin, xmax, ymax;
-   virtual int	gma_get_xmin(void);
-   virtual int	gma_get_ymin(void);
-   virtual int	gma_get_xmax(void);
-   virtual int	gma_get_ymax(void);
-   virtual void	gma_move(int dx, int dy);
-   virtual void	gma_resize(int new_width, int new_height);
-   virtual void	gma_transform(const GRect & grect);
-   virtual bool	gma_is_point_inside(int x, int y);
-   virtual bool	gma_check_object(void);
-   virtual GString gma_print(void);
+   virtual int		gma_get_xmin(void);
+   virtual int		gma_get_ymin(void);
+   virtual int		gma_get_xmax(void);
+   virtual int		gma_get_ymax(void);
+   virtual void		gma_move(int dx, int dy);
+   virtual void		gma_resize(int new_width, int new_height);
+   virtual void		gma_transform(const GRect & grect);
+   virtual bool		gma_is_point_inside(int x, int y);
+   virtual GString	gma_check_object(void);
+   virtual GString	gma_print(void);
 };
 
 inline
@@ -355,8 +268,8 @@ GMapRect::gma_get_xmax(void) { return xmax; }
 inline int
 GMapRect::gma_get_ymax(void) { return ymax; }
 
-inline bool
-GMapRect::gma_check_object(void) { return 1; }
+inline GString
+GMapRect::gma_check_object(void) { return ""; }
 
 inline void
 GMapRect::gma_move(int dx, int dy)
@@ -412,16 +325,16 @@ public:
       /// Returns #"poly"# all the time
    virtual GString	get_shape_name(void) const;
 protected:
-   virtual int	gma_get_xmin(void);
-   virtual int	gma_get_ymin(void);
-   virtual int	gma_get_xmax(void);
-   virtual int	gma_get_ymax(void);
-   virtual void	gma_move(int dx, int dy);
-   virtual void	gma_resize(int new_width, int new_height);
-   virtual void	gma_transform(const GRect & grect);
-   virtual bool	gma_is_point_inside(int x, int y);
-   virtual bool	gma_check_object(void);
-   virtual GString gma_print(void);
+   virtual int		gma_get_xmin(void);
+   virtual int		gma_get_ymin(void);
+   virtual int		gma_get_xmax(void);
+   virtual int		gma_get_ymax(void);
+   virtual void		gma_move(int dx, int dy);
+   virtual void		gma_resize(int new_width, int new_height);
+   virtual void		gma_transform(const GRect & grect);
+   virtual bool		gma_is_point_inside(int x, int y);
+   virtual GString	gma_check_object(void);
+   virtual GString	gma_print(void);
 private:
    bool		open;
    int		points, sides;
@@ -491,16 +404,16 @@ public:
       /// Returns #"oval"#
    virtual GString	get_shape_name(void) const;
 protected:
-   virtual int	gma_get_xmin(void);
-   virtual int	gma_get_ymin(void);
-   virtual int	gma_get_xmax(void);
-   virtual int	gma_get_ymax(void);
-   virtual void	gma_move(int dx, int dy);
-   virtual void	gma_resize(int new_width, int new_height);
-   virtual void	gma_transform(const GRect & grect);
-   virtual bool	gma_is_point_inside(int x, int y);
-   virtual bool	gma_check_object(void);
-   virtual GString gma_print(void);
+   virtual int		gma_get_xmin(void);
+   virtual int		gma_get_ymin(void);
+   virtual int		gma_get_xmax(void);
+   virtual int		gma_get_ymax(void);
+   virtual void		gma_move(int dx, int dy);
+   virtual void		gma_resize(int new_width, int new_height);
+   virtual void		gma_transform(const GRect & grect);
+   virtual bool		gma_is_point_inside(int x, int y);
+   virtual GString	gma_check_object(void);
+   virtual GString	gma_print(void);
 private:
    int		rmax, rmin;
    int		a, b;
@@ -539,9 +452,6 @@ GMapOval::gma_get_xmax(void) { return xmax; }
 
 inline int
 GMapOval::gma_get_ymax(void) { return ymax; }
-
-inline bool
-GMapOval::gma_check_object(void) { return 1; }
 
 inline void
 GMapOval::gma_move(int dx, int dy)

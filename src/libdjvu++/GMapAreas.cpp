@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.1 1999-09-30 19:15:28 eaf Exp $
+//C- $Id: GMapAreas.cpp,v 1.2 1999-09-30 20:15:54 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -24,6 +24,95 @@
 /****************************************************************************
 ***************************** GMapArea definition ***************************
 ****************************************************************************/
+
+void
+GMapArea::initialize_bounds(void)
+{
+   xmin=gma_get_xmin(); xmax=gma_get_xmax();
+   ymin=gma_get_ymin(); ymax=gma_get_ymax();
+   bounds_initialized=1;
+}
+
+int
+GMapArea::get_xmin(void)
+{
+   if (!bounds_initialized) initialize_bounds();
+   return xmin;
+}
+
+int
+GMapArea::get_ymin(void)
+{
+   if (!bounds_initialized) initialize_bounds();
+   return ymin;
+}
+
+int
+GMapArea::get_xmax(void)
+{
+   if (!bounds_initialized) initialize_bounds();
+   return xmax;
+}
+
+int
+GMapArea::get_ymax(void)
+{
+   if (!bounds_initialized) initialize_bounds();
+   return ymax;
+}
+
+GRect
+GMapArea::get_bound_rect(void)
+{
+   return GRect(get_xmin(), get_ymin(), get_xmax()-get_xmin(),
+		get_ymax()-get_ymin());
+}
+
+void
+GMapArea::move(int dx, int dy)
+{
+   if (!dx && !dy) return;
+   if (bounds_initialized)
+   {
+      xmin+=dx; ymin+=dy; xmax+=dx; ymax+=dy;
+   }
+   gma_move(dx, dy);
+}
+
+void
+GMapArea::resize(int new_width, int new_height)
+{
+   if (get_xmax()-get_xmin()==new_width &&
+       get_ymax()-get_ymin()==new_height) return;
+   gma_resize(new_width, new_height);
+   bounds_initialized=0;
+}
+
+void
+GMapArea::transform(const GRect & grect)
+{
+   if (grect.xmin==get_xmin() && grect.ymin==get_ymin() &&
+       grect.xmax==get_xmax() && grect.ymax==get_ymax())
+      return;
+   gma_transform(grect);
+   bounds_initialized=0;
+}
+
+GString
+GMapArea::check_object(void)
+{
+   if (get_xmax()==get_xmin()) return "Area width is ZERO";
+   if (get_ymax()==get_ymin()) return "Area height is ZERO";
+   return gma_check_object();
+}
+
+bool
+GMapArea::is_point_inside(int x, int y)
+{
+   if (!bounds_initialized) initialize_bounds();
+   return (x>=xmin && x<xmax && y>=ymin && y<ymax) ?
+	      gma_is_point_inside(x, y) : 0;
+}
 
 GString
 GMapArea::print(void)
@@ -185,13 +274,13 @@ GMapPoly::are_segments_parallel(int x11, int y11, int x12, int y12,
 GString
 GMapPoly::check_data(void)
 {
-   if (open && points<2 || !open && points<3) return "GMapPoly::check_data(): Too few points.";
+   if (open && points<2 || !open && points<3) return "Too few points in polygon.";
    for(int i=0;i<sides;i++)
       for(int j=i+2;j<sides;j++)
          if ((j+1)%points!=i)
 	    if (do_segments_intersect(xx[i], yy[i], xx[i+1], yy[i+1],
 				      xx[j], yy[j], xx[(j+1)%points], yy[(j+1)%points]))
-		return "GMapPoly::check_data(): Some segments intersect.";
+		return "Some polygon segments intersect.";
    return "";
 }
 
@@ -343,11 +432,18 @@ GMapPoly::gma_transform(const GRect & grect)
    };
 }
 
-bool
+GString
 GMapPoly::gma_check_object(void)
 {
-   GString res=check_data();
-   return res.length()==0;
+   GString str=check_data();
+   if (str.length()) return str;
+   if (border_type!=NO_BORDER &&
+       border_type!=SOLID_BORDER &&
+       border_type!=XOR_BORDER)
+      return "This border type is not supported by polygon map areas";
+   if (hilite_color!=0xffffffff)
+      return "Area highlighting is not supported by polygon map areas";
+   return "";
 }
 
 GMapPoly::GMapPoly(const int * _xx, const int * _yy, int _points, bool _open) :
@@ -406,6 +502,18 @@ GMapOval::gma_is_point_inside(int x, int y)
    return
       sqrt((x-xf1)*(x-xf1)+(y-yf1)*(y-yf1))+
       sqrt((x-xf2)*(x-xf2)+(y-yf2)*(y-yf2))<=2*rmax;
+}
+
+GString
+GMapOval::gma_check_object(void)
+{
+   if (border_type!=NO_BORDER &&
+       border_type!=SOLID_BORDER &&
+       border_type!=XOR_BORDER)
+      return "This border type is not supported by oval map areas";
+   if (hilite_color!=0xffffffff)
+      return "Area highlighting is not supported by oval map areas";
+   return "";
 }
 
 void
