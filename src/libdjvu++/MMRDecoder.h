@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.h,v 1.2 1999-12-20 01:16:38 bcr Exp $
+//C- $Id: MMRDecoder.h,v 1.3 1999-12-21 21:43:30 parag Exp $
 
 #ifndef _MMRDECODER_H_
 #define _MMRDECODER_H_
@@ -49,7 +49,7 @@
     @memo
     CCITT-G4/MMR decoder.
     @version
-    #$Id: MMRDecoder.h,v 1.2 1999-12-20 01:16:38 bcr Exp $#
+    #$Id: MMRDecoder.h,v 1.3 1999-12-21 21:43:30 parag Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> */
 //@{
@@ -71,12 +71,14 @@ class MMRDecoder
       image. */
   static GP<JB2Image> decode(ByteStream &inp);
   /** Only decode the header. */
-  static void decode_header(ByteStream &inp, int &width, int &height, int &invert);
+  static void decode_header(ByteStream &inp, int &width, int &height, 
+	  int &invert, int & strip);
  public:
   ~MMRDecoder();
   /** Construct a MMRDecoder object for decoding an image
       of size #width# by #height#. */
   MMRDecoder(ByteStream &bs, int width, int height);
+  MMRDecoder(ByteStream &bs, int width, int height, int rpstrip);
   /** Decodes a scanline and returns a pointer to the scanline data.
       Returns a pointer to the scanline buffer. The scanline data
       should be copied before calling this function again. */
@@ -85,6 +87,9 @@ class MMRDecoder
   int width;
   int height;
   int lineno;
+	int striplineno;
+	int rowsperstrip;
+	int nextstriploc;
   unsigned char *refline;
   class VLSource;
   class VLTable;

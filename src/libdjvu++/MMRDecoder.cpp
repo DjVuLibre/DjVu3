@@ -8,7 +8,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: MMRDecoder.cpp,v 1.6 1999-12-20 01:16:38 bcr Exp $
+//C- $Id: MMRDecoder.cpp,v 1.7 1999-12-21 21:43:30 parag Exp $
 
 
 #ifdef __GNUC__
@@ -279,12 +279,13 @@ static const VLCode bcodes[] = {
 // ----------------------------------------
 // SOURCE OF BITS
 
+#define VLSBUFSIZE    64
 
 class MMRDecoder::VLSource
 {
 private:
   ByteStream &inp;
-  unsigned char buffer[64];
+  unsigned char buffer[ VLSBUFSIZE ];
   unsigned int codeword;
   int lowbits;
   int bufpos;
@@ -302,6 +303,7 @@ public:
   // Consumes #n# bits.
   void shift(int n)
     { codeword<<=n; lowbits+=n; if (lowbits>=16) preload(); }
+	unsigned int reset(unsigned int offset);
 };
 
 MMRDecoder::VLSource::VLSource(ByteStream &inp)
@@ -310,6 +312,29 @@ MMRDecoder::VLSource::VLSource(ByteStream &inp)
 {
   lowbits = 32;
   preload();
+}
+
+unsigned int
+MMRDecoder::VLSource::reset(unsigned int offset){
+	unsigned int stripsize, loc;
+	unsigned int word;
+	loc = inp.tell();
+	
+	preload();
+	// The endofblock is skipped
+	shift(24);
+	preload();
+	// To make it byte aligned
+	if ( lowbits > 0 ) {
+		shift(8 - lowbits);
+	}
+	preload();
+	stripsize = peek();
+	codeword = 0;
+	lowbits = 32;
+	preload();
+
+	return stripsize;
 }
 
 void
@@ -418,12 +443,26 @@ MMRDecoder::~MMRDecoder()
   delete [] refline;
 }
 
-
 MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height)
-  : width(width), height(height), lineno(0)
+  : width(width), height(height), lineno(0), striplineno(0), 
+	  rowsperstrip(0xffff), nextstriploc(0)
 {
   refline = new unsigned char [width+5];
   memset(refline, 0, width);
+  src = new VLSource(bs);
+  mrtable = new VLTable(mrcodes, 7);
+  btable = new VLTable(bcodes, 13);
+  wtable = new VLTable(wcodes, 13);
+}
+
+MMRDecoder::MMRDecoder(ByteStream &bs, int width, int height, int rpstrip)
+  : width(width), height(height), lineno(0), striplineno(0), 
+	  rowsperstrip(rpstrip), nextstriploc(0)
+{
+	int startPoint = bs.tell();
+  refline = new unsigned char [width+5];
+  memset(refline, 0, width);
+	nextstriploc = bs.read32() + startPoint + 4;
   src = new VLSource(bs);
   mrtable = new VLTable(mrcodes, 7);
   btable = new VLTable(bcodes, 13);
@@ -436,6 +475,11 @@ MMRDecoder::scanline()
   // Check if all lines have been returned
   if (lineno >= height)
     return 0;
+	if ( striplineno == rowsperstrip ){
+		striplineno=0;
+  	memset(refline, 0, width);
+		nextstriploc += src->reset(nextstriploc) + 4;
+	}
   // Loop until scanline is complete
   unsigned char CurColor=0;
   unsigned char *ptr=refline,*StartRun=refline,*EndRun;
@@ -597,6 +641,7 @@ MMRDecoder::scanline()
     }
   /* Increment and return */
   lineno += 1;
+	striplineno += 1;
   return refline;
 }
 
@@ -605,15 +650,29 @@ MMRDecoder::scanline()
 // MAIN DECODING ROUTINE
 
 void 
-MMRDecoder::decode_header(ByteStream &inp, int &width, int &height, int &invert)
+MMRDecoder::decode_header(ByteStream &inp, int &width, int &height, int &invert
+ , int &strip)
 {
   unsigned long int magic = inp.read32();
-  if (magic == 0x4d4d5200) // "MMR\00"
+  if (magic == 0x4d4d5200) {// "MMR\00"
     invert = 0;
-  else if (magic == 0x4d4d5201) // "MMR\01"
+		strip = 0;
+	}
+  else if (magic == 0x4d4d5201) { // "MMR\01"
     invert = 1;
-  else 
+		strip = 0;
+	}
+  else if (magic == 0x4d4d5202) { // "MMR\02"
+    invert = 0;
+		strip = 1;
+	}
+  else if (magic == 0x4d4d5203) { // "MMR\03"
+    invert = 1;
+		strip = 1;
+	}
+  else {
     THROW("Cannot recognize G4/MMR header");
+	}
   width = inp.read16();
   height = inp.read16();
   if (width<=0 || height<=0)
@@ -627,8 +686,8 @@ GP<JB2Image>
 MMRDecoder::decode(ByteStream &inp)
 {
   // Read header
-  int width, height, invert;
-  decode_header(inp, width, height, invert);
+  int width, height, invert, strip, rowsperstrip;
+  decode_header(inp, width, height, invert, strip);
   // Prepare image
   GP<JB2Image> jimg = new JB2Image();
   jimg->set_dimension(width, height);
@@ -636,7 +695,12 @@ MMRDecoder::decode(ByteStream &inp)
   int blocksize = MIN(500,MAX(64,MAX(width/17,height/22)));
   int blocksperline = (width+blocksize-1)/blocksize;
   // Prepare decoder
-  MMRDecoder dcd(inp, width, height);
+	if ( strip ) {
+		rowsperstrip = inp.read16();
+	}else{
+		rowsperstrip = 0xffff;
+	}
+	MMRDecoder dcd(inp, width, height, rowsperstrip);
   // Loop on stripes
   int line = height-1;
   while (line >= 0)
