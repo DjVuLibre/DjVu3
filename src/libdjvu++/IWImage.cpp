@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: IWImage.cpp,v 1.37 2000-12-20 01:41:43 bcr Exp $
+// $Id: IWImage.cpp,v 1.38 2000-12-20 17:42:55 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -205,8 +205,6 @@ interpolate_mask(short *data16, int w, int h, int rowsize,
       split = scale;
       scale = scale+scale;
     }
-  // free memory
-  delete [] sdata;
 }
 
 
