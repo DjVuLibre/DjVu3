@@ -1,4 +1,4 @@
-.SUFFIXES: .txt .1 .html .pod
+.SUFFIXES: .txt .1 .5 .html .pod
 .1.txt:
 	@echo "nroff -man $*.1|sed -e 's,.^H,,g' > $*.txt"
 	@if [ -r "$*.1" ] ; then i="$*.1" ; else i="SRCDIR/$*.1" ; fi ; \
@@ -8,12 +8,30 @@
 		exit 1 ; \
 	fi
 
+.5.txt:
+	@echo "nroff -man $*.5|sed -e 's,.^H,,g' > $*.txt"
+	@if [ -r "$*.5" ] ; then i="$*.5" ; else i="SRCDIR/$*.5" ; fi ; \
+	if ( nroff -man "$$i"|cat -s|$(SED) -e 's,.,,g' > "$*.txt" ) ; \
+	then $(TRUE) ; else \
+		$(RM) -f "$*.txt" ; \
+		exit 1 ; \
+	fi
+
 .pod.1:
 	@echo "pod2man --section=1 $*.pod > $*.1"
-	@if [ -r "$*.pod" ] ; then i="$*.pod" ; else i="SRCDIR/$*.pod" ; fi ; \
-	if ( pod2man --section=1 --release=" " --center=" " "$$i" > "$*.1" ) ; \
+	@if [ -r "$*.pod" ] ; then d="."; else d=SRCDIR; fi ; \
+	if ( ( cd "$$d";pod2man --section=1 --release=" " --center=" " "$*.pod" ) > "$*.1" ) ; \
 	then $(TRUE) ; else \
 		$(RM) -f "$*.1" ; \
+		exit 1 ; \
+	fi	
+
+.pod.5:
+	@echo "pod2man --section=5 $*.pod > $*.5"
+	@if [ -r "$*.pod" ] ; then d="."; else d=SRCDIR; fi ; \
+	if ( ( cd "$$d";pod2man --section=5 --release=" " --center=" " "$*.pod" ) > "$*.5" ) ; \
+	then $(TRUE) ; else \
+		$(RM) -f "$*.5" ; \
 		exit 1 ; \
 	fi	
 
