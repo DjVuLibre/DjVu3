@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.h,v 1.7 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GPixmap.h,v 1.8 1999-08-13 15:31:39 leonb Exp $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
@@ -34,7 +34,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.7 1999-03-17 19:24:57 leonb Exp $# */
+    #$Id: GPixmap.h,v 1.8 1999-08-13 15:31:39 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -71,15 +71,15 @@ struct GPixel
   /** @name Predefined colors. */
   //@{ 
   /// GPixel::WHITE is initialized to #rgb:255/255/255#.
-  static GPixel WHITE; 
+  static const GPixel WHITE; 
   /// GPixel::BLACK is initialized to #rgb:0/0/0#.
-  static GPixel BLACK; 
+  static const GPixel BLACK; 
   /// GPixel::BLUE is initialized to #rgb:0/0/255#.
-  static GPixel BLUE;  
+  static const GPixel BLUE;  
   /// GPixel::GREEN is initialized to #rgb:0/255/0#.
-  static GPixel GREEN; 
+  static const GPixel GREEN; 
   /// GPixel::RED is initialized to #rgb:255/0/0#.
-  static GPixel RED;
+  static const GPixel RED;
   //@}
 };
 
@@ -106,7 +106,7 @@ public:
   /** Constructs a GPixmap with #nrows# rows and #ncolumns# columns.  When the
       optional argument #filler# is specified, all pixels are initialized 
       with the corresponding color. */
-  GPixmap(int nrows, int ncolumns, GPixel *filler=0);
+  GPixmap(int nrows, int ncolumns, const GPixel *filler=0);
   /** Constructs a GPixmap by copying the gray level image #ref#.
       The constructed GPixmap has the same size as #ref#.  The pixels
       are initialized with shades of grays copied from #ref#. */
@@ -134,7 +134,7 @@ public:
   /** Resets the GPixmap to #nrows# rows and #ncolumns# columns.  When the
       optional argument #filler# is specified, all pixels are initialized with
       the corresponding color.  The previous content of the GPixmap is discarded. */
-  void init(int nrows, int ncolumns,  GPixel *filler=0);
+  void init(int nrows, int ncolumns,  const GPixel *filler=0);
   /** Resets the GPixmap by copying the size and the contents of the color
       image #ref#.  The previous content of the GPixmap is discarded. */
   void init(const GPixmap &ref);
@@ -145,13 +145,13 @@ public:
       level image #ref#.  The optional argument #ramp# is an array of 256 
       pixel values used for mapping the gray levels to color values. 
       Setting #ramp# to zero selects a linear ramp of shades of gray. */
-  void init(const GBitmap &ref, GPixel *ramp=0);
+  void init(const GBitmap &ref, const GPixel *ramp=0);
   /** Resets the GPixmap by copying the rectangle #rect# of the gray level
       image #ref#.  The optional argument #ramp# is an array of 256 pixel
       values used for mapping the gray levels to color values.  Setting #ramp#
       to zero selects a linear ramp computed according to the maximal number
       of gray levels in #ref#. */
-  void init(const GBitmap &ref, const GRect &rect, GPixel *ramp=0);
+  void init(const GBitmap &ref, const GRect &rect, const GPixel *ramp=0);
   /** Resets the GPixmap by reading PPM data from ByteStream #ref#.  See
       \Ref{PNM and RLE file formats} for more information. */
   void init(ByteStream &ref);

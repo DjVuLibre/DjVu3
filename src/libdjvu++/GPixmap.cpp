@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.7 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GPixmap.cpp,v 1.8 1999-08-13 15:31:38 leonb Exp $
 
-// File "$Id: GPixmap.cpp,v 1.7 1999-05-25 19:42:29 eaf Exp $"
+// File "$Id: GPixmap.cpp,v 1.8 1999-08-13 15:31:38 leonb Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -38,11 +38,11 @@
 //////////////////////////////////////////////////
 
 
-GPixel GPixel::WHITE = { 255, 255, 255 };
-GPixel GPixel::BLACK = {   0,   0,   0 };
-GPixel GPixel::BLUE  = { 255,   0,   0 };
-GPixel GPixel::GREEN = {   0, 255,   0 };
-GPixel GPixel::RED   = {   0,   0, 255 };
+const GPixel GPixel::WHITE = { 255, 255, 255 };
+const GPixel GPixel::BLACK = {   0,   0,   0 };
+const GPixel GPixel::BLUE  = { 255,   0,   0 };
+const GPixel GPixel::GREEN = {   0, 255,   0 };
+const GPixel GPixel::RED   = {   0,   0, 255 };
 
 
 //////////////////////////////////////////////////
@@ -50,7 +50,7 @@ GPixel GPixel::RED   = {   0,   0, 255 };
 //////////////////////////////////////////////////
 
 
-static GPixel *
+static const GPixel *
 new_gray_ramp(int grays)
 {
   GPixel *ramp = new GPixel[256];
@@ -112,7 +112,7 @@ GPixmap::GPixmap()
 {
 }
 
-GPixmap::GPixmap(int nrows, int ncolumns, GPixel *filler)
+GPixmap::GPixmap(int nrows, int ncolumns, const GPixel *filler)
 : nrows(0), ncolumns(0), pixels(0), pixels_data(0)
 {
   init(nrows, ncolumns, filler);
@@ -156,7 +156,7 @@ GPixmap::GPixmap(const GPixmap &ref, const GRect &rect)
 
 
 void 
-GPixmap::init(int arows, int acolumns, GPixel *filler)
+GPixmap::init(int arows, int acolumns, const GPixel *filler)
 {
   delete [] pixels_data;
   pixels = pixels_data = 0;
@@ -177,13 +177,13 @@ GPixmap::init(int arows, int acolumns, GPixel *filler)
 
 
 void 
-GPixmap::init(const GBitmap &ref, GPixel *userramp)
+GPixmap::init(const GBitmap &ref, const GPixel *userramp)
 {
   init(ref.rows(), ref.columns(), 0);
   if (nrows>0 && ncolumns>0)
   {
     // Create pixel ramp
-    GPixel *ramp = userramp;
+    const GPixel *ramp = userramp;
     if (!userramp)
       ramp = new_gray_ramp(ref.get_grays());
     // Copy pixels
@@ -202,7 +202,7 @@ GPixmap::init(const GBitmap &ref, GPixel *userramp)
 
 
 void 
-GPixmap::init(const GBitmap &ref, const GRect &rect, GPixel *userramp)
+GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
 {
   init(rect.height(), rect.width(), 0);
   // compute destination rectangle
@@ -213,7 +213,7 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, GPixel *userramp)
   if (! rect2.isempty())
   {
     // allocate ramp
-    GPixel *ramp = userramp;
+    const GPixel *ramp = userramp;
     if (!userramp)
       ramp = new_gray_ramp(ref.get_grays());
     // copy pixels
