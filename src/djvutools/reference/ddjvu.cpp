@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.26 2001-07-25 23:43:47 bcr Exp $
+// $Id: ddjvu.cpp,v 1.27 2001-07-26 17:23:15 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.26 2001-07-25 23:43:47 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.27 2001-07-26 17:23:15 bcr Exp $# */
 //@{
 //@}
 
@@ -454,11 +454,7 @@ main(int argc, char **argv)
         }
       if (page_num<0) page_num=0;
       // Process remaining arguments
-      if (argc == 1) 
-        convert(GURL::Filename::UTF8("-"),GURL::Filename::UTF8("-"), page_num); 
-      else if (argc == 2) 
-        convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8("-"), page_num);
-      else if (argc == 3) 
+      if (argc == 3) 
         convert(GURL::Filename::UTF8(dargv[1]),GURL::Filename::UTF8(dargv[2]), page_num);
       else
         usage();
