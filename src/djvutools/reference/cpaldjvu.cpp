@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $
+//C- $Id: cpaldjvu.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $
 
 
 /** @name cpaldjvu
@@ -49,7 +49,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $# */
 //@{
 //@}
 
@@ -139,7 +139,7 @@ CCImage::CCImage(int width, int height)
 
 // -- Adds a run to the CCImage
 inline void 
-CCImage::add_single_run(int y, int x1, int x2, int color, int ccid=0)
+CCImage::add_single_run(int y, int x1, int x2, int color, int ccid)
 {
   int index = runs.hbound();
   runs.touch(++index);

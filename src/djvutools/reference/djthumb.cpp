@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djthumb.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $
+//C- $Id: djthumb.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $
 
 // DJTHUMB -- DjVu thumbnails generator
 
@@ -48,7 +48,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $# */
+    #$Id: djthumb.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $# */
 //@{
 //@}
 
@@ -79,7 +79,7 @@ Options:\n\
 	-s[ize] <size>	- How big (in pixels) thumbnail images\n\
 			  should be (default is 128 pixels).\n\
 \n\
-The program will generate thumbnails for every page of <djvu_file_in>
+The program will generate thumbnails for every page of <djvu_file_in> \
 and will store results into <djvu_file_out>.\n\n", progname);
 }
 
@@ -177,4 +177,5 @@ main(int argc, char ** argv)
       exc.perror();
       exit(1);
    } G_ENDCATCH;
+return 0;
 }

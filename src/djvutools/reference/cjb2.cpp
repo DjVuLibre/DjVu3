@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $
+//C- $Id: cjb2.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $
 
 /** @name cjb2
 
@@ -49,7 +49,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    #$Id: cjb2.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $# */
+    #$Id: cjb2.cpp,v 1.2 2000-09-21 23:52:30 mrosen Exp $# */
 //@{
 //@}
 
@@ -159,7 +159,7 @@ CCImage::CCImage(int width, int height, int dpi)
   :height(height), width(width), nregularccs(0)
 {
   // Compute cleaning constants
-  int dpi = MAX(200, MIN(900, dpi));
+  dpi = MAX(200, MIN(900, dpi));
   largesize = MIN( 500, MAX(64, dpi));
   smallsize = MAX(2, dpi/150);
   tinysize = MAX(0, dpi*dpi/20000 - 1);
