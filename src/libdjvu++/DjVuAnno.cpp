@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.49 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: DjVuAnno.cpp,v 1.50 2000-06-01 22:26:20 mrosen Exp $
 
 
 #ifdef __GNUC__
@@ -1396,7 +1396,7 @@ DjVuTXT::search_string(const char * string, int & from, bool search_fwd,
 
       // Get rid of the terminating separators
    while(local_string.length() &&
-      is_separator(local_string[local_string.length()-1], whole_word))
+      is_separator(local_string[(int)(local_string.length())-1], whole_word))
 	 local_string.setat(local_string.length()-1, 0);
 
    string=local_string;
