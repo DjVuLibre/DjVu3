@@ -282,6 +282,10 @@ SOURCE=.\DjVuDocument.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DjVuDumpHelper.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DjVuErrorList.cpp
 # End Source File
 # Begin Source File
@@ -455,6 +459,10 @@ SOURCE=.\DjVuDocEditor.h
 # Begin Source File
 
 SOURCE=.\DjVuDocument.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DjVuDumpHelper.h
 # End Source File
 # Begin Source File
 

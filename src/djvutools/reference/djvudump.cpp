@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $
+//C- $Id: djvudump.cpp,v 1.2 2000-10-18 23:40:02 fcrary Exp $
 
 /** @name djvuinfo
 
@@ -58,7 +58,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.1 2000-09-21 21:14:00 mrosen Exp $# */
+    #$Id: djvudump.cpp,v 1.2 2000-10-18 23:40:02 fcrary Exp $# */
 //@{
 //@}
 
@@ -71,7 +71,7 @@ display(const char *s)
 {
    DjVuDumpHelper helper;
    StdioByteStream ibs(s, "rb");
-   GP<MemoryByteStream> str_out;
+   GP<ByteStream> str_out;
    str_out=helper.dump(ibs);
    StdioByteStream obs("-", "w");
    str_out->seek(0);

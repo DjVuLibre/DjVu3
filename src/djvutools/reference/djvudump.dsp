@@ -89,10 +89,6 @@ LINK32=link.exe
 
 SOURCE=.\djvudump.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\DjVuDumpHelper.cpp
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
