@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.h,v 1.3 1999-05-27 17:22:09 eaf Exp $
+//C- $Id: IWTransform.h,v 1.4 1999-06-08 15:50:34 leonb Exp $
 
-#ifndef _TEMPLATE_H_
-#define _TEMPLATE_H_
+#ifndef _IWTRANSFORM_H_
+#define _IWTRANSFORM_H_
 
 #ifdef __GNUC__
 #pragma interface
@@ -28,7 +28,7 @@
     @memo 
     Fast IW44 transforms.
     @version 
-    #$Id: IWTransform.h,v 1.3 1999-05-27 17:22:09 eaf Exp $# 
+    #$Id: IWTransform.h,v 1.4 1999-06-08 15:50:34 leonb Exp $# 
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{
@@ -40,18 +40,7 @@
 class IWTransform
 {
  public:
-  // MMX DETECTION
-  /** Detects and enable MMX or similar technologies.  This function chects
-      whether a specialized implementations of the IW44 transform is available
-      (such as the MMX implementation) and enables it.  Returns a boolean
-      indicating whether such an implementation is available.  Speedups
-      factors may vary. */
-  static int enable_mmx();
-  /** Disable MMX or similar technologies.  The transforms will then be
-      performed using the baseline code. */
-  static int disable_mmx();
-
-  // WAVELET TRANSFORM
+ // WAVELET TRANSFORM
   /** Forward transform. */
   static void forward(short *p, int w, int h, int rowsize, int begin, int end);
   /** Forward transform. */

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GCache.h,v 1.2 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GCache.h,v 1.3 1999-06-08 15:50:34 leonb Exp $
 
 #ifndef _GCACHE_H
 #define _GCACHE_H
@@ -34,18 +34,16 @@ class GCache;
 
 class GCacheItemBase
 {
-   template<class Key, class Value>
-   friend class	GCache;
 public:
-   GCacheItemBase(void);
-   virtual ~GCacheItemBase(void);
-
-   time_t	get_time(void) const;
-private:
-   time_t	time;
-   GPosition	cache_pos;
-
-   static int	qsort_func(const void * el1, const void * el2);
+  GCacheItemBase(void);
+  virtual ~GCacheItemBase(void);
+  time_t	get_time(void) const;
+public:
+  // Do not use: These members are public because
+  // friend template classes do not work well enough.
+  time_t	time;
+  GPosition	cache_pos;
+  static int	qsort_func(const void * el1, const void * el2);
 };
 
 inline
