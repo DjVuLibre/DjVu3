@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.45 2001-04-26 23:58:11 bcr Exp $
+// $Id: DataPool.h,v 1.46 2001-07-09 19:38:05 bcr Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
@@ -65,7 +65,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.45 2001-04-26 23:58:11 bcr Exp $#
+    @version #$Id: DataPool.h,v 1.46 2001-07-09 19:38:05 bcr Exp $#
 */
 
 //@{
@@ -519,6 +519,10 @@ public:
 
       // Internal. Used by 'OpenFiles'
    void		clear_stream(const bool release=false);
+
+      /** Useful in comparing data pools.  Returns true if dirived from
+          same URL or bytestream. */
+   bool simple_compare(DataPool &pool) const;
 private:
    bool		eof_flag;
    bool		stop_flag;
@@ -562,6 +566,16 @@ private:
 public:
   static const char *Stop;
 };
+
+inline bool 
+DataPool::simple_compare(DataPool &pool) const
+{
+  // return true if these pools are identical.  False means they may or may
+  // not be identical.
+  return (this == &pool)
+    ||(furl.is_valid()&&!furl.is_empty()&&pool.furl.is_valid()&&(furl == pool.furl))
+    ||(data && (data == pool.data));
+}
 
 inline bool
 DataPool::is_connected(void) const

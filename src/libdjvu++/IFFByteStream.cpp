@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.30 2001-07-03 17:02:32 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.31 2001-07-09 19:38:05 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -473,5 +473,49 @@ long
 IFFByteStream::tell() const
 {
   return (seekto>offset)?seekto:offset;
+}
+
+bool
+IFFByteStream::compare(IFFByteStream &iff)
+{
+  bool retval=(&iff == this);
+  if(!retval)
+  {
+    GUTF8String chkid1, chkid2;
+    int size;
+    while((size=get_chunk(chkid1)) == iff.get_chunk(chkid2))
+    {
+      if(chkid1 != chkid2)
+      {
+        break;
+      }
+      if(!size)
+      {
+        retval=true;
+        break;
+      }
+      char buf[4096];
+      int len;
+      while((len=read(buf,sizeof(buf))))
+      {
+        int s=0;
+        char buf2[sizeof(buf)];
+        while(s<len)
+        {
+          const int i=iff.read(buf2+s,len-s);
+          if(!i)
+            break;
+          s+=i;
+        }
+        if((s != len)||memcmp(buf,buf2,len))
+          break;
+      }
+      if(len)
+        break;
+      iff.close_chunk();
+      close_chunk();
+    }
+  }
+  return retval;
 }
 

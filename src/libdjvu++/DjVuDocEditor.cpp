@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.84 2001-07-03 17:02:32 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.85 2001-07-09 19:38:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -529,7 +529,7 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
       file_pool=source->request_data(source, file_url);
       if(source != this)
       {
-        file_pool=DataPool::create(file_pool->get_stream()->duplicate());
+        file_pool=DataPool::create(file_pool->get_stream());
       }
     }
        // Create DataPool and see if the file exists
@@ -570,6 +570,35 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
         id=name2id[name];
       }else
       {
+           // Check to see if this page exists with a different name.
+        if(!is_page)
+        {
+          GPList<DjVmDir::File> list(dir->get_files_list());
+          for(GPosition pos=list;pos;++pos)
+          {
+            DEBUG_MSG("include " << list[pos]->is_include() << " size=" << list[pos]->size << " length=" << file_pool->get_length() << "\n");
+            if(list[pos]->is_include() && (!list[pos]->size || (list[pos]->size == file_pool->get_length())))
+            {
+              id=list[pos]->get_load_name();
+              GP<DjVuFile> file(get_djvu_file(id,false));
+              const GP<DataPool> pool(file->get_djvu_data(false));
+              if(file_pool->simple_compare(*pool))
+              {
+                // The files are the same, so just store the alias.
+                name2id[name]=id;
+              }
+              const GP<IFFByteStream> giff_old(IFFByteStream::create(pool->get_stream()));
+              const GP<IFFByteStream> giff_new(IFFByteStream::create(file_pool->get_stream()));
+              file=0;
+              if(giff_old->compare(*giff_new))
+              {
+                // The files are the same, so just store the alias.
+                name2id[name]=id;
+                return true;
+              }
+            } 
+          }
+        }
         // Otherwise create a new unique ID and remember the translation
         id=find_unique_id(name);
         name2id[name]=id;

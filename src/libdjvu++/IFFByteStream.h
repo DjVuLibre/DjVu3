@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.31 2001-07-03 17:02:32 bcr Exp $
+// $Id: IFFByteStream.h,v 1.32 2001-07-09 19:38:05 bcr Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.31 2001-07-03 17:02:32 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.32 2001-07-09 19:38:05 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -235,6 +235,11 @@ public:
       implementation which does nothing. */
   virtual void flush(void)
   { ByteStream::Wrapper::flush(); }
+  /** This is a simple compare method.  The IFFByteStream may be read for
+      the sake of the comparison.  Since IFFByteStreams are non-seekable,
+      the stream is not valid for use after comparing, regardless of the
+      result. */
+  bool compare(IFFByteStream &iff);
   /** #has_magic# is true if the stream has the DjVu file magic.
    */
   bool has_magic;
