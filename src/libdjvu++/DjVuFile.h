@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.28 1999-09-12 18:55:38 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.29 1999-09-14 22:32:38 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.28 1999-09-12 18:55:38 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.29 1999-09-14 22:32:38 eaf Exp $#
 */
 
 //@{
@@ -367,6 +367,12 @@ public:
       // Internal: used by DjVuDocument
    GP<DataPool>		get_data_pool(void) const { return data_pool; };
 
+      // Internal. Used by DjVuDocument. May block for data.
+   void			move(const GURL & dir_url);
+
+      // Internal: user by DjVuDocument
+   void			set_name(const char * name);
+
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
@@ -423,6 +429,7 @@ private:
    void		add_djvu_data(IFFByteStream & str,
 			      GMap<GURL, void *> & map,
 			      bool included_too, bool no_ndir);
+   void		move(GMap<GURL, void *> & map, const GURL & dir_url);
 };
 
 inline long

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.46 1999-09-13 20:45:03 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.47 1999-09-14 22:32:38 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -83,7 +83,6 @@ DjVuFile::check() const
     THROW("DjVuFile is not initialized");
 }
 
-
 void 
 DjVuFile::init(ByteStream & str)
 {
@@ -109,17 +108,17 @@ DjVuFile::init(ByteStream & str)
    sprintf(buffer, "djvufile:/%p.djvu", this);
    url=buffer;
 
+      // Set it here because trigger will call other DjVuFile's functions
+   initialized=true;
+   
       // Add (basically - call) the trigger
    data_pool->add_trigger(-1, static_trigger_cb, this);
-
-      // Ready
-   initialized = true;
 }
 
 void
 DjVuFile::init(const GURL & xurl, GP<DjVuPort> port) 
 {
-   DEBUG_MSG("DjVuFile::DjVuFile(): url='" << url << "'\n");
+   DEBUG_MSG("DjVuFile::init(): url='" << xurl << "'\n");
    DEBUG_MAKE_INDENT(3);
 
    if (initialized)
@@ -137,13 +136,13 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
    if (!port)
      port = simple_port = new DjVuSimplePort();
    pcaster->add_route(this, port);
-      
+
+      // Set it here because trigger will call other DjVuFile's functions
+   initialized=true;
+   
    if (!(data_pool=pcaster->request_data(this, url)))
       THROW("Failed get data for URL '"+url+"'");
    data_pool->add_trigger(-1, static_trigger_cb, this);
-
-      // Ready
-   initialized = true;
 }
 
 DjVuFile::~DjVuFile(void)
@@ -152,12 +151,11 @@ DjVuFile::~DjVuFile(void)
    DEBUG_MAKE_INDENT(3);
    {
      GCriticalSectionLock lock(&trigger_lock);
-     data_pool->del_trigger(static_trigger_cb, this);
+     if (data_pool)
+	data_pool->del_trigger(static_trigger_cb, this);
    }
    stop_decode(1);
 }
-
-
 
 void
 DjVuFile::reset(void)
@@ -190,6 +188,7 @@ DjVuFile::get_memory_usage(void) const
 GPList<DjVuFile>
 DjVuFile::get_included_files(bool only_created)
 {
+   check();
    if (!only_created && !are_incl_files_created())
       process_incl_chunks();
 
@@ -202,6 +201,7 @@ void
 DjVuFile::wait_for_chunk(void)
       // Will return after a chunk has been decoded
 {
+   check();
    DEBUG_MSG("DjVuFile::wait_for_chunk() called\n");
    DEBUG_MAKE_INDENT(3);
    chunk_mon.enter();
@@ -221,6 +221,7 @@ DjVuFile::wait_for_finish(bool self)
    if (self) DEBUG_MSG("Waiting for self termination, btw\n");
    DEBUG_MAKE_INDENT(3);
 #endif
+   check();
    
       // By locking the monitor, we guarantee that situation doesn't change
       // between the moments when we check for pending finish events
@@ -265,6 +266,7 @@ DjVuFile::wait_for_finish(bool self)
 void
 DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
 {
+   check();
    chunk_mon.enter();
    chunk_mon.broadcast();
    chunk_mon.leave();
@@ -274,6 +276,7 @@ void
 DjVuFile::notify_file_flags_changed(const DjVuFile * src,
 				    long set_mask, long clr_mask)
 {
+   check();
    if (set_mask & (DECODE_OK | DECODE_FAILED | DECODE_STOPPED))
    {
 	 // Signal threads waiting for file termination
@@ -326,6 +329,7 @@ DjVuFile::static_decode_func(void * cl_data)
 void
 DjVuFile::decode_func(void)
 {
+   check();
    DEBUG_MSG("DjVuFile::decode_func() called, url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -388,8 +392,8 @@ DjVuFile::decode_func(void)
    } ENDCATCH;
 
    TRY {
-      if (flags.test_and_modify(DECODING, 0, DECODE_OK, DECODING))
-	 pcaster->notify_file_flags_changed(this, DECODE_OK, DECODING);
+      if (flags.test_and_modify(DECODING, 0, DECODE_OK | INCL_FILES_CREATED, DECODING))
+	 pcaster->notify_file_flags_changed(this, DECODE_OK | INCL_FILES_CREATED, DECODING);
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
@@ -397,6 +401,7 @@ DjVuFile::decode_func(void)
 GP<DjVuFile>
 DjVuFile::process_incl_chunk(ByteStream & str)
 {
+   check();
    DEBUG_MSG("DjVuFile::process_incl_chunk(): processing INCL chunk...\n");
    DEBUG_MAKE_INDENT(3);
 
@@ -412,7 +417,7 @@ DjVuFile::process_incl_chunk(ByteStream & str)
    while(incl_str.length() && incl_str[0]=='\n')
    {
       GString tmp=((const char *) incl_str)+1; incl_str=tmp;
-   };
+   }
    while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
       incl_str.setat(incl_str.length()-1, 0);
 
@@ -427,12 +432,12 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       if (incl_url.is_empty())	// Fallback. Should never be used.
 	 incl_url=url.base()+incl_str;
 
-	 // Now see if there is already a file with this URL created
+	 // Now see if there is already a file with this *name* created
       {
 	 GCriticalSectionLock lock(&inc_files_lock);
 	 GPosition pos;
 	 for(pos=inc_files_list;pos;++pos)
-	    if (inc_files_list[pos]->url==incl_url) break;
+	    if (inc_files_list[pos]->url.name()==incl_url.name()) break;
 	 if (pos) return inc_files_list[pos];
       }
       
@@ -441,61 +446,91 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       if (!file) THROW("Internal error: id_to_file() didn't create any file.");
       pcaster->add_route(file, this);
 
-      GCriticalSectionLock lock(&inc_files_lock);
-      inc_files_list.append(file);
+	 // Lock the list again and check if the file has already been
+	 // added by someone else
+      {
+	 GCriticalSectionLock lock(&inc_files_lock);
+	 GPosition pos;
+	 for(pos=inc_files_list;pos;++pos)
+	    if (inc_files_list[pos]->url.name()==incl_url.name()) break;
+	 if (pos) file=inc_files_list[pos];
+	 else inc_files_list.append(file);
+      }
       return file;
    }
    return 0;
 }
 
+void
+DjVuFile::process_incl_chunks(void)
+      // This function may block for data
+{
+   check();
+   
+   GP<ByteStream> str=data_pool->get_stream();
+   int chksize;
+   GString chkid;
+   IFFByteStream iff(*str);
+   if (iff.get_chunk(chkid))
+   {
+      while((chksize=iff.get_chunk(chkid)))
+      {
+	 if (chkid=="INCL") process_incl_chunk(iff);
+	 iff.close_chunk();
+      }
+   }
+   flags=flags | INCL_FILES_CREATED;
+}
 
 GP<JB2Dict>
 DjVuFile::static_get_fgjd(void *arg)
 {
-  DjVuFile *file = (DjVuFile*)arg;
-  return file->get_fgjd(1);
+   DjVuFile *file = (DjVuFile*)arg;
+   return file->get_fgjd(1);
 }
-
 
 GP<JB2Dict>
 DjVuFile::get_fgjd(int block)
 {
-  // Simplest case
-  if (DjVuFile::fgjd)
-    return DjVuFile::fgjd;
-  // Check wether included files
-  chunk_mon.enter();
-  for(;;)
-    {
+   check();
+   
+      // Simplest case
+   if (DjVuFile::fgjd)
+      return DjVuFile::fgjd;
+      // Check wether included files
+   chunk_mon.enter();
+   for(;;)
+   {
       int active = 0;
       GPList<DjVuFile> incs = get_included_files();
       for (GPosition pos=incs.firstpos(); pos; ++pos)
-        {
-          GP<DjVuFile> file = incs[pos];
-          if (file->is_decoding()) 
+      {
+	 GP<DjVuFile> file = incs[pos];
+	 if (file->is_decoding())
             active = 1;
-          GP<JB2Dict> fgjd = file->get_fgjd();
-          if (fgjd) 
-            {
-              chunk_mon.leave();
-              return fgjd;
-            }
-        }
-      // Exit if non-blocking mode
+	 GP<JB2Dict> fgjd = file->get_fgjd();
+	 if (fgjd)
+	 {
+	    chunk_mon.leave();
+	    return fgjd;
+	 }
+      }
+	 // Exit if non-blocking mode
       if (! block) break;
-      // Exit if there is no decoding activity
+	 // Exit if there is no decoding activity
       if (! active) break;
-      // Wait until a new chunk gets decoded
+	 // Wait until a new chunk gets decoded
       wait_for_chunk();
-    }
-  chunk_mon.leave();
-  return 0;
+   }
+   chunk_mon.leave();
+   return 0;
 }
-
 
 GString
 DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
 {
+  check();
+   
   GString chkid = id;
   GString desc = "Unrecognized chunk";
   DjVuPortcaster * pcaster=get_portcaster();
@@ -604,24 +639,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
           // Send file notifications if previously started
           if (decode_was_already_started)
             {
-#ifndef DO_NOT_SEND_UNRELIABLE_NOTIFICATIONS
-              // Send chunk notifications 
-              // Unreliable but may be needed by the unix viewer.
-              if (!file->is_decoding())
-                {
-                  int chksize;
-                  GString chkid;
-                  GP<ByteStream> str=file->data_pool->get_stream();
-                  IFFByteStream iff(*str);
-                  if (!iff.get_chunk(chkid)) 
-                    THROW("EOF");
-                  while((chksize=iff.get_chunk(chkid)))
-                    {
-                      get_portcaster()->notify_chunk_done(file, chkid);
-                      iff.close_chunk();
-                    }
-                }
-#endif
               // May send duplicate notifications...
               if (file->is_decode_ok())
                 get_portcaster()->notify_file_flags_changed(file, DECODE_OK, 0);
@@ -747,8 +764,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
   return desc;
 }
 
-
-
 void
 DjVuFile::decode(ByteStream & str)
 {
@@ -819,8 +834,6 @@ DjVuFile::decode(ByteStream & str)
      }
 }
 
-
-
 void
 DjVuFile::start_decode(void)
 {
@@ -859,6 +872,8 @@ DjVuFile::start_decode(void)
 void
 DjVuFile::stop_decode(bool sync)
 {
+   check();
+   
    DEBUG_MSG("DjVuFile::stop_decode(), url='" << url <<
             "', sync=" << (int) sync << "\n");
    DEBUG_MAKE_INDENT(3);
@@ -900,28 +915,11 @@ DjVuFile::stop_decode(bool sync)
    }
 }
 
-void
-DjVuFile::process_incl_chunks(void)
-{
-   if (!data_pool) return;
-   GP<ByteStream> str=data_pool->get_stream();
-   int chksize;
-   GString chkid;
-   IFFByteStream iff(*str);
-   if (iff.get_chunk(chkid))
-   {
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 if (chkid=="INCL") process_incl_chunk(iff);
-	 iff.close_chunk();
-      }
-   }
-   flags=flags | INCL_FILES_CREATED;
-}
-
 GP<DjVuNavDir>
 DjVuFile::find_ndir(GMap<GURL, void *> & map)
 {
+   check();
+   
    DEBUG_MSG("DjVuFile::find_ndir(): looking for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -951,6 +949,8 @@ DjVuFile::find_ndir(void)
 GP<DjVuNavDir>
 DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 {
+   check();
+   
    DEBUG_MSG("DjVuFile::decode_ndir(): decoding for NDIR in '" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
    
@@ -1056,7 +1056,49 @@ DjVuFile::progress_cb(int pos, void * cl_data)
    } else
    {
       DEBUG_MSG("DataPool size is still unknown => ignoring\n");
-   };
+   }
+}
+
+//*****************************************************************************
+//******************************** Utilities **********************************
+//*****************************************************************************
+
+void
+DjVuFile::move(GMap<GURL, void *> & map, const GURL & dir_url)
+      // This function may block for data.
+{
+   if (!map.contains(url))
+   {
+      map[url]=0;
+
+      url=dir_url+url.name();
+
+      if (!are_incl_files_created()) process_incl_chunks();
+
+      GPList<DjVuFile> list=get_included_files(false);
+      for(GPosition pos=list;pos;++pos)
+	 list[pos]->move(map, dir_url);
+   }
+}
+
+void
+DjVuFile::move(const GURL & dir_url)
+      // This function may block for data.
+{
+   check();
+   DEBUG_MSG("DjVuFile::move(): dir_url='" << dir_url << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   GMap<GURL, void *> map;
+   move(map, dir_url);
+}
+
+void
+DjVuFile::set_name(const char * name)
+{
+   DEBUG_MSG("DjVuFile::set_name(): name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   url=url.base()+name;
 }
 
 //*****************************************************************************
@@ -1196,6 +1238,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 TArray<char>
 DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 {
+   check();
+   
    DEBUG_MSG("DjVuFile::get_djvu_data(): creating DjVu raw file\n");
    DEBUG_MAKE_INDENT(3);
    
