@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.17 2001-04-25 22:28:47 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.18 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.17 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.18 2001-04-25 23:04:15 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -120,6 +120,7 @@
 
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static const char * progname;
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $
+// $Id: djthumb.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: djthumb.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -82,6 +82,7 @@
 #include "DjVmDoc.h"
 #include "GOS.h"
 #include <locale.h>
+#include <stdlib.h>
 
 static const char * progname;
 

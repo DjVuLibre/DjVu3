@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $
+// $Id: djvm.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -111,6 +111,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream.h>
+#include <stdlib.h>
 
 static const char * progname;
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $
+// $Id: cjb2.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.16 2001-04-25 23:04:15 bcr Exp $ */
 //@{
 //@}
 
@@ -88,10 +88,7 @@
 #include "GOS.h"
 #include "GURL.h"
 #include <locale.h>
-
-
-
-
+#include <stdlib.h>
 
 // --------------------------------------------------
 // UTILITIES

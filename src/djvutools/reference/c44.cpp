@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $
+// $Id: c44.cpp,v 1.21 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.20 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: c44.cpp,v 1.21 2001-04-25 23:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -201,6 +201,7 @@
 #include <locale.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 // command line data
 

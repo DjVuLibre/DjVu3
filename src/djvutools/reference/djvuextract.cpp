@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.19 2001-04-25 22:28:47 bcr Exp $
+// $Id: djvuextract.cpp,v 1.20 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.19 2001-04-25 22:28:47 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.20 2001-04-25 23:04:15 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -79,6 +79,7 @@
 #include "DjVuFile.h"
 #include "GOS.h"
 #include <locale.h>
+#include <stdlib.h>
 
 
 struct DejaVuInfo

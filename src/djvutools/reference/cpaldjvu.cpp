@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.16 2001-04-25 22:46:54 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.16 2001-04-25 22:46:54 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -89,7 +89,7 @@
 #include "GOS.h"
 #include "GURL.h"
 #include <locale.h>
-
+#include <stdlib.h>
 
 #undef MIN
 #undef MAX

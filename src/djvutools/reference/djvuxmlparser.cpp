@@ -1,7 +1,7 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: djvuxmlparser.cpp,v 1.2 2001-04-25 22:28:48 bcr Exp $
+// $Id: djvuxmlparser.cpp,v 1.3 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 #include "XMLParser.h"
@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <locale.h>
+#include <stdlib.h>
 
 int 
 main(int argc,char *argv[],char *[])

@@ -30,24 +30,25 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $
+// $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.12 $
- *   $Date: 2001-04-25 22:28:47 $
- *   @(#) $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $
+ *   $Revision: 1.13 $
+ *   $Date: 2001-04-25 23:04:15 $
+ *   @(#) $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.12 2001-04-25 22:28:47 bcr Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.13 2001-04-25 23:04:15 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
 #include "GURL.h"
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 static const char ascii_ant[]="ANTa";

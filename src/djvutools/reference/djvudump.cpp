@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $
+// $Id: djvudump.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,7 +78,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.16 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.17 2001-04-25 23:04:15 bcr Exp $# */
 //@{
 //@}
 
@@ -91,9 +91,7 @@ xxx
 #include <locale.h>
 #include <stdio.h>
 #include <ctype.h>
-#ifdef WIN32
 #include <stdlib.h>
-#endif
 
 void
 display(const GURL &url)
