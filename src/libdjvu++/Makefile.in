@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.88 2000-03-01 23:47:41 leonb Exp $
+# C- $Id: Makefile.in,v 1.89 2000-03-04 01:09:09 bcr Exp $
 
 %%%include <paths>
 
@@ -19,7 +19,6 @@ incdir=@%PROJECT_PREFIX%@/include
 DEFS=@%DEFS%@
 INCS=@%INCS%@
 LDFLAGS=
-DOCXX=@%docxx%@
 LIBS=@%LIBS%@ @%LIBJPEG%@ @%libmath%@
 MAKESTLIB=@%make_stlib%@
 LIBJPEG=@%LIBJPEG%@
@@ -149,10 +148,7 @@ html: libdjvu++.dxx libdjvu++.footer
 	-$(RM) -rf Doc
 	-$(MKDIRP) Doc 2>>/dev/null
 	${DOCXX} -d Doc -B SRCDIR/libdjvu++.footer SRCDIR/libdjvu++.dxx
-	for i in Doc/*.html ; do \
-		sed 's,^<body>,<body bgcolor=\#fefefe>,g' < $$i > $$i.new ; \
-		mv $$i.new $$i ; \
-	done
+	$(DOCXXCLEAN) Doc/*.html
 
 tex:  libdjvu++.dxx
 	-@$(MKDIRP) Doc 2>>/dev/null

@@ -77,7 +77,7 @@ then
   fi
 
   makeshlib="${CONFIG_DIR}/make_shlib.sh"
-  docxxclean="${CONFIG_DIR}/docxxclean.pl"
+  docxxclean="${CONFIG_DIR}/doc++clean.pl"
 
   RULES_DIR=`cd ${CONFIG_DIR}/../rules/ 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`
   CONFIG_VARS=`echo RULES_DIR ${CONFIG_VARS}`
