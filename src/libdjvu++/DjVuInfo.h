@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.h,v 1.4 1999-09-17 12:46:05 leonb Exp $
+//C- $Id: DjVuInfo.h,v 1.5 1999-11-06 00:52:36 praveen Exp $
 
 #ifndef _DJVUINFO_H
 #define _DJVUINFO_H
@@ -24,7 +24,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.4 1999-09-17 12:46:05 leonb Exp $# */
+    #$Id: DjVuInfo.h,v 1.5 1999-11-06 00:52:36 praveen Exp $# */
 //@{
 
 
@@ -52,7 +52,7 @@
     the library will attempt to decode files whose version field is smaller
     than this macro.  If the version field is greater than or equal to this
     number, the decoder will just throw a \Ref{GException}.  */
-#define DJVUVERSION_TOO_NEW  22
+#define DJVUVERSION_TOO_NEW  25
 //@}
 
 
