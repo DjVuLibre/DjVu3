@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.7 1999-03-03 23:02:15 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.8 1999-03-04 17:11:10 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.7 1999-03-03 23:02:15 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.8 1999-03-04 17:11:10 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -537,7 +537,7 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     "nop"               // delay slot
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(hppa)
-      char *sp = (char*)(((unsigned long)stacklo+127+256) & ~0xff);
+      char *sp = (char*)(((unsigned long)stacklo+128+255) & ~0xff);
       asm volatile("copy %0,%%sp\n\t"       // set stack pointer
                    "copy %1,%%r22\n\t"      // set call address
                    ".CALL\n\t"              // call pseudo instr (why?)
@@ -551,7 +551,7 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     "jsr $26,($27),0"     // call function
                     : : "r" (sp), "r" (pc) );
 #elif #cpu(powerpc)
-      char *sp = (char*)(((unsigned long)stackhi-64) & ~0xff);
+      char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
       asm volatile ("mr 1,%0\n\t"         // set new stack pointer
                     "mr 0,%1\n\t"         // load func pointer into r0
                     "mtlr 0\n\t"          // load link register with r0
@@ -563,7 +563,7 @@ mach_start(mach_state *st1, void *pc, char *stacklo, char *stackhi)
                     "jmp %a1"             // branch to address %1
                     : : "r" (sp), "a" (pc) );
 #elif #cpu(arm) && defined(COTHREAD_UNTESTED)
-      char *sp = (char*)(((unsigned long)stackhi-64) & ~0xff);
+      char *sp = (char*)(((unsigned long)stackhi-16) & ~0xff);
       asm volatile ("mov%?\t%|sp, %0\n\t" // set new stack pointer
                     "mov%?\t%|pc, %1"     // branch to address %1
                     : : "r" (sp), "r" (pc) );
