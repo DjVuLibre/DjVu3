@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.7 2001-01-05 16:56:22 bcr Exp $
+# $Id: Makefile.in,v 1.8 2001-02-06 21:48:09 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -36,7 +36,7 @@ LIB= $(LIBDJVUXX)
 PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
 	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\
 	$(BINPATH)/bzz $(BINPATH)/djthumb $(BINPATH)/djvmcvt\
-	$(BINPATH)/djvutxt $(BINPATH)/cjb2\
+	$(BINPATH)/djvutxt $(BINPATH)/djvuanno $(BINPATH)/cjb2\
 	$(BINPATH)/cpaldjvu $(BINPATH)/csepdjvu $(BINPATH)/cdjvu $(BINPATH)/djvm
 
 # Makefile for libdjvu++.a
@@ -63,6 +63,7 @@ PPMCOCOOBJS = ppmcoco.o
 BZZOBJS = bzz.o
 DJTHUMBOBJS = djthumb.o
 DJVUTXTOBJS = djvutxt.o
+DJVUANNOOBJS = annotate.o
 CJB2OBJS = cjb2.o
 CPALDJVUOBJS = cpaldjvu.o
 CSEPDJVUOBJS = csepdjvu.o
@@ -128,6 +129,10 @@ $(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB)
 $(BINPATH)/djvutxt: $(DJVUTXTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUTXTOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUTXTOBJS) $(LIB) $(LIBS)
+
+$(BINPATH)/djvuanno: $(DJVUANNOOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUANNOOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUANNOOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/cdjvu: $(CDJVUSCRIPT)
 	cp $(CDJVUSCRIPT) $@

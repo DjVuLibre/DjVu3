@@ -30,7 +30,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: Makefile.in,v 1.111 2001-01-20 01:55:40 bcr Exp $
+# $Id: Makefile.in,v 1.112 2001-02-06 21:48:09 bcr Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -67,7 +67,7 @@ LIBOBJS= DjVuGlobal.o DjVuGlobalMemory.o GOS.o GException.o GContainer.o \
 	 GBitmap.o GPixmap.o GScaler.o DjVuPalette.o ByteStream.o \
 	 IFFByteStream.o BSByteStream.o ZPCodec.o JB2Image.o JB2EncodeCodec.o \
 	 IWImage.o IW44EncodeCodec.o MMRDecoder.o JPEGDecoder.o DataPool.o GURL.o \
-	 DjVuFileCache.o DjVuPort.o GMapAreas.o DjVuAnno.o DjVuText.o \
+	 DjVuFileCache.o DjVuPort.o GMapAreas.o DjVuAnno.o GIFFManager.o DjVuText.o \
 	 DjVuInfo.o DjVuFile.o DjVuImage.o DjVuDocument.o \
 	 DjVmDir.o DjVmDoc.o DjVmDir0.o DjVuNavDir.o DjVuErrorList.o \
 	 parseoptions.o DjVuDocEditor.o DjVuToPS.o DjVuDumpHelper.o \

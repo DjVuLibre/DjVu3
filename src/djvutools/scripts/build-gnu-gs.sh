@@ -2,7 +2,7 @@
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
-#C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
+#C- Copyright © 2001 LizardTech, Inc. All Rights Reserved.
 #C- The DjVu Reference Library is protected by U.S. Pat. No.
 #C- 6,058,214 and patents pending.
 #C- 
@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: build-gnu-gs.sh,v 1.1 2001-02-03 01:08:34 bcr Exp $
+# $Id: build-gnu-gs.sh,v 1.2 2001-02-06 21:48:09 bcr Exp $
 # $Name:  $
 # This is a short script intended to allow building a packaged version
 # of ghostscript.
@@ -50,22 +50,22 @@ do
   if [ ! -r "$i" ]
   then
     xurl="ftp://ftp.cs.wisc.edu/pub/ghost/gnu/gs"`echo "$gsversion"|sed -e 's,[.],,g'`/
-    echo "missing $i"
-    if [ -z "$url" ]
-    then
-      echo "missing $i, attempting to retrieve it"
-      wget --http-user=ftp --http-passwd=`whoami`@ -O "$i" "$xurl/$i"
-      if ( gzip -t "$i" )
-      then
-        echo success
-      else
-        rm -f "$i"
-        url="$xurl"
-      fi
-    else
+#   echo "missing $i"
+#   if [ -z "$url" ]
+#   then
+#     echo "missing $i, attempting to retrieve it"
+#      wget --http-user=ftp --http-passwd=`whoami`@ -O "$i" "$xurl/$i"
+#      if ( gzip -t "$i" )
+#      then
+#        echo success
+#      else
+#       rm -f "$i"
+#       url="$xurl"
+#      fi
+#    else
       echo "missing $i"
       url="$xurl"
-    fi    
+#   fi    
   fi
 done
 
@@ -356,18 +356,22 @@ echo "doing dummy install"
 make install
 
 echo "renaming dummy install directory"
-name=../gnu-gs-$gsversion-`uname -s`-`uname -m`
-if [ -d "$name" ]
+name=gnu-gs-$gsversion-`uname -s`-`uname -m`
+if [ -d "../$name" ]
 then
-  chmod -R 777 "$name"
-  rm -r "$name"
+  chmod -R 777 "../$name"
+  rm -r "../$name"
 fi
-mv -f "$fullprefix" "$name"
+mv -f "$fullprefix" "../$name"
 rm -rf "$prefix"
 
 echo "creating install.sh script"
-(sed 's,%-dollar-%,\$,g' > "$name"/install.sh) <<+  
+(sed 's,%-dollar-%,\$,g' > "../$name"/install.sh) <<+  
 #!/bin/sh
+if [ -d "$name" ]
+then
+  cd "$name"
+fi
 if [ -n "%-dollar-%1" ]
 then
   prefix="%-dollar-%1"
@@ -378,28 +382,31 @@ then
   echo "For example: %-dollar-%0 /usr/local"
   exit 1
 fi
-tar cf  - share man bin |(cd "%-dollar-%prefix";tar xf -)
+tar cf  - share man bin |(cd "%-dollar-%prefix";tar xvvf -)
+echo "./changeprefix %-dollar-%prefix"
 exec ./changeprefix "%-dollar-%prefix"
 +
-chmod 555 "$name/install.sh"
+chmod 555 "../$name/install.sh"
 
 echo "extracting fonts"
 for i in "$stdfonts_src" "$otherfonts_src" ; do
-  gunzip -c < "../$i"|(cd "$name/share/ghostscript";tar xf -)
+  gunzip -c < "../$i"|(cd "../$name/share/ghostscript";tar xf -)
 done
 
 echo "moving the changeprefix command"
-mv changeprefix "$name/changeprefix"
+mv changeprefix "../$name/changeprefix"
 echo "copying documentation"
-cp *.htm "$name/."
+cp *.htm "../$name/."
 echo "copying license"
-cp COPYING "$name/COPYING"
+cp COPYING "../$name/COPYING"
 
-echo "creating archive" 
-(cd ..;tar cf - `basename "$name"`)|gzip -c > "$name".tar.gz
+# echo "creating archive" 
+# (cd ..;tar cf - `basename "../$name"`)|gzip -c > "../$name".tar.gz
 
-echo "deleting dummy install directory"
-chmod -R 777 "$name"
-rm -r "$name"
+# echo "deleting dummy install directory"
+# chmod -R 777 "../$name"
+# rm -r "../$name"
 
+cp "../$name/install.sh" ../install.sh
+echo "Run ./install.sh <prefix> to install ghostscript"
 

@@ -2,7 +2,7 @@
 #C-
 #C- DjVu® Reference Library (v. 3.0)
 #C- 
-#C- Copyright © 2000 LizardTech, Inc. All Rights Reserved.
+#C- Copyright © 2001 LizardTech, Inc. All Rights Reserved.
 #C- The DjVu Reference Library is protected by U.S. Pat. No.
 #C- 6,058,214 and patents pending.
 #C- 
@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pdftodjvu.sh,v 1.5 2001-02-02 18:38:44 bcr Exp $
+# $Id: pdftodjvu.sh,v 1.6 2001-02-06 21:48:09 bcr Exp $
 # $Name:  $
 
 # DjVu Enterprise Commands
@@ -58,85 +58,90 @@ outputdev="pnmraw"
 # Parse arguments
 
 args=""
-j="$1"
-case "$j" in
-  "--"?*)
-    while [ -n "$j" ] ; do
-      case "$j" in
-        "--profile="*)
-           free=""
-           profile="$j" ;;
-        "--best"|"--best=t"*)
-           best=true ;;
-        "--free"|"--free=t"*)
-           free=true ;;
-        "--colors="*)
-           free=true 
-           args="$args '$j'" ;;
-        "--tobitonal"|"--tobitonal=t"*)
-           outputdev=pbmraw
-           defaultprofile="--profile=bitonal"
-           args="$args '$j'" ;;
-        "--togray"|"--togray=t"*)
-           outputdev=pgmraw
-           args="$args '$j'" ;;
-        "--dpi="*)
-           dpi=`echo $j|sed 's,--dpi=,,'` ;;
-        "--subsample="*|"--upsample="*|"--resize="*)
-           best=true
-           args="$args '$j'" ;;
-        "--verbose"|"--verbose=t"*)
-           verbose=true
-           cargs=`echo $cargs $j`
-           args="$args '$j'" ;;
-        "--page-range="*|"--pages-per-dict=*")
-           echo "Option $j is not supported by %0" 1>&2
-           usage=1 ;;
-        "--help")
-           usage=0 ;;
-        *)
-           free=""
-           args="$args '$j'" ;;
-      esac
-      shift
-      if [ -z "$usage" ]
-      then
-        case "$1" in
-          "--"?*) j="$1" ;;
-          *) j="" ;;
-        esac
-      else
-        j="";
-      fi
-    done ;;
-  *) ;;
-esac
-
-if [ -z "$usage" ]
+if [ -n "$1" ]
 then
-  input="$1"
-  shift
-  output="$1"
-  shift
-  if [ ! -r "$input" ]
+  j="$1"
+  case "$j" in
+    "--"?*)
+      while [ -n "$j" ] ; do
+        case "$j" in
+          "--profile="*)
+             free=""
+             profile="$j" ;;
+          "--best"|"--best=t"*)
+             best=true ;;
+          "--free"|"--free=t"*)
+             free=true ;;
+          "--colors="*)
+             free=true 
+             args="$args '$j'" ;;
+          "--tobitonal"|"--tobitonal=t"*)
+             outputdev=pbmraw
+             defaultprofile="--profile=bitonal"
+             args="$args '$j'" ;;
+          "--togray"|"--togray=t"*)
+             outputdev=pgmraw
+             args="$args '$j'" ;;
+          "--dpi="*)
+             dpi=`echo $j|sed 's,--dpi=,,'` ;;
+          "--subsample="*|"--upsample="*|"--resize="*)
+             best=true
+             args="$args '$j'" ;;
+          "--verbose"|"--verbose=t"*)
+             verbose=true
+             cargs=`echo $cargs $j`
+             args="$args '$j'" ;;
+          "--page-range="*|"--pages-per-dict=*")
+             echo "Option $j is not supported by %0" 1>&2
+             usage=1 ;;
+          "--help")
+             usage=0 ;;
+          *)
+             free=""
+             args="$args '$j'" ;;
+        esac
+        shift
+        if [ -z "$usage" ]
+        then
+          case "$1" in
+            "--"?*) j="$1" ;;
+            *) j="" ;;
+          esac
+        else
+          j="";
+        fi
+      done ;;
+    *) ;;
+  esac
+  if [ -z "$usage" ]
   then
-    echo "Failed to find input file '$input'." 1>&2
-    usage=1
-  elif [ -z "$output" ]
-  then
-    echo "Failed to specify output." 1>&2
-    usage=1
-  elif [ -n "$1" ]
-  then
-    echo "Too many arguments." 1>&2
+    input="$1"
+    shift
+    output="$1"
+    shift
+    if [ ! -r "$input" ]
+    then
+      echo "Failed to find input file '$input'." 1>&2
+      usage=1
+    elif [ -z "$output" ]
+    then
+      echo "Failed to specify output." 1>&2
+      usage=1
+    elif [ -n "$1" ]
+    then
+      echo "Too many arguments." 1>&2
+      usage=1
+    fi
+  else 
+    echo "Too few arguments." 1>&2
     usage=1
   fi
 fi
 if [ -n "$usage" ] 
 then
-e=`basename "$electroniccommand"`
-d=`basename "$documentcommand"`
-cat <<+
+  e=`basename "$electroniccommand"`
+  d=`basename "$documentcommand"`
+  cat <<+
 For usage with the DjVu3 Open Source:
   Bundled output:
     $0 --free [$e options] \\
