@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.38 2001-03-30 23:31:29 bcr Exp $
+// $Id: GString.cpp,v 1.39 2001-04-02 16:22:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,13 +47,13 @@
 #include "debug.h"
 
 
-#ifndef WIN32
+// #ifndef WIN32
 #define LIBICONV_PLUG true
-#endif
+// #endif
+
 
 #ifdef HAS_ICONV
 #include <iconv.h>//MBCS cvt
-// #include "iconv_string.h"
 #include "libcharset.h"//MBCS cvt
 #endif
 // #include <locale.h>
@@ -692,7 +692,12 @@ UTF82Native(const char source[])
   mbstate_t ps;
   for(const unsigned long *s=gsource;s[0];++s)
   { 
-    const wchar_t w=s[0];
+    const wchar_t w=(wchar_t)(s[0]);
+	if((const unsigned long)w != (s[0]))
+	{
+	  r=retval.getbuf(1);
+	  break;
+	}
     char bytes[12];
     int i=wcrtomb(bytes,w,&ps);
     if(i<0)
