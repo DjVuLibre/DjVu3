@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: package.sh,v 1.16 2001-02-02 23:04:21 bcr Exp $
+# $Id: package.sh,v 1.17 2001-02-02 23:05:53 bcr Exp $
 # $Name:  $
 
 # EXIT ON ERROR
@@ -118,7 +118,7 @@ then
   exit 1
 fi
 version=`echo $version|sed -e 's, ,-,g'`
-v=`echo "$version|sed -n -e 's,^\([0-9]\).*,\1,p'`
+v=`echo "$version"|sed -n -e 's,^\([0-9]\).*,\1,p'`
 if [ -z "$v" ]
 then
   version="alpha"
