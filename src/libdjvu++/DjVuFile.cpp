@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.44 1999-09-11 15:18:51 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.45 1999-09-12 18:55:38 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -306,7 +306,7 @@ DjVuFile::notify_file_flags_changed(const DjVuFile * src,
 	 if (all)
 	 {
 	    DEBUG_MSG("Just got ALL data for '" << url << "'\n");
-	    flags|=ALL_DATA_PRESENT;
+	    flags=flags | ALL_DATA_PRESENT;
 	    get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
 	 }
       }
@@ -388,13 +388,8 @@ DjVuFile::decode_func(void)
    } ENDCATCH;
 
    TRY {
-      flags.enter();
-      if (is_decoding())
-      {
-	 flags=flags & ~DECODING | DECODE_OK;
-	 flags.leave();
+      if (flags.test_and_modify(DECODING, 0, DECODE_OK, DECODING))
 	 pcaster->notify_file_flags_changed(this, DECODE_OK, DECODING);
-      } else flags.leave();
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
 }
@@ -833,8 +828,8 @@ DjVuFile::start_decode(void)
       if (!is_decoding())
       {
 	 if (flags & DECODE_STOPPED) reset();
-	 flags&=~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
-	 flags|=DECODING;
+	 flags=flags & ~(DECODE_OK | DECODE_STOPPED | DECODE_FAILED);
+	 flags=flags | DECODING;
       
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
@@ -847,8 +842,8 @@ DjVuFile::start_decode(void)
 	 decode_thread_started_ev.wait();
       }
    } CATCH(exc) {
-      flags&=~DECODING;
-      flags|=DECODE_FAILED;
+      flags=flags & ~DECODING;
+      flags=flags | DECODE_FAILED;
       flags.leave();
       get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       RETHROW;
@@ -916,7 +911,7 @@ DjVuFile::process_incl_chunks(void)
 	 iff.close_chunk();
       }
    }
-   flags|=INCL_FILES_CREATED;
+   flags=flags | INCL_FILES_CREATED;
 }
 
 GP<DjVuNavDir>
@@ -1017,7 +1012,7 @@ DjVuFile::trigger_cb(void)
    DEBUG_MAKE_INDENT(3);
 
    file_size=data_pool->get_length();
-   flags|=DATA_PRESENT;
+   flags=flags | DATA_PRESENT;
    get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
 
    if (!are_incl_files_created()) process_incl_chunks();
@@ -1034,7 +1029,7 @@ DjVuFile::trigger_cb(void)
    if (all)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
-      flags|=ALL_DATA_PRESENT;
+      flags=flags | ALL_DATA_PRESENT;
       get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
    }
 }

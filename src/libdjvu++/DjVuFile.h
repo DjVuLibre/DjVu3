@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.27 1999-09-11 15:18:52 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.28 1999-09-12 18:55:38 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.27 1999-09-11 15:18:52 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.28 1999-09-12 18:55:38 eaf Exp $#
 */
 
 //@{
@@ -482,8 +482,8 @@ DjVuFile::is_modified(void) const
 inline void
 DjVuFile::set_modified(bool m)
 {
-   if (m) flags|=MODIFIED;
-   else flags&=~MODIFIED;
+   if (m) flags=flags | MODIFIED;
+   else flags=flags & ~MODIFIED;
 }
 
 inline void

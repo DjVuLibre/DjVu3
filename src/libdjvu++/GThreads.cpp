@@ -9,10 +9,10 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.30 1999-08-18 21:38:00 leonb Exp $
+//C- $Id: GThreads.cpp,v 1.31 1999-09-12 18:55:27 eaf Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.30 1999-08-18 21:38:00 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.31 1999-09-12 18:55:27 eaf Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -1425,3 +1425,65 @@ GMonitor::wait(unsigned long timeout)
 
 #endif
 
+GSafeFlags &
+GSafeFlags::operator=(const GSafeFlags & f)
+{
+   enter();
+   if (flags!=f.flags)
+   {
+      flags=f.flags;
+      broadcast();
+   }
+   leave();
+   return *this;
+}
+
+GSafeFlags::operator long(void) const
+{
+   long f;
+   ((GSafeFlags *) this)->enter();
+   f=flags;
+   ((GSafeFlags *) this)->leave();
+   return f;
+}
+
+bool
+GSafeFlags::test_and_modify(long set_mask, long clr_mask,
+			    long set_mask1, long clr_mask1)
+{
+   enter();
+   if ((flags & set_mask)==set_mask &&
+       (~flags & clr_mask)==clr_mask)
+   {
+      long new_flags=flags;
+      new_flags|=set_mask1;
+      new_flags&=~clr_mask1;
+      if (new_flags!=flags)
+      {
+	 flags=new_flags;
+	 broadcast();
+      }
+      leave();
+      return true;
+   }
+   leave();
+   return false;
+}
+
+void
+GSafeFlags::wait_and_modify(long set_mask, long clr_mask,
+			    long set_mask1, long clr_mask1)
+{
+   enter();
+   while((flags & set_mask)!=set_mask ||
+	 (~flags & clr_mask)!=clr_mask) wait();
+   long new_flags=flags;
+   new_flags|=set_mask1;
+   new_flags&=~clr_mask1;
+   if (flags!=new_flags)
+   {
+      flags=new_flags;
+      broadcast();
+   }
+   leave();
+}

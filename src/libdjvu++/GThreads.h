@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.22 1999-09-09 22:25:31 eaf Exp $
+//C- $Id: GThreads.h,v 1.23 1999-09-12 18:55:27 eaf Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.22 1999-09-09 22:25:31 eaf Exp $# */
+    #$Id: GThreads.h,v 1.23 1999-09-12 18:55:27 eaf Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -417,9 +417,14 @@ public:
     { gsec->leave(); };
 };
 
-/** A thread safe class representing a set of flags. The class allows to
-    modify, test the flags and to suspend execution of the thread until
-    some given flags are set. */
+/** A thread safe class representing a set of flags. The flags are protected
+    by \Ref{GMonitor}, which is attempted to be locked whenever somebody
+    accesses the flags. One can modify the class contents using one of
+    two functions: \Ref{test_and_modify}() and \Ref{wait_and_modify}().
+    Both of them provide atomic operation of testing (first) and modification
+    (second). The flags remain locked between the moment of testing and
+    modification, which guarantees, that their state cannot be changed in
+    between of these operations. */
 class GSafeFlags : public GMonitor
 {
 private:
@@ -431,81 +436,47 @@ public:
       /** Assignment operator. Will also wake up threads waiting for the
 	  flags to change. */
    GSafeFlags & operator=(const GSafeFlags & f);
-      /** Clears those bits of the flags, which are zero in the #mask#.
-	  It will also wake up threads waiting for the flags to change. */
-   GSafeFlags &	operator&=(long mask);
-      /** Sets those bits of the flags, which are set in the #mask#.
-	  It will also wake up threads waiting for the flags to change. */
-   GSafeFlags &	operator|=(long mask);
       /** Returns the value of the flags */
    operator long(void) const;
 
-      /// Computes and returns binary AND of the flags and the #mask#
-   long	operator&(long mask) const;
+      /** If all bits mentioned in #set_mask# are set in the flags and all
+	  bits mentioned in #clr_mask# are cleared in the flags, it sets all
+	  bits from #set_mask1# in the flags, clears all flags from
+	  #clr_mask1# in the flags and returns #TRUE#. Otherwise returns
+	  #FALSE. */
+   bool	test_and_modify(long set_mask, long clr_mask,
+			long set_mask1, long clr_mask1);
 
-      /// Waits until at least one bit mentioned in #mask# is set in flags
-   void	wait_for_flags(long mask) const;
+      /** Waits until all bits mentioned in #set_mask# are set in the flags
+	  and all bits mentioned in #clr_flags# are cleared in the flags.
+	  After that it sets bits from #set_mask1# and clears bits from
+	  #clr_mask1# in the flags. */
+   void	wait_and_modify(long set_mask, long clr_mask,
+			long set_mask1, long clr_mask1);
+
+      /** Waits until all bits set in #set_mask# are set in the flags and
+	  all bits mentioned in #clr_mask# are cleared in the flags. */
+   void	wait_for_flags(long set_mask, long clr_mask=0) const;
+
+      /** Modifies the flags by setting all bits mentioned in #set_mask#
+	  and clearing all bits mentioned in #clr_mask#. If the flags have
+	  actually been modified, a broadcast will be sent. */
+   void	modify(long set_mask, long clr_mask);
 };
 
 inline
 GSafeFlags::GSafeFlags(long xflags) : flags(xflags) {}
 
-inline GSafeFlags &
-GSafeFlags::operator=(const GSafeFlags & f)
+inline void
+GSafeFlags::wait_for_flags(long set_mask, long clr_mask) const
 {
-   enter();
-   flags=f.flags;
-   broadcast();
-   leave();
-   return *this;
-}
-
-inline GSafeFlags &
-GSafeFlags::operator&=(long mask)
-{
-   enter();
-   flags&=mask;
-   broadcast();
-   leave();
-   return *this;
-}
-
-inline GSafeFlags &
-GSafeFlags::operator|=(long mask)
-{
-   enter();
-   flags|=mask;
-   broadcast();
-   leave();
-   return *this;
-}
-
-inline long
-GSafeFlags::operator&(long mask) const
-{
-   long f;
-   ((GSafeFlags *) this)->enter();
-   f=flags & mask;
-   ((GSafeFlags *) this)->leave();
-   return f;
-}
-
-inline
-GSafeFlags::operator long(void) const
-{
-   long f;
-   ((GSafeFlags *) this)->enter();
-   f=flags;
-   ((GSafeFlags *) this)->leave();
-   return f;
+   ((GSafeFlags *) this)->wait_and_modify(set_mask, clr_mask, 0, 0);
 }
 
 inline void
-GSafeFlags::wait_for_flags(long mask) const
+GSafeFlags::modify(long set_mask, long clr_mask)
 {
-   ((GSafeFlags *) this)->enter();
-   while((flags & mask)==0) ((GSafeFlags *) this)->wait();
-   ((GSafeFlags *) this)->leave();
+   test_and_modify(0, 0, set_mask, clr_mask);
 }
 
 //@}
