@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: xml2native.cpp,v 1.12 2001-10-16 18:01:43 docbill Exp $
+// $Id: xml2native.cpp,v 1.11.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name xml2native
 
@@ -43,7 +50,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: xml2native.cpp,v 1.12 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: xml2native.cpp,v 1.11.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

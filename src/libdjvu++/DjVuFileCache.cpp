@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.cpp,v 1.16 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuFileCache.cpp,v 1.15.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuFileCache.h"

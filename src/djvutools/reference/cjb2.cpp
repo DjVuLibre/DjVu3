@@ -30,9 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.27 2001-10-16 18:01:42 docbill Exp $
+// $Id: cjb2.cpp,v 1.26.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name cjb2
 
@@ -70,7 +76,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.27 2001-10-16 18:01:42 docbill Exp $ */
+    $Id: cjb2.cpp,v 1.26.2.1 2001-10-23 21:16:44 leonb Exp $ */
 //@{
 //@}
 

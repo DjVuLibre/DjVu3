@@ -32,16 +32,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: exceptions.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: exceptions.h,v 1.3.2.1 2001-10-23 21:16:47 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_EXCEPTIONS
 #define HDR_EXCEPTIONS
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "exc_file.h"
 #include "exc_msg.h"

@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: GString.h,v 1.100 2001-10-16 18:01:44 docbill Exp $
+// $Id: GString.h,v 1.99.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
 #define _GSTRING_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name GString.h
 
@@ -64,12 +70,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.100 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GString.h,v 1.99.2.1 2001-10-23 21:16:45 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuGlobal.h"
 #include "GContainer.h"
@@ -90,7 +93,9 @@
 #endif
 
 #if !HAS_MBSTATE
+#ifndef HAVE_MBSTATE_T
 typedef int mbstate_t;
+#endif
 #endif
 
 // Internal string representation.

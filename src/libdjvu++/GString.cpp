@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.136 2001-10-16 22:27:24 docbill Exp $
+// $Id: GString.cpp,v 1.134.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "GString.h"
@@ -1400,19 +1403,20 @@ GStringRep::toEscaped( const bool tosevenbit ) const
 }
 
 
-static inline const GMap<GUTF8String,GUTF8String> &
+static const GMap<GUTF8String,GUTF8String> &
 BasicMap( void )
 {
-  static GMap<GUTF8String,GUTF8String> &Basic=
-    GMap<GUTF8String,GUTF8String>::static_reference();
-  Basic["lt"]   = GUTF8String('<');
-  Basic["gt"]   = GUTF8String('>');
-  Basic["amp"]  = GUTF8String('&');
-  Basic["apos"] = GUTF8String('\47');
-  Basic["quot"] = GUTF8String('\42');
+  static GMap<GUTF8String,GUTF8String> Basic;
+  if (! Basic.size())
+    {
+      Basic["lt"]   = GUTF8String('<');
+      Basic["gt"]   = GUTF8String('>');
+      Basic["amp"]  = GUTF8String('&');
+      Basic["apos"] = GUTF8String('\47');
+      Basic["quot"] = GUTF8String('\42');
+    }
   return Basic;
 }
-
 
 GUTF8String
 GUTF8String::fromEscaped( const GMap<GUTF8String,GUTF8String> ConvMap ) const

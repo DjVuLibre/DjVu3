@@ -32,13 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.6.2.2 2001-10-19 01:02:38 leonb Exp $
+// $Id: init_qt.cpp,v 1.6.2.3 2001-10-23 21:16:47 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 
 #include <qfileinfo.h>
 #include <qtranslator.h>
@@ -83,7 +85,7 @@ static QWindowsStyle *windows = 0;
 static QMotifStyle *motif = 0;
 #if ( QT_VERSION >= 220 )
 static QMotifPlusStyle *motifplus = 0;
-static QSGIStyle *sgi = 0;
+static QSGIStyle *sgistyle = 0;
 #endif
 #if ( QT_VERSION >= 210 )
 static QPlatinumStyle *platinum = 0;
@@ -102,6 +104,9 @@ static QeApplication * qa;
 static char * appFont, * appBGCol, * appFGCol, * appName, * mwGeometry;
 static char * appStyle, * displ_name, * visual_name;
 static bool install_cmap;
+#ifndef NO_DEBUG
+static bool xsynchronize;
+#endif
 
 static void
 FakeDisplayStructure(Display * displ, Visual * visual,
@@ -153,7 +158,7 @@ x11ErrorHandler(Display * displ, XErrorEvent * event)
     case BadPixmap:
     case BadAccess:
       // do not even say anything
-#ifndef DEBUG
+#ifdef NO_DEBUG
       break;  
 #endif
     case BadDrawable:
@@ -349,6 +354,13 @@ ParseQTArgs(int & argc, char ** argv)
 	 DEBUG_MSG(argv[i] << " found\n");
          appStyle = argv[i]+7;
 	 shift(argc, argv, i);
+#ifndef NO_DEBUG
+      } else if (!strcmp(argv[i], "-sync"))
+      {
+	 DEBUG_MSG(argv[i] << " found\n");
+         xsynchronize = true;
+	 shift(argc, argv, i);
+#endif
       } else i++;
    }
 }
@@ -413,8 +425,8 @@ InitializeQT(int argc, char ** argv)
 	 QApplication::setStyle(motifplus);
       }else if (style=="sgi")
       {
-	 if ( !sgi ) sgi = new QSGIStyle();
-	 QApplication::setStyle(sgi);
+	 if ( !sgistyle ) sgistyle = new QSGIStyle();
+	 QApplication::setStyle(sgistyle);
 #endif
 #if ( QT_VERSION >= 210 )
       }else if (style=="platinum")
@@ -708,13 +720,14 @@ InitStandalone(int argc, char ** argv)
    DjVuPrefs prefs;
    InitializeQT(argc, argv);
    new QXImager(displ, visual, colormap, depth, false, prefs.optimizeLCD);
-
+#ifndef NO_DEBUG
+   if (xsynchronize)  XSynchronize(displ, True);
+#endif     
       // I don't want QT try to quit this application when the viewer's
       // window is closed. There may be an editor's one as well. So:
       // just create a dummy main widget
    QWidget * dummy_main=new QWidget();
    qApp->setMainWidget(dummy_main);
-
 #ifndef STANDALONE_USE_CACHE
    get_file_cache()->enable(0);
 #endif

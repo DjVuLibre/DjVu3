@@ -30,12 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.8.2.1 2001-10-18 15:33:34 leonb Exp $
+// $Id: djvused.cpp,v 1.8.2.2 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

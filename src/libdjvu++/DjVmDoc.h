@@ -30,15 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.31 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVmDoc.h,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "DjVmDir.h"
 
@@ -53,7 +56,7 @@ class GUTF8String;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.31 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DjVmDoc.h,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $#
 */
 
 //@{
@@ -210,8 +213,8 @@ public:
 private:
    void save_file(const GURL &codebase, const DjVmDir::File &file,
      GMap<GUTF8String,GUTF8String> *incl) const;
-   GP<DjVmDir>			dir;
-   GMap<GUTF8String, GP<DataPool> >	data;
+   GP<DjVmDir> dir;
+   GPMap<GUTF8String, DataPool > data;
 private: // dummy stuff
    static void write(ByteStream *);
    static void write_index(ByteStream *);

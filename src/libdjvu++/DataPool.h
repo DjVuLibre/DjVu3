@@ -30,15 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.h,v 1.54 2001-10-16 18:01:43 docbill Exp $
+// $Id: DataPool.h,v 1.53.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "GThreads.h"
 #include "GString.h"
@@ -65,7 +68,7 @@ class ByteStream;
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.54 2001-10-16 18:01:43 docbill Exp $#
+    @version #$Id: DataPool.h,v 1.53.2.1 2001-10-23 21:16:44 leonb Exp $#
 */
 
 //@{

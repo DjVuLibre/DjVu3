@@ -32,9 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: bin2cpp.cpp,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: bin2cpp.cpp,v 1.3.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qlib.cpp,v 1.7 2001-10-16 22:27:24 docbill Exp $
+// $Id: qlib.cpp,v 1.5.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #define INCLUDE_MENUITEM_DEF

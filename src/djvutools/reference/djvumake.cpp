@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.32 2001-10-16 22:27:24 docbill Exp $
+// $Id: djvumake.cpp,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name djvumake
 
@@ -102,7 +109,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.32 2001-10-16 22:27:24 docbill Exp $#
+    #$Id: djvumake.cpp,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>

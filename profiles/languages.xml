@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <!DOCTYPE DjVuMessages PUBLIC "-//W3C/DTD DjVuMessages 1.0//EN" "../../pubtext/DjVuLanguages.dtd">
 <!-- List of files to include to get the entire list of messages -->
-<!-- $Id: languages.xml,v 1.21 2001-10-16 18:01:42 docbill Exp $ -->
+<!-- $Id: languages.xml,v 1.20.2.1 2001-10-23 21:16:43 leonb Exp $ -->
 <DjVuLanguages>
 <BODY>
 <!-- English -->

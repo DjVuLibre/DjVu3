@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_prefs.cpp,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_viewer_prefs.cpp,v 1.3.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "djvu_file_cache.h"

@@ -30,10 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.37 2001-10-16 22:27:23 docbill Exp $
+// $Id: csepdjvu.cpp,v 1.35.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
-
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name csepdjvu
 
@@ -108,7 +113,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.37 2001-10-16 22:27:23 docbill Exp $# */
+    #$Id: csepdjvu.cpp,v 1.35.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

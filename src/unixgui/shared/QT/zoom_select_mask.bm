@@ -32,7 +32,7 @@
  *C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  *C-
  * 
- * $Id: zoom_select_mask.bm,v 1.2 2001/07/25 17:10:43 mchen Exp $
+ * $Id: zoom_select_mask.bm,v 1.1 2001/10/19 14:39:29 leonb Exp $
  * $Name:  $
  */
 #define zoom_select_mask_width 24

@@ -30,9 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.30 2001-10-16 18:01:42 docbill Exp $
+// $Id: cpaldjvu.cpp,v 1.29.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name cpaldjvu
 
@@ -69,7 +75,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.30 2001-10-16 18:01:42 docbill Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.29.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.184 2001-10-16 18:55:28 docbill Exp $
+// $Id: DjVuFile.cpp,v 1.182.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuFile.h"
@@ -1368,8 +1371,7 @@ DjVuFile::stop_decode(bool sync)
       for(GPosition pos=inc_files_list;pos;++pos)
         inc_files_list[pos]->stop_decode(0);
       
-	  if(sync)
-		  if (decode_data_pool) decode_data_pool->stop();
+//      if (decode_data_pool) decode_data_pool->stop();
     }
     
     if (sync)
@@ -1592,6 +1594,10 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
             {
               if (max_level<level)
                 max_level=level;
+              if (str_out.tell()&&chkid != "ANTz")
+              {
+                str_out.write((void *) "", 1);
+              }
               const GP<IFFByteStream> giff_out(IFFByteStream::create(gstr_out));
               IFFByteStream &iff_out=*giff_out;
               iff_out.put_chunk(chkid);
@@ -2201,111 +2207,111 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
   if (!iff.get_chunk(chkid)) 
     REPORT_EOF(true)
     
-  // Open toplevel form
-  if (top_level) 
-    ostr.put_chunk(chkid);
-  // Process chunks
-  int chunks=0;
-  int last_chunk=0;
-  G_TRY
-  {
-    int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
-    int chksize;
-    for(;(chunks_left--)&&(chksize = iff.get_chunk(chkid));last_chunk=chunks)
+    // Open toplevel form
+    if (top_level) 
+      ostr.put_chunk(chkid);
+    // Process chunks
+    int chunks=0;
+    int last_chunk=0;
+    G_TRY
     {
-      chunks++;
-      if (is_info(chkid) && info)
+      int chunks_left=(recover_errors>SKIP_PAGES)?chunks_number:(-1);
+      int chksize;
+      for(;(chunks_left--)&&(chksize = iff.get_chunk(chkid));last_chunk=chunks)
       {
-        ostr.put_chunk(chkid);
-        info->encode(*ostr.get_bytestream());
-        ostr.close_chunk();
-      }
-      else if (chkid=="INCL" && included_too)
-      {
-        GP<DjVuFile> file = process_incl_chunk(*iff.get_bytestream());
-        if (file)
+        chunks++;
+        if (is_info(chkid) && info)
         {
-          if(recover_errors!=ABORT)
-            file->set_recover_errors(recover_errors);
-          if(verbose_eof)
-            file->set_verbose_eof(verbose_eof);
-          file->add_djvu_data(ostr, map, included_too, no_ndir);
+          ostr.put_chunk(chkid);
+          info->encode(*ostr.get_bytestream());
+          ostr.close_chunk();
         }
-      } 
-      else if (is_annotation(chkid) && anno && anno->size())
-      {
-        if (!processed_annotation)
+        else if (chkid=="INCL" && included_too)
         {
-          processed_annotation = true;
-          GCriticalSectionLock lock(&anno_lock);
-          copy_chunks(anno, ostr);
-        }
-      }
-      else if (is_text(chkid) && text && text->size())
-      {
-        if (!processed_text)
+          GP<DjVuFile> file = process_incl_chunk(*iff.get_bytestream());
+          if (file)
+          {
+            if(recover_errors!=ABORT)
+              file->set_recover_errors(recover_errors);
+            if(verbose_eof)
+              file->set_verbose_eof(verbose_eof);
+            file->add_djvu_data(ostr, map, included_too, no_ndir);
+          }
+        } 
+        else if (is_annotation(chkid) && anno && anno->size())
         {
-          processed_text = true;
-          GCriticalSectionLock lock(&text_lock);
-          copy_chunks(text, ostr);
+          if (!processed_annotation)
+          {
+            processed_annotation = true;
+            GCriticalSectionLock lock(&anno_lock);
+            copy_chunks(anno, ostr);
+          }
         }
-      }
-      else if (is_meta(chkid) && meta && meta->size())
-      {
-        if (!processed_meta)
+        else if (is_text(chkid) && text && text->size())
         {
-          processed_meta = true;
-          GCriticalSectionLock lock(&meta_lock);
-          copy_chunks(meta, ostr);
+          if (!processed_text)
+          {
+            processed_text = true;
+            GCriticalSectionLock lock(&text_lock);
+            copy_chunks(text, ostr);
+          }
         }
+        else if (is_meta(chkid) && meta && meta->size())
+        {
+          if (!processed_meta)
+          {
+            processed_meta = true;
+            GCriticalSectionLock lock(&meta_lock);
+            copy_chunks(meta, ostr);
+          }
+        }
+        else if (chkid!="NDIR"||!(no_ndir || dir))
+        {  // Copy NDIR chunks, but never generate new ones.
+          ostr.put_chunk(chkid);
+          ostr.copy(*iff.get_bytestream());
+          ostr.close_chunk();
+        }
+        iff.seek_close_chunk();
       }
-      else if (chkid!="NDIR"||!(no_ndir || dir))
-      {  // Copy NDIR chunks, but never generate new ones.
-        ostr.put_chunk(chkid);
-        ostr.copy(*iff.get_bytestream());
-        ostr.close_chunk();
-      }
-      iff.seek_close_chunk();
+      if (chunks_number < 0) chunks_number=last_chunk;
     }
-    if (chunks_number < 0) chunks_number=last_chunk;
-  }
-  G_CATCH(ex)
-  {
-    if(!ex.cmp_cause(ByteStream::EndOfFile))
+    G_CATCH(ex)
     {
-      if (chunks_number < 0)
-        chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
-      report_error(ex,(recover_errors<=SKIP_PAGES));
-    }else
-    {
-      report_error(ex,true);
+      if(!ex.cmp_cause(ByteStream::EndOfFile))
+      {
+        if (chunks_number < 0)
+          chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
+        report_error(ex,(recover_errors<=SKIP_PAGES));
+      }else
+      {
+        report_error(ex,true);
+      }
     }
-  }
-  G_ENDCATCH;
-  
-  // Otherwise, writes annotation at the end (annotations could be big)
-  if (!processed_annotation && anno && anno->size())
-  {
-    processed_annotation = true;
-    GCriticalSectionLock lock(&anno_lock);
-    copy_chunks(anno, ostr);
-  }
-  if (!processed_text && text && text->size())
-  {
-    processed_text = true;
-    GCriticalSectionLock lock(&text_lock);
-    copy_chunks(text, ostr);
-  }
-  if (!processed_meta && meta && meta->size())
-  {
-    processed_meta = true;
-    GCriticalSectionLock lock(&meta_lock);
-    copy_chunks(meta, ostr);
-  }
-  // Close iff
-  if (top_level) 
-    ostr.close_chunk();
-  
+    G_ENDCATCH;
+    
+    // Otherwise, writes annotation at the end (annotations could be big)
+    if (!processed_annotation && anno && anno->size())
+    {
+      processed_annotation = true;
+      GCriticalSectionLock lock(&anno_lock);
+      copy_chunks(anno, ostr);
+    }
+    if (!processed_text && text && text->size())
+    {
+      processed_text = true;
+      GCriticalSectionLock lock(&text_lock);
+      copy_chunks(text, ostr);
+    }
+    if (!processed_meta && meta && meta->size())
+    {
+      processed_meta = true;
+      GCriticalSectionLock lock(&meta_lock);
+      copy_chunks(meta, ostr);
+    }
+    // Close iff
+    if (top_level) 
+      ostr.close_chunk();
+
   data_pool->clear_stream();
 }
 

@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.cpp,v 1.37.2.2 2001-10-18 19:35:59 leonb Exp $
+// $Id: GException.cpp,v 1.37.2.3 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

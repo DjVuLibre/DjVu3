@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.h,v 1.52 2001-10-16 18:01:44 docbill Exp $
+// $Id: parseoptions.h,v 1.51.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
 #ifndef __DJVUPARSEOPTIONS_H__
 #define __DJVUPARSEOPTIONS_H__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name parseoptions.h
    The idea is simply to have one object that we can use to parse arguments
@@ -66,7 +72,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.52 2001-10-16 18:01:44 docbill Exp $#
+   @version #$Id: parseoptions.h,v 1.51.2.1 2001-10-23 21:16:46 leonb Exp $#
  */
 
 /*@{*/
@@ -82,9 +88,6 @@
 #include "DjVu.h"
 
 #ifdef __cplusplus
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC */
 
 #ifndef DJVUPARSEOPTIONS_STANDALONE
 #include "DjVuGlobal.h"

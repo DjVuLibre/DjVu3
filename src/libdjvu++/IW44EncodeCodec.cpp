@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.17 2001-10-16 18:01:44 docbill Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.16.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 // - Author: Leon Bottou, 08/1998
 

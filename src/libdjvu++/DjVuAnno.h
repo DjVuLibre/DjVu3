@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.49 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuAnno.h,v 1.48.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
 #define _DJVUANNO_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 
 
@@ -58,12 +64,9 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.49 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: DjVuAnno.h,v 1.48.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GString.h"
 

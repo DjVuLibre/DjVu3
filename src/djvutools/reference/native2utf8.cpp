@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: native2utf8.cpp,v 1.6 2001-10-16 18:01:43 docbill Exp $
+// $Id: native2utf8.cpp,v 1.5.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name nativetoutf8
 
@@ -43,7 +50,7 @@
     @author
     Dr Bill C Riemers <bcr@lizardtech.com>
     @version
-    #$Id: native2utf8.cpp,v 1.6 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: native2utf8.cpp,v 1.5.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

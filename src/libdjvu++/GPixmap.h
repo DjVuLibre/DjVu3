@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GPixmap.h,v 1.28 2001-10-16 18:01:44 docbill Exp $
+// $Id: GPixmap.h,v 1.27.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GPIXMAP_H_
 #define _GPIXMAP_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name GPixmap.h
 
@@ -52,12 +58,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GPixmap.h,v 1.28 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GPixmap.h,v 1.27.2.1 2001-10-23 21:16:45 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GSmartPointer.h"
 

@@ -1,5 +1,5 @@
 /*C-  -*- C -*-
- * $Id: npunix.c,v 1.15 2001-10-16 18:01:45 docbill Exp $
+ * $Id: npunix.c,v 1.14.2.1 2001-10-23 21:16:47 leonb Exp $
  * $Name:  $
  */
 
@@ -284,6 +284,17 @@ Private_GetJavaClass(void)
  * These functions are located automagically by netscape.
  *
  ***********************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+  char *NP_GetMIMEDescription(void);
+  NPError NP_GetValue(void *future, NPPVariable variable, void *value);
+  NPError NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs);
+  NPError NP_Shutdown(void);
+}
+#endif
+
+
 
 /*
  * NP_GetMIMEDescription

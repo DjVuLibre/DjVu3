@@ -30,20 +30,23 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.h,v 1.31 2001-10-16 18:01:43 docbill Exp $
+// $Id: Arrays.h,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _ARRAYS_H_
 #define _ARRAYS_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 #include "GException.h"
 #include "GSmartPointer.h"
 #include <string.h>
 
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 
 /** @name Arrays.h
@@ -94,7 +97,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- Copy-on-demand implementation.
     @version 
-    #$Id: Arrays.h,v 1.31 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: Arrays.h,v 1.30.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 
 // Auxiliary classes: Will be used in place of GPBase and GPEnabled objects

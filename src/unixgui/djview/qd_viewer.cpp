@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer.cpp,v 1.26 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_viewer.cpp,v 1.25.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "qd_viewer.h"
@@ -490,6 +492,24 @@ QDViewer::eventFilter(QObject *obj, QEvent *e)
    {
       switch(e->type())
       {
+         case Event_Enter:
+         {
+           if (in_netscape)
+             {
+               DEBUG_MSG("QDViewer::eventFilter(): Got Event_Enter\n");
+               pane->setFocus();
+               // Reparenting prevent the window manager to send proper focus events.
+               Window w;
+               XEvent focusevent;
+               focusevent.type = FocusIn;
+               focusevent.xfocus.window = w  = topLevelWidget()->winId();
+               focusevent.xfocus.mode = NotifyNormal;
+               focusevent.xfocus.detail = NotifyInferior;
+               XSendEvent(x11Display(), w, False, NoEventMask, &focusevent);
+             }
+           return FALSE;
+         }
+
 	 case Event_MouseButtonPress:
 	 {
 	    DEBUG_MSG("QDViewer::eventFilter(): Got Event_MousePress\n");
@@ -646,9 +666,14 @@ QDViewer::eventFilter(QObject *obj, QEvent *e)
 		  case '?':
 		     if (in_netscape) gotoStdPage("help.html");
 		     break;
+
+                  default:
+                     break;
 	       } // switch(ev->key())
 	    } // if (override_flags.keyboard)
 	 } // case Event_KeyPress
+         default:
+           break;
       } // switch(e->type())
    } catch(const GException & exc)
    {
@@ -722,9 +747,15 @@ QDViewer::setDjVuDocument(GP<DjVuDocument> & doc, const GUTF8String &qkey_in)
    else
       new_dimg=doc->get_page(key, false, page_port.getPort());
    
-   if (!new_dimg)
-      throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
-			  ERR_MSG("QDViewer.pagekey_not_found") "\t" +qkey_in);
+   if (!new_dimg) 
+     {
+       if (doc->is_init_failed())
+         throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
+                             ERR_MSG("QDViewer.corrupt"));
+       else
+         throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
+                             ERR_MSG("QDViewer.pagekey_not_found") "\t" +qkey_in);
+     }
    setDjVuImage(new_dimg, 1);
 
    if (doc->get_pages_num()>1 &&
@@ -860,8 +891,10 @@ QDViewer::slotNotifyFileFlagsChanged(const GP<DjVuFile> & source, long set_mask,
 	    // Complain if plugin version does not match
 	 if (dimg->get_version()<=DJVUVERSION_TOO_OLD)
 	    ::showError(this, tr("Upgrade DjVu now!"),
-			tr("This DjVu document uses an inferior\ntechnology, which is no longer supported.\n")+
-			tr("Plese send a flame to the webmaster who\nuses outdated tools.\n"));
+			tr("This DjVu document uses an inferior\n"
+                           "technology, which is no longer supported.\n"
+                           "Please send a flame to the webmaster who\n"
+                           "uses outdated tools.\n"));
       }
    }
    if (set_mask & DjVuFile::DECODE_STOPPED)
@@ -888,14 +921,18 @@ QDViewer::slotNotifyFileFlagsChanged(const GP<DjVuFile> & source, long set_mask,
    
 	       // Complain if plugin version does not match
 	    if (dimg->get_version()<=DJVUVERSION_TOO_OLD)
-	       ::showError(this, tr("Upgrade DjVu now!"),
-			   tr("This DjVu document uses an inferior\ntechnology, which is no longer supported.\n")+
-			   tr("Plese send a flame to the webmaster who\nuses outdated tools.\n"));
+              ::showError(this, tr("Upgrade DjVu now!"),
+                          tr("This DjVu document uses an inferior\n"
+                             "technology, which is no longer supported.\n"
+                             "Please send a flame to the webmaster who\n"
+                             "uses outdated tools.\n"));
 
-	    QString desc=tr("Page decoding done (")+
-	       QStringFromGString(dimg->get_short_description())+")";
+            GUTF8String sdesc = 
+              DjVuMessage::LookUpUTF8(dimg->get_short_description());
+	    QString desc = tr("Page decoding done") + " (" +
+              QStringFromGString(sdesc) + ")";
 	    showStatus(desc);
-
+            
 	    predecode();
 	 }
       }
@@ -907,6 +944,12 @@ void
 QDViewer::slotNotifyDocFlagsChanged(const GP<DjVuDocument> & source, long set_mask, long)
       // Connected to the whole document
 {
+   if (set_mask & DjVuDocument::DOC_INIT_FAILED)
+     {
+       throw ERROR_MESSAGE("QDViewer::setDjVuDocument",
+                           ERR_MSG("QDViewer.corrupt"));
+     }
+
    if (set_mask & DjVuDocument::DOC_INIT_OK)
    {
       int doc_page=djvu_doc->url_to_page(dimg->get_djvu_file()->get_url());
@@ -1044,15 +1087,9 @@ QDViewer::getURL(const GUTF8String &url_in, const GUTF8String &target)
       }
    } else
    {
-      // url protocol testing fails for the relative 
-	 // See if it's relative
-//        try
-//        {
-//  	     url=GURL::UTF8(url_in);
-//        } catch(...) {}
-
-//        if (url.is_empty())
-      url=GURL::UTF8(url_in,dimg->get_djvu_file()->get_url().base());
+     GURL base = dimg->get_djvu_file()->get_url().base();
+     base.clear_all_arguments();
+     url=GURL::UTF8(url_in,base);
    }
 
    if (!url.is_empty())
@@ -1158,6 +1195,7 @@ QDViewer::predecode(void)
 void
 QDViewer::checkWMProps(void)
 {
+   if (!in_netscape) return;
    DEBUG_MSG("QDViewer::checkWMProps(): searching for DjVu properties\n");
 #ifdef UNIX
    Display * displ=x11Display();

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.23 2001-10-16 18:01:44 docbill Exp $
+// $Id: XMLParser.cpp,v 1.22.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "XMLParser.h"
@@ -189,19 +192,21 @@ lt_XMLParser::Impl::parse(const GP<ByteStream> &bs)
   parse(*tags);
 }
   
-static inline const GMap<GUTF8String,GMapArea::BorderType> &
+static const GMap<GUTF8String,GMapArea::BorderType> &
 BorderTypeMap(void)
 {
-  static GMap<GUTF8String,GMapArea::BorderType> &typeMap=
-    GMap<GUTF8String,GMapArea::BorderType>::static_reference();
-  typeMap["none"]=GMapArea::NO_BORDER;
-  typeMap["xor"]=GMapArea::XOR_BORDER;
-  typeMap["solid"]=GMapArea::SOLID_BORDER;
-  typeMap["default"]=GMapArea::SOLID_BORDER;
-  typeMap["shadowout"]=GMapArea::SHADOW_OUT_BORDER;
-  typeMap["shadowin"]=GMapArea::SHADOW_IN_BORDER;
-  typeMap["etchedin"]=GMapArea::SHADOW_EIN_BORDER;
-  typeMap["etchedout"]=GMapArea::SHADOW_EOUT_BORDER;
+  static GMap<GUTF8String,GMapArea::BorderType> typeMap;
+  if (! typeMap.size()) 
+    {
+      typeMap["none"]=GMapArea::NO_BORDER;
+      typeMap["xor"]=GMapArea::XOR_BORDER;
+      typeMap["solid"]=GMapArea::SOLID_BORDER;
+      typeMap["default"]=GMapArea::SOLID_BORDER;
+      typeMap["shadowout"]=GMapArea::SHADOW_OUT_BORDER;
+      typeMap["shadowin"]=GMapArea::SHADOW_IN_BORDER;
+      typeMap["etchedin"]=GMapArea::SHADOW_EIN_BORDER;
+      typeMap["etchedout"]=GMapArea::SHADOW_EOUT_BORDER;
+    }
   return typeMap;
 }
 

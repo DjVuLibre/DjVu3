@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.25 2001-10-16 22:27:24 docbill Exp $
+// $Id: qd_base_events.cpp,v 1.23.2.1 2001-10-23 21:16:48 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "qd_base_events.h"
@@ -704,15 +706,6 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 	    {
 	       DEBUG_MSGN("Event_Enter\n");
 	       if (needToShowToolBar()) showToolBar();
-	       // 1 ) changing focus following mouse position doesn't make
-	       //     sense for editor/shop besides
-	       // 2 ) an infinit recursion may occur due to the fact that
-	       //     we call setFocus to switch active window in "windows"
-	       //     menu (for editor/shop only, see function
-	       //     slotWindowsMenuActivated in qd_editor_shell.cpp)
-#ifdef DJVU_VIEWER
-	       pane->setFocus();
-#endif
 	       return TRUE;
 	    }
 	    case Event_Resize:

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.91 2001-10-16 22:27:24 docbill Exp $
+// $Id: GURL.cpp,v 1.89.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "GException.h"
@@ -1012,23 +1015,23 @@ GURL::operator==(const GURL & gurl2) const
 GUTF8String
 GURL::name(void) const
 {
-  if(!validurl)
-    const_cast<GURL *>(this)->init();
-  GUTF8String retval;
-  if(!is_empty())
-  {
-    const GUTF8String xurl(url);
-    const int protocol_length=protocol(xurl).length();
-    const char * ptr, * xslash=(const char *)xurl+protocol_length-1;
-    for(ptr=(const char *)xurl+protocol_length ;
-        *ptr && !is_argument(ptr) ; ptr++)
-    {
-      if (*ptr==slash)
-        xslash=ptr;
-    }
-    retval=GUTF8String(xslash+1, ptr-xslash-1);
-  }
-  return retval;
+   if(!validurl)
+     const_cast<GURL *>(this)->init();
+   GUTF8String retval;
+   if(!is_empty())
+   {
+     const GUTF8String xurl(url);
+     const int protocol_length=protocol(xurl).length();
+     const char * ptr, * xslash=(const char *)xurl+protocol_length-1;
+     for(ptr=(const char *)xurl+protocol_length;
+       *ptr && !is_argument(ptr);ptr++)
+	 {
+       if (*ptr==slash)
+          xslash=ptr;
+	 }
+     retval=GUTF8String(xslash+1, ptr-xslash-1);
+   }
+   return retval;
 }
 
 GUTF8String
@@ -1134,7 +1137,7 @@ GURL::encode_reserved(const GUTF8String &gs)
     if ( (ss>='a' && ss<='z') ||
        (ss>='A' && ss<='Z') ||
        (ss>='0' && ss<='9') ||
-       (strchr("$-_.+!*'(),:~&;", ss)) )   // Added : because of windows!
+       (strchr("$-_.+!*'(),:~?&;=", ss)) ) 
     {
       *d = ss;
       continue;

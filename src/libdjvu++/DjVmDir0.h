@@ -30,15 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir0.h,v 1.21 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVmDir0.h,v 1.20.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "GString.h"
 
@@ -58,7 +61,7 @@ class ByteStream;
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.21 2001-10-16 18:01:43 docbill Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.20.2.1 2001-10-23 21:16:44 leonb Exp $# */
 
 //@{
 

@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GScaler.h,v 1.20 2001-10-16 18:01:44 docbill Exp $
+// $Id: GScaler.h,v 1.19.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GSCALER_H_
 #define _GSCALER_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 
 #include "GException.h"
@@ -61,7 +67,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GScaler.h,v 1.20 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GScaler.h,v 1.19.2.1 2001-10-23 21:16:45 leonb Exp $# */
 //@{
 
 

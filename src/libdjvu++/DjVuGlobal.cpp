@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.37 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuGlobal.cpp,v 1.36.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** This file impliments the DjVuProgressTask elements.  The memory
     functions are implimented in a separate file, because only the memory
@@ -68,12 +75,11 @@ public:
 };
 
   
-static GMap<void *,GP<DjVuProgressTask::Data> > &
+static GPMap<void *,DjVuProgressTask::Data> &
 get_map(void)
 {
-  static GMap<void *,GP<DjVuProgressTask::Data> > &map=
-    GMap<void *,GP<DjVuProgressTask::Data> >::static_reference(); 
-  return map;
+  static GPMap<void *,DjVuProgressTask::Data> xmap;
+  return xmap;
 }
 
 djvu_progress_callback *

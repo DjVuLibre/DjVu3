@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.89 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuDocEditor.cpp,v 1.88.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuDocEditor.h"
@@ -56,14 +59,14 @@ static const char octets[4]={0x41,0x54,0x26,0x54};
 int        DjVuDocEditor::thumbnails_per_file=10;
 
 // This is a structure for active files and DataPools. It may contain
-// a DjVuFile which is currently being used by someone (I check the list
+// a DjVuFile, which is currently being used by someone (I check the list
 // and get rid of hanging files from time to time) or a DataPool,
 // which is "custom" with respect to the document (was modified or
 // inserted), or both.
 //
 // DjVuFile is set to smth!=0 when it's created using url_to_file().
-// It's reset back to ZERO in clean_files_map() when
-// it sees that a given file is not used by anyone.
+//          It's reset back to ZERO in clean_files_map() when
+//	  it sees, that a given file is not used by anyone.
 // DataPool is updated when a file is inserted
 class DjVuDocEditor::File : public GPEnabled
 {
@@ -76,9 +79,9 @@ public:
   // only by save() or save_as() functions.
   GP<DataPool>	pool;
 
-  // If 'file' is non-zero, it means that it's being used by someone
+  // If 'file' is non-zero, it means, that it's being used by someone
   // We check for unused files from time to time and ZERO them.
-  // But before we do it, we may save the DataPool in the case the
+  // But before we do it, we may save the DataPool in the case if
   // file has been modified.
   GP<DjVuFile>	file;
 };
@@ -182,9 +185,9 @@ DjVuDocEditor::init(const GURL &url)
    int pages_num=get_pages_num();
    for(int page_num=0;page_num<pages_num;page_num++)
    {
-	    // Call DjVuDocument::get_thumbnail() here to bypass logic
-	    // of DjVuDocEditor::get_thumbnail(). init() is the only safe
-	    // place where we can still call DjVuDocument::get_thumbnail();
+	 // Call DjVuDocument::get_thumbnail() here to bypass logic
+	 // of DjVuDocEditor::get_thumbnail(). init() is the only safe
+	 // place where we can still call DjVuDocument::get_thumbnail();
       const GP<DataPool> pool(DjVuDocument::get_thumbnail(page_num, true));
       if (pool)
       {
@@ -217,9 +220,8 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
       {
          const GP<File> f(files_map[pos]);
          if (f->file && f->file->get_init_data_pool())
-            return f->file->get_init_data_pool(); // Favor DjVuFile's knowledge
-         else if (f->pool) 
-           return f->pool;
+            return f->file->get_init_data_pool();// Favor DjVuFile's knowledge
+         else if (f->pool) return f->pool;
       }
    }
 
@@ -237,40 +239,38 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
 
 void
 DjVuDocEditor::clean_files_map(void)
-// Will go thru the map of files looking for unreferenced
-// files or records w/o DjVuFile and DataPool.
-// These will be modified and/or removed.
+      // Will go thru the map of files looking for unreferenced
+      // files or records w/o DjVuFile and DataPool.
+      // These will be modified and/or removed.
 {
-  DEBUG_MSG("DjVuDocEditor::clean_files_map() called\n");
-  DEBUG_MAKE_INDENT(3);
-  
-  GCriticalSectionLock lock(&files_lock);
-  
-  // See if there are too old items in the "cache", which are
-  // not referenced by anyone. If the corresponding DjVuFile has been
-  // modified, obtain the new data and replace the 'pool'. Clear the
-  // DjVuFile anyway. If both DataPool and DjVuFile are zero, remove
-  // the entry.
-  for( GPosition pos=files_map ; pos ; )
-  {
-    const GP<File> f(files_map[pos]);
-    //if (f->file && f->file->get_count()==1)
-    if (f->file && f->file->get_count()==1 && !f->file->is_modified())
-    {
-      DEBUG_MSG("ZEROing file '" << f->file->get_url() << "'\n");
-      if (f->file->is_modified())
-        f->pool=f->file->get_djvu_data(false);
-      f->file=0;
-    }
-    if (!f->file && !f->pool)
-    {
-      DEBUG_MSG("Removing record '" << files_map.key(pos) << "'\n");
-      GPosition this_pos=pos;
-      ++pos;
-      files_map.del(this_pos);
-    } else 
-      ++pos;
-  }
+   DEBUG_MSG("DjVuDocEditor::clean_files_map() called\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GCriticalSectionLock lock(&files_lock);
+
+      // See if there are too old items in the "cache", which are
+      // not referenced by anyone. If the corresponding DjVuFile has been
+      // modified, obtain the new data and replace the 'pool'. Clear the
+      // DjVuFile anyway. If both DataPool and DjVuFile are zero, remove
+      // the entry.
+   for(GPosition pos=files_map;pos;)
+   {
+      const GP<File> f(files_map[pos]);
+      if (f->file && f->file->get_count()==1)
+      {
+         DEBUG_MSG("ZEROing file '" << f->file->get_url() << "'\n");
+         if (f->file->is_modified())
+            f->pool=f->file->get_djvu_data(false);
+         f->file=0;
+      }
+      if (!f->file && !f->pool)
+      {
+         DEBUG_MSG("Removing record '" << files_map.key(pos) << "'\n");
+         GPosition this_pos=pos;
+         ++pos;
+         files_map.del(this_pos);
+      } else ++pos;
+   }
 }
 
 GP<DjVuFile>
@@ -279,7 +279,7 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create) const
    DEBUG_MSG("DjVuDocEditor::url_to_file(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-      // Check if we have a DjVuFile with this url cached (created before
+      // Check if have a DjVuFile with this url cached (created before
       // and either still active or left because it has been modified)
    GP<DjVmDir::File> frec;
    if((const DjVmDir *)djvm_dir)
@@ -293,15 +293,6 @@ DjVuDocEditor::url_to_file(const GURL & url, bool dont_create) const
          const GP<File> f(files_map[pos]);
          if (f->file)
            return f->file;
-         /*
-             // It would seem as though we ought to use the data pool info if there is one.
-             // Is this the way to do it?
-         if (f->pool)
-         {
-           GP<DjVuFile> pool_file = DjVuFile::create(url,const_cast<DjVuDocEditor *>(this));
-           return pool_file;
-         }
-         */
       }
    }
 
@@ -346,7 +337,6 @@ DjVuDocEditor::find_unique_id(GUTF8String id)
 {
   const GP<DjVmDir> dir(get_djvm_dir());
 
-  // separate id into base.ext
   GUTF8String base, ext;
   const int dot=id.rsearch('.');
   if(dot >= 0)
@@ -355,87 +345,70 @@ DjVuDocEditor::find_unique_id(GUTF8String id)
     ext=id.substr(dot+1,(unsigned int)-1);
   }else
   {
-    base=id;                    // no . => only has a base
+    base=id;
   }
 
-  // add to the base until we get an id that doesn't match anything
-  // we care about
   int cnt=0;
-  while ( dir->id_to_file(id) ||
-          dir->name_to_file(id) ||
-          dir->title_to_file(id) )
+  while (!(!dir->id_to_file(id) &&
+           !dir->name_to_file(id) &&
+           !dir->title_to_file(id)))
   {
      cnt++;
      id=base+"_"+GUTF8String(cnt);
      if (ext.length())
        id+="."+ext;
   }
-
   return id;
 }
 
 GP<DataPool>
 DjVuDocEditor::strip_incl_chunks(const GP<DataPool> & pool_in)
 {
-  DEBUG_MSG("DjVuDocEditor::strip_incl_chunks() called\n");
-  DEBUG_MAKE_INDENT(3);
-  
-  // Get the bytestream from pool_in as an IFFByteStream
-  const GP<IFFByteStream> giff_in(
-    IFFByteStream::create(pool_in->get_stream()));
-  
-  // Create an output IFFByteStream
-  const GP<ByteStream> gbs_out(ByteStream::create());
-  const GP<IFFByteStream> giff_out(IFFByteStream::create(gbs_out));
-  
-  // Get local pointers to avoid the overhead of GP dereferencing
-  IFFByteStream &iff_in=*giff_in;
-  IFFByteStream &iff_out=*giff_out;
-  
-  // Start off assuming there are no include chunks
-  bool have_incl=false;
-  
-  int chksize;
-  GUTF8String chkid;
-  if (iff_in.get_chunk(chkid))
-  {
-    // copy the outermost chunk
-    iff_out.put_chunk(chkid);
-    while((chksize=iff_in.get_chunk(chkid)))
-    {
-      if (chkid!="INCL")
+   DEBUG_MSG("DjVuDocEditor::strip_incl_chunks() called\n");
+   DEBUG_MAKE_INDENT(3);
+
+   const GP<IFFByteStream> giff_in(
+     IFFByteStream::create(pool_in->get_stream()));
+
+   const GP<ByteStream> gbs_out(ByteStream::create());
+   const GP<IFFByteStream> giff_out(IFFByteStream::create(gbs_out));
+
+   IFFByteStream &iff_in=*giff_in;
+   IFFByteStream &iff_out=*giff_out;
+
+   bool have_incl=false;
+   int chksize;
+   GUTF8String chkid;
+   if (iff_in.get_chunk(chkid))
+   {
+      iff_out.put_chunk(chkid);
+      while((chksize=iff_in.get_chunk(chkid)))
       {
-        // copy chunks that are not include chunks
-        iff_out.put_chunk(chkid);
-        iff_out.copy(*iff_in.get_bytestream());
-        iff_out.close_chunk();
-      } else
-      {
-        // otherwise note that encountered an include chunk
-        have_incl=true;
+         if (chkid!="INCL")
+         {
+            iff_out.put_chunk(chkid);
+            iff_out.copy(*iff_in.get_bytestream());
+            iff_out.close_chunk();
+         } else
+         {
+           have_incl=true;
+         }
+         iff_in.close_chunk();
       }
-      iff_in.close_chunk();
-    }
-    iff_out.close_chunk();
-  }
-  
-  if (have_incl)
-  {
-    // we found includes, so return a new datapool with
-    // the includes stripped out
-    gbs_out->seek(0,SEEK_SET);
-    return DataPool::create(gbs_out);
-  } else 
-    // otherwise return the original datapool
-    return pool_in;
+      iff_out.close_chunk();
+   }
+
+   if (have_incl)
+   {
+      gbs_out->seek(0,SEEK_SET);
+      return DataPool::create(gbs_out);
+   } else return pool_in;
 }
 
 GUTF8String
-DjVuDocEditor::insert_file( const GURL &file_url, 
-                            const GUTF8String &parent_id,
-                            int chunk_num,
-                            DjVuPort *source )
-      // Will open the 'file_url' and insert it into an existing DjVuFile
+DjVuDocEditor::insert_file(const GURL &file_url, const GUTF8String &parent_id,
+                           int chunk_num, DjVuPort *source)
+      // Will open the 'file_name' and insert it into an existing DjVuFile
       // with ID 'parent_id'. Will insert the INCL chunk at position chunk_num
       // Will NOT process ANY files included into the file being inserted.
       // Moreover it will strip out any INCL chunks in that file...
@@ -523,19 +496,17 @@ DjVuDocEditor::insert_file( const GURL &file_url,
       // Will return TRUE if the file has been successfully inserted.
       // FALSE, if the file contains NDIR chunk and has been skipped.
 bool
-DjVuDocEditor::insert_file( const GURL &file_url,
-                            bool is_page,
-                            int & file_pos,
-                            GMap<GUTF8String, GUTF8String> & name2id,
-                            DjVuPort *source )
+DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
+  int & file_pos, GMap<GUTF8String, GUTF8String> & name2id,
+  DjVuPort *source)
 {
+
   DEBUG_MSG("DjVuDocEditor::insert_file(): file_url='" << file_url <<
              "', is_page='" << is_page << "'\n");
   DEBUG_MAKE_INDENT(3);
-
-  // If there is a callback routine, let it know there's progress
   if (refresh_cb)
     refresh_cb(refresh_cl_data);
+
 
       // We do not want to insert the same file twice (important when
       // we insert a group of files at the same time using insert_group())
@@ -543,7 +514,6 @@ DjVuDocEditor::insert_file( const GURL &file_url,
   if (name2id.contains(file_url.fname()))
     return true;
 
-  // Create a datapool for the file
   GP<DataPool> file_pool(DataPool::create(file_url));
 
   if(!source)
@@ -560,14 +530,13 @@ DjVuDocEditor::insert_file( const GURL &file_url,
       file_pool=DataPool::create(file_pool->get_stream());
     }
   }
- 
-  // If there is an import codec, recast the file into IFF format (if needed)
+       // Create DataPool and see if the file exists
   if(file_pool && !file_url.is_empty() && DjVuDocument::djvu_import_codec)
   {
       (*DjVuDocument::djvu_import_codec)(file_pool,file_url,needs_compression_flag,can_compress_flag);
   }
 
-  // Check that it has IFF structure
+         // Oh. It does exist... Check that it has IFF structure
   {
        const GP<IFFByteStream> giff(
          IFFByteStream::create(file_pool->get_stream()));
@@ -576,9 +545,9 @@ DjVuDocEditor::insert_file( const GURL &file_url,
 
        int length;
        length=iff.get_chunk(chkid);
-       if ( chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
-            chkid!="FORM:BM44" && chkid!="FORM:PM44")
-         G_THROW( ERR_MSG("DjVuDocEditor.not_1_page") "\t"+file_url.get_string());
+       if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
+         chkid!="FORM:BM44" && chkid!="FORM:PM44")
+       G_THROW( ERR_MSG("DjVuDocEditor.not_1_page") "\t"+file_url.get_string());
 
        // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
        // If NDIR chunk is found, ignore the file
@@ -589,18 +558,14 @@ DjVuDocEditor::insert_file( const GURL &file_url,
          iff.close_chunk();
        }
   }
-
-  // Everything looks ok, so go insert the file.
   return insert_file(file_pool,file_url,is_page,file_pos,name2id,source);
 }
 
 bool
-DjVuDocEditor::insert_file( const GP<DataPool> &file_pool,
-                            const GURL &file_url, 
-                            bool is_page,
-                            int & file_pos, 
-                            GMap<GUTF8String, GUTF8String> & name2id,
-                            DjVuPort *source )
+DjVuDocEditor::insert_file(const GP<DataPool> &file_pool,
+  const GURL &file_url, bool is_page,
+  int & file_pos, GMap<GUTF8String, GUTF8String> & name2id,
+  DjVuPort *source)
 {
   GUTF8String errors;
   if(file_pool)
@@ -652,7 +617,7 @@ DjVuDocEditor::insert_file( const GP<DataPool> &file_pool,
       }
 
          // Good. Before we continue with the included files we want to
-         // complete insertion of this one. Notice that insertion of
+         // complete insertion of this one. Notice, that insertion of
          // children may fail, in which case we will have to modify
          // data for this file to get rid of invalid INCL
 
@@ -776,10 +741,8 @@ DjVuDocEditor::insert_file( const GP<DataPool> &file_pool,
 }
 
 void
-DjVuDocEditor::insert_group( const GList<GURL> & file_urls,
-                             int page_num,
-                             void (* _refresh_cb)(void *), 
-                             void * _cl_data)
+DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
+                             void (* _refresh_cb)(void *), void * _cl_data)
       // The function will insert every file from the list at position
       // corresponding to page_num. If page_num is negative, concatenation
       // will occur. Included files will be processed as well
@@ -961,9 +924,9 @@ DjVuDocEditor::insert_page(GP<DataPool> & _file_pool,
 }
 
 void
-DjVuDocEditor::generate_ref_map( const GP<DjVuFile> & file,
-				                         GMap<GUTF8String, void *> & ref_map,
-				                         GMap<GURL, void *> & visit_map )
+DjVuDocEditor::generate_ref_map(const GP<DjVuFile> & file,
+				GMap<GUTF8String, void *> & ref_map,
+				GMap<GURL, void *> & visit_map)
       // This private function is used to generate a list (implemented as map)
       // of files referencing the given file. To get list of all parents
       // for file with ID 'id' iterate map obtained as
@@ -997,9 +960,8 @@ DjVuDocEditor::generate_ref_map( const GP<DjVuFile> & file,
 }
 
 void
-DjVuDocEditor::remove_file( const GUTF8String &id, 
-                            bool remove_unref,
-                            GMap<GUTF8String, void *> & ref_map )
+DjVuDocEditor::remove_file(const GUTF8String &id, bool remove_unref,
+                           GMap<GUTF8String, void *> & ref_map)
       // Private function, which will remove file with ID id.
       //
       // If will also remove all INCL chunks in parent files pointing
@@ -1145,9 +1107,8 @@ DjVuDocEditor::remove_pages(const GList<int> & page_list, bool remove_unref)
 }
 
 void
-DjVuDocEditor::move_file( const GUTF8String &id,
-                          int & file_pos,
-                          GMap<GUTF8String, void *> & map )
+DjVuDocEditor::move_file(const GUTF8String &id, int & file_pos,
+                         GMap<GUTF8String, void *> & map)
       // NOTE! file_pos here is the desired position in DjVmDir *after*
       // the record with ID 'id' is removed.
 {
@@ -1168,7 +1129,7 @@ DjVuDocEditor::move_file( const GUTF8String &id,
         
                // We care to move included files only if we do not append
                // This is because the only reason why we move included
-               // files is to make them available sooner than they would
+               // files is to made them available sooner than they would
                // be available if we didn't move them. By appending files
                // we delay the moment when the data for the file becomes
                // available, of course.
@@ -1795,7 +1756,8 @@ store_file(const GP<DjVmDir> & src_djvm_dir, const GP<DjVmDoc> & djvm_doc,
 }
 
 void
-DjVuDocEditor::save_pages_as( const GP<ByteStream> &str, const GList<int> & _page_list)
+DjVuDocEditor::save_pages_as(
+  const GP<ByteStream> &str, const GList<int> & _page_list)
 {
    GList<int> page_list=sortList(_page_list);
 
@@ -1815,10 +1777,8 @@ DjVuDocEditor::save_pages_as( const GP<ByteStream> &str, const GList<int> & _pag
 }
 
 void
-DjVuDocEditor::save_file( const GUTF8String &file_id,
-                          const GURL &codebase,
-                          const bool only_modified, 
-                          GMap<GUTF8String,GUTF8String> & map )
+DjVuDocEditor::save_file(const GUTF8String &file_id, const GURL &codebase,
+  const bool only_modified, GMap<GUTF8String,GUTF8String> & map)
 {
   if(only_modified)
   {
@@ -1842,9 +1802,9 @@ DjVuDocEditor::save_file( const GUTF8String &file_id,
 }
 
 void
-DjVuDocEditor::save_file( const GUTF8String &file_id,
-                          const GURL &codebase,
-                          GMap<GUTF8String,GUTF8String> & map )
+DjVuDocEditor::save_file(
+  const GUTF8String &file_id, const GURL &codebase,
+  GMap<GUTF8String,GUTF8String> & map)
 {
    DEBUG_MSG("DjVuDocEditor::save_file(): ID='" << file_id << "'\n");
    DEBUG_MAKE_INDENT(3);
@@ -1913,8 +1873,8 @@ DjVuDocEditor::write(const GP<ByteStream> &gbs, bool force_djvm)
 }
 
 void
-DjVuDocEditor::write( const GP<ByteStream> &gbs,
-                      const GMap<GUTF8String,void *> &reserved )
+DjVuDocEditor::write(
+  const GP<ByteStream> &gbs,const GMap<GUTF8String,void *> &reserved)
 {
   DEBUG_MSG("DjVuDocEditor::write()\n");
   DEBUG_MAKE_INDENT(3);
@@ -1954,7 +1914,7 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
 
    if (where.is_empty())
    {
-         // Assume that we just want to 'save'. Check that it's possible
+         // Assume, that we just want to 'save'. Check, that it's possible
          // and proceed.
       bool can_be_saved_bundled=orig_doc_type==BUNDLED ||
                                 orig_doc_type==OLD_BUNDLED ||

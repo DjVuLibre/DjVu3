@@ -1,11 +1,14 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.cpp,v 1.14 2001-10-16 18:01:44 docbill Exp $
+// $Id: UnicodeByteStream.cpp,v 1.13.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "UnicodeByteStream.h"

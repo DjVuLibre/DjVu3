@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_ant.cpp,v 1.19 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_base_ant.cpp,v 1.18.2.1 2001-10-23 21:16:47 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "ByteStream.h"

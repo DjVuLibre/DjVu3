@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.h,v 1.20 2001-10-16 18:01:44 docbill Exp $
+// $Id: DjVuText.h,v 1.19.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
 #define _DJVUTEXT_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 
 
@@ -55,12 +61,9 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.20 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: DjVuText.h,v 1.19.2.1 2001-10-23 21:16:45 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GMapAreas.h"
 

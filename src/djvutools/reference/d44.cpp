@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.28 2001-10-16 18:01:43 docbill Exp $
+// $Id: d44.cpp,v 1.27.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name d44
 
@@ -84,7 +91,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.28 2001-10-16 18:01:43 docbill Exp $# 
+    #$Id: d44.cpp,v 1.27.2.1 2001-10-23 21:16:44 leonb Exp $# 
 */
 //@{
 //@}

@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.61 2001-10-16 18:01:43 docbill Exp $
+// $Id: ByteStream.h,v 1.60.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
 #define _BYTESTREAM_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name ByteStream.h
     
@@ -62,12 +68,9 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.61 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: ByteStream.h,v 1.60.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "Arrays.h"
 #include <stdio.h>
@@ -292,13 +295,20 @@ public:
   static GP<ByteStream> create(
     FILE * const f, char const * const mode, const bool closeme);
   /** Creates a ByteStream object for allocating the memory area of
-    length #sz# starting at address #buffer#.  This call impliments 
-    a read-only ByteStream interface for a memory area specified by
-    the user at construction time. Calls to function #read# directly
-    access this memory area.  The user must therefore make sure that its
-    content remain valid long enough.  */
+      length #sz# starting at address #buffer#.  This call impliments 
+      a read-only ByteStream interface for a memory area specified by
+      the user at construction time. Calls to function #read# directly
+      access this memory area.  The user must therefore make sure that its
+      content remain valid long enough.  */
   static GP<ByteStream> create_static(
     void const * const buffer, const size_t size);
+  
+  /** Easy access to preallocated stdin/stdout/stderr bytestreams */
+  static GP<ByteStream> get_stdin(void);
+  static GP<ByteStream> get_stdout(void);  
+  static GP<ByteStream> get_stderr(void);
+
+  /** This is the conventional name for EOF exceptions */
   static const char *EndOfFile;
   /** Returns the contents of the file as a GNativeString */
   GNativeString getAsNative(void);

@@ -30,15 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.h,v 1.51 2001-10-16 18:01:44 docbill Exp $
+// $Id: GContainer.h,v 1.50.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GCONTAINER_H_
 #define _GCONTAINER_H_
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "GException.h"
 #include "GSmartPointer.h"
@@ -73,9 +76,6 @@
 #endif
 
 
-GPEnabled *
-static_const_GPBase(GPEnabled *foo);
-
 /** @name GContainer.h
 
     Files #"GContainer.h"# and #"GContainer.cpp"# implement three main
@@ -93,7 +93,7 @@ static_const_GPBase(GPEnabled *foo);
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.51 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: GContainer.h,v 1.50.2.1 2001-10-23 21:16:45 leonb Exp $# */
 //@{
 
 
@@ -117,9 +117,8 @@ static_const_GPBase(GPEnabled *foo);
 #endif
 
 
-// GPEnabled inhertenced added so the static_const_GP class can be used
-// for static maps and lists.
-class GCont : public GPEnabled
+// GPEnabled inhertenced removed again so the code works on more machines.
+class GCont
 #if GCONTAINER_NO_MEMBER_TEMPLATES
 {
 };
@@ -909,9 +908,6 @@ template <class TYPE>
 class GList : public GListTemplate<TYPE,TYPE>
 {
 public:
-  static GList<TYPE> &static_reference(void)
-  { GList<TYPE> *ptr=new GList<TYPE>;(void)static_const_GPBase(ptr);return *ptr;}
-
   /** Null Constructor. Constructs a list with zero elements. */
   GList() : GListTemplate<TYPE,TYPE>() {}
   GList& operator=(const GList &r) 
@@ -1213,9 +1209,6 @@ template <class KTYPE, class VTYPE>
 class GMap : public GMapTemplate<KTYPE,VTYPE,VTYPE>
 {
 public:
-  static GMap &static_reference(void)
-  { GMap<KTYPE,VTYPE> *ptr=new GMap<KTYPE,VTYPE>;(void)static_const_GPBase(ptr);return *ptr;}
-
   // -- ACCESS
   GMap() : GMapTemplate<KTYPE,VTYPE,VTYPE>() {}
   GMap& operator=(const GMap &r) 
@@ -1325,14 +1318,6 @@ hash(const double & x)
     return addr[0]^addr[1]^addr[2]^addr[3];    
 }
 
-/** Function for storing GP pointers statically. */
-GPEnabled *
-static_const_GPBase(GPEnabled *foo);
-
-template<class foo>
-inline foo *
-static_const_GP( const GP<foo> &bar )
-{ return (foo *)static_const_GPBase(bar); }
 
 //@}
 //@}

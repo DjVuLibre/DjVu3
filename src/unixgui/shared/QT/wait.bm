@@ -32,7 +32,7 @@
  *C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
  *C-
  * 
- * $Id: wait.bm,v 1.2 2001-07-25 17:10:43 mchen Exp $
+ * $Id: wait.bm,v 1.2.2.1 2001-10-23 21:16:48 leonb Exp $
  * $Name:  $
  */
 #define wait_width 32

@@ -32,16 +32,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: saved_data.h,v 1.17 2001-10-16 18:01:45 docbill Exp $
+// $Id: saved_data.h,v 1.16.2.1 2001-10-23 21:16:48 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_SAVED_DATA
 #define HDR_SAVED_DATA
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 struct SavedData
 {

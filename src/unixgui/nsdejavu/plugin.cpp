@@ -32,13 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: plugin.cpp,v 1.7.2.2 2001-10-19 00:39:25 leonb Exp $
+// $Id: plugin.cpp,v 1.7.2.3 2001-10-23 21:16:47 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 
 #include "plugin.h"
 #include "path.h"
@@ -120,41 +122,72 @@ void plugin_init(shl_t handle, int loading)
 class Instance
 {
 public:
-   Widget		widget;
-   Window		window;
-   Widget		parent;
-   NPP			np_instance;
-   int			full_mode;
-   
-   Instance(void) : widget(0), window(0), parent(0),
-      np_instance(0), full_mode(1) {}
-   Instance(NPP _np_instance, int _full_mode) : widget(0), window(0),
-      parent(0), np_instance(_np_instance), full_mode(_full_mode) {}
-   
-   void Detach(void)
-   {
-      widget=0; window=0; parent=0;
-   }
-   void Attach(Widget _widget, Window _window, Widget _parent)
-   {
-      widget=_widget; window=_window; parent=_parent;
-   }
-   ~Instance(void)
-   {
-      widget=0; window=0; parent=0; np_instance=0;
-   }
+  Widget		widget;
+  Window		window;
+  Widget		parent;
+  NPP			np_instance;
+  int			full_mode;
+  
+  Instance(void);
+  Instance(NPP _np_instance, int _full_mode);
+  void Detach(void);
+  void Attach(Widget _widget, Window _window, Widget _parent);
+  ~Instance(void);
 };
+
+
+Instance::Instance(void) 
+  : widget(0), window(0), parent(0), np_instance(0), full_mode(1) 
+{
+}
+
+Instance::Instance(NPP _np_instance, int _full_mode) 
+  : widget(0), window(0),
+    parent(0), np_instance(_np_instance), full_mode(_full_mode) 
+{
+}
+
+void 
+Instance::Detach(void)
+{
+  widget=0; window=0; parent=0;
+}
+
+void 
+Instance::Attach(Widget _widget, Window _window, Widget _parent)
+{
+  widget=_widget; window=_window; parent=_parent;
+}
+
+Instance::~Instance(void)
+{
+  widget=0; window=0; parent=0; np_instance=0;
+}
+
+
+// ------------------------------------------------------------
+
 
 class DelayedRequest
 {
 public:
-   int		req_num;
-   void		* id;
-   GUTF8String status, url, target;
-
-   DelayedRequest(void) : req_num(-1) {}
-   DelayedRequest(int _req_num) : req_num(_req_num) {}
+  int req_num;
+  void *id;
+  GUTF8String status, url, target;
+  DelayedRequest(void);
+  DelayedRequest(int _req_num);
 };
+
+
+DelayedRequest::DelayedRequest(void) 
+  : req_num(-1) 
+{
+}
+
+DelayedRequest::DelayedRequest(int _req_num) 
+  : req_num(_req_num) 
+{
+}
 
 
 
@@ -1098,7 +1131,7 @@ StartProgram(void)
 	// to orphan a child under all versions of Unix.  Otherwise the
 	// SIGCHLD may cause Netscape to crash.
 
-#ifndef DEBUG
+#ifdef NO_DEBUG
 	// Don't do it in DEBUG mode => all DEBUG messages got lost.
       setsid();
 #endif

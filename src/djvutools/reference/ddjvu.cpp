@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.33 2001-10-16 22:27:24 docbill Exp $
+// $Id: ddjvu.cpp,v 1.31.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name ddjvu
 
@@ -111,7 +118,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.33 2001-10-16 22:27:24 docbill Exp $# */
+    #$Id: ddjvu.cpp,v 1.31.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

@@ -32,13 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_menu.cpp,v 1.15.2.1 2001-10-18 19:10:29 leonb Exp $
+// $Id: qd_viewer_menu.cpp,v 1.15.2.2 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 
 #include "qd_viewer_menu.h"
 #include "debug.h"

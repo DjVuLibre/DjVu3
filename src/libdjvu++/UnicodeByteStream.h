@@ -1,15 +1,18 @@
 //C-  Copyright © 2000-2001, LizardTech, Inc. All Rights Reserved.
 //C-              Unauthorized use prohibited.
 //
-// $Id: UnicodeByteStream.h,v 1.10 2001-10-16 18:01:44 docbill Exp $
+// $Id: UnicodeByteStream.h,v 1.9.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
 
 #ifndef _UNICODEBYTESTREAM_H_
 #define _UNICODEBYTESTREAM_H_
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 /** @name UnicodeByteStream.h
 
@@ -29,7 +32,7 @@
     @author
     Bill C Riemers <bcr@lizardtech.org>
     @version
-    #$Id: UnicodeByteStream.h,v 1.10 2001-10-16 18:01:44 docbill Exp $# */
+    #$Id: UnicodeByteStream.h,v 1.9.2.1 2001-10-23 21:16:46 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

@@ -32,9 +32,12 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: path.cpp,v 1.16.2.1 2001-10-19 00:39:26 leonb Exp $
+// $Id: path.cpp,v 1.16.2.2 2001-10-23 21:16:49 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -321,6 +324,10 @@ get_viewer_path(strpool *pool)
   const char *env;
   const char *dir;
   const char *test;
+  /* Environment variable NPX_DJVIEW overrides everything */
+  if ((env = getenv("NPX_DJVIEW")))
+    if (is_executable(env))
+      return env;
   /* Try relative to plugin path */
   if ((env = (const char*)GetPluginPath())) {
     const char *envs = follow_symlinks(pool, env);

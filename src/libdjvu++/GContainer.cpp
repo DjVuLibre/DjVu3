@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GContainer.cpp,v 1.35.2.1 2001-10-17 22:01:25 leonb Exp $
+// $Id: GContainer.cpp,v 1.35.2.2 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -747,28 +750,3 @@ GSetBase::empty()
 //  for (int i=0; i<nbuckets; i++)
 //    table[i] = 0;
 }
-
-static GPList<GPEnabled> &
-get_list(void)
-{
-  static GPList<GPEnabled> list;
-  return list;
-}
-
-GPEnabled *
-static_const_GPBase(GPEnabled *foo)
-{
-  if(foo)
-  {
-    static GPList<GPEnabled> &list=get_list();
-    list.append(foo);
-  }
-  return foo;
-}
-
-void
-static_destruct(void)
-{
-  get_list().empty();
-}
-

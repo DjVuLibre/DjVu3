@@ -30,12 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.97 2001-10-16 22:45:44 docbill Exp $
+// $Id: ByteStream.cpp,v 1.94.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
 #endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 // - Author: Leon Bottou, 04/1997
 
 #include "ByteStream.h"
@@ -1124,7 +1128,7 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   const char *default_mode="rb";
 #if HAS_MEMMAP
 
-  if ((!mode&&(fd!=1)&&(fd!=2)) || (mode&&(GUTF8String("rb") == mode)))
+  if ((!mode&&(fd!=0)&&(fd!=1)&&(fd!=2)) || (mode&&(GUTF8String("rb") == mode)))
   {
     MemoryMapByteStream *rb=new MemoryMapByteStream();
     retval=rb;
@@ -1137,63 +1141,56 @@ ByteStream::create(const int fd,char const * const mode,const bool closeme)
   if(!retval)
 #endif
   {
-    int fd2=fd;
-    FILE *f=0;
-    switch(fd)
-    {
-      case 0:
-        if(!closeme && !mode)
-        {
-          f=stdin;
-          fd2=(-1);
-          break;
-        }
-      case 1:
-        if(!closeme && (!mode || GUTF8String(mode) == "a"))
-        {
-          f=stdout;
-          default_mode="wb";
-          fd2=(-1);
-          break;
-        }
-      case 2:
-        if(!closeme && (!mode || GUTF8String(mode) == "a"))
-        {
-          default_mode="a";
-          f=stderr;
-          fd2=(-1);
-          break;
-        }
-      default:
+    int fd2 = fd;
+    FILE *f = 0;
+    if (fd == 0 && !closeme && !mode)
+      {
+        f=stdin;
+        fd2=(-1);
+      }
+    else if (fd == 1 && !closeme && (!mode || GUTF8String(mode) == "a"))
+      {
+        f=stdout;
+        default_mode="wb";
+        fd2 = -1;
+      }
+    else if (fd == 2 && !closeme && (!mode || GUTF8String(mode) == "a"))
+      {
+        default_mode="a";
+        f=stderr;
+        fd2 = -1;
+      }
+    else
+      {
 #ifndef UNDER_CE
         if(!closeme)
-        {
-          fd2=dup(fd);
-        } 
+          {
+            fd2 = dup(fd);
+          } 
         f=fdopen(fd2,(char*)(mode?mode:default_mode));
 #else
         if(!closeme)
-        {
-          fd2=(-1);
-        }
+          {
+            fd2 = -1;
+          }
 #endif
-        break;
-    }
+      }
+
     if(!f)
-    {
+      {
 #ifndef UNDER_CE
-      if(fd2>= 0)
-        close(fd2);
+        if(fd2>= 0)
+          close(fd2);
 #endif
-      G_THROW( ERR_MSG("ByteStream.open_fail2") );
-    }
+        G_THROW( ERR_MSG("ByteStream.open_fail2") );
+      }
     Stdio *sbs=new Stdio();
     retval=sbs;
     GUTF8String errmessage=sbs->init(f,mode?mode:default_mode,(fd2>=0));
     if(errmessage.length())
-    {
-      G_THROW(errmessage);
-    }
+      {
+        G_THROW(errmessage);
+      }
   }
   return retval;
 }
@@ -1321,11 +1318,33 @@ MemoryMapByteStream::~MemoryMapByteStream()
 
 ByteStream::Wrapper::~Wrapper() {}
 
+
+GP<ByteStream> 
+ByteStream::get_stdin(void)
+{
+  static GP<ByteStream> gp = ByteStream::create(0,0,false);
+  return gp;
+}
+
+GP<ByteStream> 
+ByteStream::get_stdout(void)
+{
+  static GP<ByteStream> gp = ByteStream::create(1,0,false);
+  return gp;
+}
+
+GP<ByteStream> 
+ByteStream::get_stderr(void)
+{
+  static GP<ByteStream> gp = ByteStream::create(2,0,false);
+  return gp;
+}
+
 void
 DjVuPrintErrorUTF8(const char *fmt, ... )
 {
-  static ByteStream * const errout=static_const_GP(ByteStream::create(2,0,false));
-  if(errout)
+  GP<ByteStream> errout = ByteStream::get_stderr();
+  if (errout)
   {
     errout->cp=ByteStream::NATIVE;
     va_list args;
@@ -1338,8 +1357,8 @@ DjVuPrintErrorUTF8(const char *fmt, ... )
 void
 DjVuPrintErrorNative(const char *fmt, ... )
 {
-  static ByteStream * const errout=static_const_GP(ByteStream::create(2,0,false));
-  if(errout)
+  GP<ByteStream> errout = ByteStream::get_stderr();
+  if (errout)
   {
     errout->cp=ByteStream::NATIVE;
     va_list args;
@@ -1352,8 +1371,8 @@ DjVuPrintErrorNative(const char *fmt, ... )
 void
 DjVuPrintMessageUTF8(const char *fmt, ... )
 {
-  static ByteStream * const strout=static_const_GP(ByteStream::create(1,0,false));
-  if(strout)
+  GP<ByteStream> strout = ByteStream::get_stdout();
+  if (strout)
   {
     strout->cp=ByteStream::NATIVE;
     va_list args;
@@ -1366,8 +1385,8 @@ DjVuPrintMessageUTF8(const char *fmt, ... )
 void
 DjVuPrintMessageNative(const char *fmt, ... )
 {
-  static ByteStream * const strout=static_const_GP(ByteStream::create(1,0,false));
-  if(strout)
+  GP<ByteStream> strout = ByteStream::get_stdout();
+  if (strout)
   {
     strout->cp=ByteStream::NATIVE;
     va_list args;

@@ -30,14 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.14 2001-10-16 18:01:44 docbill Exp $
+// $Id: IW44Image.cpp,v 1.13.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 // - Author: Leon Bottou, 08/1998
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #define IW44IMAGE_IMPLIMENTATION /* */
 

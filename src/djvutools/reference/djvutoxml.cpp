@@ -4,8 +4,15 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.10 2001-10-16 18:01:43 docbill Exp $
+// $Id: djvutoxml.cpp,v 1.9.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "DjVuDocument.h"
 #include "GOS.h"

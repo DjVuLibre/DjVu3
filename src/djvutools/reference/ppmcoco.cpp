@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.23 2001-10-16 18:01:43 docbill Exp $
+// $Id: ppmcoco.cpp,v 1.22.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name ppmcoco
 
@@ -104,7 +111,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.23 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: ppmcoco.cpp,v 1.22.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

@@ -32,16 +32,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_viewer_menu.h,v 1.4 2001-10-16 18:01:44 docbill Exp $
+// $Id: qd_viewer_menu.h,v 1.3.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_VIEWER_MENU
 #define HDR_QD_VIEWER_MENU
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "qd_viewer.h"
 

@@ -32,12 +32,14 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_toolbutt.cpp,v 1.5 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_toolbutt.cpp,v 1.4.2.1 2001-10-23 21:16:48 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
+#ifdef __GNUG__
 #pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "qd_toolbutt.h"

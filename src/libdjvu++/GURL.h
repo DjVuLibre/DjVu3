@@ -30,15 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.h,v 1.50 2001-10-16 22:27:24 docbill Exp $
+// $Id: GURL.h,v 1.48.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GURL_H_
 #define _GURL_H_
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "GString.h"
 #include "Arrays.h"
@@ -49,7 +52,7 @@
     \Ref{GURL} class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: GURL.h,v 1.50 2001-10-16 22:27:24 docbill Exp $#
+    @version #$Id: GURL.h,v 1.48.2.1 2001-10-23 21:16:45 leonb Exp $#
 */
 
 //@{

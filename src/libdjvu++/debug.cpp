@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.28 2001-10-16 18:01:44 docbill Exp $
+// $Id: debug.cpp,v 1.27.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #ifdef NO_DEBUG
 #undef NO_DEBUG
@@ -52,9 +59,6 @@
 #include <errno.h>
 #endif
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #ifndef UNIX
 #ifndef WIN32
@@ -71,7 +75,7 @@ static int              debug_level = 0;
 static int              debug_level = DEBUGLVL;
 #endif
 static int              debug_id;
-static GP<ByteStream>   debug_file;
+static FILE            *debug_file;
 static int              debug_file_count;
 
 #if THREADMODEL==NOTHREADS
@@ -80,9 +84,8 @@ static DjVuDebug debug_obj;
 static GMap<long, DjVuDebug> &
 debug_map(void)
 {
-  static GMap<long, DjVuDebug> &map=
-    GMap<long, DjVuDebug>::static_reference();
-  return map;
+  static GMap<long, DjVuDebug> xmap;
+  return xmap;
 }
 #endif
 
@@ -90,7 +93,10 @@ DjVuDebug::DjVuDebug()
   : block(0), indent(0)
 {
   id = debug_id++;
-  set_debug_file(stderr);
+#ifdef UNIX
+  if (debug_file_count++ == 0 && !debug_file)
+    set_debug_file(stderr);
+#endif
 }
 
 DjVuDebug::~DjVuDebug()
@@ -98,8 +104,8 @@ DjVuDebug::~DjVuDebug()
 #ifdef UNIX
   if (--debug_file_count == 0)
     {
-//      if (debug_file && (debug_file != stderr))
-//        fclose(debug_file);
+      if (debug_file && (debug_file != stderr))
+        fclose(debug_file);
       debug_file = 0;
     }
 #endif
@@ -115,17 +121,17 @@ DjVuDebug::format(const char *fmt, ... )
       GUTF8String buffer(fmt,ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
-      if(debug_file)
-      {
-        debug_file->writestring(buffer);
-        debug_file->flush();
-      }
+      if (debug_file)
+        {
+          fprintf(debug_file,"%s", (const char*)buffer);
+          fflush(debug_file);
+        }
 #ifdef WIN32
       else
-      {
-        USES_CONVERSION;
-        OutputDebugString(A2CT((const char *)buffer));
-      }
+        {
+          USES_CONVERSION;
+          OutputDebugString(A2CT((const char *)buffer));
+        }
 #endif
     }
 }
@@ -139,33 +145,16 @@ DjVuDebug::set_debug_level(int lvl)
 void
 DjVuDebug::set_debug_url(const GURL &url)
 {
-// #ifdef UNIX
-//  GCriticalSectionLock glock(&debug_lock);
-//  if (debug_file && (debug_file != stderr))
-//    fclose(debug_file);
-  debug_file = 0;
-  if (!url.is_empty())
-  {
-    debug_file = ByteStream::create(url, "w");
-    if (! debug_file)
-      debug_file = ByteStream::create(2,0,false);
-  }else
-  {
-    debug_file = ByteStream::create(2,0,false);
-  }
-// #endif
+  // Why make everything more complicated than necessary ?
 }
 
 void
 DjVuDebug::set_debug_file(FILE * file)
 {
-#ifdef UNIX
-//  GCriticalSectionLock glock(&debug_lock);
-//  if (debug_file && (debug_file != stderr))
-//    fclose(debug_file);
-  debug_file = 0;
-  debug_file = ByteStream::create(file,"w",(file!=stderr));
-#endif
+  GCriticalSectionLock glock(&debug_lock);
+  if (debug_file && (debug_file != stderr))
+    fclose(debug_file);
+  debug_file = file;
 }
 
 void

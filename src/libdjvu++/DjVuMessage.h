@@ -30,13 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.h,v 1.30 2001-10-16 18:01:43 docbill Exp $
+// $Id: DjVuMessage.h,v 1.29.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
-
-
 
 #ifndef __DJVU_MESSAGE_H__
 #define __DJVU_MESSAGE_H__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 
 #include "DjVuMessageLite.h"

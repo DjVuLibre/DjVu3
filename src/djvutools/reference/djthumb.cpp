@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.29 2001-10-16 18:01:43 docbill Exp $
+// $Id: djthumb.cpp,v 1.28.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 // DJTHUMB -- DjVu thumbnails generator
 
@@ -68,7 +75,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-#$Id: djthumb.cpp,v 1.29 2001-10-16 18:01:43 docbill Exp $# */
+#$Id: djthumb.cpp,v 1.28.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 

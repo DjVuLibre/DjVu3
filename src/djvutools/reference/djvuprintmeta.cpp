@@ -4,8 +4,15 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvuprintmeta.cpp,v 1.4 2001-10-16 18:01:43 docbill Exp $
+// $Id: djvuprintmeta.cpp,v 1.3.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "DjVuDocument.h"
 #include "GOS.h"
@@ -41,7 +48,7 @@ main(int argc, char * argv[], char *env[])
   }
   G_TRY
   {
-    DArray<GUTF8String> dargv(0,argc-1);
+    GArray<GUTF8String> dargv(0,argc-1);
     for(int i=0;i<argc;++i)
       dargv[i]=GNativeString(argv[i]);
 

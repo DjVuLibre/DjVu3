@@ -32,16 +32,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_pnote.h,v 1.4 2001-10-16 18:01:45 docbill Exp $
+// $Id: qt_pnote.h,v 1.3.2.1 2001-10-23 21:16:46 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QT_PNOTE
 #define HDR_QT_PNOTE
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "GPopupNote.h"
 

@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.h,v 1.37 2001-10-16 18:01:44 docbill Exp $
+// $Id: GSmartPointer.h,v 1.36.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name GSmartPointer.h
 
@@ -53,14 +59,10 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.37 2001-10-16 18:01:44 docbill Exp $# 
+    #$Id: GSmartPointer.h,v 1.36.2.1 2001-10-23 21:16:45 leonb Exp $# 
     @args
 */
 //@{
-
-#if defined(EXTERNAL_TEMPLATES) && defined(__GNUC__)
-#pragma interface
-#endif
 
 #if defined(_MSC_VER)
 // Language lawyer say MSVC6 is wrong on that one. 
@@ -68,10 +70,11 @@
 #pragma warning( disable : 4243 )
 #endif
 
-
 #include "DjVuGlobal.h"
 
 
+/* What is this innovation ? 
+   What does it do that a GArray does not do ? */
 class GPBufferBase
 {
 public:

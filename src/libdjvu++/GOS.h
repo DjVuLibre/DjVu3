@@ -30,11 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.24 2001-10-16 18:01:44 docbill Exp $
+// $Id: GOS.h,v 1.23.2.1 2001-10-23 21:16:45 leonb Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
 #define _GOS_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
+#endif
 
 /** @name GOS.h
     Files #"GOS.h"# and #"GOS.cpp"# implement operating system 
@@ -53,13 +59,10 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.24 2001-10-16 18:01:44 docbill Exp $#
+    #$Id: GOS.h,v 1.23.2.1 2001-10-23 21:16:45 leonb Exp $#
 */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 #include "DjVuGlobal.h"
 #include "GString.h"
 

@@ -32,16 +32,18 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base.h,v 1.6 2001-10-16 18:01:45 docbill Exp $
+// $Id: qd_base.h,v 1.5.2.1 2001-10-23 21:16:47 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_BASE
 #define HDR_QD_BASE
-
-#ifdef __GNUC__
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#ifdef __GNUG__
 #pragma interface
 #endif
+
 
 #include "DjVuImage.h"
 #include "GMarginCache.h"
@@ -136,7 +138,6 @@ public:
    };
 
 private:
-   const static int	toolbar_edge=5;
    bool			toolbar_shown;
    bool			toolbar_enabled;
    bool			showing_toolbar;
@@ -199,6 +200,7 @@ private slots:
       // Slot called when the system is idle (to update caches)
    void		slotCheckCache(void);
 protected:
+   static const int       toolbar_edge;
    static const char	* search_results_name;
    class QSplitter	* splitter;
    QWidget	* main_widget, * thumb_widget;
@@ -275,6 +277,7 @@ protected:
    virtual void	updateEditToolBar(void) {}
 signals:
    void		sigShowStatus(const QString &name);
+   void         sigQueryFullScreen(bool &);
 public slots:
    void		slotEnableDisplayAllHLinks(void);
    void		slotDisableDisplayAllHLinks(void);

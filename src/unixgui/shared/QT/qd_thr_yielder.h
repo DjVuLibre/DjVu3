@@ -32,13 +32,16 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_thr_yielder.h,v 1.3.2.1 2001-10-17 13:05:54 leonb Exp $
+// $Id: qd_thr_yielder.h,v 1.3.2.2 2001-10-23 21:16:48 leonb Exp $
 // $Name:  $
 
 #ifndef HDR_QD_THR_YIELDER
 #define HDR_QD_THR_YIELDER
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+#ifdef __GNUG__
+#pragma interface
 #endif
 #if defined(HAVE_COTHREAD) || !defined(AUTOCONF)
 

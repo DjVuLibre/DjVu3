@@ -30,8 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.25 2001-10-16 18:01:43 docbill Exp $
+// $Id: djvudump.cpp,v 1.24.2.1 2001-10-23 21:16:44 leonb Exp $
 // $Name:  $
+
+#ifdef __GNUG__
+#pragma implementation
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name djvuinfo
 
@@ -78,7 +85,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.25 2001-10-16 18:01:43 docbill Exp $# */
+    #$Id: djvudump.cpp,v 1.24.2.1 2001-10-23 21:16:44 leonb Exp $# */
 //@{
 //@}
 
