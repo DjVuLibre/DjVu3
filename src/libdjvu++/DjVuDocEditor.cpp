@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.22 2000-01-14 15:20:03 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.23 2000-01-14 19:03:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -172,6 +172,9 @@ DjVuDocEditor::request_data(const DjVuPort * source, const GURL & url)
 
 void
 DjVuDocEditor::clean_files_map(void)
+      // Will go thru the map of files looking for unreferenced
+      // files or records w/o DjVuFile and DataPool.
+      // These will be modified and/or removed.
 {
    DEBUG_MSG("DjVuDocEditor::clean_files_map() called\n");
    DEBUG_MAKE_INDENT(3);
@@ -375,7 +378,7 @@ DjVuDocEditor::insert_file(const char * file_name, const char * parent_id,
    return id;
 }
 
-void
+bool
 DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 			   int & file_pos, GMap<GString, GString> & name2id)
       // First it will insert the 'file_name' at position 'file_pos'.
@@ -392,13 +395,16 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       // keep track of these modifications.
       //
       // Also, if a name is in name2id, we will not insert that file again.
+      //
+      // Will return TRUE if the file has been successfully inserted.
+      // FALSE, if the file contains NDIR chunk and has been skipped.
 {
    GString errors;
 
       // We do not want to insert the same file twice (important when
       // we insert a group of files at the same time using insert_group())
       // So we check if we already did that and return if so.
-   if (name2id.contains(GOS::basename(file_name))) return;
+   if (name2id.contains(GOS::basename(file_name))) return true;
    
    TRY {
       GP<DjVmDir> dir=get_djvm_dir();
@@ -418,6 +424,14 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	 if (chkid!="FORM:DJVI" && chkid!="FORM:DJVU" &&
 	     chkid!="FORM:BM44" && chkid!="FORM:PM44")
 	    THROW("File '"+GString(file_name)+"' is not a single page DjVu file");
+
+	    // Wonderful. It's even a DjVu file. Scan for NDIR chunks.
+	    // If NDIR chunk is found, ignore the file
+	 while(iff.get_chunk(chkid))
+	 {
+	    if (chkid=="NDIR") return false;
+	    iff.close_chunk();
+	 }
       }
       
 	 // Now get a unique name for this file.
@@ -486,11 +500,15 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
 	    iff_in.close_chunk();
 
 	    TRY {
-	       insert_file(full_name, false, file_pos, name2id);
-	       GString id=name2id[name];
-	       iff_out.put_chunk("INCL");
-	       iff_out.write((const char *) id, id.length());
-	       iff_out.close_chunk();
+	       if (insert_file(full_name, false, file_pos, name2id))
+	       {
+		     // If the child file has been inserted (doesn't
+		     // contain NDIR chunk), add INCL chunk.
+		  GString id=name2id[name];
+		  iff_out.put_chunk("INCL");
+		  iff_out.write((const char *) id, id.length());
+		  iff_out.close_chunk();
+	       }
 	    } CATCH(exc) {
 		  // Should an error occur, we move on. INCL chunk will
 		  // not be copied.
@@ -523,6 +541,8 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       // included files. We want to process all of them even if we failed to
       // process one. But here we need to let the exception propagate...
    if (errors.length()) THROW(errors);
+
+   return true;
 }
 
 void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.16 2000-01-13 21:56:27 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.17 2000-01-14 19:03:28 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -28,7 +28,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.16 2000-01-13 21:56:27 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.17 2000-01-14 19:03:28 eaf Exp $#
 */
 
 //@{
@@ -287,7 +287,7 @@ private:
    GString	find_unique_id(const char * id);
    GP<DataPool>	strip_incl_chunks(const GP<DataPool> & pool);
    void		clean_files_map(void);
-   void		insert_file(const char * file_name, bool is_page,
+   bool		insert_file(const char * file_name, bool is_page,
 			    int & file_pos, GMap<GString, GString> & name2id);
    void		remove_file(const char * id, bool remove_unref,
 			    GMap<GString, void *> & ref_map);
