@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.35 2000-09-18 17:10:28 bcr Exp $
+//C- $Id: parseoptions.h,v 1.36 2000-09-21 20:16:06 bcr Exp $
 */
 
 #ifndef __DJVUPARSEOPTIONS_H__
@@ -42,7 +42,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author Bill Riemers
-   @version #$Id: parseoptions.h,v 1.35 2000-09-18 17:10:28 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.36 2000-09-21 20:16:06 bcr Exp $#
  */
 
 /*@{*/
@@ -53,7 +53,7 @@
  * configuration files.  The operations of ChangeProfile(), and the copy
  * constructor are only thread safe if you define a THREADMODEL. 
  */
-#include "c-wrappers/DjVu.h"
+#include "DjVu.h"
 
 #ifdef __cplusplus
 #ifdef __GNUC__

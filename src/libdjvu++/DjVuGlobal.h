@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.35 2000-09-18 17:10:11 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.36 2000-09-21 20:16:06 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -41,7 +41,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.35 2000-09-18 17:10:11 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.36 2000-09-21 20:16:06 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -64,7 +64,7 @@
 #include <new.h>
 #endif
 
-#include "c-wrappers/DjVu.h"
+#include "DjVu.h"
 
 // These define the two callbacks needed for C++
 typedef void djvu_delete_callback(void *);
@@ -198,7 +198,7 @@ operator delete [] (void *addr) delete_throw_spec
 #define HAS_DJVU_PROGRESS_CALLBACKS
 
 #ifdef NEED_DJVU_PROGRESS
-#include "c-wrappers/DjVu.h"
+#include "DjVu.h"
 
 extern djvu_progress_callback *_djvu_progress_ptr;
 
