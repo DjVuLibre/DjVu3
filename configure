@@ -32,7 +32,7 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: configure,v 1.53 2001-08-24 21:50:09 docbill Exp $
+# $Id: configure,v 1.54 2001-09-26 16:01:46 leonb Exp $
 # $Name:  $
 
 # LIBDJVU++ -- Decoding library and utilities
@@ -182,7 +182,7 @@ if [ -z "$without_jpeg$jpeg_name" ]
 then
     ## This is the version with JPEG 
     generate_makefile src/3rd-party/libjpeg
-    generate_main_makefile src/3rd-party/libjpeg src/libdjvu++ <<\EOF
+    generate_main_makefile src/3rd-party/libjpeg src/libdjvu++ src/djvutools/reference <<\EOF
 all: 
 	( cd src/3rd-party/libjpeg; $(MAKE) lib prog)
 	( cd src/libdjvu++; $(MAKE) lib )
@@ -194,7 +194,7 @@ EOF
 
 else
     ## This is the regular version
-    generate_main_makefile src/libdjvu++ <<\EOF
+    generate_main_makefile src/libdjvu++ src/djvutools/reference <<\EOF
 all: 
 	( cd src/libdjvu++; $(MAKE) lib )
 	( cd src/djvutools/reference; $(MAKE) prog )
