@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDynamic.cpp,v 1.3 2001-07-16 15:46:04 bcr Exp $
+// $Id: DjVuDynamic.cpp,v 1.4 2001-07-16 20:33:36 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -159,7 +159,7 @@ DjVuDynamic::DjVuDynamic(const GUTF8String &libname)
 DjVuDynamic::DjVuDynamic(const GURL &liburl)
 : lib(0)
 {
-  GP<GPEnabled>::operator=(lib=LookupDjVuDynamic(liburl.get_string(),error));
+  GP<GPEnabled>::operator=(lib=LookupDjVuDynamic(liburl.UTF8Filename(),error));
 }
 
 void *
