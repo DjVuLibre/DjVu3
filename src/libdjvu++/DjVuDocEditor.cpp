@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.82 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.83 2001-06-29 23:24:47 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -744,13 +744,26 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
         {
           GMap<GUTF8String,void *> map;
           map_ids(map);
-          GP<DjVuDocument> doc(DjVuDocument::create_wait(furl));
+          DEBUG_MSG("Read DjVuDocument furl='" << furl << "'\n");
+          GP<DjVuDocument> doc(DjVuDocument::create_noinit());
+          get_portcaster()->add_route(doc,this);
+          doc->set_verbose_eof(verbose_eof);
+          doc->set_recover_errors(recover_errors);
+//          doc->init(furl,this);
+          doc->init(furl);
+          doc->wait_for_complete_init();
           GP<ByteStream> gbs(ByteStream::create());
+          DEBUG_MSG("Saving DjVuDocument url='" << furl << "' with unique names\n");
           doc->write(gbs,map);
           gbs->seek(0L);
+          DEBUG_MSG("Loading unique names\n");
           doc=DjVuDocument::create(gbs);
+          get_portcaster()->add_route(doc,this);
+          doc->set_verbose_eof(verbose_eof);
+          doc->set_recover_errors(recover_errors);
           doc->wait_for_complete_init();
           gbs=0;
+          DEBUG_MSG("Inserting pages\n");
           int pages_num=doc->get_pages_num();
           for(int page_num=0;page_num<pages_num;page_num++)
           {
@@ -1796,6 +1809,39 @@ DjVuDocEditor::save(void)
    if (!can_be_saved())
      G_THROW( ERR_MSG("DjVuDocEditor.cant_save") );
    save_as(GURL(), orig_doc_type!=INDIRECT);
+}
+
+void
+DjVuDocEditor::write(const GP<ByteStream> &gbs, bool force_djvm)
+{
+  DEBUG_MSG("DjVuDocEditor::write()\n");
+  DEBUG_MAKE_INDENT(3);
+  if (get_thumbnails_num()==get_pages_num())
+  {
+    file_thumbnails();
+  }else
+  { 
+    remove_thumbnails();
+  }
+  clean_files_map();
+  DjVuDocument::write(gbs,force_djvm);
+}
+
+void
+DjVuDocEditor::write(
+  const GP<ByteStream> &gbs,const GMap<GUTF8String,void *> &reserved)
+{
+  DEBUG_MSG("DjVuDocEditor::write()\n");
+  DEBUG_MAKE_INDENT(3);
+  if (get_thumbnails_num()==get_pages_num())
+  {
+    file_thumbnails();
+  }else
+  { 
+    remove_thumbnails();
+  }
+  clean_files_map();
+  DjVuDocument::write(gbs,reserved);
 }
 
 void

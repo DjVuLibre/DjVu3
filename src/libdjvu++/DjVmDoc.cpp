@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.48 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.49 2001-06-29 23:24:47 bcr Exp $
 // $Name:  $
 
 
@@ -237,6 +237,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr,
   bool do_rename=false;
   GPosition pos(reserved);
 
+  GMap<GUTF8String,GUTF8String> incl;
   DEBUG_MSG("pass 1: looking for reserved names.");
   if(pos)
   {
@@ -302,6 +303,18 @@ DjVmDoc::write(const GP<ByteStream> &gstr,
     GPosition data_pos=data.contains(file->get_load_name());
     if (!data_pos)
       G_THROW( ERR_MSG("DjVmDoc.no_data") "\t" + file->get_load_name());
+    if(do_rename)
+    {
+      GP<ByteStream> gout(ByteStream::create());
+      {
+        const GP<IFFByteStream> giff_in(
+          IFFByteStream::create(data[data_pos]->get_stream()));
+        const GP<IFFByteStream> giff_out(IFFByteStream::create(gout));
+        ::save_file(*giff_in,*giff_out,*dir,incl);
+      }
+      gout->seek(0L);
+      data[data_pos]=DataPool::create(gout);
+    }
     file->size=data[data_pos]->get_length();
     if (!file->size)
       G_THROW( ERR_MSG("DjVmDoc.zero_file") );
@@ -333,7 +346,7 @@ DjVmDoc::write(const GP<ByteStream> &gstr,
   IFFByteStream &iff=*giff;
   iff.put_chunk("FORM:DJVM", 1);
   iff.put_chunk("DIRM");
-  dir->encode(iff.get_bytestream());
+  dir->encode(iff.get_bytestream(),do_rename);
   iff.close_chunk();
 
   for(pos=files_list;pos;++pos)

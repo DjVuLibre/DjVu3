@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.44 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.45 2001-06-29 23:24:47 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.44 2001-06-28 19:42:58 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.45 2001-06-29 23:24:47 bcr Exp $#
 */
 
 //@{
@@ -144,6 +144,22 @@ public:
       /** Saves the document. */
    virtual void	save_as(const GURL &where, bool bundled);
 
+      /** Saves the document in the {\em new bundled} format. All the data
+	  is "bundled" into one file and this file is written into the
+	  passed stream.
+
+	  If #force_djvm# is #TRUE# then even one page documents will be
+	  saved in the #DJVM BUNDLED# format (inside a #FORM:DJVM#);
+
+	  {\bf Plugin Warning}. This function will read contents of the whole
+	  document. Thus, if you call it from the main thread (the thread,
+	  which transfers data from Netscape), the plugin will block. */
+   virtual void	write(const GP<ByteStream> &str, bool force_djvm=false);
+     /** Always save as bundled, renaming any files conflicting with the
+         the names in the supplied GMap. */
+   virtual void	write(const GP<ByteStream> &str,
+     const GMap<GUTF8String,void *> &reserved);
+
       /** Saves the specified pages in DjVu #BUNDLED# multipage document. */
    void		save_pages_as(
      const GP<ByteStream> &str, const GList<int> & page_list);
@@ -169,7 +185,7 @@ public:
 		 to be unique in the DjVu document.
 	  @param page_num Position where the new page should be inserted at.
 	  	 Negative value means "append" */
-   void		insert_page(const GURL &fname, int page_num=-1);
+   void insert_page(const GURL &fname, int page_num=-1);
    /** Inserts a new page with data inside the #data_pool# as page
        number #page_num.
 
