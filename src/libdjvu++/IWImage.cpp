@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.10 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.11 1999-05-14 19:17:29 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.10 1999-03-17 19:24:58 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.11 1999-05-14 19:17:29 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -227,12 +227,12 @@ backward(short *p, int w, int h, int rowsize, int begin, int end)
 
 
 static int iw_quant[16] = {
-  0x010000, 
+  0x004000, 
+  0x008000, 0x008000, 0x010000,
+  0x010000, 0x010000, 0x020000,
   0x020000, 0x020000, 0x040000,
-  0x040000, 0x040000, 0x080000,
-  0x080000, 0x080000, 0x100000,
-  0x100000, 0x100000, 0x200000, 
-  0x100000, 0x100000, 0x200000
+  0x040000, 0x040000, 0x080000, 
+  0x040000, 0x040000, 0x080000
 };
 
 static float iw_norm[16] = {
@@ -1191,7 +1191,6 @@ public:
   BitContext ctxMant;
   BitContext ctxRoot;
   // helper
-  int  next_quant(void);
   int  is_null_slice(int bit, int band);
   void encode_buckets(_ZPCodecBias &zp, int bit, int band, 
                       _IWBlock &blk, _IWBlock &eblk,
@@ -1244,9 +1243,6 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   quant_hi[0] = 0;
   for (j=1; j<10; j++)
     quant_hi[j] = *q++;
-  // -- align on curbit
-  while (quant_lo[0] >= 0x8000)
-    next_quant();
   // Initialize coding contexts
   memset((void*)ctxStart, 0, sizeof(ctxStart));
   memset((void*)ctxBucket, 0, sizeof(ctxBucket));
@@ -1265,29 +1261,6 @@ _IWCodec::~_IWCodec()
   if (emap)
     delete emap;
 }
-
-
-// next_quant
-// -- computes the quantization levels for next plane.
-//    returns 1 unless all quantization are zero
-
-int
-_IWCodec::next_quant(void)
-{
-  int i;
-  int flag = 0;
-  // Quantization coefficients for first band
-  for (i=0; i<16; i++) 
-    if ((quant_lo[i] = quant_lo[i]>>1))
-      flag=1; 
-  // Quantization coefficients for other bands
-  for (i=0; i<10; i++)
-    if ((quant_hi[i] = quant_hi[i]>>1))
-      flag = 1;
-  // Return 1 if there is still a non null threshold
-  return flag;
-}
-
 
 // is_null_slice
 // -- check if data can be produced for this band/mask
@@ -1346,23 +1319,25 @@ _IWCodec::code_slice(_ZPCodecBias &zp)
                            fbucket, nbucket);
         }
     }
-  // Next slice
+  // Reduce quantization threshold
+  quant_hi[curband] = quant_hi[curband] >> 1;
+  if (curband == 0)
+    for (int i=0; i<16; i++) 
+      quant_lo[i] = quant_lo[i] >> 1;
+  // Proceed to the next slice
   if (++curband >= (int)(sizeof(bandbuckets)/sizeof(bandbuckets[0])))
     {
       curband = 0;
       curbit += 1;
-      if (! next_quant())
+      if (quant_hi[(sizeof(bandbuckets)/sizeof(bandbuckets[0]))-1] == 0)
         {
-          // All quantization factors are zero
+          // All quantization thresholds are null
           curbit = -1;
           return 0;
         }
     }
   return 1;
 }
-
-
-
 
 
 // encode_buckets
