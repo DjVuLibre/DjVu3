@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.78 2001-06-09 01:50:16 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.79 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -103,12 +103,14 @@ DjVuImage::get_info(const GP<DjVuFile> & file) const
 GP<IW44Image>
 DjVuImage::get_bg44(const GP<DjVuFile> & file) const
 {
-   if (file->bg44) return file->bg44;
+   if (file->bg44)
+     return file->bg44;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
       GP<IW44Image> bg44=get_bg44(list[pos]);
-      if (bg44) return bg44;
+      if (bg44)
+        return bg44;
    }
    return 0;
 }
@@ -116,7 +118,8 @@ DjVuImage::get_bg44(const GP<DjVuFile> & file) const
 GP<GPixmap>
 DjVuImage::get_bgpm(const GP<DjVuFile> & file) const
 {
-   if (file->bgpm) return file->bgpm;
+   if (file->bgpm)
+     return file->bgpm;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
@@ -129,12 +132,14 @@ DjVuImage::get_bgpm(const GP<DjVuFile> & file) const
 GP<JB2Image>
 DjVuImage::get_fgjb(const GP<DjVuFile> & file) const
 {
-   if (file->fgjb) return file->fgjb;
+   if (file->fgjb)
+     return file->fgjb;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
       GP<JB2Image> fgjb=get_fgjb(list[pos]);
-      if (fgjb) return fgjb;
+      if (fgjb)
+        return fgjb;
    }
    return 0;
 }
@@ -142,12 +147,14 @@ DjVuImage::get_fgjb(const GP<DjVuFile> & file) const
 GP<GPixmap>
 DjVuImage::get_fgpm(const GP<DjVuFile> & file) const
 {
-   if (file->fgpm) return file->fgpm;
+   if (file->fgpm)
+     return file->fgpm;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
       GP<GPixmap> fgpm=get_fgpm(list[pos]);
-      if (fgpm) return fgpm;
+      if (fgpm)
+        return fgpm;
    }
    return 0;
 }
@@ -155,7 +162,8 @@ DjVuImage::get_fgpm(const GP<DjVuFile> & file) const
 GP<DjVuPalette>
 DjVuImage::get_fgbc(const GP<DjVuFile> & file) const
 {
-   if (file->fgbc) return file->fgbc;
+   if (file->fgbc)
+     return file->fgbc;
    GPList<DjVuFile> list=file->get_included_files();
    for(GPosition pos=list;pos;++pos)
    {
@@ -214,36 +222,46 @@ DjVuImage::get_text() const
 GP<IW44Image>   
 DjVuImage::get_bg44() const
 {
-   if (file) return get_bg44(file);
-   else return 0;
+   if (file)
+     return get_bg44(file);
+   else
+     return 0;
 }
 
 GP<GPixmap>   
 DjVuImage::get_bgpm() const
 {
-   if (file) return get_bgpm(file);
-   else return 0;
+   if (file)
+     return get_bgpm(file);
+   else
+     return 0;
 }
 
 GP<JB2Image>   
 DjVuImage::get_fgjb() const
 {
-   if (file) return get_fgjb(file);
-   else return 0;
+   if (file)
+     return get_fgjb(file);
+   else
+     return 0;
 }
 
 GP<GPixmap>    
 DjVuImage::get_fgpm() const
 {
-   if (file) return get_fgpm(file);
-   else return 0;
+   if (file)
+     return get_fgpm(file);
+   else
+     return 0;
 }
 
 GP<DjVuPalette>    
 DjVuImage::get_fgbc() const
 {
-   if (file) return get_fgbc(file);
-   else return 0;
+   if (file)
+     return get_fgbc(file);
+   else
+     return 0;
 }
 
 int
@@ -292,9 +310,9 @@ int
 DjVuImage::get_rounded_dpi() const
 {
    return (get_dpi()+5)/10*10;
-   
+#if 0   
       /* This code used to round the reported dpi to 25, 50, 75, 100, 150,
-	 300, and 600. Now we just round the dpi to 10ths and return it
+	 300, and 600. Now we just round the dpi to 10ths and return it */
    int dpi=get_dpi();
    if (dpi>700) return dpi;
   
@@ -309,7 +327,7 @@ DjVuImage::get_rounded_dpi() const
          min_idx=i;
       };
    return std_dpi[min_idx];
-   */
+#endif
 }
 
 double
@@ -1187,14 +1205,7 @@ DjVuImage::get_rotate() const
 void
 DjVuImage::init_rotate(const DjVuInfo &info)
 { 
-  rotate_count=4;
-  for(int a=(int)(info.orientation);(a!=(int)GRect::BULRNR)&&(a!=(int)GRect::BURLNR);--rotate_count)
-  {
-    a^=((a&(int)GRect::ROTATE90_CW)
-      ?(int)(GRect::BOTTOM_UP|GRect::MIRROR|GRect::ROTATE90_CW)
-      :(int)(GRect::ROTATE90_CW));
-  }
-  rotate_count%=4;
+  rotate_count=((360-GRect::findangle(info.orientation))/90)%4;
 }
 
 void DjVuImage::set_rotate(int count) 

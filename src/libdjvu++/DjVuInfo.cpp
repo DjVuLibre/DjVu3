@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.cpp,v 1.19 2001-04-19 00:05:27 bcr Exp $
+// $Id: DjVuInfo.cpp,v 1.20 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -40,6 +40,7 @@
 #include "DjVuInfo.h"
 #include "GException.h"
 #include "ByteStream.h"
+#include "GString.h"
 
 // ----------------------------------------
 // CLASS DJVUINFO
@@ -128,3 +129,20 @@ DjVuInfo::get_memory_usage() const
 {
   return sizeof(DjVuInfo);
 }
+
+GUTF8String
+DjVuInfo::get_paramtags(void) const
+{
+  const int angle=GRect::findangle(orientation);
+  GUTF8String retval;
+  if(angle)
+  {
+    retval+="<PARAM name=\"rotate\" value=\""+GUTF8String(angle)+"\" />\n";
+  }
+  if(orientation == GRect::rotate(angle,GRect::TDLRNR))
+  {
+    retval+="<PARAM name=\"vflip\" value=\"true\" />\n";
+  }
+  return retval;
+}
+

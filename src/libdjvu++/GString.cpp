@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.109 2001-06-09 01:50:17 bcr Exp $
+// $Id: GString.cpp,v 1.110 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -383,7 +383,7 @@ GStringRep::nextCharType(
     retval=from;
     const char * ptr = data+from;
     for( const char * const eptr=ptr+((len<0)?(size-from):len);
-      (ptr<=eptr) && *ptr;)
+      (ptr<eptr) && *ptr;)
     {
        // Skip characters that fail the isCharType test
       char const * const xptr=isCharType(xiswtest,ptr,!reverse);

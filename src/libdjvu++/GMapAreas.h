@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.27 2001-06-13 22:57:38 bcr Exp $
+// $Id: GMapAreas.h,v 1.28 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -44,6 +44,7 @@
 #include "GContainer.h"
 #include "GString.h"
 #include "GRect.h"
+#include "GURL.h"
 
 /** @name GMapAreas.h
 
@@ -64,7 +65,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.27 2001-06-13 22:57:38 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.28 2001-06-21 21:38:14 bcr Exp $# */
 //@{
 
 
@@ -139,7 +140,8 @@ public:
       /** Optional URL which this map area can be associated with.
 	  If it's not empty then clicking this map area with the mouse
 	  will make the browser load the HTML page referenced by
-	  this #url# */
+	  this #url#.  Note: This may also be a relative URL, so the
+          GURL class is not used. */
    GUTF8String	url;
       /** The target for the #URL#. Standard targets are:
 	  \begin{itemize}
@@ -179,22 +181,22 @@ public:
    unsigned long int	hilite_color;
 
       /// Returns 1 if the given point is inside the hyperlink area
-   bool		is_point_inside(int x, int y);
+   bool		is_point_inside(int x, int y) const;
 
       /// Returns xmin of the bounding rectangle
-   int		get_xmin(void);
+   int		get_xmin(void) const;
       /// Returns ymin of the bounding rectangle
-   int		get_ymin(void);
+   int		get_ymin(void) const;
       /** Returns xmax of the bounding rectangle. In other words, if #X# is
 	  a coordinate of the last point in the right direction, the
 	  function will return #X+1# */
-   int		get_xmax(void);
+   int		get_xmax(void) const;
       /** Returns xmax of the bounding rectangle. In other words, if #Y# is
 	  a coordinate of the last point in the top direction, the
 	  function will return #Y+1# */
-   int		get_ymax(void);
+   int		get_ymax(void) const;
       /// Returns the hyperlink bounding rectangle
-   GRect	get_bound_rect(void);
+   GRect	get_bound_rect(void) const;
       /** Moves the hyperlink along the given vector. Is used by the
 	  hyperlinks editor. */
    void		move(int dx, int dy);
@@ -211,7 +213,7 @@ public:
 	  for saving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GUTF8String	print(void);
 
-//   GUTF8String get_area(void) const;
+   virtual GUTF8String get_xmltag(const int height) const=0;
 
       /// Virtual function returning the shape type.
    virtual MapAreaType const get_shape_type( void ) const { return UNKNOWN; };
@@ -221,7 +223,7 @@ public:
    virtual GP<GMapArea>	get_copy(void) const=0;
       /// Virtual function generating a list of defining coordinates
       /// (default are the opposite corners of the enclosing rectangle)
-   virtual void get_coords( GList<int> & CoordList );
+   virtual void get_coords( GList<int> & CoordList ) const;
    /// Virtual function maps maparea from one area to another using mapper
    virtual void map(GRectMapper &mapper)=0;
    /// Virtual function unmaps maparea from one area to another using mapper
@@ -235,7 +237,7 @@ protected:
    virtual void		gma_move(int dx, int dy)=0;
    virtual void		gma_resize(int new_width, int new_height)=0;
    virtual void		gma_transform(const GRect & grect)=0;
-   virtual bool		gma_is_point_inside(const int x, const int y)=0;
+   virtual bool		gma_is_point_inside(const int x, const int y) const=0;
    virtual char const * const	gma_check_object(void) const=0;
    virtual GUTF8String	gma_print(void)=0;
    
@@ -277,6 +279,7 @@ public:
       /// Returns \Ref{GRect} describing the map area's rectangle
    operator GRect(void);
    
+   virtual GUTF8String get_xmltag(const int height) const;
       /// Returns MapRect
    virtual MapAreaType const get_shape_type( void ) const { return RECT; };
       /// Returns #"rect"#
@@ -296,7 +299,7 @@ protected:
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual bool		gma_is_point_inside(const int x, const int y) const;
    virtual char const * const gma_check_object(void) const;
    virtual GUTF8String	gma_print(void);
 };
@@ -355,6 +358,7 @@ public:
       /// Checks validity of the polygon 
    char const * const	check_data(void);
 
+   virtual GUTF8String get_xmltag(const int height) const;
       /// Returns MapPoly
    virtual MapAreaType const get_shape_type( void ) const { return POLY; };
       /// Returns #"poly"# all the time
@@ -362,7 +366,7 @@ public:
       /// Returns a copy of the polygon
    virtual GP<GMapArea>	get_copy(void) const;
       /// Virtual function generating a list of defining coordinates
-   void get_coords( GList<int> & CoordList );
+   void get_coords( GList<int> & CoordList ) const;
       /// Virtual function maps polygon from one area to another using mapper
    virtual void map(GRectMapper &mapper);
    /// Virtual function unmaps polygon from one area to another using mapper
@@ -375,7 +379,7 @@ protected:
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual bool		gma_is_point_inside(const int x, const int y) const;
    virtual char const * const gma_check_object(void) const;
    virtual GUTF8String	gma_print(void);
 private:
@@ -420,6 +424,7 @@ public:
       /// Returns the greater of \Ref{get_a}() and \Ref{get_b}()
    int		get_rmax(void) const;
 
+   virtual GUTF8String get_xmltag(const int height) const;
       /// Returns MapOval
    virtual MapAreaType const get_shape_type( void ) const { return OVAL; };
       /// Returns #"oval"#
@@ -438,7 +443,7 @@ protected:
    virtual void		gma_move(int dx, int dy);
    virtual void		gma_resize(int new_width, int new_height);
    virtual void		gma_transform(const GRect & grect);
-   virtual bool		gma_is_point_inside(const int x, const int y);
+   virtual bool		gma_is_point_inside(const int x, const int y) const;
    virtual char const * const	gma_check_object(void) const;
    virtual GUTF8String	gma_print(void);
 private:

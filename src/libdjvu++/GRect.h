@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.25 2001-04-02 21:17:15 bcr Exp $
+// $Id: GRect.h,v 1.26 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.25 2001-04-02 21:17:15 bcr Exp $# */
+    #$Id: GRect.h,v 1.26 2001-06-21 21:38:14 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -141,6 +141,23 @@ public:
     TDRLCW=ROTATE90_CW|MIRROR,     /* backwards and rotate 90 */
     BURLCW=ROTATE90_CW|MIRROR|BOTTOM_UP    /* rotate 270 */
   };
+
+  static Orientations
+  rotate(const int angle,Orientations orientation)
+  {
+    for(int a=(((angle)%360)+405)%360;a>90;a-=90)
+      orientation=(Orientations)((int)orientation^(int)(orientation&ROTATE90_CW)?BURLCW:ROTATE90_CW);
+    return orientation;
+  }
+
+  static int
+  findangle(const Orientations orientation)
+  {
+    int a=270;
+    while(a&&(rotate(a,BURLNR)!=orientation)&&(rotate(a,TDRLNR)!=orientation))
+      a-=90;
+    return a;
+  }
 
   /** Constructs an empty rectangle */
   GRect();

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.62 2001-06-18 20:08:05 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.63 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -66,6 +66,7 @@ GUTF8String &
 DjVuMessage::programname(void)
 {
   static GUTF8String xprogramname;
+  use_language();
   return xprogramname;
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.25 2001-06-13 22:57:38 bcr Exp $
+// $Id: GMapAreas.cpp,v 1.26 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -93,39 +93,39 @@ GMapArea::initialize_bounds(void)
 }
 
 int
-GMapArea::get_xmin(void)
+GMapArea::get_xmin(void) const
 {
    if (!bounds_initialized)
-     initialize_bounds();
+     const_cast<GMapArea *>(this)->initialize_bounds();
    return xmin;
 }
 
 int
-GMapArea::get_ymin(void)
+GMapArea::get_ymin(void) const
 {
    if (!bounds_initialized)
-     initialize_bounds();
+     const_cast<GMapArea *>(this)->initialize_bounds();
    return ymin;
 }
 
 int
-GMapArea::get_xmax(void)
+GMapArea::get_xmax(void) const
 {
    if (!bounds_initialized)
-     initialize_bounds();
+     const_cast<GMapArea *>(this)->initialize_bounds();
    return xmax;
 }
 
 int
-GMapArea::get_ymax(void)
+GMapArea::get_ymax(void) const
 {
    if (!bounds_initialized)
-     initialize_bounds();
+     const_cast<GMapArea *>(this)->initialize_bounds();
    return ymax;
 }
 
 GRect
-GMapArea::get_bound_rect(void)
+GMapArea::get_bound_rect(void) const
 {
    return GRect(get_xmin(), get_ymin(), get_xmax()-get_xmin(),
 		get_ymax()-get_ymin());
@@ -201,10 +201,10 @@ GMapArea::check_object(void)
 }
 
 bool
-GMapArea::is_point_inside(int x, int y)
+GMapArea::is_point_inside(int x, int y) const
 {
    if (!bounds_initialized)
-      initialize_bounds();
+     const_cast<GMapArea *>(this)->initialize_bounds();
    return (x>=xmin && x<xmax && y>=ymin && y<ymax) ?
 	      gma_is_point_inside(x, y) : false;
 }
@@ -223,7 +223,7 @@ GMapArea::print(void)
    int i;
    GUTF8String tmp;
    GUTF8String url1, target1, comment1;
-   GUTF8String url_str=(const char *) url;
+   const GUTF8String url_str=url;
    for(i=0;i<(int) url_str.length();i++)
    {
       char ch=url_str[i];
@@ -342,7 +342,7 @@ GMapArea::unmap(GRectMapper &mapper)
 
 /// Virtual function generating a list of defining coordinates
 /// (default are the opposite corners of the enclosing rectangle)
-void GMapArea::get_coords( GList<int> & CoordList )
+void GMapArea::get_coords( GList<int> & CoordList ) const
 {
   CoordList.append( get_xmin() );
   CoordList.append( get_ymin() );
@@ -535,7 +535,7 @@ GMapPoly::optimize_data(void)
 }
 
 bool
-GMapPoly::gma_is_point_inside(const int xin, const int yin)
+GMapPoly::gma_is_point_inside(const int xin, const int yin) const
 {
    if (open)
      return false;
@@ -710,7 +710,7 @@ GMapPoly::gma_print(void)
 }
 
 /// Virtual function generating a list of defining coordinates
-void GMapPoly::get_coords( GList<int> & CoordList )
+void GMapPoly::get_coords( GList<int> & CoordList ) const
 {
   for(int i = 0 ; i < points ; i++)
   {
@@ -764,7 +764,7 @@ GMapOval::gma_transform(const GRect & grect)
 }
 
 bool
-GMapOval::gma_is_point_inside(const int x, const int y)
+GMapOval::gma_is_point_inside(const int x, const int y) const
 {
    return
       sqrt((x-xf1)*(x-xf1)+(y-yf1)*(y-yf1))+
@@ -881,7 +881,7 @@ GMapRect::gma_move(int dx, int dy)
 }
 
 bool
-GMapRect::gma_is_point_inside(const int x, const int y)
+GMapRect::gma_is_point_inside(const int x, const int y) const
 {
    return (x>=xmin)&&(x<xmax)&&(y>=ymin)&&(y<ymax);
 }
@@ -911,6 +911,115 @@ GMapOval::gma_move(int dx, int dy)
 }
 
 GP<GMapArea>
-GMapOval::get_copy(void) const { return new GMapOval(*this); }
+GMapOval::get_copy(void) const
+{
+  return new GMapOval(*this);
+}
 
+static GUTF8String
+GMapArea2xmltag(const GMapArea &area,const GUTF8String &coords)
+{
+  GUTF8String retval("<AREA coords=\""
+    +coords+"\" shape=\""+area.get_shape_name()+"\" "
+    +"alt=\""+area.comment.toEscaped()+"\" ");
+  if(area.url.length())
+  {
+    retval+="href=\""+area.url+"\" ";
+  }else
+  {
+    retval+="nohref=\"nohref\" ";
+  }
+  if(area.target.length())
+  {
+    retval+="target=\""+area.target.toEscaped()+"\" ";
+  }
+  //  highlight
+  if( area.hilite_color != GMapArea::NO_HILITE &&
+      area.hilite_color != GMapArea::XOR_HILITE )
+  {
+    retval+=GUTF8String().format( "highlight=\"#%06X\" ", area.hilite_color );
+  }
+  const char *b_type="none";
+  switch( area.border_type )
+  {
+  case GMapArea::NO_BORDER:
+    b_type = "none";
+    break;
+  case GMapArea::XOR_BORDER:
+    b_type = "xor";
+    break;
+  case GMapArea::SOLID_BORDER:
+    b_type = "solid";
+    break;
+  case GMapArea::SHADOW_IN_BORDER:
+    b_type = "shadowin";
+    break;
+  case GMapArea::SHADOW_OUT_BORDER:
+    b_type = "shadowout";
+    break;
+  case GMapArea::SHADOW_EIN_BORDER:
+    b_type = "etchedin";
+    break;
+  case GMapArea::SHADOW_EOUT_BORDER:
+    b_type = "etchedout";
+    break;
+  }
+  retval=retval+"bordertype=\""+b_type+"\" ";
+  if( GUTF8String(area.border_type) != GMapArea::NO_BORDER)
+  {
+    retval+="bordercolor=\""+GUTF8String().format("#%06X",area.border_color)
+      +"\" border=\""+GUTF8String(area.border_width)+"\" ";
+  }
+  if(area.border_always_visible )
+    retval=retval+"visible=\"visible\" ";
+  return retval+"/>\n";
+}
+
+GUTF8String
+GMapRect::get_xmltag(const int height) const
+{
+  return GMapArea2xmltag( *this, GUTF8String(get_xmin())
+    +","+GUTF8String(height-1-get_ymax())
+    +","+GUTF8String(get_xmax())
+    +","+GUTF8String(height-1-get_ymin()));
+#if 0
+  GUTF8String retval;
+  return retval;
+#endif
+}
+
+GUTF8String
+GMapOval::get_xmltag(const int height) const
+{ 
+  return GMapArea2xmltag( *this, GUTF8String(get_xmin())
+    +","+GUTF8String(height-1-get_ymax())
+    +","+GUTF8String(get_xmax())
+    +","+GUTF8String(height-1-get_ymin()));
+#if 0
+  GUTF8String retval;
+  return retval;
+#endif
+}
+
+GUTF8String
+GMapPoly::get_xmltag(const int height) const
+{
+  GList<int> CoordList;
+  get_coords(CoordList);
+  GPosition pos=CoordList;
+  GUTF8String retval;
+  if(pos)
+  {
+    GUTF8String coords(CoordList[pos]);
+    while(++pos)
+    {
+      coords+=","+GUTF8String(height-1-CoordList[pos]);
+      if(! ++pos)
+        break;
+      coords+=","+GUTF8String(CoordList[pos]);
+    }
+    retval=GMapArea2xmltag( *this, coords);
+  }
+  return retval;
+}
 

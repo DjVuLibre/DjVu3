@@ -4,14 +4,13 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvutoxml.cpp,v 1.5 2001-06-13 18:26:19 bcr Exp $
+// $Id: djvutoxml.cpp,v 1.6 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #include "DjVuDocument.h"
 #include "GOS.h"
 #include "DjVuMessage.h"
 #include "ByteStream.h"
-#include "GMapAreas.h"
 #include "DjVuAnno.h"
 #include "DjVuText.h"
 #include "DjVuImage.h"
@@ -43,7 +42,7 @@ public:
 };
 
 DjVuXMLExtractor::DjVuXMLExtractor(void)
-: version("1.0"), notext(0), noanno(-1) {}
+: version("1.0"), notext(-1), noanno(-1) {}
 
 static void
 usage(void)
@@ -58,11 +57,6 @@ writeDocHead( ByteStream & str_out,
               const GP<DjVuDocument> & doc );
 
 static void
-writeArea( ByteStream & str_out,
-           GMapArea & area,
-           int WindowHeight );
-
-static void
 writeText( ByteStream & str_out,
            GP<DjVuTXT> txt,
            const int internal_page_num,
@@ -70,10 +64,9 @@ writeText( ByteStream & str_out,
 
 static void
 OutputZone( ByteStream & str_out,
-            GUTF8String textUTF8,
+            const GUTF8String &textUTF8,
             DjVuTXT::Zone zone,
-            int prev_ztype,
-            int WindowHeight );
+            const int WindowHeight );
 
 static GUTF8String
 indent ( int spaces);
@@ -152,7 +145,7 @@ main(int argc, char * argv[], char *env[])
   if(extract.noanno<0 && extract.notext<0)
   {
     extract.noanno=0;
-    extract.notext=1;
+    extract.notext=0;
   }
 #ifdef DEBUG_SET_LEVEL
   {
@@ -253,15 +246,14 @@ void
 DjVuXMLExtractor::writeXMLprolog ( ByteStream & str_out )
 {
   // Write XMLDecl
-  static char const XMLDecl[] = "<?xml version=\"%s\" ?>\n";
-  GUTF8String s;
-  s.format(XMLDecl,version);
-  str_out.write( (const char *)s, s.length() );
+  static char const XMLDecl[] = "<?xml version=\"1.0\" ?>\n";
+  str_out.writall(XMLDecl, sizeof(XMLDecl)-1);
 
   // Write doctypedecl
   static char const doctypedecl[] = "<!DOCTYPE DjVuXML PUBLIC \"-//W3C//DTD DjVuXML %s//EN\" \"pubtext/DjVuXML-s.dtd\">\n";
+  GUTF8String s;
   s.format(doctypedecl,version);
-  str_out.write( (const char *)s,s.length());
+  str_out.writestring(s);
 }
 
 
@@ -318,17 +310,6 @@ DjVuXMLExtractor::writeDocBody( ByteStream & str_out,
   str_out.write( Etag, sizeof(Etag)-1 );
 }
 
-static void
-startMap( ByteStream &str_out, const int external_page_num, const bool isEmpty)
-{
-  static char const Stag2a[] = "  <MAP name=\"Page%0d\">\n";
-  static char const Stag2b[] = "  <MAP name=\"Page%0d\"/>\n";
-  char const * const Stag2 = (isEmpty)?Stag2a:Stag2b;
-  GUTF8String MapTag;
-  MapTag.format( Stag2, external_page_num );
-  str_out.write( (const char *)MapTag, MapTag.length() );
-}
-
 //  Generate output for a single page
 //  If there are no maps, no output is generated. Otherwise, we generate an 
 //  OBJECT and a MAP.
@@ -344,26 +325,37 @@ DjVuXMLExtractor::doPage( ByteStream & str_out,
 
   //  <OBJECT> tag
   //    First, puzzle out the URL
-  GURL url = doc->page_to_url(internal_page_num);
-  if ( doc->get_doc_type() == DjVuDocument::BUNDLED )
-    url = url.base();       // bundled, so strip off the page number
+  GURL url = doc->get_init_url();
+  const GUTF8String pagename=dimg->get_djvu_file()->get_url().fname();
   //    Now, build the tag
   GUTF8String ObjectTag = "  <OBJECT";
-  ObjectTag = ObjectTag + " data=\"" + url + "\"";
-  ObjectTag = ObjectTag + " type=\"" + (*dimg).get_mimetype() + "\"";
-  ObjectTag = ObjectTag + " height=\"" + GUTF8String((*dimg).get_height()) + "\"";
-  ObjectTag = ObjectTag + " width=\"" + GUTF8String((*dimg).get_width()) + "\"";
+  ObjectTag = ObjectTag + " data=\"" + url.get_string() + "\"";
+  ObjectTag = ObjectTag + " type=\"" + dimg->get_mimetype() + "\"";
+  ObjectTag = ObjectTag + " height=\"" + GUTF8String(dimg->get_height()) + "\"";
+  ObjectTag = ObjectTag + " width=\"" + GUTF8String(dimg->get_width()) + "\"";
   if(!noanno)
   {
-    ObjectTag = ObjectTag + " usemap=\"Page" + GUTF8String(external_page_num) + "\"";
+    ObjectTag = ObjectTag + " usemap=\""+pagename.toEscaped()+"\"";
   }
   ObjectTag = ObjectTag + ">\n";
   str_out.write( (const char *)ObjectTag, ObjectTag.length() );
-  //  page number
-  GUTF8String PageNum;
-  PageNum.format( "    <PARAM name=\"FLAGS\" value=\"PAGE=%0d\" />\n", external_page_num );  //----strict switch?
-  str_out.write( (const char *)PageNum, PageNum.length() );
+  str_out.writestring("    <PARAM name=\"PAGE\" value=\""+pagename.toEscaped()+"\" />\n");  //----strict switch?
 
+  const GP<DjVuInfo> info(dimg->get_info());
+  if(info)
+  {
+    str_out.writestring(info->get_paramtags());
+  }
+  const GP<DjVuAnno> anno(DjVuAnno::create());
+  if(!noanno)
+  {
+    const GP<ByteStream> anno_str = dimg->get_anno();
+    if(anno_str)
+    {
+      anno->decode(anno_str);
+    }
+  }
+  str_out.writestring(anno->get_paramtags());
   //  TEXT element (if any)
   if(!notext)
   {
@@ -389,150 +381,8 @@ DjVuXMLExtractor::doPage( ByteStream & str_out,
 
   if(!noanno)
   {
-    GP<ByteStream> anno_str = dimg->get_anno();
-    if (anno_str)
-    {
-      GP<DjVuAnno> anno = DjVuAnno::create();
-      anno->decode(anno_str);
-
-      // Annotation areas
-      GP<DjVuANT> ant = anno->ant;
-      if (ant)
-      {
-        startMap(str_out,external_page_num,true);
-        static char const Etag2[] = "  </MAP>\n";
-        GPList<GMapArea> maps = ant->map_areas;
-        DEBUG_MSG( "Number of map areas = " << maps.size() << "\n" );
-
-        //  MAP tag
-        for( GPosition area = maps.firstpos() ; area ; ++area )
-        {
-          writeArea( str_out, *(maps[area]), dimg->get_height() );
-        }
-        str_out.write( Etag2, sizeof(Etag2)-1 );
-      }else
-      {
-        startMap(str_out,external_page_num,false);
-      }
-    }else
-    {
-      startMap(str_out,external_page_num,false);
-    }
+    str_out.writestring(anno->get_xmlmap(pagename,dimg->get_height()));
   }
-}
-
-
-static void
-writeArea( ByteStream & str_out,
-           GMapArea & area,
-           int WindowHeight )
-{
-  GUTF8String msg("    <AREA");
-
-  //  shape
-  msg = msg + " shape=\"" + area.get_shape_name() + "\"";
-
-  //  coordinates
-  GUTF8String coords;
-
-  switch( area.get_shape_type() )
-  {
-  case GMapArea::RECT:          // For rectangle and oval, the coordinates are reported
-  case GMapArea::OVAL:          // in top left, then bottom right regardless of the order
-                                // in which they are stored.
-    coords += "," + GUTF8String( area.get_xmin() ) +
-              "," + GUTF8String( WindowHeight - 1 -area.get_ymax() ) +
-              "," + GUTF8String( area.get_xmax() ) +
-              "," + GUTF8String( WindowHeight - 1 -area.get_ymin() );
-    break;
-
-  default:                      // For everything else (polygons), report the points in
-                                // order they appear.
-    {
-      GList<int> CoordList;
-      area.get_coords( CoordList );
-      for (GPosition i = CoordList ; i ; ++i)
-      {
-        coords += "," + GUTF8String( CoordList[i] );
-        ++i;
-        coords += "," + GUTF8String( WindowHeight - 1 - CoordList[i] );
-      }
-    }
-    break;
-  }
-
-  msg = msg + " coords=\"" + coords.substr(1,coords.length()-1) + "\"";
-
-
-  //  URI
-  if( !!area.url ) 
-    msg = msg + " href=\"" + area.url +"\"";
-  else
-    msg = msg + " nohref=\"nohref\"";
-
-  //  alt
-  msg = msg + " alt=\"" + GUTF8String(area.comment).toEscaped() + "\"";
-
-  //  target
-  if( area.target.length() > 0 )
-    msg = msg + " target=\"" + area.target + "\"";
-
-  //  highlight
-  if( area.hilite_color != GMapArea::NO_HILITE &&
-      area.hilite_color != GMapArea::XOR_HILITE )
-  {
-    GUTF8String hilite;
-    hilite.format( "#%06X", area.hilite_color );
-    msg = msg + " highlight=\"" + hilite + "\"";
-  }
-
-  //  border type
-  GUTF8String b_type;
-  switch( area.border_type )
-  {
-  case GMapArea::NO_BORDER:
-    b_type = "none";
-    break;
-  case GMapArea::XOR_BORDER:
-    b_type = "xor";
-    break;
-  case GMapArea::SOLID_BORDER:
-    b_type = "solid";
-    break;
-  case GMapArea::SHADOW_IN_BORDER:
-    b_type = "shadowin";
-    break;
-  case GMapArea::SHADOW_OUT_BORDER:
-    b_type = "shadowout";
-    break;
-  case GMapArea::SHADOW_EIN_BORDER:
-    b_type = "etchedin";
-    break;
-  case GMapArea::SHADOW_EOUT_BORDER:
-    b_type = "etchedout";
-    break;
-  }
-  msg = msg + " bordertype=\"" + b_type + "\"";
-
-  //  border color
-  if( GUTF8String(area.border_type) != GMapArea::NO_BORDER )
-  {
-    GUTF8String color;
-    color.format( "#%06X", area.border_color );
-    msg = msg + " bordercolor=\"" + color + "\"";
-  }
-
-  //  border width
-  if( GUTF8String(area.border_type) != GMapArea::NO_BORDER )
-    msg = msg + " border=\"" + GUTF8String(area.border_width) + "\"";
-
-  //  border visible
-  if( area.border_always_visible )
-    msg = msg + " visible=\"visible\"";
-
-  //  close message
-  msg += " />\n";                                                       //-------------strictness switch?
-  str_out.write( (const char *)msg, msg.length() );
 }
 
 
@@ -543,7 +393,7 @@ writeText( ByteStream & str_out,
            const int WindowHeight )
 {
   assert( txt->has_valid_zones() );
-  DEBUG_MSG( "--zonetype=" << txt->page_zone.ztype << "\n" );
+//  DEBUG_MSG( "--zonetype=" << txt->page_zone.ztype << "\n" );
 
   GPosition i = txt->page_zone.children;
 
@@ -558,66 +408,132 @@ writeText( ByteStream & str_out,
     OutputZone( str_out,
                 txt->textUTF8,
                 txt->page_zone.children[i], 
-                txt->page_zone.ztype,
                 WindowHeight );
 
   //  Ending tags for missing layers
   for( layer = next_layer-1 ; layer > DjVuTXT::PAGE ; layer-- )
     EndingTag( str_out, layer );
 }
+static const char *tags[8]=
+{ "HIDDENTEXT",
+  "PAGE",
+  "PAGECOLUMN",
+  "REGION",
+  "PARAGRAPH",
+  "LINE", 
+  "WORD",
+  "CHARACTER" };
+static const int tags_size=sizeof(tags)/sizeof(const char *);
 
+
+static GUTF8String
+start_tag(const DjVuTXT::ZoneType zone)
+{
+  GUTF8String retval;
+  if((tags_size > (int)zone)&&((int)zone >= 0))
+  {
+    switch (zone)
+    {
+      case DjVuTXT::CHARACTER:
+        retval="<"+GUTF8String(tags[zone])+">";
+        break;
+      case DjVuTXT::WORD:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+">";
+        break;
+      default:
+        retval=indent(2*(int)zone+2)+"<"+tags[zone]+">\n";
+        break;
+    }
+  }
+  return retval;
+}
+
+static inline GUTF8String
+start_tag(const int layer)
+{
+  return start_tag((const DjVuTXT::ZoneType)layer);
+}
+
+
+static GUTF8String
+end_tag(const DjVuTXT::ZoneType zone)
+{
+  GUTF8String retval;
+  if((tags_size > (int)zone)&&((int)zone >= 0))
+  {
+    switch (zone)
+    {
+      case DjVuTXT::CHARACTER:
+        retval="</"+GUTF8String(tags[zone])+">";
+        break;
+      case DjVuTXT::WORD:
+        retval="</"+GUTF8String(tags[zone])+">\n";
+        break;
+      default:
+        retval=indent(2*(int)zone+2)+"</"+tags[zone]+">\n";
+        break;
+    }
+  }
+  return retval;
+}
+
+static inline GUTF8String
+end_tag(const int layer)
+{
+  return end_tag((const DjVuTXT::ZoneType)layer);
+}
 
 static void
 OutputZone( ByteStream & str_out,
-            GUTF8String textUTF8,
+            const GUTF8String &textUTF8,
             DjVuTXT::Zone zone,
-            int prev_ztype,
-            int WindowHeight )
+            const int WindowHeight )
 {
-  DEBUG_MSG( "--zonetype=" << zone.ztype << "\n" );
+//  DEBUG_MSG( "--zonetype=" << zone.ztype << "\n" );
 
+  const GUTF8String xindent(indent( 2 * zone.ztype + 2 ));
+  GPosition pos=zone.children;
   // Build attribute string
-  if( zone.ztype == DjVuTXT::WORD )
+  if( ! pos )
   {
-    GUTF8String word = indent( 2*zone.ztype + 2 );
-    word += "<WORD coords=\"";
-    GUTF8String coords;
-    coords.format( "%d,%d,%d,%d\">", zone.rect.xmin, 
-                                    WindowHeight - 1 - zone.rect.ymin,
-                                    zone.rect.xmax, 
-                                    WindowHeight - 1 - zone.rect.ymax);
-    word += coords;
-    word += textUTF8.substr(zone.text_start,zone.text_length).toEscaped();
-    char *sword=word.getbuf();
-    for(int i=word.length()-1;(i>0)&&isspace(sword[i]);--i)
-    {
-      sword[i]=0;
-    }
-    word += "</WORD>\n";
-    str_out.write( (char const *)word, word.length() );
+    const GUTF8String lf((zone.ztype < DjVuTXT::WORD)?"\n":"");
+    GUTF8String tag= xindent;
+    tag.format((const char *)(tag+"<%s coords=\"%d,%d,%d,%d\">"+lf),
+      tags[zone.ztype],
+      zone.rect.xmin, WindowHeight - 1 - zone.rect.ymin,
+      zone.rect.xmax, WindowHeight - 1 - zone.rect.ymax);
+    const int start=zone.text_start;
+    const int end=textUTF8.firstEndSpace(start,zone.text_length);
+    str_out.writestring(tag+textUTF8.substr(start,end-start).toEscaped()
+      +lf+"</"+tags[zone.ztype]+">\n");
+    str_out.writestring(end_tag(zone.ztype));
   } else
   {
-    GPosition i = zone.children;
-
     //  Beginning tags for this layer and any missing layers
     int layer;
-    int next_layer = zone.children[i].ztype;
-    for( layer = zone.ztype ; layer < next_layer ; layer++ )
-      BeginningTag( str_out, layer );
 
     //  Output the next layer
-    for( ; i ; ++i )
+    for(layer=zone.ztype; pos ; ++pos )
+    {
+      int next_layer=zone.children[pos].ztype;
+      for( ;layer < next_layer;layer++ )
+      {
+        str_out.writestring(start_tag(layer));
+      }
+      while (layer > next_layer )
+      {
+        str_out.writestring(end_tag(--layer));
+      }
       OutputZone( str_out,
                   textUTF8,
-                  zone.children[i], 
-                  zone.ztype,
+                  zone.children[pos], 
                   WindowHeight );
-
-    //  Ending tags for this layer and any missing layers
-    for( layer = next_layer-1 ; layer >= zone.ztype ; layer-- )
-      EndingTag( str_out, layer );
+    }
+    for(const int next_layer=zone.ztype;layer > next_layer;)
+    {
+      str_out.writestring(end_tag(--layer));
+    }
   }
-
 }
 
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.84 2001-06-14 15:53:04 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.85 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -515,15 +515,31 @@ GLParser::get_object(const char * name, bool last)
 //********************************** ANT ************************************
 //***************************************************************************
 
+static const char *zoom_strings[]={
+  "default","page","width","one2one","stretch"};
+static const int zoom_strings_size=sizeof(zoom_strings)/sizeof(const char *);
+
+static const char *mode_strings[]={
+  "default","color","fore","back","bw"};
+static const int mode_strings_size=sizeof(mode_strings)/sizeof(const char *);
+
+static const char *align_strings[]={
+  "default","left","center","right","top","bottom"};
+static const int align_strings_size=sizeof(align_strings)/sizeof(const char *);
+
 #define PNOTE_TAG	"pnote"
 #define BACKGROUND_TAG	"background"
 #define ZOOM_TAG	"zoom"
 #define MODE_TAG	"mode"
 #define ALIGN_TAG	"align"
+#define HALIGN_TAG	"halign"
+#define VALIGN_TAG	"valign"
+
+static const unsigned long default_bg_color=0xffffffff;
 
 DjVuANT::DjVuANT(void)
 {
-   bg_color=0xffffffff;
+   bg_color=default_bg_color;
    zoom=0;
    mode=MODE_UNSPEC;
    hor_align=ver_align=ALIGN_UNSPEC;
@@ -531,6 +547,47 @@ DjVuANT::DjVuANT(void)
 
 DjVuANT::~DjVuANT()
 {
+}
+
+GUTF8String
+DjVuANT::get_paramtags(void) const
+{
+  GUTF8String retval;
+  if(zoom > 0)
+  {
+    retval+="<PARAM name=\"" ZOOM_TAG "\" value=\""+GUTF8String(zoom)+="\" />\n";
+  }else if(zoom && ((-zoom)<zoom_strings_size))
+  {
+    retval+="<PARAM name=\"" ZOOM_TAG "\" value=\""+GUTF8String(zoom_strings[-zoom])+"\" />\n";
+  }
+  if((mode>0)&&(mode<mode_strings_size))
+  {
+    retval+="<PARAM name=\"" MODE_TAG "\" value=\""+GUTF8String(mode_strings[mode])+"\" />\n";
+  }
+  if((hor_align>ALIGN_UNSPEC)&&(hor_align<align_strings_size))
+  {
+    retval+="<PARAM name=\"" HALIGN_TAG "\" value=\""+GUTF8String(align_strings[hor_align])+"\" />\n";
+  }
+  if((ver_align>ALIGN_UNSPEC)&&(ver_align<align_strings_size))
+  {
+    retval+="<PARAM name=\"" VALIGN_TAG "\" value=\""+GUTF8String(align_strings[ver_align])+"\" />\n";
+  }
+  if((bg_color&0xffffff) == bg_color)
+  {
+    retval+="<PARAM name=\"" BACKGROUND_TAG "\" value=\""+GUTF8String().format("#%06lX",bg_color)+"\" />\n";
+  }
+  return retval;
+}
+
+GUTF8String
+DjVuANT::get_xmlmap(const GUTF8String &name,const int height) const
+{
+  GUTF8String retval("<MAP name=\""+name.toEscaped()+"\" >\n");
+  for(GPosition pos(map_areas);pos;++pos)
+  {
+    retval+=map_areas[pos]->get_xmltag(height);
+  }
+  return retval+"</MAP>\n";
 }
 
 GUTF8String
@@ -554,6 +611,7 @@ DjVuANT::decode(class GLParser & parser)
    ver_align=get_ver_align(parser);
    map_areas=get_map_areas(parser);
 }
+
 
 void 
 DjVuANT::decode(ByteStream & str)
@@ -646,6 +704,7 @@ DjVuANT::cvt_color(const char * color, unsigned long int def)
 unsigned long int
 DjVuANT::get_bg_color(GLParser & parser)
 {
+  unsigned long retval=default_bg_color;
   DEBUG_MSG("DjVuANT::get_bg_color(): getting background color ...\n");
   DEBUG_MAKE_INDENT(3);
   G_TRY
@@ -655,11 +714,22 @@ DjVuANT::get_bg_color(GLParser & parser)
     {
       GUTF8String color=(*obj)[0]->get_symbol();
       DEBUG_MSG("color='" << color << "'\n");
-      return cvt_color(color, 0xffffff);
-      } else { DEBUG_MSG("can't find any.\n"); }
+      retval=cvt_color(color, 0xffffff);
+    }
+#ifndef NO_DEBUG
+    if(retval == default_bg_color)
+    {
+      DEBUG_MSG("can't find any.\n");
+    }
+#endif // NO_DEBUG
   } G_CATCH_ALL {} G_ENDCATCH;
-  DEBUG_MSG("resetting color to 0xffffffff (UNSPEC)\n");
-  return 0xffffffff;
+#ifndef NO_DEBUG
+  if(retval == default_bg_color)
+  {
+    DEBUG_MSG("resetting color to 0xffffffff (UNSPEC)\n");
+  }
+#endif // NO_DEBUG
+  return retval;
 }
 
 int
@@ -669,6 +739,7 @@ DjVuANT::get_zoom(GLParser & parser)
       //   =0 - not set
       //   >0 - numeric zoom (%%)
 {
+  int retval=ZOOM_UNSPEC;
   DEBUG_MSG("DjVuANT::get_zoom(): getting zoom factor ...\n");
   DEBUG_MAKE_INDENT(3);
   G_TRY
@@ -676,26 +747,48 @@ DjVuANT::get_zoom(GLParser & parser)
     GP<GLObject> obj=parser.get_object(ZOOM_TAG);
     if (obj && obj->get_list().size()==1)
     {
-      GUTF8String zoom=(*obj)[0]->get_symbol();
+      const GUTF8String zoom((*obj)[0]->get_symbol());
       DEBUG_MSG("zoom='" << zoom << "'\n");
-      
-      if (zoom=="stretch") return ZOOM_STRETCH;
-      else if (zoom=="one2one") return ZOOM_ONE2ONE;
-      else if (zoom=="width") return ZOOM_WIDTH;
-      else if (zoom=="page") return ZOOM_PAGE;
-      else if (zoom[0]!='d')
+     
+      for(int i=0;(i<zoom_strings_size);++i)
       {
-        G_THROW( ERR_MSG("DjVuAnno.bad_zoom") );
-      }else return zoom.substr(1, zoom.length()).toInt(); //atoi((const char *) zoom+1);
-      } else { DEBUG_MSG("can't find any.\n"); }
+        if(zoom == zoom_strings[i])
+        {
+          retval=((-1)-i);
+          break;
+        }
+      }
+      if(retval == ZOOM_UNSPEC)
+      {
+        if (zoom[0]!='d')
+        {
+          G_THROW( ERR_MSG("DjVuAnno.bad_zoom") );
+        }else
+        {
+          retval=zoom.substr(1, zoom.length()).toInt(); //atoi((const char *) zoom+1);
+        }
+      }
+    }
+#ifndef NO_DEBUG
+    if(retval == ZOOM_UNSPEC)
+    {
+      DEBUG_MSG("can't find any.\n");
+    }
+#endif // NO_DEBUG
   } G_CATCH_ALL {} G_ENDCATCH;
-  DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
-  return ZOOM_UNSPEC;
+#ifndef NO_DEBUG
+  if(retval == ZOOM_UNSPEC)
+  {
+    DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
+  }
+#endif // NO_DEBUG
+  return retval;
 }
 
 int
 DjVuANT::get_mode(GLParser & parser)
 {
+  int retval=MODE_UNSPEC;
   DEBUG_MSG("DjVuAnt::get_mode(): getting default mode ...\n");
   DEBUG_MAKE_INDENT(3);
   G_TRY
@@ -703,61 +796,146 @@ DjVuANT::get_mode(GLParser & parser)
     GP<GLObject> obj=parser.get_object(MODE_TAG);
     if (obj && obj->get_list().size()==1)
     {
-      GUTF8String mode=(*obj)[0]->get_symbol();
+      const GUTF8String mode((*obj)[0]->get_symbol());
       DEBUG_MSG("mode='" << mode << "'\n");
-      
-      if (mode=="color") return MODE_COLOR;
-      else if (mode=="fore") return MODE_FORE;
-      else if (mode=="back") return MODE_BACK;
-      else if (mode=="bw") return MODE_BW;
-      } else { DEBUG_MSG("can't find any.\n"); }
+      for(int i=0;(i<mode_strings_size);++i)
+      {
+        if(mode == mode_strings[i])
+        {
+          retval=i;
+          break;
+        }
+      }
+    }
+#ifndef NO_DEBUG
+    if(retval == MODE_UNSPEC)
+    {
+      DEBUG_MSG("can't find any.\n");
+    }
+#endif // NO_DEBUG
   } G_CATCH_ALL {} G_ENDCATCH;
-  DEBUG_MSG("resetting mode to MODE_UNSPEC\n");
-  return MODE_UNSPEC;
+#ifndef NO_DEBUG
+  if(retval == MODE_UNSPEC)
+  {
+    DEBUG_MSG("resetting mode to MODE_UNSPEC\n");
+  }
+#endif // NO_DEBUG
+  return retval;
 }
 
-int
+static inline DjVuANT::alignment
+legal_halign(const int i)
+{
+  DjVuANT::alignment retval;
+  switch((DjVuANT::alignment)i)
+  {
+  case DjVuANT::ALIGN_LEFT:
+  case DjVuANT::ALIGN_CENTER:
+  case DjVuANT::ALIGN_RIGHT:
+    retval=(DjVuANT::alignment)i;
+    break;
+  default:
+    retval=DjVuANT::ALIGN_UNSPEC;
+    break;
+  }
+  return retval;
+}
+
+static inline DjVuANT::alignment
+legal_valign(const int i)
+{
+  DjVuANT::alignment retval;
+  switch((DjVuANT::alignment)i)
+  {
+  case DjVuANT::ALIGN_CENTER:
+  case DjVuANT::ALIGN_TOP:
+  case DjVuANT::ALIGN_BOTTOM:
+    retval=(DjVuANT::alignment)i;
+    break;
+  default:
+    retval=DjVuANT::ALIGN_UNSPEC;
+    break;
+  }
+  return retval;
+}
+
+DjVuANT::alignment
 DjVuANT::get_hor_align(GLParser & parser)
 {
   DEBUG_MSG("DjVuAnt::get_hor_align(): getting hor page alignemnt ...\n");
   DEBUG_MAKE_INDENT(3);
+  alignment retval=ALIGN_UNSPEC;
   G_TRY
   {
     GP<GLObject> obj=parser.get_object(ALIGN_TAG);
     if (obj && obj->get_list().size()==2)
     {
-      GUTF8String align=(*obj)[0]->get_symbol();
+      const GUTF8String align((*obj)[0]->get_symbol());
       DEBUG_MSG("hor_align='" << align << "'\n");
       
-      if (align=="left") return ALIGN_LEFT;
-      else if (align=="center") return ALIGN_CENTER;
-      else if (align=="right") return ALIGN_RIGHT;
-      } else { DEBUG_MSG("can't find any.\n"); }
+      for(int i=(int)ALIGN_UNSPEC;(i<align_strings_size);++i)
+      {
+        const alignment j=legal_halign(i);
+        if((i == (int)j)&&(align == align_strings[i]))
+        {
+          retval=j;
+          break;
+        }
+      }
+    }
+#ifndef NO_DEBUG
+    if(retval == ALIGN_UNSPEC)
+    {
+      DEBUG_MSG("can't find any.\n");
+    }
+#endif // NO_DEBUG
   } G_CATCH_ALL {} G_ENDCATCH;
-  DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
-  return ALIGN_UNSPEC;
+#ifndef NO_DEBUG
+  if(retval == ALIGN_UNSPEC)
+  {
+    DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
+  }
+#endif // NO_DEBUG
+  return retval;
 }
 
-int
+DjVuANT::alignment
 DjVuANT::get_ver_align(GLParser & parser)
 {
   DEBUG_MSG("DjVuAnt::get_ver_align(): getting vert page alignemnt ...\n");
   DEBUG_MAKE_INDENT(3);
+  alignment retval=ALIGN_UNSPEC;
   G_TRY
   {
     GP<GLObject> obj=parser.get_object(ALIGN_TAG);
     if (obj && obj->get_list().size()==2)
     {
-      GUTF8String align=(*obj)[1]->get_symbol();
+      const GUTF8String align((*obj)[1]->get_symbol());
       DEBUG_MSG("ver_align='" << align << "'\n");
-      
-      if (align=="top") return ALIGN_TOP;
-      else if (align=="center") return ALIGN_CENTER;
-      else if (align=="bottom") return ALIGN_BOTTOM;
-      } else { DEBUG_MSG("can't find any.\n"); }
+      for(int i=(int)ALIGN_UNSPEC;(i<align_strings_size);++i)
+      {
+        const alignment j=legal_valign(i);
+        if((i == (int)j)&&(align == align_strings[i]))
+        {
+          retval=j;
+          break;
+        }
+      }
+    }
+#ifndef NO_DEBUG
+    if(retval == ALIGN_UNSPEC)
+    {
+      DEBUG_MSG("can't find any.\n");
+    }
+#endif // NO_DEBUG
   } G_CATCH_ALL {} G_ENDCATCH;
-  DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
-  return ALIGN_UNSPEC;
+#ifndef NO_DEBUG
+  if(retval == ALIGN_UNSPEC)
+  {
+    DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
+  }
+#endif // NO_DEBUG
+  return retval;
 }
 
 GPList<GMapArea>
@@ -916,7 +1094,7 @@ DjVuANT::encode_raw(void) const
 
       //*** Background color
    del_all_items(BACKGROUND_TAG, parser);
-   if (bg_color!=0xffffffff)
+   if (bg_color!=default_bg_color)
    {
       buffer.format("(" BACKGROUND_TAG " #%02X%02X%02X)",
 	      (unsigned int)((bg_color & 0xff0000) >> 16),
@@ -929,16 +1107,16 @@ DjVuANT::encode_raw(void) const
    del_all_items(ZOOM_TAG, parser);
    if (zoom!=ZOOM_UNSPEC)
    {
-      if (zoom==ZOOM_STRETCH)
-        buffer="(" ZOOM_TAG " stretch)";
-      else if (zoom==ZOOM_ONE2ONE)
-        buffer="(" ZOOM_TAG " one2one)";
-      else if (zoom==ZOOM_WIDTH)
-        buffer="(" ZOOM_TAG " width)";
-      else if (zoom==ZOOM_PAGE)
-        buffer="(" ZOOM_TAG " page)";
-      else
-        buffer.format("(" ZOOM_TAG " d%d)", zoom);
+      buffer="(" ZOOM_TAG " ";
+      const int i=1-zoom;
+      if((i>=0)&& (i<zoom_strings_size))
+      {
+        buffer+=zoom_strings[i];
+      }else
+      {
+        buffer+="d"+GUTF8String(zoom);
+      }
+      buffer+=")";
       parser.parse(buffer);
    }
 
@@ -946,14 +1124,11 @@ DjVuANT::encode_raw(void) const
    del_all_items(MODE_TAG, parser);
    if (mode!=MODE_UNSPEC)
    {
-      if (mode==MODE_COLOR)
-        buffer="(" MODE_TAG " color)";
-      else if (mode==MODE_FORE)
-        buffer="(" MODE_TAG " fore)";
-      else if (mode==MODE_BACK)
-        buffer="(" MODE_TAG " back)";
-      else if (mode==MODE_BW)
-        buffer="(" MODE_TAG " bw)";
+      const int i=mode-1;
+      if((i>=0)&& (i<mode_strings_size))
+      { 
+        buffer="(" MODE_TAG " "+GUTF8String(mode_strings[i])+")";
+      }
       parser.parse(buffer);
    }
 
@@ -961,23 +1136,9 @@ DjVuANT::encode_raw(void) const
    del_all_items(ALIGN_TAG, parser);
    if (hor_align!=ALIGN_UNSPEC || ver_align!=ALIGN_UNSPEC)
    {
-      buffer="(" ALIGN_TAG " ";
-      if (hor_align==ALIGN_LEFT)
-        buffer+="left ";
-      else if (hor_align==ALIGN_CENTER)
-        buffer+="center ";
-      else if (hor_align==ALIGN_RIGHT)
-        buffer+="right ";
-      else
-        buffer+="default ";
-      if (ver_align==ALIGN_TOP)
-        buffer+="top)";
-      else if (ver_align==ALIGN_CENTER)
-        buffer+="center)";
-      else if (ver_align==ALIGN_BOTTOM)
-        buffer+="bottom)";
-      else
-        buffer+="default)";
+      buffer= GUTF8String("(" ALIGN_TAG " ")
+        +align_strings[((hor_align<ALIGN_UNSPEC)||(hor_align>=align_strings_size))?ALIGN_UNSPEC:hor_align]
+        +" "+align_strings[((ver_align<ALIGN_UNSPEC)||(ver_align>=align_strings_size))?ALIGN_UNSPEC:ver_align]+")";
       parser.parse(buffer);
    }
    
@@ -1023,6 +1184,22 @@ DjVuANT::copy(void) const
 //***************************************************************************
 //******************************** DjVuAnno *********************************
 //***************************************************************************
+
+GUTF8String
+DjVuAnno::get_xmlmap(const GUTF8String &name,const int height) const
+{
+  return ant
+    ?(ant->get_xmlmap(name,height))
+    :("<MAP name=\""+name.toEscaped()+"\" />\n");
+}
+
+GUTF8String
+DjVuAnno::get_paramtags(void) const
+{
+  return ant
+    ?(ant->get_paramtags())
+    :GUTF8String();
+}
 
 void
 DjVuAnno::decode(const GP<ByteStream> &gbs)
@@ -1104,5 +1281,4 @@ DjVuAnno::merge(const GP<DjVuAnno> & anno)
       decode(gstr);
    }
 }
-
 

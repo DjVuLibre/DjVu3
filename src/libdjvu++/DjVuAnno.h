@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.h,v 1.41 2001-06-14 16:10:51 mchen Exp $
+// $Id: DjVuAnno.h,v 1.42 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUANNO_H
@@ -58,7 +58,7 @@
     @memo Implements support for DjVuImage annotations
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuAnno.h,v 1.41 2001-06-14 16:10:51 mchen Exp $# */
+    #$Id: DjVuAnno.h,v 1.42 2001-06-21 21:38:14 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -89,7 +89,7 @@ public:
    enum { MODE_UNSPEC=0, MODE_COLOR, MODE_FORE, MODE_BACK, MODE_BW };
    enum { ZOOM_STRETCH=-4, ZOOM_ONE2ONE=-3, ZOOM_WIDTH=-2,
 	  ZOOM_PAGE=-1, ZOOM_UNSPEC=0 };
-   enum { ALIGN_UNSPEC=0, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT,
+   enum alignment { ALIGN_UNSPEC=0, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT,
 	  ALIGN_TOP, ALIGN_BOTTOM };
 
       /// Creates an empty annotation object.
@@ -123,10 +123,10 @@ public:
    int		mode;
       /** Horizontal page alignment. Possible values are #ALIGN_LEFT#,
 	  #ALIGN_CENTER#, #ALIGN_RIGHT# and #ALIGN_UNSPEC#. */
-   int		hor_align;
+   alignment hor_align;
       /** Vertical page alignment. Possible values are #ALIGN_TOP#,
 	  #ALIGN_CENTER#, #ALIGN_BOTTOM# and #ALIGN_UNSPEC#. */
-   int		ver_align;
+   alignment ver_align;
       /** List of defined map areas. They may be just areas of highlighting
 	  or hyperlink. Please refer to \Ref{GMapArea}, \Ref{GMapRect},
 	  \Ref{GMapPoly} and \Ref{GMapOval} for details. */
@@ -163,6 +163,10 @@ public:
 
       /// Converts color from string in \#RRGGBB notation to an unsigned integer
    static unsigned long int	cvt_color(const char * color, unsigned long int def);
+      /// Obtain the <MAP></MAP> tag for these annotations.
+   GUTF8String get_xmlmap(const GUTF8String &name, const int height) const;
+      /// Obtain the flags for the default specifications.
+   GUTF8String get_paramtags(void) const;
 private:
    void			decode(class GLParser & parser);
    
@@ -172,8 +176,8 @@ private:
    static unsigned long int	get_bg_color(class GLParser & parser);
    static int		get_zoom(class GLParser & parser);
    static int		get_mode(class GLParser & parser);
-   static int		get_hor_align(class GLParser & parser);
-   static int		get_ver_align(class GLParser & parser);
+   static alignment    get_hor_align(class GLParser & parser);
+   static alignment    get_ver_align(class GLParser & parser);
    static GPList<GMapArea>get_map_areas(class GLParser & parser);
    static void		del_all_items(const char * name, class GLParser & parser);
 };
@@ -202,7 +206,7 @@ public:
 	  chunk with previously decoded information. This function
 	  should be called right after applying \Ref{IFFByteStream::get_chunk}()
 	  to data from #FORM:ANNO#. */
-   void decode(const GP<ByteStream> & bs);
+   void decode(const GP<ByteStream> &bs);
 
       /** Encodes all annotations back into a sequence of chunks to be put
 	  inside a #FORM:ANNO#. */
@@ -218,6 +222,9 @@ public:
       /** Returns the number of bytes needed by this data structure. It's
 	  used by caching routines to estimate the size of a \Ref{DjVuImage}. */
    inline unsigned int get_memory_usage() const;
+      /// Obtain the <MAP></MAP> tag for these annotations.
+   GUTF8String get_xmlmap(const GUTF8String &name, const int height) const;
+   GUTF8String get_paramtags(void) const;
 private: // dummy stuff
    static void decode(ByteStream *);
    static void encode(ByteStream *);

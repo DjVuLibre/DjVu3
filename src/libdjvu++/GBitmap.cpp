@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.53 2001-04-21 00:16:58 bcr Exp $
+// $Id: GBitmap.cpp,v 1.54 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.53 2001-04-21 00:16:58 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.54 2001-06-21 21:38:14 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -1488,6 +1488,35 @@ GBitmap::append_line(unsigned char *&data,const unsigned char *row,
       append_run(data,count);
     }
 }
+
+#if 0
+static inline int
+GetRowTDLRNR(
+  GBitmap &bit,const int row, const unsigned char *&startptr,
+  const unsigned char *&stopptr)
+{
+  stopptr=(startptr=bit[row])+bit.columns();
+  return 1;
+}
+
+static inline int
+GetRowTDLRNR(
+  GBitmap &bit,const int row, const unsigned char *&startptr,
+  const unsigned char *&stopptr)
+{
+  stopptr=(startptr=bit[row])+bit.columns();
+  return 1;
+}
+
+static inline int
+GetRowTDRLNR(
+  GBitmap &bit,const int row, const unsigned char *&startptr,
+  const unsigned char *&stopptr)
+{
+  startptr=(stopptr=bit[row]-1)+bit.columns();
+  return -1;
+}
+#endif // 0
 
 GP<GBitmap> 
 GBitmap::rotate(int count)

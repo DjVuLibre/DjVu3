@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuInfo.h,v 1.14 2001-04-02 21:17:15 bcr Exp $
+// $Id: DjVuInfo.h,v 1.15 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUINFO_H
@@ -46,7 +46,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: DjVuInfo.h,v 1.14 2001-04-02 21:17:15 bcr Exp $# */
+    #$Id: DjVuInfo.h,v 1.15 2001-06-21 21:38:14 bcr Exp $# */
 //@{
 
 
@@ -79,6 +79,8 @@ class ByteStream;
 #define DJVUVERSION_TOO_NEW  26
 //@}
 
+
+class GUTF8String;
 
 /** Information component.
     Each instance of class #DjVuInfo# represents the information
@@ -134,6 +136,9 @@ public:
 
   /** We also store the current image orientation as three bits. */
   GRect::Orientations orientation;
+
+     /// Obtain the flags for the default specifications.
+  GUTF8String get_paramtags(void) const;
 };
 
 

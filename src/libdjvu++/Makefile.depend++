@@ -1,49 +1,66 @@
 ### BEGIN C++ DEPENDENCIES
-Arrays.o: Arrays.cpp Arrays.h GException.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GSmartPointer.h ByteStream.h
-BSByteStream.o: BSByteStream.cpp BSByteStream.h \
+Arrays.o: Arrays.cpp \
+ /home/bcr/build/packages/src/include/config.h Arrays.h \
+ GException.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GSmartPointer.h \
+ ByteStream.h
+BSByteStream.o: BSByteStream.cpp \
+ /home/bcr/build/packages/src/include/config.h BSByteStream.h \
  ByteStream.h Arrays.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GSmartPointer.h ZPCodec.h GContainer.h
 BSEncodeByteStream.o: BSEncodeByteStream.cpp \
- BSByteStream.h ByteStream.h Arrays.h \
- GException.h DjVuGlobal.h \
- ../../src/include/DjVu.h GSmartPointer.h \
- ZPCodec.h GContainer.h GString.h
-ByteStream.o: ByteStream.cpp ByteStream.h \
+ /home/bcr/build/packages/src/include/config.h BSByteStream.h \
+ ByteStream.h Arrays.h GException.h \
+ DjVuGlobal.h ../../src/include/DjVu.h \
+ GSmartPointer.h ZPCodec.h GContainer.h \
+ GString.h
+ByteStream.o: ByteStream.cpp \
+ /home/bcr/build/packages/src/include/config.h ByteStream.h \
  Arrays.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h GOS.h \
  GString.h GContainer.h GURL.h GThreads.h \
  DjVuMessage.h DjVuMessageLite.h
-DataPool.o: DataPool.cpp DataPool.h GThreads.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GException.h GString.h GContainer.h \
- GSmartPointer.h GURL.h Arrays.h \
- IFFByteStream.h ByteStream.h GOS.h \
- debug.h
-DjVmDir.o: DjVmDir.cpp DjVmDir.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
+DataPool.o: DataPool.cpp \
+ /home/bcr/build/packages/src/include/config.h DataPool.h \
+ GThreads.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GException.h GString.h \
+ GContainer.h GSmartPointer.h GURL.h \
+ Arrays.h IFFByteStream.h ByteStream.h \
+ GOS.h debug.h
+debug.o: debug.cpp \
+ /home/bcr/build/packages/src/include/config.h debug.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
+ GContainer.h GException.h GSmartPointer.h \
+ ByteStream.h Arrays.h GURL.h GThreads.h
+DjVmDir0.o: DjVmDir0.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVmDir0.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
+ GContainer.h GException.h GSmartPointer.h \
+ ByteStream.h Arrays.h debug.h
+DjVmDir.o: DjVmDir.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVmDir.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  GThreads.h BSByteStream.h ByteStream.h \
  Arrays.h ZPCodec.h GURL.h debug.h
-DjVmDir0.o: DjVmDir0.cpp DjVmDir0.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GContainer.h GException.h GSmartPointer.h \
- ByteStream.h Arrays.h debug.h
-DjVmDoc.o: DjVmDoc.cpp DjVmDoc.h DjVmDir.h \
- GString.h DjVuGlobal.h ../../src/include/DjVu.h \
- GContainer.h GException.h GSmartPointer.h \
- GThreads.h DataPool.h GURL.h Arrays.h \
+DjVmDoc.o: DjVmDoc.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVmDoc.h \
+ DjVmDir.h GString.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GContainer.h \
+ GException.h GSmartPointer.h GThreads.h \
+ DataPool.h GURL.h Arrays.h \
  IFFByteStream.h ByteStream.h GOS.h \
  debug.h
-DjVuAnno.o: DjVuAnno.cpp DjVuAnno.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
+DjVuAnno.o: DjVuAnno.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuAnno.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  IFFByteStream.h ByteStream.h Arrays.h \
  BSByteStream.h ZPCodec.h GMapAreas.h \
- GRect.h debug.h
-DjVuDocEditor.o: DjVuDocEditor.cpp DjVuDocEditor.h \
+ GRect.h GURL.h GThreads.h debug.h
+DjVuDocEditor.o: DjVuDocEditor.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuDocEditor.h \
  DjVuDocument.h DjVuPort.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GURL.h GString.h \
@@ -53,7 +70,8 @@ DjVuDocEditor.o: DjVuDocEditor.cpp DjVuDocEditor.h \
  DjVuPalette.h GPixmap.h DjVuAnno.h \
  IFFByteStream.h ByteStream.h DataPool.h \
  IW44Image.h ZPCodec.h GOS.h debug.h
-DjVuDocument.o: DjVuDocument.cpp DjVuDocument.h \
+DjVuDocument.o: DjVuDocument.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuDocument.h \
  DjVuPort.h GThreads.h DjVuGlobal.h \
  ../../src/include/DjVu.h GException.h GURL.h \
  GString.h GContainer.h GSmartPointer.h \
@@ -63,20 +81,30 @@ DjVuDocument.o: DjVuDocument.cpp DjVuDocument.h \
  GPixmap.h DjVuAnno.h DjVuFileCache.h \
  IFFByteStream.h ByteStream.h GOS.h \
  DataPool.h IW44Image.h ZPCodec.h debug.h
-DjVuDumpHelper.o: DjVuDumpHelper.cpp DjVuDumpHelper.h \
+DjVuDumpHelper.o: DjVuDumpHelper.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuDumpHelper.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h DataPool.h GThreads.h \
  GException.h GString.h GContainer.h \
  GURL.h Arrays.h DjVmDir.h DjVuInfo.h \
  GRect.h IFFByteStream.h ByteStream.h
-DjVuErrorList.o: DjVuErrorList.cpp DjVuErrorList.h \
+DjVuErrorList.o: DjVuErrorList.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuErrorList.h \
  DjVuPort.h GThreads.h DjVuGlobal.h \
  ../../src/include/DjVu.h GException.h GURL.h \
  GString.h GContainer.h GSmartPointer.h \
  Arrays.h DjVmDoc.h DjVmDir.h GOS.h \
  DataPool.h
-DjVuFile.o: DjVuFile.cpp DjVuFile.h DjVuInfo.h \
- GSmartPointer.h DjVuGlobal.h \
+DjVuFileCache.o: DjVuFileCache.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuFileCache.h \
+ DjVuFile.h DjVuInfo.h GSmartPointer.h \
+ DjVuGlobal.h ../../src/include/DjVu.h GRect.h \
+ DjVuPalette.h GContainer.h GException.h \
+ GPixmap.h DjVuPort.h GThreads.h GURL.h \
+ GString.h Arrays.h debug.h
+DjVuFile.o: DjVuFile.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuFile.h \
+ DjVuInfo.h GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GRect.h DjVuPalette.h \
  GContainer.h GException.h GPixmap.h \
  DjVuPort.h GThreads.h GURL.h GString.h \
@@ -85,18 +113,15 @@ DjVuFile.o: DjVuFile.cpp DjVuFile.h DjVuInfo.h \
  DjVuAnno.h DjVuText.h GMapAreas.h \
  DataPool.h JB2Image.h ZPCodec.h \
  IW44Image.h DjVuNavDir.h debug.h
-DjVuFileCache.o: DjVuFileCache.cpp DjVuFileCache.h \
- DjVuFile.h DjVuInfo.h GSmartPointer.h \
- DjVuGlobal.h ../../src/include/DjVu.h GRect.h \
- DjVuPalette.h GContainer.h GException.h \
- GPixmap.h DjVuPort.h GThreads.h GURL.h \
- GString.h Arrays.h debug.h
-DjVuGlobal.o: DjVuGlobal.cpp DjVuGlobal.h \
+DjVuGlobal.o: DjVuGlobal.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuGlobal.h \
  ../../src/include/DjVu.h GOS.h GString.h \
  GContainer.h GException.h GSmartPointer.h \
  GThreads.h
-DjVuGlobalMemory.o: DjVuGlobalMemory.cpp
-DjVuImage.o: DjVuImage.cpp DjVuImage.h \
+DjVuGlobalMemory.o: DjVuGlobalMemory.cpp \
+ /home/bcr/build/packages/src/include/config.h
+DjVuImage.o: DjVuImage.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuImage.h \
  DjVuFile.h DjVuInfo.h GSmartPointer.h \
  DjVuGlobal.h ../../src/include/DjVu.h GRect.h \
  DjVuPalette.h GContainer.h GException.h \
@@ -105,47 +130,56 @@ DjVuImage.o: DjVuImage.cpp DjVuImage.h \
  GBitmap.h DjVuDocument.h JB2Image.h \
  ZPCodec.h IW44Image.h DataPool.h \
  ByteStream.h GMapAreas.h debug.h
-DjVuInfo.o: DjVuInfo.cpp DjVuInfo.h \
+DjVuInfo.o: DjVuInfo.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuInfo.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GRect.h GException.h \
  ByteStream.h Arrays.h
-DjVuMessage.o: DjVuMessage.cpp DjVuMessage.h \
+DjVuMessage.o: DjVuMessage.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuMessage.h \
  DjVuMessageLite.h GString.h DjVuGlobal.h \
  ../../src/include/DjVu.h GContainer.h \
  GException.h GSmartPointer.h GOS.h \
  XMLTags.h ByteStream.h Arrays.h GURL.h \
  GThreads.h debug.h
 DjVuMessageLite.o: DjVuMessageLite.cpp \
+ /home/bcr/build/packages/src/include/config.h \
  DjVuMessageLite.h GString.h DjVuGlobal.h \
  ../../src/include/DjVu.h GContainer.h \
  GException.h GSmartPointer.h GOS.h \
  XMLTags.h ByteStream.h Arrays.h GURL.h \
  GThreads.h debug.h
-DjVuNavDir.o: DjVuNavDir.cpp DjVuNavDir.h \
+DjVuNavDir.o: DjVuNavDir.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuNavDir.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  GThreads.h GURL.h Arrays.h debug.h \
  GOS.h ByteStream.h
-DjVuPalette.o: DjVuPalette.cpp GException.h \
+DjVuPalette.o: DjVuPalette.cpp \
+ /home/bcr/build/packages/src/include/config.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  ByteStream.h Arrays.h GSmartPointer.h \
  BSByteStream.h ZPCodec.h GContainer.h \
  DjVuPalette.h GPixmap.h
-DjVuPort.o: DjVuPort.cpp DjVuPort.h GThreads.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GException.h GURL.h GString.h \
- GContainer.h GSmartPointer.h Arrays.h \
- GOS.h DjVuImage.h DjVuFile.h DjVuInfo.h \
- GRect.h DjVuPalette.h GPixmap.h \
- DjVuAnno.h DjVuDocument.h DjVuMessageLite.h \
- DataPool.h
-DjVuText.o: DjVuText.cpp DjVuText.h GMapAreas.h \
- GSmartPointer.h DjVuGlobal.h \
+DjVuPort.o: DjVuPort.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuPort.h \
+ GThreads.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GException.h GURL.h \
+ GString.h GContainer.h GSmartPointer.h \
+ Arrays.h GOS.h DjVuImage.h DjVuFile.h \
+ DjVuInfo.h GRect.h DjVuPalette.h \
+ GPixmap.h DjVuAnno.h DjVuDocument.h \
+ DjVuMessageLite.h DataPool.h
+DjVuText.o: DjVuText.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuText.h \
+ GMapAreas.h GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GContainer.h \
- GException.h GString.h GRect.h \
- IFFByteStream.h ByteStream.h Arrays.h \
- BSByteStream.h ZPCodec.h debug.h
-DjVuToPS.o: DjVuToPS.cpp DjVuToPS.h \
+ GException.h GString.h GRect.h GURL.h \
+ Arrays.h GThreads.h IFFByteStream.h \
+ ByteStream.h BSByteStream.h ZPCodec.h \
+ debug.h
+DjVuToPS.o: DjVuToPS.cpp \
+ /home/bcr/build/packages/src/include/config.h DjVuToPS.h \
  DjVuDocument.h DjVuPort.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GURL.h GString.h \
@@ -153,99 +187,132 @@ DjVuToPS.o: DjVuToPS.cpp DjVuToPS.h \
  DjVuImage.h DjVuFile.h DjVuInfo.h GRect.h \
  DjVuPalette.h GPixmap.h DjVuAnno.h \
  ByteStream.h GBitmap.h debug.h
-GBitmap.o: GBitmap.cpp GBitmap.h \
+GBitmap.o: GBitmap.cpp \
+ /home/bcr/build/packages/src/include/config.h GBitmap.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ByteStream.h Arrays.h \
  GException.h GRect.h GString.h \
  GContainer.h GThreads.h
-GContainer.o: GContainer.cpp GContainer.h \
+GContainer.o: GContainer.cpp \
+ /home/bcr/build/packages/src/include/config.h GContainer.h \
  GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h
-GException.o: GException.cpp GException.h \
+GException.o: GException.cpp \
+ /home/bcr/build/packages/src/include/config.h GException.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  DjVuMessageLite.h GString.h GContainer.h \
  GSmartPointer.h debug.h
-GIFFManager.o: GIFFManager.cpp GIFFManager.h \
+GIFFManager.o: GIFFManager.cpp \
+ /home/bcr/build/packages/src/include/config.h GIFFManager.h \
  IFFByteStream.h DjVuGlobal.h \
  ../../src/include/DjVu.h GException.h GString.h \
  GContainer.h GSmartPointer.h ByteStream.h \
  Arrays.h debug.h
-GMapAreas.o: GMapAreas.cpp GMapAreas.h \
+GMapAreas.o: GMapAreas.cpp \
+ /home/bcr/build/packages/src/include/config.h GMapAreas.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GContainer.h \
- GException.h GString.h GRect.h debug.h
-GOS.o: GOS.cpp GException.h DjVuGlobal.h \
+ GException.h GString.h GRect.h GURL.h \
+ Arrays.h GThreads.h debug.h
+GOS.o: GOS.cpp /home/bcr/build/packages/src/include/config.h \
+ GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GThreads.h GOS.h \
  GString.h GContainer.h GSmartPointer.h \
  GURL.h Arrays.h
-GPixmap.o: GPixmap.cpp GPixmap.h \
+GPixmap.o: GPixmap.cpp \
+ /home/bcr/build/packages/src/include/config.h GPixmap.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h GString.h GContainer.h \
  GException.h ByteStream.h Arrays.h \
  GRect.h GBitmap.h GThreads.h
-GRect.o: GRect.cpp GRect.h DjVuGlobal.h \
- ../../src/include/DjVu.h GException.h
-GScaler.o: GScaler.cpp GScaler.h GException.h \
- DjVuGlobal.h ../../src/include/DjVu.h GRect.h \
- GBitmap.h GSmartPointer.h GPixmap.h
-GSmartPointer.o: GSmartPointer.cpp GThreads.h \
+GRect.o: GRect.cpp \
+ /home/bcr/build/packages/src/include/config.h GRect.h \
+ DjVuGlobal.h ../../src/include/DjVu.h \
+ GException.h
+GScaler.o: GScaler.cpp \
+ /home/bcr/build/packages/src/include/config.h GScaler.h \
+ GException.h DjVuGlobal.h \
+ ../../src/include/DjVu.h GRect.h GBitmap.h \
+ GSmartPointer.h GPixmap.h
+GSmartPointer.o: GSmartPointer.cpp \
+ /home/bcr/build/packages/src/include/config.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GSmartPointer.h
-GString.o: GString.cpp GString.h DjVuGlobal.h \
- ../../src/include/DjVu.h GContainer.h \
- GException.h GSmartPointer.h debug.h
-GThreads.o: GThreads.cpp GThreads.h \
+GString.o: GString.cpp \
+ /home/bcr/build/packages/src/include/config.h GString.h \
+ DjVuGlobal.h ../../src/include/DjVu.h \
+ GContainer.h GException.h GSmartPointer.h \
+ debug.h
+GThreads.o: GThreads.cpp \
+ /home/bcr/build/packages/src/include/config.h GThreads.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h DjVuMessageLite.h GString.h \
  GContainer.h GSmartPointer.h
-GURL.o: GURL.cpp GException.h DjVuGlobal.h \
- ../../src/include/DjVu.h GOS.h GString.h \
- GContainer.h GSmartPointer.h GURL.h \
- Arrays.h GThreads.h debug.h
-GUnicode.o: GUnicode.cpp GString.h DjVuGlobal.h \
- ../../src/include/DjVu.h GContainer.h \
- GException.h GSmartPointer.h
-IFFByteStream.o: IFFByteStream.cpp IFFByteStream.h \
+GUnicode.o: GUnicode.cpp \
+ /home/bcr/build/packages/src/include/config.h GString.h \
+ DjVuGlobal.h ../../src/include/DjVu.h \
+ GContainer.h GException.h GSmartPointer.h
+GURL.o: GURL.cpp \
+ /home/bcr/build/packages/src/include/config.h GException.h \
+ DjVuGlobal.h ../../src/include/DjVu.h GOS.h \
+ GString.h GContainer.h GSmartPointer.h \
+ GURL.h Arrays.h GThreads.h debug.h
+IFFByteStream.o: IFFByteStream.cpp \
+ /home/bcr/build/packages/src/include/config.h IFFByteStream.h \
  DjVuGlobal.h ../../src/include/DjVu.h \
  GException.h GString.h GContainer.h \
  GSmartPointer.h ByteStream.h Arrays.h
-IW44EncodeCodec.o: IW44EncodeCodec.cpp IW44Image.h \
+IW44EncodeCodec.o: IW44EncodeCodec.cpp \
+ /home/bcr/build/packages/src/include/config.h IW44Image.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ZPCodec.h GContainer.h \
  GException.h GBitmap.h GPixmap.h \
  IFFByteStream.h GString.h ByteStream.h \
  Arrays.h GRect.h MMX.h
-IW44Image.o: IW44Image.cpp IW44Image.h \
+IW44Image.o: IW44Image.cpp \
+ /home/bcr/build/packages/src/include/config.h IW44Image.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ZPCodec.h GContainer.h \
  GException.h GBitmap.h GPixmap.h \
  IFFByteStream.h GString.h ByteStream.h \
  Arrays.h GRect.h MMX.h
-JB2EncodeCodec.o: JB2EncodeCodec.cpp JB2Image.h \
+JB2EncodeCodec.o: JB2EncodeCodec.cpp \
+ /home/bcr/build/packages/src/include/config.h JB2Image.h \
  GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  ZPCodec.h GBitmap.h
-JB2Image.o: JB2Image.cpp JB2Image.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
+JB2Image.o: JB2Image.cpp \
+ /home/bcr/build/packages/src/include/config.h JB2Image.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
  GContainer.h GException.h GSmartPointer.h \
  ZPCodec.h GThreads.h GRect.h GBitmap.h
-JPEGDecoder.o: JPEGDecoder.cpp JPEGDecoder.h \
+JPEGDecoder.o: JPEGDecoder.cpp \
+ /home/bcr/build/packages/src/include/config.h JPEGDecoder.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h ByteStream.h Arrays.h \
  GException.h GPixmap.h
-MMRDecoder.o: MMRDecoder.cpp MMRDecoder.h \
+MMRDecoder.o: MMRDecoder.cpp \
+ /home/bcr/build/packages/src/include/config.h MMRDecoder.h \
  GSmartPointer.h DjVuGlobal.h \
  ../../src/include/DjVu.h JB2Image.h GString.h \
  GContainer.h GException.h ZPCodec.h \
  ByteStream.h Arrays.h GBitmap.h
-MMX.o: MMX.cpp MMX.h DjVuGlobal.h \
- ../../src/include/DjVu.h
+MMX.o: MMX.cpp /home/bcr/build/packages/src/include/config.h \
+ MMX.h DjVuGlobal.h ../../src/include/DjVu.h
+parseoptions.o: parseoptions.cpp \
+ /home/bcr/build/packages/src/include/config.h parseoptions.h \
+ GString.h DjVuGlobal.h ../../src/include/DjVu.h \
+ GContainer.h GException.h GSmartPointer.h \
+ Arrays.h DjVuMessage.h DjVuMessageLite.h \
+ GURL.h GThreads.h
 UnicodeByteStream.o: UnicodeByteStream.cpp \
+ /home/bcr/build/packages/src/include/config.h \
  UnicodeByteStream.h DjVuGlobal.h \
  ../../src/include/DjVu.h GString.h GContainer.h \
  GException.h GSmartPointer.h ByteStream.h \
  Arrays.h
-XMLParser.o: XMLParser.cpp XMLParser.h \
+XMLParser.o: XMLParser.cpp \
+ /home/bcr/build/packages/src/include/config.h XMLParser.h \
  GContainer.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h GURL.h \
  GString.h Arrays.h GThreads.h XMLTags.h \
@@ -254,27 +321,15 @@ XMLParser.o: XMLParser.cpp XMLParser.h \
  DjVuAnno.h DjVuFile.h DjVuInfo.h \
  DjVuPalette.h GPixmap.h DjVuImage.h \
  debug.h
-XMLTags.o: XMLTags.cpp XMLTags.h GContainer.h \
- GException.h DjVuGlobal.h \
+XMLTags.o: XMLTags.cpp \
+ /home/bcr/build/packages/src/include/config.h XMLTags.h \
+ GContainer.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h \
  GString.h UnicodeByteStream.h ByteStream.h \
  Arrays.h
-ZPCodec.o: ZPCodec.cpp ZPCodec.h GContainer.h \
- GException.h DjVuGlobal.h \
+ZPCodec.o: ZPCodec.cpp \
+ /home/bcr/build/packages/src/include/config.h ZPCodec.h \
+ GContainer.h GException.h DjVuGlobal.h \
  ../../src/include/DjVu.h GSmartPointer.h \
  ByteStream.h Arrays.h
-debug.o: debug.cpp debug.h GString.h \
- DjVuGlobal.h ../../src/include/DjVu.h \
- GContainer.h GException.h GSmartPointer.h \
- ByteStream.h Arrays.h GURL.h GThreads.h
-parseoptions.o: parseoptions.cpp parseoptions.h \
- GString.h DjVuGlobal.h ../../src/include/DjVu.h \
- GContainer.h GException.h GSmartPointer.h \
- Arrays.h DjVuMessage.h DjVuMessageLite.h
-test.o: test.cpp ByteStream.h Arrays.h \
- GException.h DjVuGlobal.h GSmartPointer.h
-test1.o: test1.cpp ByteStream.h Arrays.h \
- GException.h DjVuGlobal.h GSmartPointer.h
-test2.o: test2.cpp ByteStream.h Arrays.h \
- GException.h DjVuGlobal.h GSmartPointer.h
 ### END   C++ DEPENDENCIES

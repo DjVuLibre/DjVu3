@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.75 2001-06-19 19:06:17 bcr Exp $
+// $Id: GURL.cpp,v 1.76 2001-06-21 21:38:14 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -434,6 +434,10 @@ GURL::GURL(const char * url_in) : url(url_in ? url_in : ""), validurl(false)
 }
 
 GURL::GURL(const GUTF8String & url_in) : url(url_in), validurl(false)
+{
+}
+
+GURL::GURL(const GNativeString & url_in) : url(url_in), validurl(false)
 {
 }
 
