@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.33 2001-04-19 23:25:46 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.34 2001-04-20 00:30:54 bcr Exp $
 // $Name:  $
 
 
@@ -40,6 +40,7 @@
 #include "XMLTags.h"
 #include "ByteStream.h"
 #include "GURL.h"
+#include "debug.h"
 #include <ctype.h>
 #include <stdlib.h>
 // #include <stdio.h>
@@ -562,11 +563,35 @@ DjVuMessage::InsertArg( GUTF8String &message,
   {
     do
     {
-      const int format_end=message.search('!',format_start+target.length()+1);
+      const int n=format_start+target.length()+1;
+      const int format_end=message.search('!',n);
       if(format_end > format_start)
-      {
-        message = message.substr( 0, format_start )+arg
-          +message.substr( format_end+1, (unsigned int)(-1));
+      { 
+        const int len=1+format_end-n;
+        if(0 && len && isascii(message[n-1]))
+        {
+          GUTF8String narg;
+          GUTF8String format="%"+message.substr(n-1,len);
+          switch(format[len-1])
+          {
+            case 'd':
+              narg.format((const char *)format,atoi((const char *)(arg)));
+              break;
+            case 'u':
+            case 'x':
+              narg.format((const char *)format,atoi((const char *)(arg)));
+              break;
+            default:
+              narg.format((const char *)format,(const char *)arg);
+              break;
+          }
+          message = message.substr( 0, format_start )+narg
+            +message.substr( format_end+1, (unsigned int)(-1));
+        }else
+        {
+          message = message.substr( 0, format_start )+arg
+            +message.substr( format_end+1, (unsigned int)(-1));
+        }
       }
       format_start=message.search(target,format_start+arg.length());
     } while(format_start >= 0);
