@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: qd_base_events.cpp,v 1.2 2001-06-20 18:15:17 mchen Exp $
+// $Id: qd_base_events.cpp,v 1.3 2001-06-20 21:32:16 mchen Exp $
 // $Name:  $
 
 
@@ -541,16 +541,22 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			lastrect->intersect(*lastrect, rectDocument);
 
 			int cur_zoom_factor=getZoom();
-			int zoom1 = cur_zoom_factor*((float)rectVisible.height()/lastrect->height());
-			int zoom2 = cur_zoom_factor*((float)rectVisible.width()/lastrect->width());
+			int hzoom = cur_zoom_factor*((float)rectVisible.height()/lastrect->height());
+			int wzoom = cur_zoom_factor*((float)rectVisible.width()/lastrect->width());
 			
-//  			printf("rectVisible: height x width = %d x %d\n", rectVisible.height(), rectVisible.width());
-//  			printf("lastrect:    height x width = %d x %d\n", lastrect->height(), lastrect->width());
-			int new_zoom=(zoom1<zoom2?zoom1:zoom2)+IDC_ZOOM_MIN;			
-//  			printf("zoom=%d,  zoom1=%d,  zoom2=%d\n", new_zoom, zoom1, zoom2);
-			if ( new_zoom < IDC_ZOOM_MAX )
+			int new_zoom_factor=hzoom<wzoom?hzoom:wzoom;
+			int new_zoom_cmd=new_zoom_factor+IDC_ZOOM_MIN;
+
+			if ( new_zoom_cmd < IDC_ZOOM_MAX )
 			{
-			   setZoom(new_zoom, true,  ZOOM_MANUAL);
+			   setZoom(new_zoom_cmd, true, ZOOM_MANUAL);
+
+			   // centering the new zoomed area 
+			   int dx = -(rectVisible.xmax+rectVisible.xmin-lastrect->xmax-lastrect->xmin)/2;
+			   int dy = -(rectVisible.ymax+rectVisible.ymin-lastrect->ymax-lastrect->ymin)/2;
+			   float zf = new_zoom_factor/float(cur_zoom_factor);
+			   dx *= zf; dy *= zf;
+			   scroll(dx,dy);
 			} else
 			{
 			   QPainter p(pane);
@@ -559,7 +565,7 @@ QDBase::eventFilter(QObject *obj, QEvent *e)
 			   p.setClipRect(G2Q(*lastrect));
 			   p.drawRect(G2Q(*lastrect));
 			}
-                
+	    
 			delete lastrect;
 			lastrect=0;
 		     }
