@@ -238,7 +238,8 @@ process_general_option()
             A_DEFS=`escape "$s"`" $A_DEFS"
             ;;
         *)
-            return 1;
+            # Do not complain for empty option
+            [ x$* != x ] && return 1;
             ;;
   esac
   return 0
