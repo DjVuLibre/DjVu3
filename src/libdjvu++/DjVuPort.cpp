@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.16 1999-09-09 21:38:42 leonb Exp $
+//C- $Id: DjVuPort.cpp,v 1.17 1999-09-10 19:24:20 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,6 +18,8 @@
 #include "DjVuPort.h"
 #include "GOS.h"
 #include "DjVuImage.h"
+#include "DjVuDocument.h"
+#include "DjVuFile.h"
 
 
 //****************************************************************************
@@ -404,30 +406,23 @@ DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const char * name)
 }
 
 void
-DjVuPortcaster::notify_file_done(const DjVuPort * source)
+DjVuPortcaster::notify_file_flags_changed(const DjVuFile * source,
+					  long set_mask, long clr_mask)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
    for(GPosition pos=list; pos; ++pos)
-     list[pos]->notify_file_done(source);
+     list[pos]->notify_file_flags_changed(source, set_mask, clr_mask);
 }
 
 void
-DjVuPortcaster::notify_file_stopped(const DjVuPort * source)
+DjVuPortcaster::notify_doc_flags_changed(const DjVuDocument * source,
+					 long set_mask, long clr_mask)
 {
    GPList<DjVuPort> list;
    compute_closure(source, list);
    for(GPosition pos=list; pos; ++pos)
-     list[pos]->notify_file_stopped(source);
-}
-
-void
-DjVuPortcaster::notify_file_failed(const DjVuPort * source)
-{
-   GPList<DjVuPort> list;
-   compute_closure(source, list);
-   for(GPosition pos=list; pos; ++pos)
-     list[pos]->notify_file_failed(source);
+     list[pos]->notify_doc_flags_changed(source, set_mask, clr_mask);
 }
 
 void
@@ -437,24 +432,6 @@ DjVuPortcaster::notify_decode_progress(const DjVuPort * source, float done)
    compute_closure(source, list);
    for(GPosition pos=list; pos; ++pos)
      list[pos]->notify_decode_progress(source, done);
-}
-
-void
-DjVuPortcaster::notify_file_data_received(const DjVuPort * source)
-{
-   GPList<DjVuPort> list;
-   compute_closure(source, list);
-   for(GPosition pos=list; pos; ++pos)
-     list[pos]->notify_file_data_received(source);
-}
-
-void
-DjVuPortcaster::notify_all_data_received(const DjVuPort * source)
-{
-   GPList<DjVuPort> list;
-   compute_closure(source, list);
-   for(GPosition pos=list; pos; ++pos)
-     list[pos]->notify_all_data_received(source);
 }
 
 //****************************************************************************
@@ -489,26 +466,13 @@ void
 DjVuPort::notify_chunk_done(const DjVuPort *, const char *) {}
 
 void
-DjVuPort::notify_file_done(const DjVuPort *) {}
+DjVuPort::notify_file_flags_changed(const DjVuFile *, long, long) {}
 
 void
-DjVuPort::notify_file_stopped(const DjVuPort *) {}
-
-void
-DjVuPort::notify_file_failed(const DjVuPort *) {}
+DjVuPort::notify_doc_flags_changed(const DjVuDocument *, long, long) {}
 
 void
 DjVuPort::notify_decode_progress(const DjVuPort *, float) {}
-
-void
-DjVuPort::notify_file_data_received(const DjVuPort *) {}
-
-void
-DjVuPort::notify_all_data_received(const DjVuPort *) {}
-
-
-
-
 
 //****************************************************************************
 //*************************** DjVuSimplePort *********************************

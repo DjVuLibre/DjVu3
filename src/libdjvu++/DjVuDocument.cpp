@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.30 1999-09-09 18:24:18 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.31 1999-09-10 19:24:19 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -509,16 +509,17 @@ DjVuDocument::notify_chunk_done(const DjVuPort * source, const char * name)
 }
 
 void
-DjVuDocument::notify_all_data_received(const DjVuPort * source)
+DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
+					long set_mask, long clr_mask)
 {
-   if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
-      if (!ndir || dummy_ndir)
-	 if (source->inherits("DjVuFile"))
+   if (set_mask & DjVuFile::ALL_DATA_PRESENT)
+      if (doc_type==OLD_BUNDLED || doc_type==INDEXED)
+	 if (!ndir || dummy_ndir)
 	 {
+	    DEBUG_MSG("DjVuDocument::notify_file_flags_changed(): ALL_DATA_PRESENT: updating nav. dir.\n");
 	    GP<DjVuNavDir> dir=((DjVuFile *) source)->find_ndir();
 	    if (dir)
 	    {
-	       DEBUG_MSG("DjVuDocument::notify_all_data_received(): updating nav. dir.\n");
 	       ndir=dir;
 	       dummy_ndir=false;
 	    }

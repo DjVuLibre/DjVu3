@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.13 1999-09-09 21:42:14 leonb Exp $
+//C- $Id: DjVuPort.h,v 1.14 1999-09-10 19:24:20 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@geocities.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.13 1999-09-09 21:42:14 leonb Exp $# */
+    @version #$Id: DjVuPort.h,v 1.14 1999-09-10 19:24:20 eaf Exp $# */
 //@{
 
 class DjVuPort;
@@ -178,35 +178,35 @@ public:
       /** This notification is sent when a new chunk has been decoded. */
    virtual void		notify_chunk_done(const DjVuPort * source, const char * name);
 
-      /** This notification is sent after decoding of a particular file
-	  has been finished successfully. */
-   virtual void		notify_file_done(const DjVuPort * source);
+      /** This notification is sent after the \Ref{DjVuFile} flags have
+	  been changed. This happens, for example, when:
+	  \begin{itemize}
+	    \item Decoding succeeded, failed or just stopped
+	    \item All data has been received
+	    \item All included files have been created
+	  \end{itemize}
+	  
+	  @param source \Ref{DjVuFile}, which flags have been changed
+	  @param set_mask bits, which have been set
+	  @param clr_mask bits, which have been cleared */
+   virtual void		notify_file_flags_changed(const class DjVuFile * source,
+						  long set_mask, long clr_mask);
 
-      /** This notification is sent when decoding of a particular file
-	  has been stopped by the user. */
-   virtual void		notify_file_stopped(const DjVuPort * source);
+      /** This notification is sent after the \Ref{DjVuDocument} flags have
+	  been changed. This happens, for example, after it receives enough
+	  data and can determine its structure (#BUNDLED#, #INDEXED#, etc.).
 
-      /** This notification is sent when decoding of a particular file
-	  has failed. */
-   virtual void		notify_file_failed(const DjVuPort * source);
-
+	  @param source \Ref{DjVuDocument}, which flags have been changed
+	  @param set_mask bits, which have been set
+	  @param clr_mask bits, which have been cleared */
+   virtual void		notify_doc_flags_changed(const class DjVuDocument * source,
+						 long set_mask, long clr_mask);
+   
       /** This notification is sent from time to time while decoding is in
 	  progress. The purpose is obvious: to provide a way to know how much
 	  is done and how long the decoding will continue.  Argument #done# is
 	  a number from 0 to 1 reflecting the progress. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
-
-      /** This notification is sent after a given file received all the data.
-	  The reason why we have it is because the data is passed to the
-	  \Ref{DjVuFile}s and \Ref{DjVuDocument}s in the form of
-	  \Ref{DataPool}, which may have all the data, some of the data or
-	  nothing at all.  The data may be added later (as it happens in the
-	  Netscape plugin) and we may want to know when it's done. */
-   virtual void		notify_file_data_received(const DjVuPort * source);
-
-      /** This notification is send after a given file {\em and all files
-	  included into it} received all the data. */
-   virtual void		notify_all_data_received(const DjVuPort * source);
       //@}
 };
 
@@ -296,7 +296,7 @@ private:
 
     In some cases the requests and notifications are sent to every possible
     destination, and the order is not significant (like it is for
-    \Ref{notify_file_done}() request). Others should be sent to the closest
+    \Ref{notify_file_flags_changed}() request). Others should be sent to the closest
     destinations first, and only then to the farthest, in case if they have
     not been processed by the closest. The examples are \Ref{request_data}(),
     \Ref{notify_error}() and \Ref{notify_status}().
@@ -396,33 +396,19 @@ public:
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
-   virtual void		notify_file_done(const DjVuPort * source);
+   virtual void		notify_file_flags_changed(const class DjVuFile * source,
+						  long set_mask, long clr_mask);
 
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
-   virtual void		notify_file_stopped(const DjVuPort * source);
-
-      /** Computes destination list for #source# and calls the corresponding
-	  function in each of the ports from the destination list starting from
-	  the closest. */
-   virtual void		notify_file_failed(const DjVuPort * source);
-
+   virtual void		notify_doc_flags_changed(const class DjVuDocument * source,
+						 long set_mask, long clr_mask);
+   
       /** Computes destination list for #source# and calls the corresponding
 	  function in each of the ports from the destination list starting from
 	  the closest. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
-
-      /** Computes destination list for #source# and calls the corresponding
-	  function in each of the ports from the destination list starting from
-	  the closest. */
-   virtual void		notify_file_data_received(const DjVuPort * source);
-
-      /** Computes destination list for #source# and calls the corresponding
-	  function in each of the ports from the destination list starting from
-	  the closest. */
-   virtual void		notify_all_data_received(const DjVuPort * source);
-
 private:
       // We use these 'void *' to minimize template instanciations.
    friend class DjVuPort;

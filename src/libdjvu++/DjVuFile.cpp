@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.41 1999-09-09 22:26:04 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.42 1999-09-10 19:24:20 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -299,32 +299,49 @@ DjVuFile::notify_chunk_done(const DjVuPort *, const char *)
 }
 
 void
-DjVuFile::notify_file_done(const DjVuPort * src)
+DjVuFile::notify_file_flags_changed(const DjVuFile * src,
+				    long set_mask, long clr_mask)
 {
-   if (src==this && is_decode_ok())
-      get_portcaster()->cache_djvu_file(this, this);
+   if (set_mask & (DECODE_OK | DECODE_FAILED | DECODE_STOPPED))
+   {
+      if (src==this && is_decode_ok())
+	 get_portcaster()->cache_djvu_file(this, this);
    
       // Signal threads waiting for file termination
-   finish_mon.enter();
-   finish_mon.broadcast();
-   finish_mon.leave();
+      finish_mon.enter();
+      finish_mon.broadcast();
+      finish_mon.leave();
    
-      // In case a thread is still waiting for a chunk
-   chunk_mon.enter();
-   chunk_mon.broadcast();
-   chunk_mon.leave();
-}
-
-void
-DjVuFile::notify_file_stopped(const DjVuPort * src)
-{
-   DjVuFile::notify_file_done(src);
-}
-
-void
-DjVuFile::notify_file_failed(const DjVuPort * src)
-{
-   DjVuFile::notify_file_done(src);
+	 // In case a thread is still waiting for a chunk
+      chunk_mon.enter();
+      chunk_mon.broadcast();
+      chunk_mon.leave();
+   }
+   
+   if ((set_mask & ALL_DATA_PRESENT) && src!=this &&
+       are_incl_files_created() && is_data_present())
+   {
+      if (src!=this && are_incl_files_created() && is_data_present())
+      {
+	    // Check if all children have data
+	 bool all=true;
+	 {
+	    GCriticalSectionLock lock(&inc_files_lock);
+	    for(GPosition pos=inc_files_list;pos;++pos)
+	       if (!inc_files_list[pos]->is_all_data_present())
+	       {
+		  all=false;
+		  break;
+	       }
+	 }
+	 if (all)
+	 {
+	    DEBUG_MSG("Just got ALL data for '" << url << "'\n");
+	    flags|=ALL_DATA_PRESENT;
+	    get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
+	 }
+      }
+   }
 }
 
 void
@@ -386,7 +403,7 @@ DjVuFile::decode_func(void)
 	    flags=flags & ~DECODING | DECODE_STOPPED;
 	    flags.leave();
 	    pcaster->notify_status(this, GString(url)+" STOPPED");
-	    pcaster->notify_file_stopped(this);
+	    pcaster->notify_file_flags_changed(this, DECODE_STOPPED, DECODING);
 	 } else
 	 {
 	    flags.enter();
@@ -394,7 +411,7 @@ DjVuFile::decode_func(void)
 	    flags.leave();
 	    pcaster->notify_status(this, GString(url)+" FAILED");
 	    pcaster->notify_error(this, exc.get_cause());
-	    pcaster->notify_file_failed(this);
+	    pcaster->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
 	 };
       } CATCH(exc) {
 	 DEBUG_MSG("******* Oops. Almost missed an exception\n");
@@ -407,7 +424,7 @@ DjVuFile::decode_func(void)
       {
 	 flags=flags & ~DECODING | DECODE_OK;
 	 flags.leave();
-	 pcaster->notify_file_done(this);
+	 pcaster->notify_file_flags_changed(this, DECODE_OK, DECODING);
       } else flags.leave();
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("decoding thread for url='" << url << "' ended\n");
@@ -648,9 +665,9 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 #endif
               // May send duplicate notifications...
               if (file->is_decode_ok())
-                get_portcaster()->notify_file_done(file);
+                get_portcaster()->notify_file_flags_changed(file, DECODE_OK, 0);
               else if (file->is_decode_failed())
-                get_portcaster()->notify_file_failed(file);
+                get_portcaster()->notify_file_flags_changed(file, DECODE_FAILED, 0);
             }
         }
       desc.format("Indirection chunk");
@@ -874,7 +891,7 @@ DjVuFile::start_decode(void)
       flags&=~DECODING;
       flags|=DECODE_FAILED;
       flags.leave();
-      get_portcaster()->notify_file_failed(this);
+      get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       RETHROW;
    } ENDCATCH;
    flags.leave();
@@ -1024,40 +1041,6 @@ DjVuFile::decode_ndir(void)
 }
 
 void
-DjVuFile::notify_all_data_received(const DjVuPort * src)
-{
-#ifdef DEBUG_MSG
-   DEBUG_MSG("Intercept a notify_all_data_received()\n");
-   DEBUG_MAKE_INDENT(3);
-   if (src!=this) { DEBUG_MSG("it comes from an included file\n"); }
-   else DEBUG_MSG("and it comes from us\n");
-   if (flags & INCL_FILES_CREATED) { DEBUG_MSG("and we HAVE all files included\n"); }
-   else DEBUG_MSG("and we do NOT have all files included\n");
-#endif
-
-   if (src!=this && are_incl_files_created() && is_data_present())
-   {
-	 // Check if all children have data
-      bool all=true;
-      {
-	 GCriticalSectionLock lock(&inc_files_lock);
-	 for(GPosition pos=inc_files_list;pos;++pos)
-	    if (!inc_files_list[pos]->is_all_data_present())
-	    {
-	       all=false;
-	       break;
-	    }
-      }
-      if (all)
-      {
-	 DEBUG_MSG("Just got ALL data for '" << url << "'\n");
-	 flags|=ALL_DATA_PRESENT;
-	 get_portcaster()->notify_all_data_received(this);
-      }
-   }
-}
-
-void
 DjVuFile::static_trigger_cb(void * cl_data)
 {
    DjVuFile * th=(DjVuFile *) cl_data;
@@ -1076,7 +1059,7 @@ DjVuFile::trigger_cb(void)
 
    file_size=data_pool->get_length();
    flags|=DATA_PRESENT;
-   get_portcaster()->notify_file_data_received(this);
+   get_portcaster()->notify_file_flags_changed(this, DATA_PRESENT, 0);
 
    if (!are_incl_files_created()) process_incl_chunks();
 
@@ -1093,7 +1076,7 @@ DjVuFile::trigger_cb(void)
    {
       DEBUG_MSG("It appears, that we have ALL data for '" << url << "'\n");
       flags|=ALL_DATA_PRESENT;
-      get_portcaster()->notify_all_data_received(this);
+      get_portcaster()->notify_file_flags_changed(this, ALL_DATA_PRESENT, 0);
    }
 }
 
