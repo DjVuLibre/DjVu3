@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.21 1999-10-05 17:36:37 leonb Exp $
+//C- $Id: DjVuAnno.cpp,v 1.22 1999-10-10 21:08:19 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -146,9 +146,9 @@ void
 GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 {
    int aldel_cur_pos=0;
-   if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; };
+   if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; }
    
-   char buffer[256];
+   char buffer[1024];
    GTArray<char> buffer_str;
    const char * to_print=0;
    switch(type)
@@ -158,21 +158,20 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 	 to_print=buffer;
 	 break;
       case STRING:
-	 if (1)
 	 {
 	    int src=0, dst=0;
-	    buffer_str.resize(string.length()*2);
+	    buffer_str.resize(5+string.length()*2);
 	    buffer_str[dst++]='"';
 	    for(src=0;src<(int)string.length();src++)
 	    {
 	       char ch=string[src];
 	       if (ch=='"') buffer_str[dst++]='\\';
 	       buffer_str[dst++]=ch;
-	    };
+	    }
 	    buffer_str[dst++]='"';
 	    buffer_str[dst++]=0;
 	    to_print=buffer_str;
-	 };
+	 }
 	 break;
       case SYMBOL:
 	 sprintf(buffer, "%s", (const char *) symbol);
@@ -182,7 +181,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 	 sprintf(buffer, "(%s", (const char *) name);
 	 to_print=buffer;
 	 break;
-   };
+   }
    if (!compact && *cur_pos+strlen(to_print)>70)
    {
       char ch='\n';
@@ -190,7 +189,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
       ch=' ';
       for(int i=0;i<indent;i++) str.write(&ch, 1);
       *cur_pos=indent;
-   };
+   }
    str.write(to_print, strlen(to_print));
    char ch=' ';
    str.write(&ch, 1);
@@ -202,7 +201,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
 	 list[pos]->print(str, compact, indent, cur_pos);
       str.write(") ", 2);
       *cur_pos+=2;
-   };
+   }
    
    if (aldel_cur_pos) delete cur_pos;
 }
@@ -219,7 +218,7 @@ GLObject::get_string(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to string.");
       THROW(buffer);
-   };
+   }
    return string;
 }
 
@@ -235,7 +234,7 @@ GLObject::get_symbol(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to symbol.");
       THROW(buffer);
-   };
+   }
    return symbol;
 }
 
@@ -251,7 +250,7 @@ GLObject::get_number(void) const
       else if (type==LIST) sprintf(buffer1, "compound object '%s'", (const char *) name);
       strcat(buffer, buffer1); strcat(buffer, " to integer.");
       THROW(buffer);
-   };
+   }
    return number;
 }
 
@@ -267,7 +266,7 @@ GLObject::get_name(void) const
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       THROW(buffer);
-   };
+   }
    return name;
 }
 
@@ -283,7 +282,7 @@ GLObject::operator[](int n) const
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       THROW(buffer);
-   };
+   }
    if (n>=list.size()) THROW("Too few elements in '"+name+"'");
    int i;
    GPosition pos;
@@ -303,7 +302,7 @@ GLObject::get_list(void)
       else if (type==SYMBOL) sprintf(buffer1, "symbol '%s'", (const char *) symbol);
       strcat(buffer, buffer1); strcat(buffer, " to compound object.");
       THROW(buffer);
-   };
+   }
    return list;
 }
 
@@ -360,7 +359,7 @@ GLParser::get_token(const char * & start)
 	 {
            char ch=*start++;
            if (!ch) THROW("EOF");
-           if (ch==')') { start--; break; };
+           if (ch==')') { start--; break; }
            if (isspace(ch)) break;
            str+=ch;
 	 }
@@ -387,7 +386,7 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
 		    "'(' must be IMMEDIATELY followed by an object name.",
 		    (const char *) cur_name);
 	    THROW(buffer);
-	 };
+	 }
 	 
 	 GLToken tok=get_token(start);
 	 GP<GLObject> object=tok.object;	// This object should be SYMBOL
@@ -559,9 +558,9 @@ DjVuANT::decode_comp(char ch1, char ch2)
 	 if (ch2>='0' && ch2<='9') dig2=ch2-'0';
 	 if (ch2>='A' && ch2<='F') dig2=10+ch2-'A';
 	 return (dig1 << 4) | dig2;
-      };
+      }
       return dig1;
-   };
+   }
    return 0;
 }
 
@@ -607,7 +606,7 @@ DjVuANT::get_bg_color(GLParser & parser)
 	 GString color=(*obj)[0]->get_symbol();
 	 DEBUG_MSG("color='" << color << "'\n");
 	 return cvt_color(color, 0xffffff);
-      } else { DEBUG_MSG("can't find any.\n"); };
+      } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting color to 0xffffffff (UNSPEC)\n");
    return 0xffffffff;
@@ -636,7 +635,7 @@ DjVuANT::get_zoom(GLParser & parser)
 	 else if (zoom=="page") return ZOOM_PAGE;
 	 else if (zoom[0]!='d') THROW("Illegal zoom specification");
 	 else return atoi((const char *) zoom+1);
-      } else { DEBUG_MSG("can't find any.\n"); };
+      } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");
    return ZOOM_UNSPEC;
@@ -659,7 +658,7 @@ DjVuANT::get_mode(GLParser & parser)
 	 else if (mode=="fore") return MODE_FORE;
 	 else if (mode=="back") return MODE_BACK;
 	 else if (mode=="bw") return MODE_BW;
-      } else { DEBUG_MSG("can't find any.\n"); };
+      } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting mode to MODE_UNSPEC\n");
    return MODE_UNSPEC;
@@ -681,7 +680,7 @@ DjVuANT::get_hor_align(GLParser & parser)
 	 if (align=="left") return ALIGN_LEFT;
 	 else if (align=="center") return ALIGN_CENTER;
 	 else if (align=="right") return ALIGN_RIGHT;
-      } else { DEBUG_MSG("can't find any.\n"); };
+      } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
    return ALIGN_UNSPEC;
@@ -703,7 +702,7 @@ DjVuANT::get_ver_align(GLParser & parser)
 	 if (align=="top") return ALIGN_TOP;
 	 else if (align=="center") return ALIGN_CENTER;
 	 else if (align=="bottom") return ALIGN_BOTTOM;
-      } else { DEBUG_MSG("can't find any.\n"); };
+      } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting alignment to ALIGN_UNSPEC\n");
    return ALIGN_UNSPEC;
