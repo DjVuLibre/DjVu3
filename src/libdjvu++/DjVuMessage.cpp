@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.38 2001-04-24 16:54:49 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.39 2001-04-24 17:11:21 bcr Exp $
 // $Name:  $
 
 
@@ -101,7 +101,7 @@ static const char headstring[]="HEAD";
 static const char includestring[]="INCLUDE";
 static const char messagestring[]="MESSAGE";
 
-#ifdef WIN32
+#if defined(WIN32)
 static GURL
 RegOpenReadConfig ( HKEY hParentKey )
 {
@@ -146,8 +146,7 @@ GetModulePath( void )
   USES_CONVERSION;
   return GURL::Filename::Native(T2CA(path)).base();
 }
-#else
-#ifdef UNIX
+#elif defined(UNIX) && !defined(NO_DEBUG)
 extern char **environ;
 static char **e=environ-1;
 static GURL
@@ -162,7 +161,6 @@ GetModulePath( void )
     retval=GURL::Filename::Native(argv[0]).base();
   return retval;
 }
-#endif
 #endif
 
 static GList<GURL>

@@ -34,6 +34,7 @@ c44.o: c44.cpp ../../../src/libdjvu++/GString.h \
  ../../../src/libdjvu++/IW44Image.h \
  ../../../src/libdjvu++/ZPCodec.h \
  ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/IFFByteStream.h \
  ../../../src/libdjvu++/ByteStream.h \
  ../../../src/libdjvu++/Arrays.h \
@@ -211,6 +212,7 @@ djvuextract.o: djvuextract.cpp \
  ../../../src/libdjvu++/GURL.h \
  ../../../src/libdjvu++/DjVuFile.h \
  ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/GOS.h
@@ -224,6 +226,7 @@ djvumake.o: djvumake.cpp \
  ../../../src/libdjvu++/DjVuImage.h \
  ../../../src/libdjvu++/DjVuFile.h \
  ../../../src/libdjvu++/DjVuInfo.h \
+ ../../../src/libdjvu++/GRect.h \
  ../../../src/libdjvu++/DjVuPalette.h \
  ../../../src/libdjvu++/GPixmap.h \
  ../../../src/libdjvu++/DjVuPort.h \
