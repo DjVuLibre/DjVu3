@@ -7,11 +7,11 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GRect.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GRect.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 // -- Implementation of class GRect and GRectMapper
-// - File "$Id: GRect.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// - File "$Id: GRect.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 #ifdef __GNUC__

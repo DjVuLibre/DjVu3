@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: c44.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: c44.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 /** @name c44
@@ -148,7 +148,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: c44.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 //@}
 

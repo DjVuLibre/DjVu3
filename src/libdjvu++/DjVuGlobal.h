@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: DjVuGlobal.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -26,7 +26,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.1 1999-01-22 00:40:19 leonb Exp $#
+    #$Id: DjVuGlobal.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> -- initial (empty) file.  */
 //@{

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GException.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -60,7 +60,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GException.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

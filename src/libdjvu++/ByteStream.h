@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: ByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _BYTESTREAM_H
@@ -38,7 +38,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

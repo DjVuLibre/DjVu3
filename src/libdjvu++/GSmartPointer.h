@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GSmartPointer.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GSmartPointer.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 #ifndef _GSMARTPOINTER_H_
 #define _GSMARTPOINTER_H_
@@ -29,7 +29,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@research.att.com> -- bug fix.
     @version 
-    #$Id: GSmartPointer.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# 
+    #$Id: GSmartPointer.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# 
     @args
 */
 //@{

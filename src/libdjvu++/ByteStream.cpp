@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: ByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: ByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__

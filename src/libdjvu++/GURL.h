@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GURL.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GURL.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 #ifndef _GURL_H_
 #define _GURL_H_
@@ -23,7 +23,7 @@
     class used to store URLs in a system independent format.
     @memo System independent URL representation.
     @author Andrei Erofeev
-    @version #$Id: GURL.h,v 1.1 1999-01-22 00:40:19 leonb Exp $#
+    @version #$Id: GURL.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $#
 */
 
 //@{

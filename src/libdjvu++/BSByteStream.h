@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: BSByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: BSByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _BSBYTESTREAM_H
@@ -90,7 +90,7 @@
     @memo
     Simple Burrows-Wheeler general purpose compressor.
     @version
-    #$Id: BSByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: BSByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GThreads.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -66,7 +66,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GThreads.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 

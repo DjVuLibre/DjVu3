@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GException.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,7 +22,7 @@
 #include "debug.h"
 
 
-// File "$Id: GException.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// File "$Id: GException.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 static const char *outofmemory = "Out of memory";

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GString.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GString.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _GSTRING_H_
@@ -35,7 +35,7 @@
     @author
     Leon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GString.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

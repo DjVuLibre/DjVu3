@@ -7,13 +7,13 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GIFFManager.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 /*****************************************************************************
  *
- *   $Revision: 1.1 $
+ *   $Revision: 1.1.1.1 $
  *   $Date: 1999-01-22 00:40:19 $
- *   @(#) $Id: GIFFManager.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+ *   @(#) $Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
  *
  *****************************************************************************/
 
@@ -47,7 +47,7 @@
     @author 
     Andrei Erofeev <eaf@geocities.com> -- Initial implementation.
     @version 
-    #$Id: GIFFManager.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: GIFFManager.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 
 /** #GIFFChunk# is the base class for other IFF chunks understood by
     {\Ref GIFFManager}. It provides some basic interface, and is not supposed

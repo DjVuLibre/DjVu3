@@ -7,17 +7,17 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GIFFManager.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 /*****************************************************************************
  *
- *   $Revision: 1.1 $
+ *   $Revision: 1.1.1.1 $
  *   $Date: 1999-01-22 00:40:19 $
- *   @(#) $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+ *   @(#) $Id: GIFFManager.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
  *
  *****************************************************************************/
 
-// $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+// $Id: GIFFManager.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 // - Author: Andrei Erofeev, 7/1998
 
 #ifdef __GNUC__

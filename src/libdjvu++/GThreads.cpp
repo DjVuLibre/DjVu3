@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $
+//C-  $Id: IFFByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -64,7 +64,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.1 1999-01-22 00:40:19 leonb Exp $# */
+    #$Id: IFFByteStream.h,v 1.1.1.1 1999-01-22 00:40:19 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__
