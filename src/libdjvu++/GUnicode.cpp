@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.32 2001-10-12 20:07:45 leonb Exp $
+// $Id: GUnicode.cpp,v 1.33 2001-10-12 20:21:33 leonb Exp $
 // $Name:  $
 
 #ifdef HAVE_CONFIG_H
@@ -242,6 +242,17 @@ GStringRep::Unicode::create(
   return retval;
 }
 
+#if HAS_ICONV
+/* This template works around incompatible iconv protoypes */
+template<typename _T> inline size_t 
+iconv_adaptor(size_t(*iconv_func)(iconv_t, _T, size_t *, char**, size_t*),
+              iconv_t cd, char **inbuf, size_t *inbytesleft,
+              char **outbuf, size_t *outbytesleft)
+{
+  return iconv_func (cd, (_T)inbuf, inbytesleft, outbuf, outbytesleft);
+}
+#endif
+
 GP<GStringRep>
 GStringRep::Unicode::create(
   void const * const xbuf,
@@ -306,12 +317,7 @@ GStringRep::Unicode::create(
             GPBuffer<char> gutf8buf(utf8buf,pleft);
             char *p=utf8buf;
             unsigned char const *last=ptr;
-#ifdef HAVE_CONST_CHAR_ICONV
-            const char **iptr = (const char**)&ptr;
-#else
-            char **iptr = (char**)&ptr;
-#endif
-            for(;iconv(cv, iptr, &ptrleft, &p, &pleft);last=ptr)
+            for(;iconv_adaptor(iconv, cv, (char**)&ptr, &ptrleft, &p, &pleft);last=ptr) 
               EMPTY_LOOP;
             iconv_close(cv);
             retval=create(utf8buf,(size_t)last-(size_t)buf,t);
