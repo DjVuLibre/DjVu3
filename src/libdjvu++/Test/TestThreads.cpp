@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: TestThreads.cpp,v 1.9 2000-05-01 16:15:25 bcr Exp $
+//C- $Id: TestThreads.cpp,v 1.10 2000-07-24 16:33:38 bcr Exp $
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,7 +21,6 @@
 
 
 
-GThread th;
 GEvent ev;
 GCriticalSection sec;
 static int flag = 0;
@@ -116,6 +115,8 @@ second(void *arg)
 int
 main()
 {
+  GThread th;
+  GThread th2;
   th.create(second,(void*)1);
   second(0);
   xprintf("0 sleeping 3s\n");
@@ -124,8 +125,10 @@ main()
   ev.set();
   xprintf("0 sleeping 6s\n");
   sleeper.wait(6000);
-  xprintf("0 waiting for end of 1\n");
-  th.wait_for_finish();
+  xprintf("0 destroying thread 1 identifier\n");
+  th.GThread::~GThread();
+  xprintf("0 sleeping 10s\n");
+  sleeper.wait(10000);
   xprintf("0 leave\n");
 }
 

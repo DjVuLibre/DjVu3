@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.39 2000-07-03 17:28:13 bcr Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.40 2000-07-24 16:33:37 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -117,21 +117,47 @@ DjVuDocEditor::init(const char * fname)
       // data, but we will take care of it by redirecting the request_data().
    initialized=true;
    DjVuDocument::init(doc_url, this);
-
+   
       // Cool. Now extract the thumbnails...
-   GCriticalSectionLock lock(&thumb_lock);
-   int pages_num=get_pages_num();
-   for(int page_num=0;page_num<pages_num;page_num++)
+      // We keep them in a separate map in the DjVuDocEditor
+      // because pages may be shuffled, you know...
    {
-	 // Call DjVuDocument::get_thumbnail() here to bypass logic
-	 // of DjVuDocEditor::get_thumbnail(). init() is the only safe
-	 // place where we can still call DjVuDocument::get_thumbnail();
-      GP<DataPool> pool=DjVuDocument::get_thumbnail(page_num, true);
-      if (pool)
+      DEBUG_MSG("extracting thumbnails...\n");
+      DEBUG_MAKE_INDENT(3);
+
+	 // We're not calling DjVuDocument::get_thumbnail() here
+	 // because DjVuDocument::get_thumnail() is too general, and, thus,
+	 // slow. We're pretty sure that all the data we need is on
+	 // the hard disk, and is immediately available. No
+	 // need to use all the plugin tricks.
+      int page_cnt=0;
+      GCriticalSectionLock lock(&thumb_lock);
+      GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
+      for(GPosition pos=files_list;pos;++pos)
       {
-	 TArray<char> * data=new TArray<char>(pool->get_size()-1);
-	 pool->get_data(*data, 0, data->size());
-	 thumb_map[page_to_id(page_num)]=data;
+	 GP<DjVmDir::File> frec=files_list[pos];
+	 if (frec->is_thumbnails())
+	 {
+	    GP<DataPool> frec_data=request_data(this, id_to_url(frec->id));
+	    GP<ByteStream> str_in=frec_data->get_stream();
+	    IFFByteStream iff_in(*str_in);
+	    GString chunk_name;
+	    if (iff_in.get_chunk(chunk_name) &&
+		chunk_name=="FORM:THUM")
+	       while(iff_in.get_chunk(chunk_name))
+	       {
+		  if (chunk_name=="TH44")
+		  {
+		     GP<MemoryByteStream> str_out=new MemoryByteStream;
+		     str_out->copy(iff_in);
+		     TArray<char> * data=new TArray<char>(str_out->get_data());
+		     thumb_map[page_to_id(page_cnt)]=data;
+		     DEBUG_MSG("retrieved thumbnail icon data for page " << page_cnt << "\n");
+		     page_cnt++;
+		  }
+		  iff_in.close_chunk();
+	       }
+	 }
       }
    }
       // And remove then from DjVmDir so that DjVuDocument

@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.124 2000-07-05 16:50:53 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.125 2000-07-24 16:33:37 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -330,6 +330,20 @@ DjVuDocument::init_thread(void)
 	      doc_type==OLD_INDEXED ? "OLD_INDEXED" :
 	      doc_type==SINGLE_PAGE ? "SINGLE_PAGE" :
 	      "UNKNOWN") << "'\n");
+}
+
+bool
+DjVuDocument::wait_for_complete_init(void)
+{
+  flags.enter();
+  while(!(flags & DOC_INIT_FAILED) &&
+        !(flags & DOC_INIT_OK)) flags.wait();
+  flags.leave();
+  init_thread_flags.enter();
+  while (!(init_thread_flags & FINISHED))
+    init_thread_flags.wait();
+  init_thread_flags.leave();
+  return (flags & (DOC_INIT_OK | DOC_INIT_FAILED))!=0;
 }
 
 GString

@@ -1,20 +1,18 @@
 //C-  -*- C++ -*-
 //C-
-//C- Copyright (c) 1998-1999 AT&T Corp.
-//C- Copyright (c) 2000 LizardTech Inc.
-//C- All rights reserved.
+//C- Copyright (c) 1999 AT&T Corp.  All rights reserved.
 //C-
-//C- This software may only be used by you under license from LizardTech
-//C- Inc. A copy of LizardTech's Source Code Agreement is available at
-//C- LizardTech's Internet website having the URL <http://www.djvu.com/open>.
+//C- This software may only be used by you under license from AT&T
+//C- Corp. ("AT&T"). A copy of AT&T's Source Code Agreement is available at
+//C- AT&T's Internet website having the URL <http://www.djvu.att.com/open>.
 //C- If you received this software without first entering into a license with
-//C- LizardTech, you have an infringing copy of this software and cannot use it
-//C- without violating LizardTech's intellectual property rights.
+//C- AT&T, you have an infringing copy of this software and cannot use it
+//C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.cpp,v 1.47 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: GThreads.cpp,v 1.48 2000-07-24 16:33:37 bcr Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.47 2000-05-31 21:42:33 bcr Exp $"
+// **** File "$Id: GThreads.cpp,v 1.48 2000-07-24 16:33:37 bcr Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -102,17 +100,6 @@ start(void *arg)
   return 0;
 }
 
-void
-GThread::wait_for_finish(void)
-{
-  if ((xentry || xarg) && hthr)
-    {
-      if (thrid == GetCurrentThreadId())
-        THROW("Cannot wait for termination of calling thread.");
-      WaitForSingleObject(hthr, INFINITE);
-    }
-}
-
 GThread::GThread(int stacksize)
   : hthr(0), thrid(0), xentry(0), xarg(0)
 {
@@ -120,7 +107,6 @@ GThread::GThread(int stacksize)
 
 GThread::~GThread()
 {
-  wait_for_finish();
   if (hthr)
     CloseHandle(hthr);
   hthr = 0;
@@ -230,7 +216,7 @@ GMonitor::signal()
           {
             SetEvent(w->gwait);
             w->waiting = FALSE;
-            break; // Only one thread runs
+            break; // Only one thread is allowed to run!
           }
     }
 }
@@ -337,7 +323,7 @@ struct thr_waiting {
   struct thr_waiting *next;     // ptr to next waiting thread record
   struct thr_waiting *prev;     // ptr to ptr to this waiting thread
   unsigned long thid;           // id of waiting thread
-  void *wchan;                  // cause of the wait
+  int *wchan;                   // cause of the wait
 };
 static struct thr_waiting *first_waiting_thr = 0;
 static struct thr_waiting *last_waiting_thr = 0;
@@ -347,7 +333,7 @@ static struct thr_waiting *last_waiting_thr = 0;
 // Argument ``self'' must be current thread id.
 // Assumes ``ThreadBeginCritical'' has been called before.
 static void
-macthread_wait(ThreadID self, void *wchan)
+macthread_wait(ThreadID self, int *wchan)
 {
   // Prepare and link wait record
   struct thr_waiting wait; // no need to malloc :-)
@@ -358,10 +344,12 @@ macthread_wait(ThreadID self, void *wchan)
   *(wait.prev ? &wait.prev->next : &first_waiting_thr ) = &wait;
   *(wait.next ? &wait.next->prev : &last_waiting_thr ) = &wait;
   // Leave critical section and start waiting.
+  (*wchan)++;
   SetThreadStateEndCritical(self, kStoppedThreadState, kNoThreadID);
   // The Apple documentation says that the above call reschedules a new
   // thread.  Therefore it will only return when the thread wakes up.
   ThreadBeginCritical();
+  (*wchan)--;
   // Unlink wait record
   *(wait.prev ? &wait.prev->next : &first_waiting_thr ) = wait.next;
   *(wait.next ? &wait.next->prev : &last_waiting_thr ) = wait.prev;
@@ -370,8 +358,10 @@ macthread_wait(ThreadID self, void *wchan)
 
 // Wakeup one thread or all threads waiting on cause wchan
 static void
-macthread_wakeup(void *wchan, int onlyone)
+macthread_wakeup(int *wchan, int onlyone)
 {
+  if (*wchan == 0)
+    return;
   for (struct thr_waiting *q=first_waiting_thr; q; q=q->next)
     if (q->wchan == wchan) {
       // Found a waiting thread
@@ -383,13 +373,13 @@ macthread_wakeup(void *wchan, int onlyone)
 }
 
 GThread::GThread(int stacksize) 
-  : thid(kNoThreadID), finished(0), xentry(0), xarg(0)
+  : thid(kNoThreadID), xentry(0), xarg(0)
 {
 }
 
 GThread::~GThread(void)
 {
-   wait_for_finish();
+  thid = kNoThreadID;
 }
 
 pascal void *
@@ -400,7 +390,6 @@ GThread::start(void *arg)
     {
       TRY
         {
-          gt->finished = 0;
           (gt->xentry)(gt->xarg);
         }
       CATCH(ex)
@@ -420,15 +409,13 @@ GThread::start(void *arg)
       abort();
 #endif
     }
-  gt->finished = 1;
-  macthread_wakeup((void*)gt, 0);
   return 0;
 }
 
 int
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (thid != kNoThreadID)
+  if (xentry || thid!=kNoThreadID)
     return -1;
   xentry = entry;
   xarg = arg;
@@ -440,26 +427,12 @@ GThread::create(void (*entry)(void*), void *arg)
 }
 
 void
-GThread::wait_for_finish()
-{
-  if ((xentry || xarg) && (thid != kNoThreadID))
-    {
-      if (thid == (unsigned long)current())
-        THROW("Cannot wait for termination of calling thread.");
-      if (! finished)
-        macthread_wait(thid, (void*)this);
-    }
-}
-
-void
 GThread::terminate()
 {
-  if ((thid != kNoThreadID) && !finished)
-    {
-      finished = 1;
-      DisposeThread( thid, NULL, false );
-      macthread_wakeup((void*)this, 0);
-    }
+  if (thid != kNoThreadID) {
+    DisposeThread( thid, NULL, false );
+    thid = kNoThreadID;
+  }
 }
 
 int
@@ -480,7 +453,7 @@ GThread::current()
 
 // GMonitor implementation
 GMonitor::GMonitor() 
-  : count(1), locker(0)
+  : ok(0), count(1), locker(0), wlock(0), wsig(0)
 {
   locker = kNoThreadID;
   ok = 1;
@@ -490,8 +463,8 @@ GMonitor::~GMonitor()
 {
   ok = 0;
   ThreadBeginCritical();
-  macthread_wakeup((void*)this, 0);
-  macthread_wakeup((void*)count, 0);
+  macthread_wakeup(&wsig, 0);
+  macthread_wakeup(&wlock, 0);
   ThreadEndCritical();
   YieldToAnyThread();
 }
@@ -505,7 +478,7 @@ GMonitor::enter()
   if (count>0 || self!=locker)
     {
       while (ok && count<=0)
-        macthread_wait(self, (void*)&count);
+        macthread_wait(self, &wlock);
       count = 1;
       locker = self;
     }
@@ -522,7 +495,7 @@ GMonitor::leave()
     THROW("Monitor was not acquired by this thread (GMonitor::leave)");
   ThreadBeginCritical();
   if (++count > 0)
-    macthread_wakeup((void*)&count, 1);
+    macthread_wakeup(&wlock, 1);
   ThreadEndCritical();
 }
 
@@ -534,7 +507,7 @@ GMonitor::signal()
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::signal)");
   ThreadBeginCritical();
-  macthread_wakeup((void*)this, 1);
+  macthread_wakeup(&wsig, 1);
   ThreadEndCritical();
 }
 
@@ -546,7 +519,7 @@ GMonitor::broadcast()
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
   ThreadBeginCritical();
-  macthread_wakeup((void*)this, 0);
+  macthread_wakeup(&wsig, 0);
   ThreadEndCritical();
 }
 
@@ -565,11 +538,11 @@ GMonitor::wait()
       ThreadBeginCritical();
       int sav_count = count;
       count = 1;
-      macthread_wakeup((void*)count, 1);
-      macthread_wait(self, (void*)this);
+      macthread_wakeup(&wlock, 1);
+      macthread_wait(self, &wsig);
       // Re-acquire
       while (ok && count<=0)
-        macthread_wait(self, (void*)&count);
+        macthread_wait(self, &wlock);
       count = sav_count;
       locker = self;
       ThreadEndCritical();
@@ -603,8 +576,6 @@ GMonitor::wait(unsigned long timeout)
 #endif
 
 
-static GMonitor finish_mon;
-
 void *
 GThread::start(void *arg)
 {
@@ -629,7 +600,6 @@ GThread::start(void *arg)
 #endif 
       TRY
         {
-          gt->finished = 0;
           (gt->xentry)(gt->xarg);
         }
       CATCH(ex)
@@ -651,46 +621,20 @@ GThread::start(void *arg)
 #endif
     }
 #endif
-     // Signal thread termination
-  finish_mon.enter();
-  gt->finished = 1;
-  finish_mon.broadcast();
-  finish_mon.leave();
-     // Do not add anything below this line!
-     // The GThread object may already be destroyed by now.
   return 0;
 }
 
 
-void
-GThread::wait_for_finish(void)
-{
-  if (xentry || xarg)
-    {
-      pthread_t caller=pthread_self();
-      if (pthread_equal(hthr, caller))
-        THROW("Cannot wait for termination of calling thread.");
-      // This is not very efficient
-      // but has low memory overhead.
-      finish_mon.enter();
-      while (!finished)
-        finish_mon.wait();
-      finish_mon.leave();
-    }
-}
-
 // GThread
 
 GThread::GThread(int stacksize) : 
-  hthr(0), finished(0), xentry(0), xarg(0)
+  hthr(0), xentry(0), xarg(0)
 {
 }
 
 GThread::~GThread()
 {
-      // Need to wait because the start() function will want
-      // to set the 'finished' flag
-   wait_for_finish();
+  hthr = 0;
 }
 
 int  
@@ -717,15 +661,8 @@ GThread::create(void (*entry)(void*), void *arg)
 void 
 GThread::terminate()
 {
-  if ((xentry || xarg) && !finished)
-    {
-      pthread_cancel(hthr);
-      // Signal termination
-      finish_mon.enter();
-      finished = 1;
-      finish_mon.broadcast();
-      finish_mon.leave();
-    }
+  if (xentry || xarg)
+    pthread_cancel(hthr);
 }
 
 int
@@ -917,6 +854,7 @@ GMonitor::wait(unsigned long timeout)
 #define MAXPENALTY (1000)
 // Trace task switches
 #undef COTHREAD_TRACE
+#undef COTHREAD_TRACE_VERBOSE
 
 // -------------------------------------- context switch code
 
@@ -1084,18 +1022,39 @@ struct cotask {
   void *wchan;
   coselect *wselect;
   unsigned long *maxwait;
+  // delete after termination
+  bool autodelete;
 };
 
 static cotask *maintask = 0;
 static cotask *curtask  = 0;
+static cotask *autodeletetask = 0;
 static unsigned long globalmaxwait = 0;
+static void (*scheduling_callback)(int) = 0;
+static timeval time_base;
 
-// Hmmm. Waiting tasks should really be in a separate list
+
+static void 
+cotask_free(cotask *task)
+{
+#ifdef COTHREAD_TRACE
+  fprintf(stderr,"cothreads: freeing task %p with autodelete=%d\n", 
+          task,task->autodelete);
+#endif
+  if (task && task!=maintask)
+    {
+      if (task->stack) 
+        delete [] task->stack;
+      task->stack = 0;
+      if (task->ehctx) 
+        free(task->ehctx);
+      task->ehctx = 0;
+      delete task;
+    }
+}
 
 
 // -------------------------------------- time
-
-static timeval time_base;
 
 static unsigned long
 time_elapsed(int reset=1)
@@ -1107,13 +1066,16 @@ time_elapsed(int reset=1)
   if (reset && elapsed>0)
     {
 #ifdef COTHREAD_TRACE
+#ifdef COTHREAD_TRACE_VERBOSE
       fprintf(stderr,"cothreads: %4ld ms in task %p\n", elapsed, curtask);
+#endif
 #endif
       time_base.tv_sec = tm.tv_sec;
       time_base.tv_usec += msec*1000;
     }
   return elapsed;
 }
+
 
 // -------------------------------------- scheduler
 
@@ -1207,6 +1169,10 @@ cotask_yield()
           curtask = r;
           mach_switch(&old->regs, &curtask->regs);
         }
+      // handle autodelete
+      if (autodeletetask && autodeletetask->autodelete) 
+        cotask_free(autodeletetask);
+      autodeletetask = 0;
       // return 
       if (count == 1)
         return 1;
@@ -1248,6 +1214,58 @@ cotask_yield()
   goto reschedule;
 }
 
+
+static void
+cotask_terminate(cotask *task)
+{
+#ifdef COTHREAD_TRACE
+  fprintf(stderr,"cothreads: terminating task %p\n", task);
+#endif
+  if (task && task!=maintask)
+    {
+      if (task->prev && task->next)
+        {
+          if (scheduling_callback)
+            (*scheduling_callback)(GThread::CallbackTerminate);
+          task->prev->next = task->next;
+          task->next->prev = task->prev;
+          // mark task as terminated
+          task->prev = 0; 
+          // self termination
+          if (task == curtask)
+            {
+              if (task->autodelete)
+                autodeletetask = task;
+              cotask_yield();
+            }
+        }
+    }
+}
+
+
+static void
+cotask_wakeup(void *wchan, int onlyone)
+{
+  if (maintask && curtask)
+    {
+      cotask *n = curtask->next;
+      cotask *q = n;
+      do 
+        { 
+          if (q->wchan == wchan)
+            {
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+              q->over = 0;
+	      if (onlyone)
+		return;
+            }
+          q = q->next;
+        } 
+      while (q!=n);
+    }
+}
 
 
 // -------------------------------------- select / get_select
@@ -1331,34 +1349,6 @@ cotask_get_select(int &nfds, fd_set *rfds, fd_set *wfds, fd_set *efds,
 
 
 
-// -------------------------------------- utilities
-
-static void
-cotask_wakeup(void *wchan, int onlyone)
-{
-  if (maintask && curtask)
-    {
-      cotask *n = curtask->next;
-      cotask *q = n;
-      do 
-        { 
-          if (q->wchan == wchan)
-            {
-              q->wchan=0; 
-              q->maxwait=0; 
-              q->wselect=0; 
-              q->over = 0;
-	      if (onlyone)
-		return;
-            }
-          q = q->next;
-        } 
-      while (q!=n);
-    }
-}
-
-
-
 // -------------------------------------- libgcc hook
 
 #ifndef NO_LIBGCC_HOOKS
@@ -1391,8 +1381,6 @@ cotask_get_eh_context()
 
 
 // -------------------------------------- GThread
-
-static void (*scheduling_callback)(int) = 0;
 
 void 
 GThread::set_scheduling_callback(void (*call)(int))
@@ -1439,18 +1427,14 @@ GThread::GThread(int stacksize)
 
 GThread::~GThread()
 {
-  if (task==0 || task==maintask)
-    return;
-  wait_for_finish();
-  // Now we know that execution has terminated.
-  if (task->stack) 
-    delete [] task->stack;
-  task->stack = 0;
-  if (task->ehctx) 
-    free(task->ehctx);
-  task->ehctx = 0;
-  delete task;
-  task = 0;
+  if (task && task!=maintask)
+    {
+      if (task->prev) // running
+        task->autodelete = true;
+      else
+        cotask_free(task);
+      task = 0;
+    }
 }
 
 
@@ -1504,27 +1488,12 @@ starttwo(GThread *thr)
 #endif
     }
 #endif 
-  thr->terminate();
+  cotask_terminate(curtask);
   GThread::yield();
   // Do not add anything below this line!
   // Nothing should reach it anyway.
   abort();
 }
-
-
-void
-GThread::wait_for_finish(void)
-{
-  if (maintask && curtask && (xentry || xarg))
-    {
-      if (task == curtask)
-        THROW("Cannot wait for termination of calling thread.");
-      if (task->next && task->prev)
-        curtask->wchan = (void*)this;
-      cotask_yield();
-    }
-}
-
 
 int 
 GThread::create(void (*entry)(void*), void *arg)
@@ -1551,24 +1520,8 @@ GThread::create(void (*entry)(void*), void *arg)
 void 
 GThread::terminate()
 {
-  if (!task)
-    return;
-  if (task==maintask)
-    abort();
-  if (task->prev && task->next)
-    {
-      if (scheduling_callback)
-        (*scheduling_callback)(CallbackTerminate);
-      task->prev->next = task->next;
-      task->next->prev = task->prev;
-      // mark task as terminated...
-      task->prev = 0; 
-      // signal termination
-      cotask_wakeup((void*)this, 0);
-      // yield if current task
-      if (task == curtask)
-        cotask_yield();
-    }
+  if (task && task!=maintask)
+    cotask_terminate(task);
 }
 
 int
@@ -1604,7 +1557,7 @@ GThread::current()
 // -------------------------------------- GMonitor
 
 GMonitor::GMonitor()
-  : count(1), locker(0)
+  : count(1), locker(0), wlock(0), wsig(0)
 {
   locker = 0;
   ok = 1;
@@ -1613,8 +1566,8 @@ GMonitor::GMonitor()
 GMonitor::~GMonitor()
 {
   ok = 0;
-  cotask_wakeup((void*)this, 0);
-  cotask_wakeup((void*)count, 0);    
+  cotask_wakeup((void*)&wsig, 0);
+  cotask_wakeup((void*)&wlock, 0);    
   cotask_yield();
   // Because we know how the scheduler works, we know that this single call to
   // yield will run all unblocked tasks and given them the chance to leave the
@@ -1629,8 +1582,10 @@ GMonitor::enter()
     {
       while (ok && count<=0)
         {
-          curtask->wchan = (void*)&count;
+          curtask->wchan = (void*)&wlock;
+          wlock++;
           cotask_yield();
+          wlock--;
         }
       count = 1;
       locker = self;
@@ -1644,8 +1599,8 @@ GMonitor::leave()
   void *self = GThread::current();
   if (ok && (count>0 || self!=locker))
     THROW("Monitor was not acquired by this thread (GMonitor::leave)");
-  if (++count > 0)
-    cotask_wakeup((void*)&count, 1);
+  if (++count > 0 && wlock > 0)
+    cotask_wakeup((void*)&wlock, 1);
 }
 
 void
@@ -1654,9 +1609,12 @@ GMonitor::signal()
   void *self = GThread::current();
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::signal)");
-  cotask_wakeup((void*)this, 1);
-  if (scheduling_callback)
-    (*scheduling_callback)(GThread::CallbackUnblock);
+  if (wsig > 0)
+    {
+      cotask_wakeup((void*)&wsig, 1);
+      if (scheduling_callback)
+        (*scheduling_callback)(GThread::CallbackUnblock);
+    }
 }
 
 void
@@ -1665,9 +1623,12 @@ GMonitor::broadcast()
   void *self = GThread::current();
   if (count>0 || self!=locker)
     THROW("Monitor was not acquired by this thread (GMonitor::broadcast)");
-  cotask_wakeup((void*)this, 0);
-  if (scheduling_callback)
-    (*scheduling_callback)(GThread::CallbackUnblock);
+  if (wsig > 0)
+    {
+      cotask_wakeup((void*)&wsig, 0);
+      if (scheduling_callback)
+        (*scheduling_callback)(GThread::CallbackUnblock);
+    }
 }
 
 void
@@ -1683,14 +1644,18 @@ GMonitor::wait()
       // Atomically release monitor and wait
       int sav_count = count;
       count = 1;
-      curtask->wchan = (void*)this;
-      cotask_wakeup((void*)count, 1);
+      curtask->wchan = (void*)&wsig;
+      cotask_wakeup((void*)&wlock, 1);
+      wsig++;
       cotask_yield();
+      wsig--;
       // Re-acquire
       while (ok && count <= 0)
         {
-          curtask->wchan = &count;
+          curtask->wchan = (void*)&wlock;
+          wlock++;
           cotask_yield();
+          wlock--;
         }
       count = sav_count;
       locker = self;
@@ -1712,14 +1677,18 @@ GMonitor::wait(unsigned long timeout)
       count = 1;
       unsigned long maxwait = time_elapsed(0) + timeout;
       curtask->maxwait = &maxwait;
-      curtask->wchan = (void*)this;
-      cotask_wakeup((void*)count, 1);
+      curtask->wchan = (void*)&wsig;
+      cotask_wakeup((void*)&wlock, 1);
+      wsig++;
       cotask_yield();
+      wsig--;
       // Re-acquire
       while (ok && count<=0)
         {
-          curtask->wchan = &count;
+          curtask->wchan = (void*)&wlock;
+          wlock++;
           cotask_yield();
+          wlock--;
         }
       count = sav_count;
       locker = self;
@@ -1727,6 +1696,15 @@ GMonitor::wait(unsigned long timeout)
 }
 
 #endif
+
+
+
+
+// ----------------------------------------
+// GSAFEFLAGS 
+// ----------------------------------------
+
+
 
 GSafeFlags &
 GSafeFlags::operator=(const GSafeFlags & f)

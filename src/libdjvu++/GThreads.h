@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GThreads.h,v 1.36 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: GThreads.h,v 1.37 2000-07-24 16:33:38 bcr Exp $
 
 #ifndef _GTHREADS_H_
 #define _GTHREADS_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Praveen Guduru <praveen@sanskrit.lz.att.com> -- mac implementation.
     @version
-    #$Id: GThreads.h,v 1.36 2000-05-31 21:42:33 bcr Exp $# */
+    #$Id: GThreads.h,v 1.37 2000-07-24 16:33:38 bcr Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -178,15 +178,12 @@ public:
       thread, but the thread is not started. 
       Argument #stacksize# is used by the #COTHREADS# model only for
       specifying the amount of memory needed for the processor stack. A
-      negative value will be replaced by a suitable default value (128Kb as of
-      12/1998). A minimum value of 32Kb is silently enforced. */
+      negative value will be replaced by a suitable default value of 128Kb.
+      A minimum value of 32Kb is silently enforced. */
   GThread(int stacksize = -1);
-  /** Destructor. If you attempt to destroy the #GThread# object before
-      the thread is actually terminated the destructor will block waiting
-      for the termination to happen (see \Ref{wait_for_finish}()). You
-      should be very careful not to destroy the #GThread# object from its
-      own thread, since this will abort the program, as no thread can wait
-      for itself. */
+  /** Destructor.  Destroying the thread object while the thread is running is
+      perfectly ok since it only destroys the thread identifier.  Execution
+      will continue without interference. */
   ~GThread();
   /** Starts the thread. The new thread executes function #entry# with
       argument #arg#.  The thread terminates when the function returns.  A
@@ -199,9 +196,6 @@ public:
       destroyed. This function must be considered as a last resort since
       memory may be lost. */
   void terminate();
-  /** Will wait until the thread finishes. If called from the managed
-      thread, an exception will be thrown. */
-  void wait_for_finish(void);
   /** Causes the current thread to relinquish the processor.  The scheduler
       selects a thread ready to run and transfers control to that thread.  The
       actual effect of #yield# heavily depends on the selected implementation.
@@ -221,12 +215,10 @@ private:
 #elif THREADMODEL==MACTHREADS
 private:
   unsigned long thid;
-  unsigned int finished;
   static pascal void *start(void *arg);
 #elif THREADMODEL==POSIXTHREADS
 private:
   pthread_t hthr;
-  unsigned int finished;
   static void *start(void *arg);
 #elif THREADMODEL==JRITHREADS
 private:
@@ -359,6 +351,8 @@ private:
   int ok;
   int count;
   unsigned long locker;
+  int wlock;
+  int wsig;
 #elif THREADMODEL==POSIXTHREADS
   int ok;
   int count;
@@ -369,6 +363,8 @@ private:
   int ok;
   int count;
   void *locker;
+  int wlock;
+  int wsig;
 #elif THREADMODEL==JRITHREADS
   JRIGlobalRef obj;
 #endif  
@@ -390,7 +386,6 @@ inline GThread::~GThread(void) {}
 inline void GThread::terminate() {}
 inline int GThread::yield() { return 0; }
 inline void* GThread::current() { return 0; }
-inline void GThread::wait_for_finish(void) {}
 inline GMonitor::GMonitor() {}
 inline GMonitor::~GMonitor() {}
 inline void GMonitor::enter() {}
