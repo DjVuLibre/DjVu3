@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $
+// $Id: d44.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.14 2001-04-04 22:12:10 bcr Exp $# 
+    #$Id: d44.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $# 
 */
 //@{
 //@}
@@ -129,7 +129,7 @@ usage()
 
 
 void
-parse(DArray<GString> &argv)
+parse(DArray<GUTF8String> &argv)
 {
   const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
@@ -164,7 +164,7 @@ parse(DArray<GString> &argv)
   if (pnmurl.is_empty())
     {
       const GURL codebase = iw4url.base();
-      GString base = iw4url.fname();
+      GUTF8String base = iw4url.fname();
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
@@ -181,10 +181,10 @@ main(int argc, char **argv)
 mymain(int argc, char **argv)
 #endif
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY
@@ -194,7 +194,7 @@ mymain(int argc, char **argv)
       // Check input file
       GP<ByteStream> gibs=ByteStream::create(iw4url,"rb");
       ByteStream &ibs=*gibs;
-      GString chkid;
+      GUTF8String chkid;
       // Determine file type
       { 
         GP<IFFByteStream> giff=IFFByteStream::create(gibs);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $
+// $Id: cjb2.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.13 2001-04-04 22:12:10 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $ */
 //@{
 //@}
 
@@ -895,10 +895,10 @@ usage()
 int 
 main(int argc, const char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY
@@ -914,7 +914,7 @@ main(int argc, const char **argv)
       // Parse options
       for (int i=1; i<argc; i++)
         {
-          GString arg = dargv[i];
+          GUTF8String arg = dargv[i];
           if (arg == "-dpi" && i+1<argc)
             {
               char *end;

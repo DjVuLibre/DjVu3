@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.57 2001-04-12 22:40:14 fcrary Exp $
+// $Id: JB2Image.cpp,v 1.58 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -69,7 +69,7 @@ protected:
 
 // virtual
   bool CodeBit(const bool bit, BitContext &ctx);
-  void code_comment(GString &comment);
+  void code_comment(GUTF8String &comment);
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict &jim);
   void code_inherited_shape_count(JB2Dict &jim);
@@ -516,7 +516,7 @@ JB2Dict::JB2Codec::CodeNum(int low, int high, NumContext *pctx, int v)
 // CODE COMMENTS
 
 void 
-JB2Dict::JB2Codec::Decode::code_comment(GString &comment)
+JB2Dict::JB2Codec::Decode::code_comment(GUTF8String &comment)
 {
       int size=CodeNum(0, BIGPOSITIVE, dist_comment_length);
       comment.empty();

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.55 2001-04-16 23:59:13 bcr Exp $
+// $Id: GOS.cpp,v 1.56 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -286,7 +286,7 @@ GOS::sleep(int milliseconds)
 
   
 
-
+#if 0
 /*MBCS*/
 GString
 GOS::encode_mbcs_reserved(const char * filename)
@@ -330,6 +330,7 @@ GOS::encode_mbcs_reserved(const char * filename)
    return res;
 }
 /*MBCS*/
+#endif
 
 // -----------------------------------------
 // Testing

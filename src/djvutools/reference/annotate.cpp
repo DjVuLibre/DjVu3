@@ -30,18 +30,18 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $
+// $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /*****************************************************************************
  *
- *   $Revision: 1.10 $
- *   $Date: 2001-04-12 22:40:14 $
- *   @(#) $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $
+ *   $Revision: 1.11 $
+ *   $Date: 2001-04-21 00:16:57 $
+ *   @(#) $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $
  *
  *****************************************************************************/
 
-static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.10 2001-04-12 22:40:14 fcrary Exp $";
+static const char RCSVersion[]="@(#) $Id: annotate.cpp,v 1.11 2001-04-21 00:16:57 bcr Exp $";
 
 #include "GIFFManager.h"
 #include "GOS.h"
@@ -66,7 +66,7 @@ static inline void del_anno(GIFFManager &mng)
      mng.del_chunk(binary_ant);
 }
 
-static void remove_djvu(DArray<GString> & argv)
+static void remove_djvu(DArray<GUTF8String> & argv)
    // argv[]: annotate -remove <djvu_in> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -79,14 +79,14 @@ static void remove_djvu(DArray<GString> & argv)
    
    del_anno(mng);
       
-   GString fname;
+   GUTF8String fname;
    if(argc > 3)
    {
      fname=argv[3];
    }else
    {
      const int last_dot_pos=argv[2].rsearch('.');
-     GString ext;
+     GUTF8String ext;
      if(last_dot_pos >= 0)
      {
        ext=last_dot_pos+(const char *)argv[2];
@@ -98,7 +98,7 @@ static void remove_djvu(DArray<GString> & argv)
    mng.save_file(dst);
 }
 
-static void extract_djvu(DArray<GString> & argv)
+static void extract_djvu(DArray<GUTF8String> & argv)
    // argv[]: annotate -extract <djvu_in> <annotate_out> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -114,7 +114,7 @@ static void extract_djvu(DArray<GString> & argv)
      chunk=mng.get_chunk(binary_ant);
      if(!chunk)
      {
-       G_THROW(GString( ERR_MSG("annotate.failed_chunk") "\t")+ascii_ant);
+       G_THROW(GUTF8String( ERR_MSG("annotate.failed_chunk") "\t")+ascii_ant);
      }
    }
    TArray<char> ant_contents=chunk->get_data();
@@ -129,7 +129,7 @@ static void extract_djvu(DArray<GString> & argv)
    }
 }
 
-static void insert_djvu(DArray<GString> & argv)
+static void insert_djvu(DArray<GUTF8String> & argv)
    // argv[]: annotate -insert <djvu_in> <annotate_in> [<djvu_out>]
 {
    const int argc=argv.hbound()+1;
@@ -149,7 +149,7 @@ static void insert_djvu(DArray<GString> & argv)
   
    del_anno(mng);
 
-   GString ant_name=ascii_ant;
+   GUTF8String ant_name=ascii_ant;
    int info_pos;
    if (mng.get_chunk("INFO", &info_pos))
    {
@@ -159,16 +159,16 @@ static void insert_djvu(DArray<GString> & argv)
    } else ant_name+="[0]";
    mng.add_chunk(ant_name, ant_contents);
 
-   GString fname;
+   GUTF8String fname;
    if(argc > 4)
    {
      fname=argv[4];
    }else
    {
-     GString gdot=argv[2];
+     GUTF8String gdot=argv[2];
      gdot=gdot.getNative2UTF8();
      const int last_dot_pos=gdot.rsearch('.');
-     GString ext;
+     GUTF8String ext;
      if(last_dot_pos >= 0)
      {
        ext=last_dot_pos+(const char *)gdot;
@@ -182,10 +182,10 @@ static void insert_djvu(DArray<GString> & argv)
 
 int main(int argc, char ** argv)
 {
-   DArray<GString> dargv(0,argc-1);
+   DArray<GUTF8String> dargv(0,argc-1);
    for(int i=0;i<argc;++i)
    {
-     GString g(argv[i]);
+     GUTF8String g(argv[i]);
      dargv[i]=g.getNative2UTF8();
    }
    G_TRY

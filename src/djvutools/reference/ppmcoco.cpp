@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $
+// $Id: ppmcoco.cpp,v 1.12 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.11 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: ppmcoco.cpp,v 1.12 2001-04-21 00:16:58 bcr Exp $# */
 //@{
 //@}
 
@@ -149,10 +149,10 @@ str_to_gamma(const char *str)
 int 
 main (int argc, char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   const GURL::Filename::UTF8 stdinurl("-");
@@ -166,11 +166,11 @@ main (int argc, char **argv)
       int flag = 0;
       for (int i=1; i<argc; i++)
         {
-          if (dargv[i] == GString("-from") && i+1<argc)
+          if (dargv[i] == "-from" && i+1<argc)
             {
           fromGamma = str_to_gamma(dargv[++i]);
             }
-          else if ((argv[i] == GString("-to")) && i+1<argc)
+          else if ((argv[i] == "-to") && i+1<argc)
             {
               toGamma = str_to_gamma(dargv[++i]);
             }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djthumb.cpp,v 1.13 2001-04-09 20:49:40 chrisp Exp $
+// $Id: djthumb.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 // DJTHUMB -- DjVu thumbnails generator
@@ -68,7 +68,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.13 2001-04-09 20:49:40 chrisp Exp $# */
+    #$Id: djthumb.cpp,v 1.14 2001-04-21 00:16:57 bcr Exp $# */
 //@{
 //@}
 
@@ -116,10 +116,10 @@ progress_cb(int page_num, void *)
 int
 main(int argc, char ** argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
       // Get the program name
@@ -133,7 +133,7 @@ main(int argc, char ** argv)
 
 #ifdef DEBUG
    {
-      const GString debug(GOS::getenv("DEBUG"));
+      const GUTF8String debug(GOS::getenv("DEBUG"));
       if (debug.length())
       {
 //	 int level=debug.is_int()?atoi((const char *)debug):1;
@@ -146,8 +146,8 @@ main(int argc, char ** argv)
 #endif
    
    G_TRY {
-      GString name_in;
-      GString name_out;
+      GUTF8String name_in;
+      GUTF8String name_out;
       int size=128;
       bool verbose=false;
    
@@ -158,8 +158,8 @@ main(int argc, char ** argv)
 	    if (!name_in.length()) name_in=dargv[i];
 	    else if (!name_out.length()) name_out=dargv[i];
 	    else DjVuPrintError("Unexpected string '%s' ignored.\n", (const char *)dargv[i]);
-	 } else if (GString::ncmp(dargv[i], "-v", 2)) verbose=true;
-	 else if (GString::ncmp(dargv[i], "-s", 2))
+	 } else if (dargv[i].ncmp("-v", 2)) verbose=true;
+	 else if (dargv[i].ncmp("-s", 2))
 	 {
 	    if (++i<argc)
 	    {

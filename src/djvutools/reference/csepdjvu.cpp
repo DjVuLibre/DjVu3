@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.17 2001-04-20 22:40:33 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.17 2001-04-20 22:40:33 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $# */
 //@{
 //@}
 
@@ -1265,10 +1265,10 @@ parse_slice(const char *q, csepdjvuopts &opts)
 int 
 main(int argc, const char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY
@@ -1293,7 +1293,7 @@ main(int argc, const char **argv)
       // Process arguments
       for (int i=1; i<argc; i++)
         {
-          GString arg = dargv[i];
+          GUTF8String arg = dargv[i];
           if (arg == "-v")
             opts.verbose = 1;
           else if (arg == "-vv")

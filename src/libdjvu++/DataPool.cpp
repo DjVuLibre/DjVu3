@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.77 2001-04-20 17:53:18 bcr Exp $
+// $Id: DataPool.cpp,v 1.78 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 
@@ -282,7 +282,7 @@ DataPool::OpenFiles::close_all(void)
 class FCPools
 {
 private:
-   GMap<GURL, GPList<DataPool> >	map;	// GMap<GString, GPList<DataPool>> in fact
+   GMap<GURL, GPList<DataPool> >	map;	// GMap<GUTF8String, GPList<DataPool>> in fact
    GCriticalSection		map_lock;
 
    static FCPools	* global_ptr;
@@ -1501,7 +1501,7 @@ DataPool::analyze_iff(void)
    
    GP<IFFByteStream> giff=IFFByteStream::create(str);
    IFFByteStream &iff=*giff;
-   GString chkid;
+   GUTF8String chkid;
    int size;
    if ((size=iff.get_chunk(chkid)) && size>=0)
    {

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.33 2001-03-06 19:55:42 bcr Exp $
+// $Id: JB2Image.h,v 1.34 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
@@ -129,7 +129,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.33 2001-03-06 19:55:42 bcr Exp $#
+    #$Id: JB2Image.h,v 1.34 2001-04-21 00:16:58 bcr Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -281,7 +281,7 @@ public:
   
 public:
   /** Comment string coded by JB2 file. */
-  GString comment;
+  GUTF8String comment;
 
 private:
   int inherited_shapes;
@@ -599,7 +599,7 @@ protected:
     const int column );
 
   virtual bool CodeBit(const bool bit, BitContext &ctx) = 0;
-  virtual void code_comment(GString &comment) = 0;
+  virtual void code_comment(GUTF8String &comment) = 0;
   virtual void code_record_type(int &rectype) = 0;
   virtual int code_match_index(int &index, JB2Dict &jim)=0;
   virtual void code_inherited_shape_count(JB2Dict &jim)=0;

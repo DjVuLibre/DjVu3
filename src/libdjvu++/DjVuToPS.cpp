@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.25 2001-04-13 00:41:16 bcr Exp $
+// $Id: DjVuToPS.cpp,v 1.26 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -196,7 +196,7 @@ DjVuToPS::write(ByteStream & str, const char * format, ...)
    va_list args;
    va_start(args, format);
   
-   GString tmp;
+   GUTF8String tmp;
    tmp.format(format, args);
    str.writall((const char *) tmp, tmp.length());
 }
@@ -1162,7 +1162,7 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
   
   int doc_pages=doc->get_pages_num();
   
-  GString buffer;
+  GUTF8String buffer;
   if (!page_range)
   {
     page_range=buffer.format("1-%d", doc_pages);

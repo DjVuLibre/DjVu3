@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.12 2001-04-20 18:38:35 bcr Exp $
+// $Id: GUnicode.cpp,v 1.13 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -162,26 +162,26 @@ GUnicode::GUnicode(void)
   GP<UnicodeRep>::operator=(UnicodeRep::create());
 }
 
-GUnicode::GUnicode(GString &str)
+GUnicode::GUnicode(GUTF8String &str)
 {
   GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(str,str.length());
 }
 
-GUnicode::GUnicode(GString &str, unsigned int const i)
+GUnicode::GUnicode(GUTF8String &str, unsigned int const i)
 {
   GP<UnicodeRep>::operator=(UnicodeRep::create());
   unsigned int const  j=str.length();
   (*this)->init(str,(i>j)?j:i);
 }
  
-GUnicode::GUnicode(const GString &str)
+GUnicode::GUnicode(const GUTF8String &str)
 {
   GP<UnicodeRep>::operator=(UnicodeRep::create());
   (*this)->init(str,str.length());
 }
 
-GUnicode::GUnicode(const GString &str, unsigned int const i)
+GUnicode::GUnicode(const GUTF8String &str, unsigned int const i)
 {
   GP<UnicodeRep>::operator=(UnicodeRep::create());
   unsigned int const  j=str.length();

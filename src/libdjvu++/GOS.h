@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.h,v 1.20 2001-04-12 00:25:00 bcr Exp $
+// $Id: GOS.h,v 1.21 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef _GOS_H_
@@ -53,7 +53,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.20 2001-04-12 00:25:00 bcr Exp $#
+    #$Id: GOS.h,v 1.21 2001-04-21 00:16:58 bcr Exp $#
 */
 //@{
 
@@ -101,7 +101,7 @@ class GOS
   /// Read the named variable from the environment, and converts it to UTF8.
   static GUTF8String getenv(const GUTF8String &name);
 
-
+#if 0
   // -------------------------------------------
   // Functions for converting filenames and urls
   // -------------------------------------------
@@ -112,6 +112,7 @@ class GOS
       Use \Ref{decode_reserved}() to convert the URL back to the filename. */
 //  static GString encode_reserved(const char * filename);
   static GString encode_mbcs_reserved(const char * filename);/*MBCS*/
+#endif
 
 };
 

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: GPixmap.cpp,v 1.33 2001-04-19 00:05:28 bcr Exp $
+// $Id: GPixmap.cpp,v 1.34 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 // -- Implements class PIXMAP
@@ -498,7 +498,7 @@ GPixmap::init(ByteStream &bs)
 void 
 GPixmap::save_ppm(ByteStream &bs, int raw) const
 {
-  GString head;
+  GUTF8String head;
   head.format("P%c\n%d %d\n255\n", (raw ? '6' : '3'), ncolumns, nrows);
   bs.writall((void*)(const char *)head, head.length());
   if (raw)

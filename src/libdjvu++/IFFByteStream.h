@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.h,v 1.29 2001-02-23 01:12:23 praveen Exp $
+// $Id: IFFByteStream.h,v 1.30 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef _IFFBYTESTREAM_H_
@@ -89,7 +89,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.29 2001-02-23 01:12:23 praveen Exp $# */
+    #$Id: IFFByteStream.h,v 1.30 2001-04-21 00:16:58 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -169,7 +169,7 @@ public:
       and #rawsizeptr#. These variables will be overwritten with the offset
       and the length of the file segment containing both the chunk header and
       the chunk data. */
-  int get_chunk(GString &chkid, int *rawoffsetptr=0, int *rawsizeptr=0);
+  int get_chunk(GUTF8String &chkid, int *rawoffsetptr=0, int *rawsizeptr=0);
   /** Enters a chunk for writing.  Function #put_chunk# prepares a chunk
       header and positions the IFFByteStream at the beginning of the chunk
       data.  Argument #chkid# defines a extended chunk identifier for this
@@ -198,7 +198,7 @@ public:
       identifier of a composite chunk is the concatenation of the chunk
       identifier, of a semicolon #":"#, and of the secondary chunk identifier,
       as in #"FORM:DJVU"#. */
-  void short_id(GString &chkid);
+  void short_id(GUTF8String &chkid);
   /** Returns the qualified chunk identifier of the current chunk.  String
       #chkid# is overwritten with the {\em qualified chunk identifier} of the
       current chunk.  The qualified chunk identifier of a composite chunk is
@@ -209,7 +209,7 @@ public:
       identifier, as in #"DJVU.INFO"#.  According to the EA IFF 85 identifier
       scoping rules, the qualified chunk identifier uniquely defines how the
       chunk data should be interpreted. */
-  void full_id(GString &chkid);
+  void full_id(GUTF8String &chkid);
   /** Checks a potential chunk identifier.  This function categorizes the
       chunk identifier formed by the first four characters of string #chkid#.
       It returns #0# if this is a legal identifier for a regular chunk.  It

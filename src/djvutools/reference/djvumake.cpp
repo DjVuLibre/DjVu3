@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.16 2001-04-06 18:38:31 chrisp Exp $
+// $Id: djvumake.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.16 2001-04-06 18:38:31 chrisp Exp $#
+    #$Id: djvumake.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -203,7 +203,7 @@ analyze_mmr_chunk(const GURL &url)
         {
           // Search Smmr chunk
           bs.seek(0);
-          GString chkid;
+          GUTF8String chkid;
           GP<IFFByteStream> giff=IFFByteStream::create(gbs);
           IFFByteStream &iff=*giff;
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
@@ -253,7 +253,7 @@ analyze_jb2_chunk(const GURL &url)
         {
           // Search Sjbz chunk
           bs.seek(0);
-          GString chkid;
+          GUTF8String chkid;
           GP<IFFByteStream> giff=IFFByteStream::create(gbs);
           IFFByteStream &iff=*giff;
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
@@ -281,7 +281,7 @@ analyze_jb2_chunk(const GURL &url)
 // -- Create info chunk from specification or mask
 
 void
-create_info_chunk(IFFByteStream &iff, DArray<GString> &argv)
+create_info_chunk(IFFByteStream &iff, DArray<GUTF8String> &argv)
 {
   const int argc=argv.hbound()+1;
   // Process info specification
@@ -390,7 +390,7 @@ create_incl_chunk(IFFByteStream &iff, char *chkid, const char *fileid)
 // -- Create chunk by copying file contents
 
 void 
-create_raw_chunk(IFFByteStream &iff, const GString &chkid, const GURL &url)
+create_raw_chunk(IFFByteStream &iff, const GUTF8String &chkid, const GURL &url)
 {
   iff.put_chunk(chkid);
   GP<ByteStream> ibs=ByteStream::create(url,"rb");
@@ -422,7 +422,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
   GP<ByteStream> gbs=ByteStream::create(url,"rb");
   GP<IFFByteStream> gbsi=IFFByteStream::create(gbs);
   IFFByteStream &bsi=*gbsi;
-  GString chkid;
+  GUTF8String chkid;
   bsi.get_chunk(chkid);
   if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
     G_THROW("djvumake: FG44 file has incorrect format (wrong IFF header)");
@@ -463,7 +463,7 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, const GURL &url)
 // -- Create and check BG44 chunk
 
 void 
-create_bg44_chunk(IFFByteStream &iff, char *ckid, GString filespec)
+create_bg44_chunk(IFFByteStream &iff, char *ckid, GUTF8String filespec)
 {
   if (! bg44iff)
     {
@@ -472,9 +472,9 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GString filespec)
       const int i=filespec.rsearch(':');
       if (!i)
         G_THROW("djvumake: no filename specified in first BG44 specification");
-      GString filename=(i<0)?filespec:GString(filespec, i);
+      GUTF8String filename=(i<0)?filespec:GUTF8String(filespec, i);
       bg44iff = IFFByteStream::create(ByteStream::create(GURL::Filename::UTF8(filename),"rb"));
-      GString chkid;
+      GUTF8String chkid;
       bg44iff->get_chunk(chkid);
       if (chkid != "FORM:PM44" && chkid != "FORM:BM44")
         G_THROW("djvumake: BG44 file has incorrect format (wrong IFF header)");        
@@ -497,7 +497,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, GString filespec)
     G_THROW("djvumake: invalid BG44 specification (syntax error)");
   
   int flag = (nchunks>=99);
-  GString chkid;
+  GUTF8String chkid;
   while (nchunks-->0 && bg44iff->get_chunk(chkid))
     {
       if (chkid!="PM44" && chkid!="BM44")
@@ -612,10 +612,10 @@ create_masksub_chunks(IFFByteStream &iff, const GURL &url)
 int
 main(int argc, char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY

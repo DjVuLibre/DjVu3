@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.74 2001-04-20 18:04:51 chrisp Exp $
+// $Id: GString.cpp,v 1.75 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -275,16 +275,6 @@ GStringRep::concat(const char *s1,const char *s2) const
 
 const char *GString::nullstr = "";
 
-#if 0
-GString &
-GString::operator= ( const GP<GStringRep> &rep)
-{
-  GP<GStringRep>::operator=(rep);
-  gstr=(*this)->data;
-  return (*this);
-}
-#endif
-
 void
 GString::empty( void )
 {
@@ -316,6 +306,33 @@ GP<GStringRep>
 GStringRep::upcase( void ) const
 {
   GP<GStringRep> retval=const_cast<GStringRep *>(this);
+#if 0
+  unsigned long *buf;
+  GPBuffer<unsigned char> gbuf(buf,size+1);
+  bool changed=false;
+  int n=0,i=0;
+  while(n<size)
+  {
+    unsigned long w=0;
+    const int len=getUCS4(w,n);
+    if(len>0)
+    {
+      n+=len;
+      if(islower((wchar_t)w))
+      {
+        buf[i++]=towupper(w);
+        changed=true;
+      }else
+      {
+        buf[i++]=w;
+      }
+    }else
+    {
+      buf[i++]=data[n++];
+    }
+  }
+#endif
+
   for(const unsigned char *d=(const unsigned char *)data;*d;d++)
   {
     if(islower(*d))
@@ -928,6 +945,29 @@ static GString locale_charset(void)
 #endif
 #endif /* HAS_ICONV */
 
+// Convert a UCS4 to a multibyte string in the value bytes.  
+// The data pointed to by ptr should be long enough to contain
+// the results with a nill termination.  (Normally 7 characters
+// is enough.)
+unsigned char *
+GStringRep::UCS4toNative(const unsigned long w0,unsigned char *ptr, void *ps)
+{
+  unsigned short w1, w2;
+  for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
+    count;--count,w1=w2)
+  {
+    // wchar_t can be either UCS4 or UCS2
+    const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
+    int i=wcrtomb((char *)ptr,w,(mbstate_t *)ps);
+    if(i<0)
+    {
+      break;
+    }
+    ptr+=i;
+  }
+  ptr[0]=0;
+  return ptr;
+}
 
 GP<GStringRep> 
 GStringRep::toNative(const bool noconvert) const
@@ -942,39 +982,23 @@ GStringRep::toNative(const bool noconvert) const
     {
       const size_t length=strlen(data);
       const unsigned char * const eptr=(const unsigned char *)(data+length);
-      char *buf;
-      GPBuffer<char> gbuf(buf,12*length+12); 
-      char *r=buf;
+      unsigned char *buf;
+      GPBuffer<unsigned char> gbuf(buf,12*length+12); 
+      unsigned char *r=buf;
       mbstate_t ps;
       for(const unsigned char *s=(const unsigned char *)data;(s<eptr)&& *s;)
       {
         const unsigned long w0=UTF8toUCS4(s,eptr);
-        unsigned short w1, w2;
-        for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
-          count;--count,w1=w2)
+        const unsigned char * const r0=r;
+        r=UCS4toNative(w0,r,&ps);
+        if(r == r0)
         {
-            // wchar_t can be either UCS4 or UCS2
-          const wchar_t w=(sizeof(wchar_t) == sizeof(w1))?(wchar_t)w1:(wchar_t)w0;
-          char bytes[12];
-          int i=wcrtomb(bytes,w,&ps);
-          if(i<0)
-          {
-            r=buf;
-            break;
-          }else if(!i)
-          {
-            break;
-          }else
-          {
-            for(int j=0;j<i;++j)
-            {
-              (r++)[0]=bytes[j];
-            }
-          }
+          r=buf;
+          break;
         }
       }
       r[0]=0;
-      retval=Native::create(buf);
+      retval=Native::create((const char *)buf);
     }else
     {
       retval=Native::create((size_t)0);

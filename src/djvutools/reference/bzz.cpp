@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.16 2001-04-09 20:49:39 chrisp Exp $
+// $Id: bzz.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.16 2001-04-09 20:49:39 chrisp Exp $ */
+    $Id: bzz.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $ */
 //@{
 //@}
 
@@ -88,10 +88,10 @@ usage(void)
 int 
 main(int argc, char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY
@@ -100,9 +100,9 @@ main(int argc, char **argv)
       program=dargv[0]=GOS::basename(dargv[0]);
       // Obtain default mode from program name
       int blocksize = -1;
-      if (program == GString("bzz"))
+      if (dargv[0] == "bzz")
         blocksize = 1100;
-      else if (program == GString("unbzz"))
+      else if (dargv[0] == "unbzz")
         blocksize = 0;
       // Parse arguments
       if (argc>=2 && dargv[1][0]=='-')
@@ -125,8 +125,8 @@ main(int argc, char **argv)
       if (blocksize < 0)
         usage();
       // Obtain filenames
-      const GURL::Filename::UTF8 inurl((argc>=2)?dargv[1]:GString("-"));
-      const GURL::Filename::UTF8 outurl((argc>=3)?dargv[2]:GString("-"));
+      const GURL::Filename::UTF8 inurl((argc>=2)?dargv[1]:GUTF8String("-"));
+      const GURL::Filename::UTF8 outurl((argc>=3)?dargv[2]:GUTF8String("-"));
       if (argc >= 4)
         usage();
       // Action

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.12 2001-04-09 20:22:33 bcr Exp $
+// $Id: djvm.cpp,v 1.13 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.12 2001-04-09 20:22:33 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.13 2001-04-21 00:16:57 bcr Exp $# */
 //@{
 //@}
 
@@ -152,7 +152,7 @@ Usage:\n\
 }
 
 static void
-create(DArray<GString> &argv)
+create(DArray<GUTF8String> &argv)
       // djvm -c[reate] <doc.djvu> <page_1.djvu> ... <page_n.djvu>
       // doc.djvu will be overwritten
 {
@@ -174,7 +174,7 @@ create(DArray<GString> &argv)
 }
 
 static void
-insert(DArray<GString> &argv)
+insert(DArray<GUTF8String> &argv)
       // djvm -i[nsert] <doc.djvu> <page.djvu> <page_num>
 {
    const int argc=argv.hbound()+1;
@@ -194,7 +194,7 @@ insert(DArray<GString> &argv)
 }
 
 static void
-del(DArray<GString> &argv)
+del(DArray<GUTF8String> &argv)
       // djvm -d[elete] <doc.djvu> <page_num>
 {
    const int argc=argv.hbound()+1;
@@ -214,7 +214,7 @@ del(DArray<GString> &argv)
 }
 
 static void
-list(DArray<GString> &argv)
+list(DArray<GUTF8String> &argv)
       // djvm -l[ist] <doc.djvu>
 {
    const int argc=argv.hbound()+1;
@@ -262,20 +262,20 @@ list(DArray<GString> &argv)
 int
 main(int argc, char ** argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   progname=dargv[0]=GOS::basename(dargv[0]);
    
    G_TRY {
       if (argc<2) { usage(); exit(1); }
-      if (GString::ncmp(dargv[1], "-c", 2)) create(dargv);
-      else if (GString::ncmp(dargv[1], "-i", 2)) insert(dargv);
-      else if (GString::ncmp(dargv[1], "-d", 2)) del(dargv);
-      else if (GString::ncmp(dargv[1], "-l", 2)) list(dargv);
+      if (dargv[1].ncmp("-c", 2)) create(dargv);
+      else if (dargv[1].ncmp("-i", 2)) insert(dargv);
+      else if (dargv[1].ncmp("-d", 2)) del(dargv);
+      else if (dargv[1].ncmp("-l", 2)) list(dargv);
       else { usage(); exit(1); }
    } G_CATCH(exc) {
       exc.perror();

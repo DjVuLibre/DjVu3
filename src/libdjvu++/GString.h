@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.58 2001-04-20 22:40:33 bcr Exp $
+// $Id: GString.h,v 1.59 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.58 2001-04-20 22:40:33 bcr Exp $# */
+    #$Id: GString.h,v 1.59 2001-04-21 00:16:58 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -205,6 +205,8 @@ public:
   static unsigned char *UCS4toUTF8(
     const unsigned long w,unsigned char *ptr);
 
+  static unsigned char *UCS4toNative(
+    const unsigned long w,unsigned char *ptr, void *ps);
 
   int cmp(const char *s2, const int len=(-1)) const; 
   static int cmp(
@@ -451,7 +453,7 @@ class GString : protected GP<GStringRep>
 public: 
   friend GUTF8String;
   friend GNativeString;
-
+protected:
   // Sets the gstr pointer;
   void init(void);
 
@@ -502,7 +504,6 @@ public:
       than 32768 characters. */
   GString(const GString &fmt, va_list &args);
   
-public:
   /** Copy operator. Resets this string with the value of the string #gs#.
       This operation is efficient because string memory is allocated using a
       "copy-on-write" strategy. Both strings will share the same segment of
@@ -526,6 +527,7 @@ public:
   GString& assignUTF8(const char *str)
   { return ((*this)=GStringRep::UTF8::create(str)); }
 
+public:
   // -- ACCESS
   /** Converts a string into a constant null terminated character array.  This
       conversion operator is very efficient because it simply returns a

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvmcvt.cpp,v 1.14 2001-04-17 16:41:07 bcr Exp $
+// $Id: djvmcvt.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name djvmcvt
@@ -106,7 +106,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.14 2001-04-17 16:41:07 bcr Exp $# */
+    #$Id: djvmcvt.cpp,v 1.15 2001-04-21 00:16:57 bcr Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -147,7 +147,7 @@ Usage:\n\
 }
 
 static void
-do_bundled(DArray<GString> &argv)
+do_bundled(DArray<GUTF8String> &argv)
       // <progname> -b[undled] <file_in> <file_out>
 {
    const int argc=argv.hbound()+1;
@@ -160,7 +160,7 @@ do_bundled(DArray<GString> &argv)
 }
 
 static void
-do_indirect(DArray<GString> &argv)
+do_indirect(DArray<GUTF8String> &argv)
       // <progname> -i[ndirect] <file_in> <dir_out> <idx_fname>
 {
    const int argc=argv.hbound()+1;
@@ -174,10 +174,10 @@ do_indirect(DArray<GString> &argv)
 int 
 main(int argc, char ** argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   progname=dargv[0]=GOS::basename(dargv[0]);
@@ -186,8 +186,8 @@ main(int argc, char ** argv)
 
    bool bundled=true;
    G_TRY {
-      if (GString::ncmp(dargv[1], "-b", 2)) bundled=true;
-      else if (GString::ncmp(dargv[1], "-i", 2)) bundled=false;
+      if (dargv[1].ncmp("-b", 2)) bundled=true;
+      else if (dargv[1].ncmp("-i", 2)) bundled=false;
       else { Usage(); exit(1); }
 
       if (bundled) do_bundled(dargv);

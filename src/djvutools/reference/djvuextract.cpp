@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $
+// $Id: djvuextract.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.16 2001-04-09 20:49:40 chrisp Exp $#
+    #$Id: djvuextract.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -106,7 +106,7 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
   ibs->seek(0);
   GP<IFFByteStream> giff=IFFByteStream::create(ibs);
   IFFByteStream &iff=*giff;
-  GString chkid;
+  GUTF8String chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
   if (chkid != "FORM:DJVU")
@@ -129,13 +129,13 @@ display_info_chunk(GP<ByteStream> ibs, const GURL &url)
 }
 
 
-void
-extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
+static void
+extract_chunk(GP<ByteStream> ibs, const GUTF8String &id, GP<ByteStream> out)
 {
   ibs->seek(0);
   GP<IFFByteStream> giff=IFFByteStream::create(ibs);
   IFFByteStream &iff=*giff;
-  GString chkid;
+  GUTF8String chkid;
   if (! iff.get_chunk(chkid))
     G_THROW("Malformed DJVU file");
   if (chkid != "FORM:DJVU")
@@ -143,7 +143,7 @@ extract_chunk(GP<ByteStream> ibs, const char *id, GP<ByteStream> out)
   
 
   // Special case for FG44 and BG44
-  if (id == GString("BG44") || id == GString("FG44"))
+  if (id == "BG44" || id == "FG44")
     {
       // Rebuild IW44 file
       GP<IFFByteStream> giffout=IFFByteStream::create(out);
@@ -204,10 +204,10 @@ usage()
 int
 main(int argc, char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY
@@ -217,7 +217,7 @@ main(int argc, char **argv)
       // Process page number
       int page_num=0;
       for(i=1;i<argc;i++)
-	 if (GString::ncmp(dargv[i], "-page=", 6))
+	 if (dargv[i].ncmp("-page=", 6))
            {
               page_num = dargv[i].substr(6,dargv[i].length()).toInt() - 1; // atoi(6+(const char *)dargv[i]) - 1;
              for(int j=i;j<argc-1;j++) 

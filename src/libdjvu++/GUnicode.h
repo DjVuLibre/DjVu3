@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.h,v 1.6 2001-04-11 16:59:51 bcr Exp $
+// $Id: GUnicode.h,v 1.7 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef __GUNICODE_
@@ -92,7 +92,7 @@ public:
 
 protected:
   unsigned int len;
-  GString gs;
+  GUTF8String gs;
   Remainder remainder;
   unsigned long *UnicodePtr;
   GPBuffer<unsigned long> gUnicodePtr;
@@ -112,24 +112,24 @@ private:
   static GP<UnicodeRep> concat(const UnicodeRep &,const UnicodeRep &);
 public:
   void init (void const * const,unsigned int const,const EncodeType=EBCDIC);
-  inline void init (GString &,unsigned int const=0);
-  inline void init (const GString &,unsigned int const=0);
+  inline void init (GUTF8String &,unsigned int const=0);
+  inline void init (const GUTF8String &,unsigned int const=0);
   inline operator unsigned long const * () const;
   inline operator char const * () const;
-  inline GString get_GString() const;
+  inline GUTF8String get_GUTF8String() const;
   inline void const * get_remainder (void) const;
   inline size_t get_remainder_size (void) const;
   inline EncodeType get_remainderType (void) const;
   inline unsigned int length(void) const;
   inline bool operator == (const UnicodeRep &s) const;
   inline bool operator != (const UnicodeRep &s) const;
-  inline bool operator == (const GString &s) const;
-  inline bool operator != (const GString &s) const;
+  inline bool operator == (const GUTF8String &s) const;
+  inline bool operator != (const GUTF8String &s) const;
   static GP<UnicodeRep> concat(const GP<UnicodeRep> &,const GP<UnicodeRep> &);
 };
 
 inline void
-UnicodeRep::init (GString &str,unsigned int const i)
+UnicodeRep::init (GUTF8String &str,unsigned int const i)
 {
   init((char const *)str,i,UTF8);
   if(gs == str)
@@ -139,7 +139,7 @@ UnicodeRep::init (GString &str,unsigned int const i)
 }
 
 inline void
-UnicodeRep::init (const GString &str,unsigned int const i)
+UnicodeRep::init (const GUTF8String &str,unsigned int const i)
 {
   init((char const *)str,i,UTF8);
   if(gs == str)
@@ -156,8 +156,8 @@ inline
 UnicodeRep::operator char const * () const
 {return gs;}
 
-inline GString
-UnicodeRep::get_GString (void) const
+inline GUTF8String
+UnicodeRep::get_GUTF8String (void) const
 {return gs;}
 
 inline const void *
@@ -189,13 +189,13 @@ UnicodeRep::operator != (const UnicodeRep &s) const
 }
 
 inline bool 
-UnicodeRep::operator == (const GString &s) const
+UnicodeRep::operator == (const GUTF8String &s) const
 {
 	return (gs == s)?true:false;
 }
 
 inline bool 
-UnicodeRep::operator != (const GString &s) const
+UnicodeRep::operator != (const GUTF8String &s) const
 {
 	return (gs != s)?true:false;
 }
@@ -216,10 +216,10 @@ public:
     EBCDIC=UnicodeRep::EBCDIC,
     OTHER=UnicodeRep::OTHER};
   GUnicode(void);
-  GUnicode(GString &str);
-  GUnicode(GString &str,unsigned int const);
-  GUnicode(const GString &str);
-  GUnicode(const GString &str,unsigned int const);
+  GUnicode(GUTF8String &str);
+  GUnicode(GUTF8String &str,unsigned int const);
+  GUnicode(const GUTF8String &str);
+  GUnicode(const GUTF8String &str,unsigned int const);
   GUnicode( unsigned long const * const wide );
   GUnicode( unsigned long const * const wide, unsigned int const );
   GUnicode( unsigned char const * const,
@@ -230,7 +230,7 @@ public:
     unsigned int const, const EncodeType );
   inline operator unsigned long const * () const;
   inline operator char const * () const;
-  inline GString get_GString (void) const;
+  inline GUTF8String get_GUTF8String (void) const;
   inline void const *get_remainder (void) const;
   inline size_t get_remainder_size (void) const;
   inline EncodeType get_remainderType (void) const;
@@ -239,13 +239,13 @@ public:
   inline GUnicode & operator += (const GUnicode &guni);
   inline GUnicode & operator += (unsigned long const);
   inline GUnicode & operator += (unsigned long const *);
-  inline GUnicode & operator += (const GString &);
+  inline GUnicode & operator += (const GUTF8String &);
   inline unsigned long operator [] (int n) const;
   inline bool operator ! () const;
   inline bool operator == (const GUnicode &) const;
   inline bool operator != (const GUnicode &) const;
-  inline bool operator == (const GString &) const;
-  inline bool operator != (const GString &) const;
+  inline bool operator == (const GUTF8String &) const;
+  inline bool operator != (const GUTF8String &) const;
   friend inline GUnicode operator + (const GUnicode &,const GUnicode &);
   GUnicode substr(unsigned int const from,unsigned int const to) const;
   GUnicode substr_nr(unsigned int const from,unsigned int const to) const;
@@ -288,7 +288,7 @@ GUnicode & GUnicode::operator += (unsigned long const *w)
 }
 
 inline 
-GUnicode & GUnicode::operator += (const GString &gs)
+GUnicode & GUnicode::operator += (const GUTF8String &gs)
 {
   return (operator += (GUnicode(gs)));
 }
@@ -318,13 +318,13 @@ GUnicode::operator != (const GUnicode &s) const
 }
 
 inline bool 
-GUnicode::operator == (const GString &s) const
+GUnicode::operator == (const GUTF8String &s) const
 {
   return ((GP<UnicodeRep>::operator*()) == s);
 }
 
 inline bool 
-GUnicode::operator != (const GString &s) const
+GUnicode::operator != (const GUTF8String &s) const
 {
   return ((GP<UnicodeRep>::operator*()) != s);
 }
@@ -337,9 +337,9 @@ inline
 GUnicode::operator char const * () const
 {return (char const *)(**this);}
 
-inline GString
-GUnicode::get_GString (void) const
-{return GString((*this)->get_GString());}
+inline GUTF8String
+GUnicode::get_GUTF8String (void) const
+{return GUTF8String((*this)->get_GUTF8String());}
 
 inline const void *
 GUnicode::get_remainder (void) const

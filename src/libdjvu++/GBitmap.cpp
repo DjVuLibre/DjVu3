@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.52 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GBitmap.cpp,v 1.53 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.52 2001-04-12 17:05:32 fcrary Exp $"
+// File "$Id: GBitmap.cpp,v 1.53 2001-04-21 00:16:58 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -860,7 +860,7 @@ GBitmap::save_pbm(ByteStream &bs, int raw)
   GMonitorLock lock(monitor());
   // header
   {
-    GString head;
+    GUTF8String head;
     head.format("P%c\n%d %d\n", (raw ? '4' : '1'), ncolumns, nrows);
     bs.writall((void*)(const char *)head, head.length());
   }
@@ -912,7 +912,7 @@ GBitmap::save_pgm(ByteStream &bs, int raw)
   if (!bytes)
     uncompress();
   // header
-  GString head;
+  GUTF8String head;
   head.format("P%c\n%d %d\n%d\n", (raw ? '5' : '2'), ncolumns, nrows, grays-1);
   bs.writall((void*)(const char *)head, head.length());
   // body
@@ -956,7 +956,7 @@ GBitmap::save_rle(ByteStream &bs)
   if (grays > 2)
     G_THROW( ERR_MSG("GBitmap.cant_make_PBM") );
   // header
-  GString head;
+  GUTF8String head;
   head.format("R4\n%d %d\n", ncolumns, nrows);
   bs.writall((void*)(const char *)head, head.length());
   // body

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.9 2001-04-12 18:50:51 fcrary Exp $
+// $Id: IW44Image.cpp,v 1.10 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1503,7 +1503,7 @@ IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
     G_THROW( ERR_MSG("IW44Image.left_open2") );
-  GString chkid;
+  GUTF8String chkid;
   iff.get_chunk(chkid);
   if (chkid != "FORM:BM44")
     G_THROW( ERR_MSG("IW44Image.corrupt_BM44") );
@@ -1781,7 +1781,7 @@ IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
     G_THROW( ERR_MSG("IW44Image.left_open4") );
-  GString chkid;
+  GUTF8String chkid;
   iff.get_chunk(chkid);
   if (chkid!="FORM:PM44" && chkid!="FORM:BM44")
     G_THROW( ERR_MSG("IW44Image.corrupt_BM44_2") );

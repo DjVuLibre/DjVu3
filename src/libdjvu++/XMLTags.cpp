@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.15 2001-04-20 18:29:20 praveen Exp $
+// $Id: XMLTags.cpp,v 1.16 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -209,7 +209,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     {
       case '?':
       {
-        while(len < 4 || tag.substr_nr(len-2,len).get_GString() != "?>")
+        while(len < 4 || tag.substr_nr(len-2,len).get_GUTF8String() != "?>")
         {
           GUnicode cont(xmlbs.gets(0,'>',true));
           if(!cont[0])
@@ -235,7 +235,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       {
         if(tag[2] == '-' && tag[3] == '-')
         {
-          while((len < 7) || (tag.substr_nr(len-3,len).get_GString() != "-->"))
+          while((len < 7) || (tag.substr_nr(len-3,len).get_GUTF8String() != "-->"))
           {
             GUnicode cont(xmlbs.gets(0,'>',true));
             if(!cont[0])
@@ -307,7 +307,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       GPosition last=level.lastpos();
       if(last)
       {
-        level[last]->addraw(raw.get_GString());
+        level[last]->addraw(raw.get_GUTF8String());
 //        DjVuPrintMessage("Got raw %s: %s\n",(const char *)(level[last]->name),(const char *)raw);
       }else if(!isspaces((unsigned long const *)raw))
       {

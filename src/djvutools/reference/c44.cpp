@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.17 2001-04-06 18:38:31 chrisp Exp $
+// $Id: c44.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.17 2001-04-06 18:38:31 chrisp Exp $# */
+    #$Id: c44.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $# */
 //@{
 //@}
 
@@ -458,14 +458,14 @@ resolve_quality(int npix)
 
 
 void
-parse(DArray<GString> &argv)
+parse(DArray<GUTF8String> &argv)
 {
   const int argc=argv.hbound()+1;
   for (int i=1; i<argc; i++)
     {
       if (argv[i][0] == '-')
         {
-          if (argv[i] == GString("-bpp"))
+          if (argv[i] == "-bpp")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-bpp'");
@@ -473,7 +473,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple bitrate specification");
               parse_bpp(argv[i]);
             }
-          else if (argv[i] == GString("-size"))
+          else if (argv[i] == "-size")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-size'");
@@ -481,7 +481,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple bitrate specification");
               parse_size(argv[i]);
             }
-          else if (argv[i] == GString("-decibel"))
+          else if (argv[i] == "-decibel")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-decibel'");
@@ -489,7 +489,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple decibel specification");
               parse_decibel(argv[i]);
             }
-          else if (argv[i] == GString("-slice"))
+          else if (argv[i] == "-slice")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-slice'");
@@ -497,7 +497,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple slice specification");
               parse_slice(argv[i]);
             }
-          else if (argv[i] == GString("-mask"))
+          else if (argv[i] == "-mask")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-mask'");
@@ -505,7 +505,7 @@ parse(DArray<GString> &argv)
                 G_THROW("c44: multiple mask specification");
               mskurl = GURL::Filename::UTF8(argv[i]);
             }
-          else if (argv[i] == GString("-dbfrac"))
+          else if (argv[i] == "-dbfrac")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-dbfrac'");
@@ -516,35 +516,35 @@ parse(DArray<GString> &argv)
               if (flag_dbfrac<=0 || flag_dbfrac>1 || *ptr)
                 G_THROW("c44: illegal dbfrac specification");
             }
-          else if (argv[i] == GString("-crcbnone"))
+          else if (argv[i] == "-crcbnone")
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnone;
             }
-          else if (argv[i] == GString("-crcbhalf"))
+          else if (argv[i] == "-crcbhalf")
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBhalf;
             }
-          else if (argv[i] == GString("-crcbnormal"))
+          else if (argv[i] == "-crcbnormal")
             {
               if (flag_crcbmode>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBnormal;
             }
-          else if (argv[i] == GString("-crcbfull"))
+          else if (argv[i] == "-crcbfull")
             {
               if (flag_crcbmode>=0 || flag_crcbdelay>=0)
                 G_THROW("c44: incompatible chrominance options");
               flag_crcbdelay = flag_crcbmode = 0;
               arg_crcbmode = IW44Image::CRCBfull;
             }
-          else if (argv[i] == GString("-crcbdelay"))
+          else if (argv[i] == "-crcbdelay")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-crcbdelay'");
@@ -555,7 +555,7 @@ parse(DArray<GString> &argv)
               if (*ptr || flag_crcbdelay<0 || flag_crcbdelay>=100)
                 G_THROW("c44: illegal argument for option '-crcbdelay'");
             }
-          else if (argv[i] == GString("-dpi"))
+          else if (argv[i] == "-dpi")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-dpi'");
@@ -566,7 +566,7 @@ parse(DArray<GString> &argv)
               if (*ptr || flag_dpi<25 || flag_dpi>4800)
                 G_THROW("c44: illegal argument for option '-dpi'");
             }
-          else if (argv[i] == GString("-gamma"))
+          else if (argv[i] == "-gamma")
             {
               if (++i >= argc)
                 G_THROW("c44: no argument for option '-gamma'");
@@ -592,7 +592,7 @@ parse(DArray<GString> &argv)
   if (iw4url.is_empty())
     {
       GURL codebase=pnmurl.base();
-      GString base = pnmurl.fname();
+      GUTF8String base = pnmurl.fname();
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
@@ -651,10 +651,10 @@ create_photo_djvu_file(IW44Image &iw, int w, int h,
 int
 main(int argc, char **argv)
 {
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
   G_TRY

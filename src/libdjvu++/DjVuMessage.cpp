@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.35 2001-04-20 17:08:26 bcr Exp $
+// $Id: DjVuMessage.cpp,v 1.36 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 
@@ -224,8 +224,8 @@ GetProfilePaths(void)
     path=GURL::Filename::UTF8(RootDjVuDir);
     if(!path.is_empty() && path.is_dir())
       paths.append(path);
-    GString oldlocale(setlocale(LC_CTYPE,0));
-    GString defaultlocale((oldlocale.search('_') < 0)
+    GUTF8String oldlocale(setlocale(LC_CTYPE,0));
+    GUTF8String defaultlocale((oldlocale.search('_') < 0)
       ?setlocale(LC_CTYPE,"")
       :(const char *)oldlocale);
     if(oldlocale != defaultlocale)

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.16 2001-04-16 19:25:51 bcr Exp $
+// $Id: ddjvu.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.16 2001-04-16 19:25:51 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $# */
 //@{
 //@}
 
@@ -339,10 +339,10 @@ int
 main(int argc, char **argv)
 {
 #endif
-  DArray<GString> dargv(0,argc-1);
+  DArray<GUTF8String> dargv(0,argc-1);
   for(int i=0;i<argc;++i)
   {
-    GString g(argv[i]);
+    GUTF8String g(argv[i]);
     dargv[i]=g.getNative2UTF8();
   }
    G_TRY
@@ -352,7 +352,7 @@ main(int argc, char **argv)
       while (argc>1 && dargv[1][0]=='-' && dargv[1][1])
         {
           GUTF8String s(dargv[1]);
-          if (dargv[1] == GString("-v"))
+          if (dargv[1] == GUTF8String("-v"))
             {
               flag_verbose = 1;
             }

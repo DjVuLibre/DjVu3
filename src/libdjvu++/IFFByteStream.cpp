@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.27 2001-04-19 00:05:28 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.28 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 // -- Implementation of IFFByteStream
@@ -130,7 +130,7 @@ IFFByteStream::check_id(const char *id)
 // -- get next chunk header
 
 int  
-IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
+IFFByteStream::get_chunk(GUTF8String &chkid, int *rawoffsetptr, int *rawsizeptr)
 {
   int bytes;
   char buffer[8];
@@ -394,7 +394,7 @@ IFFByteStream::seek_close_chunk(void)
 // Returns the id of the current chunk
 
 void 
-IFFByteStream::short_id(GString &chkid)
+IFFByteStream::short_id(GUTF8String &chkid)
 {
   if (!ctx)
     G_THROW( ERR_MSG("IFFByteStream.no_chunk_id") );
@@ -409,7 +409,7 @@ IFFByteStream::short_id(GString &chkid)
 // Returns the full chunk id of the current chunk
 
 void 
-IFFByteStream::full_id(GString &chkid)
+IFFByteStream::full_id(GUTF8String &chkid)
 {
   short_id(chkid);
   if (ctx->bComposite)

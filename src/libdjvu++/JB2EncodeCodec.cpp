@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.8 2001-04-12 22:40:14 fcrary Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.9 2001-04-21 00:16:58 bcr Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -65,7 +65,7 @@ protected:
   void encode_libonly_shape(GP<JB2Image> jim, int shapeno);
 // virtual
   bool CodeBit(const bool bit, BitContext &ctx);
-  void code_comment(GString &comment);
+  void code_comment(GUTF8String &comment);
   void code_record_type(int &rectype);
   int code_match_index(int &index, JB2Dict &jim);
   void code_inherited_shape_count(JB2Dict &jim);
@@ -164,7 +164,7 @@ JB2Dict::JB2Codec::Encode::CodeNum(int num, int low, int high, NumContext &ctx)
 // CODE COMMENTS
 
 void 
-JB2Dict::JB2Codec::Encode::code_comment(GString &comment)
+JB2Dict::JB2Codec::Encode::code_comment(GUTF8String &comment)
 {
   // Encode size
       int size=comment.length();
