@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.16 2001-04-25 22:46:54 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.15 2001-04-25 22:28:47 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.16 2001-04-25 22:46:54 bcr Exp $# */
 //@{
 //@}
 
@@ -849,7 +849,7 @@ cpaldjvu(const GPixmap &input, GURL &urlout, const cpaldjvuopts &opts)
   iff.close_chunk();
   // -- ``FGbz'' chunk
   iff.put_chunk("FGbz");
-  pal.encode(obs);
+  pal.encode(iff.get_bytestream());
   iff.close_chunk();
   // -- ``BG44'' chunk
   IWEncoderParms iwparms;
