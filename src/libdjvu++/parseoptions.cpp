@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.24 2000-01-07 17:13:48 eaf Exp $
+//C- $Id: parseoptions.cpp,v 1.25 2000-01-11 21:09:38 eaf Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -685,8 +685,8 @@ DjVuParseOptions::ReadConfig
 {
 #ifdef THREADMODEL
 #if THREADMODEL!=NOTHREADS
-  static GCriticalSection locking();
-  GCriticalSectionLock(locking);
+  static GCriticalSection func_lock;
+  GCriticalSectionLock lk(&func_lock);
 #endif /* THREADMODEL */
 #endif
   int retval;
