@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.30 2000-05-09 18:17:26 mrosen Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.31 2000-05-10 17:03:06 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1062,7 +1062,9 @@ DjVuDocEditor::file_thumbnails(void)
       if (image_num>=ipf || page_num>=pages_num)
       {
 	    // Get unique ID for this file
-	 GString id=find_unique_id("thumb");
+         GString id;
+         id.format("thumb%03d.djvu",page_num);
+	 id=find_unique_id(id);
 
 	    // Create a file record with the chosen ID
 	 GP<DjVmDir::File> file=new DjVmDir::File(id, id, id, DjVmDir::File::THUMBNAILS);
