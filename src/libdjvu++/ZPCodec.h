@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ZPCodec.h,v 1.23 2001-02-08 23:30:05 bcr Exp $
+// $Id: ZPCodec.h,v 1.24 2001-02-14 19:49:02 bcr Exp $
 // $Name:  $
 
 #ifndef _ZPCODEC_H
@@ -50,7 +50,7 @@ class ByteStream;
     Files #"ZPCodec.h"# and #"ZPCodec.cpp"# implement a fast binary adaptive
     quasi-arithmetic coder named ZP-Coder.  Because of its speed and
     convenience, the ZP-Coder is used in several parts of the DjVu reference
-    library (See \Ref{BSByteStream.h}, \Ref{JB2Image.h}, \Ref{IWImage.h}).
+    library (See \Ref{BSByteStream.h}, \Ref{JB2Image.h}, \Ref{IW44Image.h}).
     The following comments avoid the theory (see the historical remarks for
     useful pointers) and concentrate on the user perspective on the ZP-Coder.
 
@@ -153,7 +153,7 @@ class ByteStream;
     @memo
     Binary adaptive quasi-arithmetic coder.
     @version
-    #$Id: ZPCodec.h,v 1.23 2001-02-08 23:30:05 bcr Exp $#
+    #$Id: ZPCodec.h,v 1.24 2001-02-14 19:49:02 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.142 2001-02-14 02:30:56 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.143 2001-02-14 19:49:01 bcr Exp $
 // $Name:  $
 
 
@@ -47,7 +47,7 @@
 #include "IFFByteStream.h"
 #include "GOS.h"
 #include "DataPool.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "GRect.h"
 
 #include "debug.h"

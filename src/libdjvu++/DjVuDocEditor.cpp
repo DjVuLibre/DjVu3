@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.58 2001-02-14 02:30:56 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.59 2001-02-14 19:49:01 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -41,7 +41,7 @@
 #include "DjVuImage.h"
 #include "IFFByteStream.h"
 #include "DataPool.h"
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "GOS.h"
 #include "DjVuAnno.h"
 #include "GRect.h"

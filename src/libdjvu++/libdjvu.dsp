@@ -395,7 +395,7 @@ SOURCE=.\IW44EncodeCodec.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\IWImage.cpp
+SOURCE=.\IW44Image.cpp
 # End Source File
 # Begin Source File
 
@@ -587,7 +587,7 @@ SOURCE=.\IFFByteStream.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\IWImage.h
+SOURCE=.\IW44Image.h
 # End Source File
 # Begin Source File
 

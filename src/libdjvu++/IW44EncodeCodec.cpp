@@ -30,16 +30,16 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44EncodeCodec.cpp,v 1.5 2001-02-14 02:30:56 bcr Exp $
+// $Id: IW44EncodeCodec.cpp,v 1.6 2001-02-14 19:49:02 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
 
-#define IWIMAGE_IMPLIMENTATION /* */
+#define IW44IMAGE_IMPLIMENTATION /* */
 
 
 
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "ZPCodec.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
@@ -106,7 +106,7 @@ bandbuckets[] =
     coefficients.  The coefficients are stored in a memory efficient data
     structure.  Member function \Ref{get_bitmap} renders an arbitrary segment
     of the image into a \Ref{GBitmap}.  Member functions \Ref{decode_iff} and
-    \Ref{encode_iff} read and write DjVu IW44 files (see \Ref{IWImage.h}).
+    \Ref{encode_iff} read and write DjVu IW44 files (see \Ref{IW44Image.h}).
     Both the copy constructor and the copy operator are declared as private
     members. It is therefore not possible to make multiple copies of instances
     of this class. */
@@ -114,6 +114,8 @@ bandbuckets[] =
 class IWBitmap::Encode : public IWBitmap
 {
 public:
+  /// Destructor
+  virtual ~Encode(void);
   /** Null constructor.  Constructs an empty IWBitmap object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
@@ -122,7 +124,7 @@ public:
   /** Initializes an IWBitmap with image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWImage.h}). */
+      bilevel image specifying the masked pixels (see \Ref{IW44Image.h}). */
   void init(const GBitmap &bm, const GP<GBitmap> mask=0);
   // CODER
   /** Encodes one data chunk into ByteStream #bs#.  Parameter #parms# controls
@@ -136,6 +138,13 @@ public:
       (identifier #BM44#).  Data for each chunk is generated with
       #encode_chunk# using the corresponding parameters in array #parms#. */
   virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
+  /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
+      #encode_chunk# initializes the coder for encoding or decoding.  Function
+      #close_codec# must be called after processing the last chunk in order to
+      reset the coder and release the associated memory. */
+  virtual void close_codec(void);
+protected:
+  Codec::Encode *ycodec;
 };
 
 /** IW44 encoded color image. This class provided functions for managing a
@@ -143,7 +152,7 @@ public:
     coefficients are stored in a memory efficient data structure.  Member
     function \Ref{get_pixmap} renders an arbitrary segment of the image into a
     \Ref{GPixmap}.  Member functions \Ref{decode_iff} and \Ref{encode_iff}
-    read and write DjVu IW44 files (see \Ref{IWImage.h}).  Both the copy
+    read and write DjVu IW44 files (see \Ref{IW44Image.h}).  Both the copy
     constructor and the copy operator are declared as private members. It is
     therefore not possible to make multiple copies of instances of this
     class. */
@@ -156,6 +165,8 @@ public:
     CRCBhalf=IW44Image::CRCBhalf, 
     CRCBnormal=IW44Image::CRCBnormal, 
     CRCBfull=IW44Image::CRCBfull };
+  /// Destructor
+  virtual ~Encode(void);
   /** Null constructor.  Constructs an empty IWPixmap object. This object does
       not contain anything meaningful. You must call function \Ref{init},
       \Ref{decode_iff} or \Ref{decode_chunk} to populate the wavelet
@@ -164,7 +175,7 @@ public:
   /** Initializes an IWPixmap with color image #bm#.  This constructor
       performs the wavelet decomposition of image #bm# and records the
       corresponding wavelet coefficient.  Argument #mask# is an optional
-      bilevel image specifying the masked pixels (see \Ref{IWImage.h}).
+      bilevel image specifying the masked pixels (see \Ref{IW44Image.h}).
       Argument #crcbmode# specifies how the chrominance information should be
       encoded (see \Ref{CRCBMode}). */
   void init(const GPixmap &bm, const GP<GBitmap> mask=0, CRCBMode crcbmode=CRCBnormal);
@@ -180,6 +191,13 @@ public:
       (identifier #PM44#).  Data for each chunk is generated with
       #encode_chunk# using the corresponding parameters in array #parms#. */
   virtual void encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms);
+  /** Resets the encoder/decoder state.  The first call to #decode_chunk# or
+      #encode_chunk# initializes the coder for encoding or decoding.  Function
+      #close_codec# must be called after processing the last chunk in order to
+      reset the coder and release the associated memory. */
+  virtual void close_codec(void);
+protected:
+  Codec::Encode *ycodec, *cbcodec, *crcodec;
 };
 
 class IW44Image::Map::Encode : public IW44Image::Map // DJVU_CLASS
@@ -196,14 +214,14 @@ public:
 class IW44Image::Codec::Encode : public IW44Image::Codec
 {
 public:
-  Encode(IW44Image::Map &map) : Codec(map,1) {}
+  Encode(IW44Image::Map &map) : Codec(map) {}
   // Coding
   virtual int code_slice(ZPCodec &zp);
-  virtual float estimate_decibel(float frac);
+  float estimate_decibel(float frac);
   // Data
-  virtual void encode_buckets(ZPCodec &zp, int bit, int band,
+  void encode_buckets(ZPCodec &zp, int bit, int band,
     IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket);
-  virtual int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
+  int encode_prepare(int band, int fbucket, int nbucket, IW44Image::Block &blk, IW44Image::Block &eblk);
 };
 
 //////////////////////////////////////////////////////
@@ -1182,8 +1200,8 @@ IW44Image::Codec::Encode::estimate_decibel(float frac)
   int i,j;
   const float *q;
   // Test that we are encoding
-  if (!encoding || !emap)
-    G_THROW("IWImage.cant_estimate");
+  if (!emap)
+    G_THROW("IW44Image.cant_estimate");
   // Fill norm arrays
   float norm_lo[16];
   float norm_hi[10];
@@ -1307,8 +1325,13 @@ IW44Image::create(const GBitmap &bm, const GP<GBitmap> mask)
 }
 
 IWBitmap::Encode::Encode(void)
-: IWBitmap()
+: IWBitmap(), ycodec(0)
 {}
+
+IWBitmap::Encode::~Encode()
+{
+  close_codec();
+}
 
 void
 IWBitmap::Encode::init(const GBitmap &bm, const GP<GBitmap> gmask)
@@ -1352,22 +1375,28 @@ IWBitmap::Encode::init(const GBitmap &bm, const GP<GBitmap> gmask)
   eymap->create(buffer, w, msk8, mskrowsize);
 }
 
+void 
+IWBitmap::Encode::close_codec(void)
+{
+  delete ycodec;
+  ycodec = 0;
+  IWBitmap::close_codec();
+}
+
 int  
 IWBitmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IWImage.need_stop");
-  if (ycodec && !ycodec->encoding)
-    G_THROW("IWImage.codec_open2");
+    G_THROW("IW44Image.need_stop");
   if (! ymap)
-    G_THROW("IWImage.empty_object");
+    G_THROW("IW44Image.empty_object");
   // Open codec
   if (!ycodec)
-    {
-      cslice = cserial = cbytes = 0;
-      ycodec = new Codec::Encode(*ymap);
-    }
+  {
+    cslice = cserial = cbytes = 0;
+    ycodec = new Codec::Encode(*ymap);
+  }
   // Adjust cbytes
   cbytes += sizeof(struct IW44Image::PrimaryHeader);
   if (cserial == 0)
@@ -1431,7 +1460,7 @@ void
 IWBitmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec)
-    G_THROW("IWImage.left_open1");
+    G_THROW("IW44Image.left_open1");
   int flag = 1;
   iff.put_chunk("FORM:BM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode iff chunk",nchunks);
@@ -1457,8 +1486,13 @@ IW44Image::create(
 }
 
 IWPixmap::Encode::Encode(void)
-: IWPixmap()
+: IWPixmap(), ycodec(0), cbcodec(0), crcodec(0)
 {}
+
+IWPixmap::Encode::~Encode()
+{
+  close_codec();
+}
 
 void
 IWPixmap::Encode::init(const GPixmap &pm, const GP<GBitmap> gmask, CRCBMode crcbmode)
@@ -1535,7 +1569,7 @@ void
 IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
   if (ycodec)
-    G_THROW("IWImage.left_open3");
+    G_THROW("IW44Image.left_open3");
   int flag = 1;
   iff.put_chunk("FORM:PM44", 1);
   DJVU_PROGRESS_TASK(iff,"encode pixmap chunk", nchunks);
@@ -1550,27 +1584,36 @@ IWPixmap::Encode::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderPar
   close_codec();
 }
 
+void 
+IWPixmap::Encode::close_codec(void)
+{
+  delete ycodec;
+  delete cbcodec;
+  delete crcodec;
+  ycodec = crcodec = cbcodec = 0;
+  IWPixmap::close_codec();
+}
+
 int  
 IWPixmap::Encode::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
   // Check
   if (parm.slices==0 && parm.bytes==0 && parm.decibels==0)
-    G_THROW("IWImage.need_stop2");
-  if (ycodec && !ycodec->encoding)
-    G_THROW("IWImage.codec_open4");
+    G_THROW("IW44Image.need_stop2");
   if (!ymap)
-    G_THROW("IWImage.empty_object2");
+    G_THROW("IW44Image.empty_object2");
   // Open
   if (!ycodec)
+  {
+    cslice = cserial = cbytes = 0;
+    ycodec = new Codec::Encode(*ymap);
+    if (crmap && cbmap)
     {
-      cslice = cserial = cbytes = 0;
-      ycodec = new Codec::Encode(*ymap);
-      if (crmap && cbmap)
-        {
-          cbcodec = new Codec::Encode(*cbmap);
-          crcodec = new Codec::Encode(*crmap);
-        }
+      cbcodec = new Codec::Encode(*cbmap);
+      crcodec = new Codec::Encode(*crmap);
     }
+  }
+
   // Adjust cbytes
   cbytes += sizeof(struct IW44Image::PrimaryHeader);
   if (cserial == 0)

@@ -47,7 +47,7 @@
     */
 //@{
 
-// $Id: libdjvu++.dxx,v 1.36 2000-11-02 02:59:21 bcr Exp $
+// $Id: libdjvu++.dxx,v 1.37 2001-02-14 19:49:02 bcr Exp $
 // $Name:  $
 
 
@@ -460,7 +460,7 @@
     chunk.  This composite chunk always begins with one #"INFO"# chunk
     describing the image size and resolution (see \Ref{DjVuInfo.h}).  One or
     more additional #"BG44"# chunks contains the image data encoded with the
-    IW44 representation (see \Ref{IWImage.h}).  The image size specified in
+    IW44 representation (see \Ref{IW44Image.h}).  The image size specified in
     the #"INFO"# chunk and the image size specified in the IW44 data must be
     equal.
 
@@ -501,7 +501,7 @@
     \item 
       The foreground colors may be encoded using a small color image, the {\em
       foreground color image}, encoded as a single #"FG44"# chunk using the
-      IW44 representation (see \Ref{IWImage.h}).  Such compound DjVu images
+      IW44 representation (see \Ref{IW44Image.h}).  Such compound DjVu images
       are rendered by painting the foreground color image on top of the
       background color image using the foreground mask as a stencil.  The
       pixel size of the foreground color image is computed by rounding up the
@@ -520,7 +520,7 @@
 
     The background layer is a color image, \Ref{the background color image}
     ncoded by an arbitrary number of #"BG44"# chunks containing successive
-    IW44 refinements (see \Ref{IWImage.h}).  The size of this image is
+    IW44 refinements (see \Ref{IW44Image.h}).  The size of this image is
     computed by rounding up the quotient of the mask size by an integer
     sub-sampling factor ranging from 1 to 12.  Most Compound DjVu Images use a
     background sub-sampling factor equal to 3.  Smaller sub-sampling factors
@@ -716,7 +716,7 @@
        Thumbnail files contain optional thumbnail images for a few consecutive
        pages of the document.  Thumbnail files consist of a single
        #"FORM:THUM"# composite chunk containing several #"TH44"# chunks
-       containing IW44 encoded thumbnail images (see \Ref{IWImage.h}).  These
+       containing IW44 encoded thumbnail images (see \Ref{IW44Image.h}).  These
        thumbnails always pertain the first few page files following the
        thumbnail file in the document directory.
     \end{itemize}
@@ -803,8 +803,7 @@
 //@Include: GPixmap.h
 //@Include: MMX.h
 //@Include: GScaler.h
-//@Include: IWTransform.h
-//@Include: IWImage.h
+//@Include: IW44Image.h
 //@Include: JB2Image.h
 //@Include: DjVuInfo.h
 //@Include: DjVuAnno.h

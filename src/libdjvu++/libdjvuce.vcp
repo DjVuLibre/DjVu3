@@ -1108,7 +1108,7 @@ DEP_CPP_DJVUD=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1150,7 +1150,7 @@ DEP_CPP_DJVUD=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1192,7 +1192,7 @@ DEP_CPP_DJVUD=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1235,7 +1235,7 @@ DEP_CPP_DJVUD=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1277,7 +1277,7 @@ DEP_CPP_DJVUD=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1324,7 +1324,7 @@ DEP_CPP_DJVUDO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1365,7 +1365,7 @@ DEP_CPP_DJVUDO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1406,7 +1406,7 @@ DEP_CPP_DJVUDO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1448,7 +1448,7 @@ DEP_CPP_DJVUDO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1489,7 +1489,7 @@ DEP_CPP_DJVUDO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1656,7 +1656,7 @@ DEP_CPP_DJVUF=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\JPEGDecoder.h"\
 	".\MMRDecoder.h"\
@@ -1695,7 +1695,7 @@ DEP_CPP_DJVUF=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\JPEGDecoder.h"\
 	".\MMRDecoder.h"\
@@ -1736,7 +1736,7 @@ DEP_CPP_DJVUF=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\JPEGDecoder.h"\
 	".\MMRDecoder.h"\
@@ -1778,7 +1778,7 @@ DEP_CPP_DJVUF=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\JPEGDecoder.h"\
 	".\MMRDecoder.h"\
@@ -1816,7 +1816,7 @@ DEP_CPP_DJVUF=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\JPEGDecoder.h"\
 	".\MMRDecoder.h"\
@@ -1857,7 +1857,7 @@ DEP_CPP_DJVUFI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1890,7 +1890,7 @@ DEP_CPP_DJVUFI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1923,7 +1923,7 @@ DEP_CPP_DJVUFI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1957,7 +1957,7 @@ DEP_CPP_DJVUFI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -1990,7 +1990,7 @@ DEP_CPP_DJVUFI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2177,7 +2177,7 @@ DEP_CPP_DJVUI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2218,7 +2218,7 @@ DEP_CPP_DJVUI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2259,7 +2259,7 @@ DEP_CPP_DJVUI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2301,7 +2301,7 @@ DEP_CPP_DJVUI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2342,7 +2342,7 @@ DEP_CPP_DJVUI=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2769,7 +2769,7 @@ DEP_CPP_DJVUPO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2810,7 +2810,7 @@ DEP_CPP_DJVUPO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2851,7 +2851,7 @@ DEP_CPP_DJVUPO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2894,7 +2894,7 @@ DEP_CPP_DJVUPO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -2936,7 +2936,7 @@ DEP_CPP_DJVUPO=\
 	".\GThreads.h"\
 	".\GURL.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
+	".\IW44Image.h"\
 	".\JB2Image.h"\
 	".\ZPCodec.h"\
 	
@@ -4089,7 +4089,7 @@ DEP_CPP_IFFBY=\
 # End Source File
 # Begin Source File
 
-SOURCE="..\libdjvu++\IWImage.cpp"
+SOURCE="..\libdjvu++\IW44Image.cpp"
 
 !IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
 
@@ -4105,8 +4105,7 @@ DEP_CPP_IWIMA=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
-	".\IWTransform.h"\
+	".\IW44Image.h"\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_IWIMA=\
@@ -4127,8 +4126,7 @@ DEP_CPP_IWIMA=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
-	".\IWTransform.h"\
+	".\IW44Image.h"\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_IWIMA=\
@@ -4149,8 +4147,7 @@ DEP_CPP_IWIMA=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
-	".\IWTransform.h"\
+	".\IW44Image.h"\
 	".\ZPCodec.h"\
 	
 NODEP_CPP_IWIMA=\
@@ -4172,8 +4169,7 @@ DEP_CPP_IWIMA=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
-	".\IWTransform.h"\
+	".\IW44Image.h"\
 	".\ZPCodec.h"\
 	
 
@@ -4192,117 +4188,8 @@ DEP_CPP_IWIMA=\
 	".\GSmartPointer.h"\
 	".\GString.h"\
 	".\IFFByteStream.h"\
-	".\IWImage.h"\
-	".\IWTransform.h"\
+	".\IW44Image.h"\
 	".\ZPCodec.h"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE="..\libdjvu++\IWTransform.cpp"
-
-!IF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Release"
-
-DEP_CPP_IWTRA=\
-	".\Arrays.h"\
-	".\ByteStream.h"\
-	".\DjVuGlobal.h"\
-	".\GBitmap.h"\
-	".\GContainer.h"\
-	".\GException.h"\
-	".\GOS.h"\
-	".\GPixmap.h"\
-	".\GRect.h"\
-	".\GSmartPointer.h"\
-	".\GString.h"\
-	".\IWTransform.h"\
-	".\MMX.h"\
-	
-NODEP_CPP_IWTRA=\
-	".\c-wrappers\DjVu.h"\
-	
-
-!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE SH3) Debug"
-
-DEP_CPP_IWTRA=\
-	".\Arrays.h"\
-	".\ByteStream.h"\
-	".\DjVuGlobal.h"\
-	".\GBitmap.h"\
-	".\GContainer.h"\
-	".\GException.h"\
-	".\GOS.h"\
-	".\GPixmap.h"\
-	".\GRect.h"\
-	".\GSmartPointer.h"\
-	".\GString.h"\
-	".\IWTransform.h"\
-	".\MMX.h"\
-	
-NODEP_CPP_IWTRA=\
-	".\c-wrappers\DjVu.h"\
-	
-
-!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Release"
-
-DEP_CPP_IWTRA=\
-	".\Arrays.h"\
-	".\ByteStream.h"\
-	".\DjVuGlobal.h"\
-	".\GBitmap.h"\
-	".\GContainer.h"\
-	".\GException.h"\
-	".\GOS.h"\
-	".\GPixmap.h"\
-	".\GRect.h"\
-	".\GSmartPointer.h"\
-	".\GString.h"\
-	".\IWTransform.h"\
-	".\MMX.h"\
-	
-NODEP_CPP_IWTRA=\
-	".\DjVu.h"\
-	
-
-!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE x86em) Debug"
-
-DEP_CPP_IWTRA=\
-	"..\include\DjVu.h"\
-	".\Arrays.h"\
-	".\ByteStream.h"\
-	".\DjVuGlobal.h"\
-	".\GBitmap.h"\
-	".\GContainer.h"\
-	".\GException.h"\
-	".\GOS.h"\
-	".\GPixmap.h"\
-	".\GRect.h"\
-	".\GSmartPointer.h"\
-	".\GString.h"\
-	".\IWTransform.h"\
-	".\MMX.h"\
-	
-
-!ELSEIF  "$(CFG)" == "libdjvuce - Win32 (WCE MIPS) Debug"
-
-DEP_CPP_IWTRA=\
-	"..\include\DjVu.h"\
-	".\Arrays.h"\
-	".\ByteStream.h"\
-	".\DjVuGlobal.h"\
-	".\GBitmap.h"\
-	".\GContainer.h"\
-	".\GException.h"\
-	".\GOS.h"\
-	".\GPixmap.h"\
-	".\GRect.h"\
-	".\GSmartPointer.h"\
-	".\GString.h"\
-	".\IWTransform.h"\
-	".\MMX.h"\
 	
 
 !ENDIF 

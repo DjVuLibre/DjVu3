@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IWImage.cpp,v 1.49 2001-02-14 19:11:10 praveen Exp $
+// $Id: IW44Image.cpp,v 1.1 2001-02-14 19:49:02 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -39,9 +39,9 @@
 #pragma implementation
 #endif
 
-#define IWIMAGE_IMPLIMENTATION /* */
+#define IW44IMAGE_IMPLIMENTATION /* */
 
-#include "IWImage.h"
+#include "IW44Image.h"
 #include "ZPCodec.h"
 #include "GBitmap.h"
 #include "GPixmap.h"
@@ -106,7 +106,7 @@ class IW44Image::Codec::Decode : public IW44Image::Codec
 {
 public:
   // Construction
-  Decode(IW44Image::Map &map) : Codec(map,0) {}
+  Decode(IW44Image::Map &map) : Codec(map) {}
   // Coding
   virtual int code_slice(ZPCodec &zp);
 };
@@ -518,7 +518,7 @@ struct IW44Image::Alloc // DJVU_CLASS
 // *** Class IW44Image::Block [implementation]
 
 
-IW44Image::Block::Block()
+IW44Image::Block::Block(void)
 {
   pdata[0] = pdata[1] = pdata[2] = pdata[3] = 0;
 }
@@ -612,7 +612,7 @@ IW44Image::Map::allocp(int n)
 }
 
 int 
-IW44Image::Map::get_bucket_count() const
+IW44Image::Map::get_bucket_count(void) const
 {
   int buckets = 0;
   for (int blockno=0; blockno<nb; blockno++)
@@ -623,7 +623,7 @@ IW44Image::Map::get_bucket_count() const
 }
 
 unsigned int 
-IW44Image::Map::get_memory_usage() const
+IW44Image::Map::get_memory_usage(void) const
 {
   unsigned int usage = sizeof(Map);
   usage += sizeof(IW44Image::Block) * nb;
@@ -707,12 +707,12 @@ IW44Image::Map::image(int subsample, const GRect &rect,
   int boxsize = 1<<nlevel;
   // Parameter check
   if (subsample!=(32>>nlevel))
-    G_THROW("IWImage.sample_factor");
+    G_THROW("IW44Image.sample_factor");
   if (rect.isempty())
-    G_THROW("IWImage.empty_rect");    
+    G_THROW("IW44Image.empty_rect");    
   GRect irect(0,0,(iw+subsample-1)/subsample,(ih+subsample-1)/subsample);
   if (rect.xmin<0 || rect.ymin<0 || rect.xmax>irect.xmax || rect.ymax>irect.ymax)
-    G_THROW("IWImage.bad_rect");
+    G_THROW("IW44Image.bad_rect");
   // Multiresolution rectangles 
   // -- needed[i] tells which coeffs are required for the next step
   // -- recomp[i] tells which coeffs need to be computed at this level
@@ -860,10 +860,9 @@ bandbuckets[] =
 
 // IW44Image::Codec constructor
 
-IW44Image::Codec::Codec(IW44Image::Map &map, int encoding)
-  : map(map), 
+IW44Image::Codec::Codec(IW44Image::Map &xmap)
+  : map(xmap), 
     emap(0),
-    encoding(encoding),
     curband(0),
     curbit(1)
 {
@@ -1269,15 +1268,14 @@ max(const int x, const int y)
 // CLASS IW44Image
 //////////////////////////////////////////////////////
 
-IW44Image::IW44Image()
+IW44Image::IW44Image(void)
   : db_frac(1.0),
-    ymap(0), cbmap(0), crmap(0), ycodec(0), cbcodec(0), crcodec(0),
+    ymap(0), cbmap(0), crmap(0),
     cslice(0), cserial(0), cbytes(0)
 {}
 
 IW44Image::~IW44Image()
 {
-  close_codec();
   delete ymap;
   delete cbmap;
   delete crmap;
@@ -1295,19 +1293,26 @@ IW44Image::create_decode(const bool color)
 int
 IW44Image::encode_chunk(ByteStream &, const IWEncoderParms &)
 {
-  G_THROW("IWImage.codec_open2");
-  return 0;
+  G_THROW("IW44Image.codec_open2");
 }
 
 void 
 IW44Image::encode_iff(IFFByteStream &, int nchunks, const IWEncoderParms *)
 {
-  G_THROW("IWImage.codec_open2");
+  G_THROW("IW44Image.codec_open2");
 }
 
   
 void 
-IW44Image::close_codec()
+IWBitmap::close_codec(void)
+{
+  delete ycodec;
+  ycodec = 0;
+  cslice = cbytes = cserial = 0;
+}
+
+void 
+IWPixmap::close_codec(void)
 {
   delete ycodec;
   delete cbcodec;
@@ -1317,13 +1322,13 @@ IW44Image::close_codec()
 }
 
 int 
-IW44Image::get_width() const
+IW44Image::get_width(void) const
 {
   return (ymap)?(ymap->iw):0;
 }
 
 int 
-IW44Image::get_height() const
+IW44Image::get_height(void) const
 {
   return (ymap)?(ymap->ih):0;
 }
@@ -1333,12 +1338,17 @@ IW44Image::get_height() const
 // CLASS IWBITMAP
 //////////////////////////////////////////////////////
 
-IWBitmap::IWBitmap()
+IWBitmap::IWBitmap(void )
 : IW44Image()
 {}
 
+IWBitmap::~IWBitmap()
+{
+  close_codec();
+}
+
 int
-IWBitmap::get_percent_memory() const
+IWBitmap::get_percent_memory(void) const
 {
   int buckets = 0;
   int maximum = 0;
@@ -1351,7 +1361,7 @@ IWBitmap::get_percent_memory() const
 }
 
 unsigned int
-IWBitmap::get_memory_usage() const
+IWBitmap::get_memory_usage(void) const
 {
   unsigned int usage = sizeof(GBitmap);
   if (ymap)
@@ -1361,7 +1371,7 @@ IWBitmap::get_memory_usage() const
 
 
 GP<GBitmap> 
-IWBitmap::get_bitmap()
+IWBitmap::get_bitmap(void)
 {
   // Check presence of data
   if (ymap == 0)
@@ -1410,40 +1420,37 @@ IWBitmap::get_bitmap(int subsample, const GRect &rect)
 int
 IWBitmap::decode_chunk(ByteStream &bs)
 {
-  // Check
-  if (ycodec && ycodec->encoding)
-    G_THROW("IWImage.codec_open");
   // Open
   if (! ycodec)
-    {
-      cslice = cserial = 0;
-      delete ymap;
-      ymap = 0;
-    }
+  {
+    cslice = cserial = 0;
+    delete ymap;
+    ymap = 0;
+  }
   // Read primary header
   struct IW44Image::PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("IWImage.cant_read_primary");
+    G_THROW("IW44Image.cant_read_primary");
   if (primary.serial != cserial)
-    G_THROW("IWImage.wrong_serial");
+    G_THROW("IW44Image.wrong_serial");
   int nslices = cslice + primary.slices;
   // Read auxilliary headers
   if (cserial == 0)
     {
       struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("IWImage.cant_read_secondary");
+        G_THROW("IW44Image.cant_read_secondary");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("IWImage.incompat_codec");
+        G_THROW("IW44Image.incompat_codec");
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("IWImage.recent_codec");
+        G_THROW("IW44Image.recent_codec");
       // Read tertiary header
       struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("IWImage.cant_read_tertiary");
+        G_THROW("IW44Image.cant_read_tertiary");
       if (! (secondary.major & 0x80))
-        G_THROW("IWImage.has_color");
+        G_THROW("IW44Image.has_color");
       // Create ymap and ycodec
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -1479,12 +1486,12 @@ IWBitmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("IWImage.param_range");
+    G_THROW("IW44Image.param_range");
 }
 
 
 int 
-IWBitmap::get_serial()
+IWBitmap::get_serial(void)
 {
   return cserial;
 }
@@ -1493,11 +1500,11 @@ void
 IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("IWImage.left_open2");
+    G_THROW("IW44Image.left_open2");
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid != "FORM:BM44")
-    G_THROW("IWImage.corrupt_BM44");
+    G_THROW("IW44Image.corrupt_BM44");
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid == "BM44")
@@ -1516,7 +1523,7 @@ IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
 //////////////////////////////////////////////////////
 
 
-IWEncoderParms::IWEncoderParms()
+IWEncoderParms::IWEncoderParms(void)
 {
   // Zero represent default values
   memset((void*)this, 0, sizeof(IWEncoderParms));
@@ -1533,12 +1540,15 @@ IWEncoderParms::IWEncoderParms()
 
 IWPixmap::IWPixmap(void)
 : IW44Image(), crcb_delay(10), crcb_half(0)
+{}
+
+IWPixmap::~IWPixmap()
 {
+  close_codec();
 }
 
-
 int
-IWPixmap::get_percent_memory() const
+IWPixmap::get_percent_memory(void) const
 {
   int buckets = 0;
   int maximum = 0;
@@ -1561,7 +1571,7 @@ IWPixmap::get_percent_memory() const
 }
 
 unsigned int
-IWPixmap::get_memory_usage() const
+IWPixmap::get_memory_usage(void) const
 {
   unsigned int usage = sizeof(GPixmap);
   if (ymap)
@@ -1575,7 +1585,7 @@ IWPixmap::get_memory_usage() const
 
 
 GP<GPixmap> 
-IWPixmap::get_pixmap()
+IWPixmap::get_pixmap(void)
 {
   // Check presence of data
   if (ymap == 0)
@@ -1657,40 +1667,38 @@ IWPixmap::get_pixmap(int subsample, const GRect &rect)
 int
 IWPixmap::decode_chunk(ByteStream &bs)
 {
-  // Check
-  if (ycodec && ycodec->encoding)
-    G_THROW("IWImage.codec_open3");
   // Open
   if (! ycodec)
-    {
+  {
       cslice = cserial = 0;
       delete ymap;
       ymap = 0;
-    }
+  }
+
   // Read primary header
   struct IW44Image::PrimaryHeader primary;
   if (bs.readall((void*)&primary, sizeof(primary)) != sizeof(primary))
-    G_THROW("IWImage.cant_read_primary2");
+    G_THROW("IW44Image.cant_read_primary2");
   if (primary.serial != cserial)
-    G_THROW("IWImage.wrong_serial2");
+    G_THROW("IW44Image.wrong_serial2");
   int nslices = cslice + primary.slices;
   // Read secondary header
   if (cserial == 0)
     {
       struct IW44Image::SecondaryHeader secondary;
       if (bs.readall((void*)&secondary, sizeof(secondary)) != sizeof(secondary))
-        G_THROW("IWImage.cant_read_secondary2");
+        G_THROW("IW44Image.cant_read_secondary2");
       if ((secondary.major & 0x7f) != IWCODEC_MAJOR)
-        G_THROW("IWImage.incompat_codec2");
+        G_THROW("IW44Image.incompat_codec2");
       if (secondary.minor > IWCODEC_MINOR)
-        G_THROW("IWImage.recent_codec2");
+        G_THROW("IW44Image.recent_codec2");
       // Read tertiary header
       struct IW44Image::TertiaryHeader2 tertiary;
       unsigned int header3size = sizeof(tertiary);
       if (secondary.minor < 2)
         header3size = sizeof(IW44Image::TertiaryHeader1);
       if (bs.readall((void*)&tertiary, header3size) != header3size)
-        G_THROW("IWImage.cant_read_tertiary2");
+        G_THROW("IW44Image.cant_read_tertiary2");
       // Handle header information
       int w = (tertiary.xhi << 8) | tertiary.xlo;
       int h = (tertiary.yhi << 8) | tertiary.ylo;
@@ -1754,11 +1762,11 @@ IWPixmap::parm_dbfrac(float frac)
   if (frac>0 && frac<=1)
     db_frac = frac;
   else
-    G_THROW("IWImage.param_range2");
+    G_THROW("IW44Image.param_range2");
 }
 
 int 
-IWPixmap::get_serial()
+IWPixmap::get_serial(void)
 {
   return cserial;
 }
@@ -1768,11 +1776,11 @@ void
 IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
 {
   if (ycodec)
-    G_THROW("IWImage.left_open4");
+    G_THROW("IW44Image.left_open4");
   GString chkid;
   iff.get_chunk(chkid);
   if (chkid!="FORM:PM44" && chkid!="FORM:BM44")
-    G_THROW("IWImage.corrupt_BM44_2");
+    G_THROW("IW44Image.corrupt_BM44_2");
   while (--maxchunks>=0 && iff.get_chunk(chkid))
     {
       if (chkid=="PM44" || chkid=="BM44")
@@ -1872,26 +1880,5 @@ IW44Image::Transform::Decode::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
           q->b = max(0,min(255,tb));
         }
     }
-}
-
-int 
-IW44Image::Codec::encode_prepare(int, int, int, IW44Image::Block &, IW44Image::Block &) 
-{
-  G_THROW("IWImage.decoder_only");
-  return 0;
-}
-
-void 
-IW44Image::Codec::encode_buckets(ZPCodec &zp, int bit, int band,
-  IW44Image::Block &blk, IW44Image::Block &eblk, int fbucket, int nbucket)
-{
-  G_THROW("IWImage.decoder_only");
-}
-
-float 
-IW44Image::Codec::estimate_decibel(float frac)
-{
-  G_THROW("IWImage.decoder_only");
-  return 0;
 }
 
