@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.8 1999-06-08 16:02:46 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.9 1999-06-09 19:43:44 leonb Exp $
 
 
 
@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#define IWTRANSFORM_TIMER
 #ifdef IWTRANSFORM_TIMER
 #include "GOS.h"
 #endif
@@ -226,18 +226,11 @@ mmx_bv_2 ( short* &q, short* e, int s, int s3 )
 // NEW FILTERS
 //////////////////////////////////////////////////////
 
-
-static short *zeroes = 0;
-
 static void
 filter_begin(int w, int h)
 {
   if (MMXControl::mmxflag < 0)  
     MMXControl::enable_mmx();
-  if (zeroes)
-    delete [] zeroes;
-  zeroes = new short[w];
-  memset(zeroes, 0, w*sizeof(short));
 }
 
 
@@ -248,9 +241,6 @@ filter_end()
   if (MMXControl::mmxflag > 0)
     MMXemms;
 #endif
-  if (zeroes)
-    delete [] zeroes;
-  zeroes = 0;
 }
 
 
@@ -319,42 +309,42 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
         else if (y>=3)
           {
             // Special cases
-            short *q1 = (y-2<h ? q+s : zeroes);
-            short *q3 = (y<h ? q+s3 : zeroes);
+            short *q1 = (y-2<h ? q+s : 0);
+            short *q3 = (y<h ? q+s3 : 0);
             if (y>=6)
               {
                 while (q<e)
                   {
-                    int a = (int)q[-s] + (int)(*q1);
-                    int b = (int)q[-s3] + (int)(*q3);
+                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
+                    int b = (int)q[-s3] + (q3 ? (int)(*q3) : 0);
                     *q += (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
             else if (y>=4)
               {
                 while (q<e)
                   {
-                    int a = (int)q[-s] + (int)(*q1);
-                    int b = (int)(*q3);
+                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
+                    int b = (q3 ? (int)(*q3) : 0);
                     *q += (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
             else
               {
                 while (q<e)
                   {
-                    int a = (int)(*q1);
-                    int b = (int)(*q3);
+                    int a = (q1 ? (int)(*q1) : 0);
+                    int b = (q3 ? (int)(*q3) : 0);
                     *q += (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
           }
@@ -396,42 +386,42 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
         else if (y<h)
           {
             // Special cases
-            short *q1 = (y+1<h ? q+s : zeroes);
-            short *q3 = (y+3<h ? q+s3 : zeroes);
+            short *q1 = (y+1<h ? q+s : 0);
+            short *q3 = (y+3<h ? q+s3 : 0);
             if (y>=3)
               {
                 while (q<e)
                   {
-                    int a = (int)q[-s] + (int)(*q1);
-                    int b = (int)q[-s3] + (int)(*q3);
+                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
+                    int b = (int)q[-s3] + (q3 ? (int)(*q3) : 0);
                     *q -= (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
             else if (y>=1)
               {
                 while (q<e)
                   {
-                    int a = (int)q[-s] + (int)(*q1);
-                    int b = (int)(*q3);
+                    int a = (int)q[-s] + (q1 ? (int)(*q1) : 0);
+                    int b = (q3 ? (int)(*q3) : 0);
                     *q -= (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
             else
               {
                 while (q<e)
                   {
-                    int a = (int)(*q1);
-                    int b = (int)(*q3);
+                    int a = (q1 ? (int)(*q1) : 0);
+                    int b = (q3 ? (int)(*q3) : 0);
                     *q -= (((a<<3)+a-b+16)>>5);
                     q += scale;
-                    q1 += scale;
-                    q3 += scale;
+                    if (q1) q1 += scale;
+                    if (q3) q3 += scale;
                   }
               }
           }
