@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVmDoc.cpp,v 1.31 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVmDoc.cpp,v 1.32 2000-11-18 00:21:12 fcrary Exp $
 // $Name:  $
 
 
@@ -44,7 +44,7 @@
 #include "GOS.h"
 #include "debug.h"
 
-static const char octets[4]={0x41,0x54,0x41,0x25};
+static const char octets[4]={0x41,0x54,0x26,0x54};
 
 DjVmDoc::DjVmDoc(void)
 {

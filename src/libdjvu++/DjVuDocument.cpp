@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocument.cpp,v 1.132 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDocument.cpp,v 1.133 2000-11-18 00:21:12 fcrary Exp $
 // $Name:  $
 
 
@@ -44,7 +44,7 @@
 #include "GOS.h"
 #include "debug.h"
 
-static const char octets[4]={0x41,0x54,0x26,0x41};
+static const char octets[4]={0x41,0x54,0x26,0x54};
 const float	DjVuDocument::thumb_gamma=(float)2.20;
 
 void (* DjVuDocument::djvu_import_codec)(

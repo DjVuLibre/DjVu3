@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocEditor.cpp,v 1.48 2000-11-09 20:15:05 jmw Exp $
+// $Id: DjVuDocEditor.cpp,v 1.49 2000-11-18 00:21:12 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -44,7 +44,7 @@
 
 #include <ctype.h>
 
-static const char octets[4]={0x41,0x54,0x41,0x25};
+static const char octets[4]={0x41,0x54,0x26,0x54};
 
 int        DjVuDocEditor::thumbnails_per_file=10;
 
