@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuDocEditor.cpp,v 1.50 2000-12-18 17:13:41 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.51 2000-12-22 22:49:31 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -616,7 +616,7 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       str_out.seek(0);
       GP<DataPool> new_file_pool=new DataPool(str_out);
       {
-            // It's important, that we replace the pool here anyway.
+            // It's important that we replace the pool here anyway.
             // By doing this we load the file into memory. And this is
             // exactly what insert_group() wants us to do because
             // it creates temporary files.
@@ -685,7 +685,7 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num,
                GP<DjVuDocument> doc=new DjVuDocument();
                doc->init(GOS::filename_to_url(fname));
 #ifndef UNDER_CE
-	       GString dirname=tmpnam(0);
+	             GString dirname=tmpnam(0);
 #else
                GString dirname="tempFileForDjVu" ;
 #endif
