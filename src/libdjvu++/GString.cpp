@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.46 2001-04-12 00:25:00 bcr Exp $
+// $Id: GString.cpp,v 1.47 2001-04-12 15:28:34 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -578,7 +578,7 @@ GString::GString(const char fmt[], va_list args)
   }
 #endif
   // Go altering the string
-  (*this) = (const char *)buffer;
+  (*this) = GStringRep::create((const char *)buffer);
 }
 
 int 
