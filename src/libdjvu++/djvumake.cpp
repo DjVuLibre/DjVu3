@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvumake.cpp,v 1.3 1999-02-18 00:12:01 leonb Exp $
+//C-  $Id: djvumake.cpp,v 1.4 1999-02-18 22:46:07 leonb Exp $
 
 /** @name djvumake
 
@@ -15,8 +15,16 @@
     \begin{verbatim}
        % djvumake <djvufile> [Sjbz=<jb2file>] [FG44=<iw4file>] [BG44=<iw4file>]
     \end{verbatim}
+
+    {\bf Recipe for creating a Color DjVu File}\\
+    You should first use program \Ref{c44} and produce an IW44 file "my.iw4".
+    Assuming that this image is 640 pixels wide and 480 pixels high, you can
+    assemble file #"my.djvu"# using #djvumake# with the following arguments.
+    \begin{verbatim}
+       % djvumake my.djvu  INFO=640,480  BG44=my.iw4
+    \end{verbatim}
     
-    {\bf Recipe for Creating a Bilevel DjVu File}\\
+    {\bf Recipe for creating a Bilevel DjVu File}\\
     The first step consists in creating a \Ref{JB2Image} object according to
     the guidelines specified in section \Ref{JB2Image.h}.  Then use function
     #JB2Image::encode# to save the JB2 data into a file named #"myjb2.q"# for
@@ -26,7 +34,7 @@
        % djvumake my.djvu Sjbz=myjb2.q
     \end{verbatim}
     
-    {\bf Recipe for Creating a Color DjVu File}\\
+    {\bf Recipe for creating a Compound DjVu File}\\
     Let us assume that you use a program like Gimp \URL{http://www.gimp.org}
     or Photoshop.  You have created your image using two layers.  The
     background layer contains all pictures and background details.  The
@@ -37,9 +45,10 @@
     displayed where the layer mask is black.  You can see a Gimp example in
     file #"@Samples/layers.xcf.gz"#.
 
-    This layered model is very close to the DjVu model.  In the DjVu model
-    however, the three images (the background layer, the foreground layer
-    mask, and the actual foreground layer) can have different resolutions.
+    This layered model is very close to the Compound DjVu Image model.  In the
+    DjVu model however, the three images (the background layer, the foreground
+    layer mask, and the actual foreground layer) can have different
+    resolutions.
     \begin{itemize}
     \item
     The size of the foreground layer mask is always equal to the size of the
@@ -69,7 +78,7 @@
     average, you eliminate the original pixels which are not visible, such as
     pixels of the background layer which are masked by the foreground, or
     pixels of the foreground color layer which are not visible because of the
-    mask transparency.  
+    mask transparency.
     
     It sometimes happens that you cannot compute the color of a pixel in the
     subsampled image because none of the pixels in the corresponding image are
@@ -99,14 +108,10 @@
        djvumake my.djvu Sjbz=myjb2.q FG44=myfg.iw4 BG44=mybg.iw4
     \end{verbatim}
 
-    {\bf Recipe for creating an IW44 File}\\
-    You do not need program #djvumake# to create an IW44 File.  
-    Program \Ref{c44} already produces compliant IW44 files.
-
     @memo
-    Create Bilevel DjVu files or Color DjVu files.
+    Create DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.3 1999-02-18 00:12:01 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.4 1999-02-18 22:46:07 leonb Exp $#
     @author
     Leon Bottou <leonb@research.att.com> */
 //@{
@@ -150,11 +155,10 @@ usage()
          "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
          "   BG44=[iw4file][:nchunks]    --  Create one or more IW44 background chunks\n"
          "\n"
-         "* You may omit the specification of the information chunk. An information\n"
-         "  chunk will be created using the image size of the first stencil chunk\n"
-         "* Although this program tries to issue a warning when you are building an\n"
-         "  incorrect djvu file. There is no guarantee that these warnings flag\n"
-         "  all conditions.\n"
+         "You may omit the specification of the information chunk. An information\n"
+         "chunk will be created using the image size of the first stencil chunk\n"
+         "This program tries to issue a warning when you are building an\n"
+         "incorrect djvu file.\n"
          "\n");
   exit(1);
 }
@@ -285,8 +289,9 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
   for (red=1; red<=12; red++)
     if (iw==(w+red-1)/red && ih==(h+red-1)/red)
       break;
+  flag_contains_fg = red;
   if (red>12)
-    fprintf(stderr, "djvumake: FG44 reduction is not in [1..12] range\n");
+    fprintf(stderr, "djvumake: FG44 subsampling is not in [1..12] range\n");
   mbs.seek(0);
   iff.put_chunk(ckid);
   iff.copy(mbs);
@@ -356,8 +361,9 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
           for (red=1; red<=12; red++)
             if (iw==(w+red-1)/red && ih==(h+red-1)/red)
               break;
+          flag_contains_bg = red;
           if (red>12)
-            fprintf(stderr, "djvumake: BG44 reduction is not in [1..12] range\n");
+            fprintf(stderr, "djvumake: BG44 subsampling is not in [1..12] range\n");
         }
       mbs.seek(0);
       iff.put_chunk(ckid);
@@ -404,15 +410,13 @@ main(int argc, char **argv)
             }
           else if (! strncmp(argv[i],"FG44=",5))
             {
-              create_fg44_chunk(iff, "FG44", argv[i]+5);
               if (flag_contains_fg)
                 fprintf(stderr,"djvumake: duplicate 'FG44' chunk\n");
-              flag_contains_fg = 1;
+              create_fg44_chunk(iff, "FG44", argv[i]+5);
             }
           else if (! strncmp(argv[i],"BG44=",5))
             {
               create_bg44_chunk(iff, "BG44", argv[i]+5);
-              flag_contains_bg = 1;
             }
           else
             {
@@ -422,10 +426,23 @@ main(int argc, char **argv)
       // Close
       iff.close_chunk();
       // Sanity checks
-      if (! flag_contains_stencil)
-        fprintf(stderr,"djvumake: djvu file contains no 'Sjbz' chunk\n");
-      if (flag_contains_bg && !flag_contains_fg)
-        fprintf(stderr,"djvumake: djvu file contains a 'BG44' chunk but no 'FG44' chunk\n");
+      if (flag_contains_stencil)
+        {
+          if (flag_contains_bg && ! flag_contains_fg)
+            fprintf(stderr,"djvumake: djvu file contains a BG44 chunk but no FG44 chunk\n");
+          if (flag_contains_fg && ! flag_contains_bg)
+            fprintf(stderr,"djvumake: djvu file contains a FG44 chunk but no BG44 chunk\n");
+        }
+      else if (flag_contains_bg)
+        {
+          // Color DjVu Image
+          if (flag_contains_bg!=1)
+            fprintf(stderr,"djvumake: color djvu image has subsampled BG44 chunk\n"); 
+          if (flag_contains_fg)
+            fprintf(stderr,"djvumake: color djvu file contains FG44 chunk\n");            
+        }
+      else
+        fprintf(stderr,"djvumake: djvu file contains no Sjbz or BG44 chunk\n");
     }
   CATCH(ex)
     {

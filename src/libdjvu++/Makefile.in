@@ -26,7 +26,7 @@ PROG= djvuinfo c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz
 LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
 	 GThreads.o ByteStream.o ZPCodec.o GBitmap.o GPixmap.o \
 	 IFFByteStream.o BSByteStream.o JB2Image.o GScaler.o IWImage.o \
-	 DjVuImage.o GOS.o DjVuGlobal.o	debug.o	
+	 DjVuImage.o GOS.o DjVuGlobal.o
 
 # Make all
 
@@ -151,7 +151,7 @@ DjVuImage.o: DjVuImage.cpp DjVuImage.h GString.h DjVuGlobal.h \
 GBitmap.o: GBitmap.cpp GBitmap.h DjVuGlobal.h GRect.h ByteStream.h \
  GException.h GContainer.h GSmartPointer.h GString.h
 GContainer.o: GContainer.cpp GContainer.h DjVuGlobal.h GException.h
-GException.o: GException.cpp GException.h DjVuGlobal.h debug.h
+GException.o: GException.cpp GException.h DjVuGlobal.h
 GOS.o: GOS.cpp GException.h DjVuGlobal.h GThreads.h GOS.h GString.h \
  GSmartPointer.h
 GPixmap.o: GPixmap.cpp GString.h DjVuGlobal.h GException.h \
@@ -183,7 +183,6 @@ c44.o: c44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
 d44.o: d44.cpp GString.h DjVuGlobal.h GException.h GSmartPointer.h \
  IWImage.h GRect.h GBitmap.h ByteStream.h GContainer.h GPixmap.h \
  IFFByteStream.h GOS.h
-debug.o: debug.cpp
 djvuextract.o: djvuextract.cpp GException.h DjVuGlobal.h ByteStream.h \
  GContainer.h GSmartPointer.h IFFByteStream.h GString.h
 djvuinfo.o: djvuinfo.cpp GException.h DjVuGlobal.h GString.h \

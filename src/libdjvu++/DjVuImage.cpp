@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuImage.cpp,v 1.6 1999-02-12 16:57:48 leonb Exp $
+//C-  $Id: DjVuImage.cpp,v 1.7 1999-02-18 22:46:06 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -276,8 +276,63 @@ compute_red(int w, int h, int rw, int rh)
   return 16;
 }
 
+
+int 
+DjVuImage::is_legal_bilevel() const
+{
+  // Components
+  GP<DjVuInfo> info = get_info();
+  GP<JB2Image> fgjb = get_fgjb();
+  GP<IWPixmap> bg44 = get_bg44();
+  GP<GPixmap>  fgpm = get_fgpm();
+  // Check info
+  if (! info)
+    return 0;
+  int width = info->width;
+  int height = info->height;
+  if (! (width>0 && height>0))
+    return 0;
+  // Check fgjb
+  if (!fgjb)
+    return 0;
+  if (fgjb->get_width()!=width || fgjb->get_height()!=height)
+    return 0;
+  // Check that color information is not present.
+  if (bg44 || fgpm)
+    return 0;
+  // Ok.
+  return 1;
+}
+
 int 
 DjVuImage::is_legal_color() const
+{
+  // Components
+  GP<DjVuInfo> info = get_info();
+  GP<JB2Image> fgjb = get_fgjb(); 
+  GP<IWPixmap> bg44 = get_bg44();
+  GP<GPixmap>  fgpm = get_fgpm();
+  // Check info
+  if (! info)
+    return 0;
+  int width = info->width;
+  int height = info->height;
+  if (! (width>0 && height>0))
+    return 0;
+  // Check bg44
+  if (!bg44)
+    return 0;
+  if (bg44->get_width()!=width || bg44->get_height()!=height)
+    return 0;
+  // Check that extra information is not present.
+  if (fgjb || fgpm)
+    return 0;
+  // Ok.
+  return 1;
+}
+
+int 
+DjVuImage::is_legal_compound() const
 {
   // Components
   GP<DjVuInfo> info = get_info();
@@ -292,55 +347,30 @@ DjVuImage::is_legal_color() const
   if (! (width>0 && height>0))
     return 0;
   // Check fgjb
-  if (fgjb)
-    if (fgjb->get_width()!=width || fgjb->get_height()!=height)
-      return 0;
+  if (!fgjb)
+    return 0;
+  if (fgjb->get_width()!=width || fgjb->get_height()!=height)
+    return 0;
   // Check background
   int bgred = 0;
   if (bg44)
     bgred = compute_red(width, height, bg44->get_width(), bg44->get_height());
-  if (bgred>12)
+  if (bgred<1 || bgred>12)
     return 0;
   // Check foreground colors
   int fgred = 0;
   if (fgpm)
     fgred = compute_red(width, height, fgpm->columns(), fgpm->rows());
-  if (fgred>12)
+  if (fgred<1 || fgred>12)
     return 0;
-  // Test for pure color image (IW44)
-  if (bgred==1 && fgjb==0 && fgred==0)
-    return 1;
-  // Test for multilayer color image (DJVU)
+  // Check that all components are present
   if (fgjb && bgred && fgred)
     return 1;
   // Unrecognized
   return 0;
 }
 
-int 
-DjVuImage::is_legal_bilevel() const
-{
-  // Components
-  GP<DjVuInfo> info = get_info();
-  GP<JB2Image> fgjb = get_fgjb();
-  // Check info
-  if (! info)
-    return 0;
-  int width = info->width;
-  int height = info->height;
-  if (! (width>0 && height>0))
-    return 0;
-  // Check fgjb
-  if (!fgjb)
-    return 0;
-  if (fgjb->get_width()!=width || fgjb->get_height()!=height)
-    return 0;
-  // Check that color information is not present.
-  if (get_bg44() || get_fgpm())
-    return 0;
-  // Ok.
-  return 1;
-}
+
 
 
 

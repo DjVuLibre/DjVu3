@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: djvutopnm.cpp,v 1.11 1999-02-18 16:11:15 leonb Exp $
+//C-  $Id: djvutopnm.cpp,v 1.12 1999-02-18 22:46:07 leonb Exp $
 
 
 /** @name djvutopnm
@@ -85,7 +85,7 @@
     Yann Le Cun <yann@research.att.com>\\
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.11 1999-02-18 16:11:15 leonb Exp $# */
+    #$Id: djvutopnm.cpp,v 1.12 1999-02-18 22:46:07 leonb Exp $# */
 //@{
 //@}
 
@@ -132,14 +132,17 @@ convert(const char *from, const char *to)
   DjVuInfo *info = dimg.get_info();
   int colorp = dimg.is_legal_color();
   int blackp = dimg.is_legal_bilevel();
+  int compoundp = dimg.is_legal_compound();
   if (flag_verbose)
     {
-      if (colorp)
-        fprintf(stderr, "This is a legal color DjVu image\n");
+      if (compoundp)
+        fprintf(stderr, "This is a legal Compound DjVu image\n");
+      else if (colorp)
+        fprintf(stderr, "This is a legal Color DjVu image\n");
       else if (blackp)
-        fprintf(stderr, "This is a legal bilevel DjVu image\n");
+        fprintf(stderr, "This is a legal Bilevel DjVu image\n");
     }    
-  if (!colorp && !blackp)
+  if (!compoundp && !colorp && !blackp)
     { 
       fprintf(stderr,"Warning: This is not a well formed DjVu image\n");
       if (!info)

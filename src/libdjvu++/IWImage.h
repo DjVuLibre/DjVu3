@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.h,v 1.3 1999-02-11 14:33:11 leonb Exp $
+//C-  $Id: IWImage.h,v 1.4 1999-02-18 22:46:06 leonb Exp $
 
 #ifndef _IWIMAGE_H_
 #define _IWIMAGE_H_
@@ -20,15 +20,16 @@
     and color images (see class \Ref{IWPixmap}).  Programs \Ref{c44} and
     \Ref{d44} demonstrate how to encode and decode IW44 files.
 
-    {\bf IW44 File Structure} --- The IW44 files are structured according to the
-    EA IFF85 specifications (see \Ref{IFFByteStream.h}).  Gray level images
-    consist of a single #"FORM:BM44"# chunk composed of an arbitrary number of
-    #"BM44"# data chunks.  Color images consist of a single #"FORM:PM44"#
-    chunk composed of an arbitrary number of #"PM44"# data chunks.  The
-    successive #"PM44"# or #"BM44"# data chunks contain successive refinements
-    of the encoded image.  Each chunk contains a certain number of "data
-    slices".  The first chunk also contains a small image header.  You can use
-    program \Ref{djvuinfo} to display all this structural information:
+    {\bf IW44 File Structure} --- The IW44 files are structured according to
+    the EA IFF85 specifications (see \Ref{IFFByteStream.h}).  Gray level IW44
+    Images consist of a single #"FORM:BM44"# chunk composed of an arbitrary
+    number of #"BM44"# data chunks.  Color IW44 Images consist of a single
+    #"FORM:PM44"# chunk composed of an arbitrary number of #"PM44"# data
+    chunks.  The successive #"PM44"# or #"BM44"# data chunks contain
+    successive refinements of the encoded image.  Each chunk contains a
+    certain number of "data slices".  The first chunk also contains a small
+    image header.  You can use program \Ref{djvuinfo} to display all this
+    structural information:
     \begin{verbatim}
     % djvuinfo lag.iw4
     lag.iw4:
@@ -97,7 +98,7 @@
     @author
     Leon Bottou <leonb@research.att.com>
     @version
-    #$Id: IWImage.h,v 1.3 1999-02-11 14:33:11 leonb Exp $# */
+    #$Id: IWImage.h,v 1.4 1999-02-18 22:46:06 leonb Exp $# */
 //@{
 
 #ifdef __GNUC__

@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.cpp,v 1.5 1999-02-08 19:50:12 leonb Exp $
+//C-  $Id: GException.cpp,v 1.6 1999-02-18 22:46:06 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -19,10 +19,11 @@
 #include <string.h>
 #include <new.h>
 #include "GException.h"
+#ifdef DEBUGLVL
 #include "debug.h"
+#endif
 
-
-// File "$Id: GException.cpp,v 1.5 1999-02-08 19:50:12 leonb Exp $"
+// File "$Id: GException.cpp,v 1.6 1999-02-18 22:46:06 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
@@ -53,8 +54,9 @@ GException::GException (const char *xcause, const char *file, int line, const ch
 {
   // good place to set a breakpoint and DEBUG message too. 
   // It'd hard to track exceptions which seem to go from nowhere
+#ifdef DEBUG_MSG
   DEBUG_MSG("GException::GException(): cause=" << (cause ? cause : "unknown") << "\n");
-
+#endif
   if (xcause && xcause!=outofmemory) 
     {
       char *s = new char[strlen(xcause)+1];
