@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.5 1999-09-22 18:12:13 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.6 1999-09-22 19:35:27 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -26,16 +26,6 @@ DjVmDoc::DjVmDoc(void)
    DEBUG_MAKE_INDENT(3);
 
    dir=new DjVmDir();
-}
-
-void
-DjVmDoc::insert_file(DjVmDir::File * f, const TArray<char> & d, int pos)
-{
-   GP<DataPool> pool=new DataPool();
-   pool->add_data((const char *) d, d.size());
-   pool->set_eof();
-
-   insert_file(f, pool, pos);
 }
 
 void

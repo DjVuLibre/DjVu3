@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.5 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVmDoc.h,v 1.6 1999-09-22 19:36:38 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -22,7 +22,6 @@
 #include "ByteStream.h"
 #include "GSmartPointer.h"
 #include "GContainer.h"
-#include "Arrays.h"
 #include "GString.h"
 #include "DjVmDir.h"
 #include "DataPool.h"
@@ -33,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.5 1999-09-03 23:03:06 eaf Exp $#
+    @version #$Id: DjVmDoc.h,v 1.6 1999-09-22 19:36:38 eaf Exp $#
 */
 
 //@{
@@ -76,15 +75,6 @@ public:
 	  data #data# at position #pos#. If #pos# is negative, the file
           will be appended to the document. Otherwise it will be inserted
           at position #pos#. */
-   void		insert_file(DjVmDir::File * f, const TArray<char> & data, int pos=-1);
-      /** Inserts a file described by \Ref{DjVmDir::File} structure with
-	  data #data# at position #pos#. If #pos# is negative, the file
-          will be appended to the document. Otherwise it will be inserted
-          at position #pos#.
-
-	  This is the same function as the previous one except for the
-	  way in which data is provided.
-      */
    void		insert_file(DjVmDir::File * f, GP<DataPool> data, int pos=-1);
    
       /** Removes file with the specified #id# from the document. Every
