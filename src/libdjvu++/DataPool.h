@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.14 1999-09-14 22:28:34 eaf Exp $
+//C- $Id: DataPool.h,v 1.15 1999-09-16 19:56:15 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -43,7 +43,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.14 1999-09-14 22:28:34 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.15 1999-09-16 19:56:15 eaf Exp $#
 */
 
 //@{
@@ -176,14 +176,12 @@ private:
    {
    public:
       GEvent	event;
-      void	* reader_id;
+      bool	reenter_flag;
       int	offset;
       int	size;
-      bool	stop_flag;
-      Reader(void) : reader_id(0), offset(0), size(-1), stop_flag(false) {};
-      Reader(void * reader_id_in, int offset_in=0, int size_in=-1) :
-	    reader_id(reader_id_in), offset(offset_in),
-	    size(size_in), stop_flag(false) {};
+      Reader(void) : reenter_flag(false), offset(0), size(-1){};
+      Reader(int offset_in=0, int size_in=-1) :
+	    reenter_flag(false), offset(offset_in), size(size_in) {};
       virtual ~Reader(void) {};
    };
    class Trigger : public GPEnabled
@@ -495,9 +493,9 @@ private:
    void		wait_for_data(const GP<Reader> & reader);
    void		wake_up_all_readers(void);
    void		check_triggers(void);
-   void		stop_reader(void * reader_id);
-   int		get_data(void * buffer, int offset, int size, void * reader_id);
+   int		get_data(void * buffer, int offset, int size, int level);
    int		get_size(int start, int length) const;
+   void		restart_readers(void);
 
    static void	static_trigger_cb(void *);
    void		trigger_cb(void);

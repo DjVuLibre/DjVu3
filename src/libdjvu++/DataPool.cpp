@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.18 1999-09-16 15:45:05 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.19 1999-09-16 19:56:15 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -413,11 +413,11 @@ DataPool::has_data(int dstart, int dlength)
 int
 DataPool::get_data(void * buffer, int offset, int sz)
 {
-   return get_data(buffer, offset, sz, this);
+   return get_data(buffer, offset, sz, 0);
 }
 
 int
-DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
+DataPool::get_data(void * buffer, int offset, int sz, int level)
 {
    if (stop_flag) THROW("STOP");
    if (sz < 0) THROW("Size must be non negative");
@@ -427,7 +427,23 @@ DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
    {
       if (length>0 && offset+sz>length) sz=length-offset;
       if (sz<0) sz=0;
-      return pool->get_data(buffer, start+offset, sz, reader_id);
+      while(1)
+      {
+	    // Ask the underlying (master) DataPool for data. Note, that
+	    // master DataPool may throw the "DATA_POOL_REENTER" exception
+	    // demanding all readers to restart. This happens when
+	    // a DataPool in the chain of DataPools stops. All readers
+	    // should return to the most upper level and then reenter the
+	    // DataPools hierarchy. Some of them will be stopped by "STOP"
+	    // exception.
+	 TRY {
+	    if (stop_flag) THROW("STOP");
+	    return pool->get_data(buffer, start+offset, sz, level+1);
+	 } CATCH(exc) {
+	    if (strcmp(exc.get_cause(), "DATA_POOL_REENTER") || level)
+	       RETHROW;
+	 } ENDCATCH;
+      }
    } 
    else if (stream)
    {
@@ -457,7 +473,7 @@ DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
       DEBUG_MSG("DataPool::get_data(): There is no data in the pool.\n");
       DEBUG_MSG("offset=" << offset << ", size=" << sz <<
 		", data_size=" << data->size() << "\n");
-      GP<Reader> reader=new Reader(reader_id, offset, sz);
+      GP<Reader> reader=new Reader(offset, sz);
       TRY {
 	 {
 	    GCriticalSectionLock slock(&readers_lock);
@@ -482,7 +498,7 @@ DataPool::get_data(void * buffer, int offset, int sz, void * reader_id)
 	 // This call to get_data() should return immediately as there MUST
 	 // be data in the buffer after wait_for_data(reader) returns
 	 // or eof_flag should be TRUE
-      return get_data(buffer, reader->offset, reader->size, reader->reader_id);
+      return get_data(buffer, reader->offset, reader->size, level);
    }
    return 0;
 }
@@ -493,7 +509,7 @@ DataPool::wait_for_data(const GP<Reader> & reader)
       // given reader in the internal buffer
 {
    DEBUG_MSG("DataPool::wait_for_data(): waiting for data at offset=" << reader->offset <<
-	     ", id=" << reader->reader_id << "\n");
+	     ", length=" << reader->size << "\n");
    DEBUG_MAKE_INDENT(3);
 
 #if THREADMODEL==NOTHREADS
@@ -501,7 +517,8 @@ DataPool::wait_for_data(const GP<Reader> & reader)
 #else
    while(1)
    {
-      if (stop_flag || reader->stop_flag) THROW("STOP");
+      if (stop_flag) THROW("STOP");
+      if (reader->reenter_flag) THROW("DATA_POOL_REENTER");
       if (eof_flag || block_list.get_bytes(reader->offset, 1)) return;
       if (pool || stream) return;
 
@@ -556,30 +573,30 @@ DataPool::stop(void)
    stop_flag=true;
 
    wake_up_all_readers();
-   
-   if (pool) pool->stop_reader(this);
+
+      // Now let all readers, which already go thru to the master DataPool,
+      // come back and reenter. While reentering some of them will go
+      // thru this DataPool again and will be stopped ("STOP" exception)
+      // Others (which entered the master DataPool thru other slave DataPools)
+      // will simply continue waiting for their data.
+   if (pool) pool->restart_readers();
 }
 
 void
-DataPool::stop_reader(void * reader_id)
+DataPool::restart_readers(void)
 {
-   DEBUG_MSG("DataPool::stop_reader(): Stopping reader with ID=" << reader_id << "\n");
+   DEBUG_MSG("DataPool::restart_readers(): telling all readers to reenter\n");
    DEBUG_MAKE_INDENT(3);
-
-      // Find the reader object with given reader_id
+   
    GCriticalSectionLock slock(&readers_lock);
    for(GPosition pos=readers_list;pos;++pos)
    {
-      Reader & str=*(readers_list[pos]);
-      if (str.reader_id==reader_id)
-      {
-	 DEBUG_MSG("found one!\n");
-	 str.stop_flag=true;	// Set the flag
-	 str.event.set();	// And wake the reader up
-      }
+      GP<Reader> reader=readers_list[pos];
+      reader->reenter_flag=true;
+      reader->event.set();
    }
       
-   if (pool) pool->stop_reader(reader_id);
+   if (pool) pool->restart_readers();
 }
 
 void
