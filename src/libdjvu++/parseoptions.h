@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.14 1999-12-17 01:01:04 bcr Exp $
+//C- $Id: parseoptions.h,v 1.15 1999-12-17 02:21:35 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -55,7 +55,7 @@
 
    @memo Class used for parsing options and configuration files.
    @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.14 1999-12-17 01:01:04 bcr Exp $#
+   @version #$Id: parseoptions.h,v 1.15 1999-12-17 02:21:35 bcr Exp $#
  */
 
 //@{
@@ -320,7 +320,6 @@ extern "C" {
 #endif /* DOCXX_CODE */
 #ifdef __cplusplus
 };
-#endif /* __cplusplus */
 
 
 class DjVuTokenList;
@@ -712,6 +711,8 @@ public:
   Entries() : Token(0),Name(0) {};
 };
 #endif /* _PARSEOPTIONS_H_IMPLEMENTATION_  */
+
+#endif /* __cplusplus */
 
 #endif /* __DJVUPARSEOPTIONS_H__ */
 
