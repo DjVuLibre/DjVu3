@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.75 1999-10-18 21:45:52 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.76 1999-10-21 15:02:17 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -22,6 +22,12 @@
 #ifdef NEED_JPEG_DECODER
 #include "JPEGDecoder.h"
 #endif
+
+#define STRINGIFY(x) STRINGIFY_(x)
+#define STRINGIFY_(x) #x
+
+
+
 
 class ProgressByteStream : public ByteStream
 {
@@ -574,14 +580,17 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
         THROW("DjVu Decoder: Corrupted file (Duplicate INFO chunk)");
       if (djvi)
         THROW("DjVu Decoder: Corrupted file (Found INFO chunk in FORM:DJVI)");
-
-	 // We want to set the info in the DjVuFile right now in case
-	 // if DjVuInfo::decode() throws an error due to too big version
-	 // of the image. If we don't set it, the plugin will not be able
-	 // to retrieve the document version.
-      info=new DjVuInfo();
+      // DjVuInfo::decode no longer throws version exceptions
+      GP<DjVuInfo> info=new DjVuInfo();
       info->decode(iff);
+      DjVuFile::info = info;
       desc.format("Page information");
+      // Consistency checks (previously in DjVuInfo::decode)
+      if (info->width<0 || info->height<0)
+        THROW("DjVu Decoder: Corrupted file (image size is zero)");
+      if (info->version >= DJVUVERSION_TOO_NEW)
+        THROW("DjVu Decoder: Cannot decode DjVu files with version >= "
+              STRINGIFY(DJVUVERSION_TOO_NEW) );
     }
 
   // FORM:ANNO and ANTa (annotation)

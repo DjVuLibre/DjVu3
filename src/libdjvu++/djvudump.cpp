@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.5 1999-09-27 21:04:53 leonb Exp $
+//C- $Id: djvudump.cpp,v 1.6 1999-10-21 15:02:17 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.5 1999-09-27 21:04:53 leonb Exp $# */
+    #$Id: djvudump.cpp,v 1.6 1999-10-21 15:02:17 leonb Exp $# */
 //@{
 //@}
 
@@ -88,13 +88,13 @@ display_djvu_info(IFFByteStream &iff, GString, size_t size, DjVmInfo& )
   struct DjVuInfo info;
   info.decode(iff);
   if (size >= 4)
-    printf("DjVu info, %dx%d", info.width, info.height);
+    printf("DjVu %dx%d", info.width, info.height);
   if (size >= 5)
-    printf(", version %d", info.version);
+    printf(", v%d", info.version);
   if (size >= 8)
     printf(", %d dpi", info.dpi);
   if (size >= 8)
-    printf(", gamma %3.1f", info.gamma);
+    printf(", gamma=%3.1f", info.gamma);
 }
 
 void
@@ -242,7 +242,7 @@ display_chunks(IFFByteStream &iff, const GString &head)
         if (fullid == disproutines[i].id || id == disproutines[i].id)
           {
             int n = msg.length();
-	    while (n++ < 26) putchar(' ');
+	    while (n++ < 22) putchar(' ');
 	    if (!iff.composite()) printf("    ");
             (*disproutines[i].subr)(iff, head2, size, djvminfo);
             break;

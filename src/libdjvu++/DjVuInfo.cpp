@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.cpp,v 1.3 1999-06-09 21:24:20 leonb Exp $
+//C- $Id: DjVuInfo.cpp,v 1.4 1999-10-21 15:02:17 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -65,12 +65,6 @@ DjVuInfo::decode(ByteStream &bs)
     gamma = 22.0 * buffer[8];
   if (size>=10)
     reserved = buffer[9];
-  // Consistency checks
-  if (width<0 || height<0)
-    THROW("DjVu Decoder: Corrupted file (image size is zero)");
-  if (version >= DJVUVERSION_TOO_NEW)
-    THROW("DjVu Decoder: Cannot decode DjVu files with version >= "
-          STRINGIFY(DJVUVERSION_TOO_NEW) );
   // Fixup
   if (gamma <= 0.3 || gamma >= 5.0)
     gamma = 2.2;
