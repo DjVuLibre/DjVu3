@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.70 2001-04-04 22:12:11 bcr Exp $
+// $Id: parseoptions.cpp,v 1.71 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1118,10 +1118,9 @@ DjVuParseOptions::ReadFile(int &line,FILE *f,int profile)
           (state == READ_VALUE_DOUBLE_QUOTE))
         {
           const char *v=VarTokens->GetString(var);
-          char *r=new char [strlen(v)+strlen(value)+2];
-          sprintf(r,"%s=%s",v,value);
-          Add(startline,profile,-1,r);
-          delete [] r;
+          GString buf;
+          buf.format("%s=%s",v,value);
+          Add(startline,profile,-1,(const char *)buf);
         }else
         {
           Add(startline,profile,var,value);

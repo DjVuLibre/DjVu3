@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.9 2001-04-04 22:12:11 bcr Exp $
+// $Id: XMLTags.cpp,v 1.10 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -222,11 +222,11 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
         GString xname=tagtoname(((const char *)tag)+2);
 //        if(xname.downcase() == "xml")
 //        {
-//          printf("Got XMLDecl: %s",(const char *)tag);
+//          DjVuPrint("Got XMLDecl: %s",(const char *)tag);
 //          
 //        }else
 //        {
-//          printf("Got PI: %s",(const char *)tag);
+//          DjVuPrint("Got PI: %s",(const char *)tag);
 //        }
         break;
       }
@@ -245,10 +245,10 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
             }
             len=((tag+=cont).length());
           }
-//          printf("Got Comment: %s\n",(const char *)tag);
+//          DjVuPrint("Got Comment: %s\n",(const char *)tag);
         }else
         {
-//          printf("Got declaration: %s\n",(const char *)tag);
+//          DjVuPrint("Got declaration: %s\n",(const char *)tag);
         }
         break;
       }
@@ -258,7 +258,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
         GPosition last=level.lastpos();
         if(last || level[last]->name != xname)
         {
-//          printf("Got end tag: %s\n",(const char *)name);
+//          DjVuPrint("Got end tag: %s\n",(const char *)name);
           level.del(last);
         }else
         {
@@ -269,8 +269,8 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       }
       default:
       {
-//        printf("Got tag: %s\n",(const char *)tag);
-//        printf("Got tag: %s\n",(const char *)xname);
+//        DjVuPrint("Got tag: %s\n",(const char *)tag);
+//        DjVuPrint("Got tag: %s\n",(const char *)xname);
         GPosition last=level.lastpos();
         GP<lt_XMLTags> t;
         if(last)
@@ -307,7 +307,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       if(last)
       {
         level[last]->addraw(raw.get_GString());
-//        printf("Got raw %s: %s\n",(const char *)(level[last]->name),(const char *)raw);
+//        DjVuPrint("Got raw %s: %s\n",(const char *)(level[last]->name),(const char *)raw);
       }else if(!isspaces((unsigned long const *)raw))
       {
         GString mesg;

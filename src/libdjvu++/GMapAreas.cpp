@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.21 2001-03-27 20:15:30 praveen Exp $
+// $Id: GMapAreas.cpp,v 1.22 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -372,10 +372,9 @@ GMapRect::gma_transform(const GRect & grect)
 GString
 GMapRect::gma_print(void)
 {
-   char buffer[128];
-   sprintf(buffer, "(%s %d %d %d %d) ",
+   GString buffer;
+   return buffer.format("(%s %d %d %d %d) ",
 	   RECT_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
-   return buffer;
 }
 
 void 
@@ -702,9 +701,8 @@ GMapPoly::gma_print(void)
    GString res=GString('(')+POLY_TAG+space;
    for(int i=0;i<points;i++)
    {
-      char buffer[128];
-      sprintf(buffer, "%d %d ", xx[i], yy[i]);
-      res+=buffer;
+      GString buffer;
+      res+=buffer.format("%d %d ", xx[i], yy[i]);
    }
    res.setat(res.length()-1, ')');
    res+=space;
@@ -813,10 +811,9 @@ GMapOval::GMapOval(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
 GString
 GMapOval::gma_print(void)
 {
-   char buffer[128];
-   sprintf(buffer, "(%s %d %d %d %d) ",
+   GString buffer;
+   return buffer.format("(%s %d %d %d %d) ",
 	   OVAL_TAG, xmin, ymin, xmax-xmin, ymax-ymin);
-   return buffer;
 }
 
 void 

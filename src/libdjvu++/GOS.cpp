@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.49 2001-04-04 22:12:11 bcr Exp $
+// $Id: GOS.cpp,v 1.50 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -221,10 +221,10 @@ GOS::basename(const char *fname, const char *suffix)
 // -- A small helper function returning a 
 //    stdio error message in a static buffer.
 
-static const char *
+static GString 
 errmsg()
 {
-  static char buffer[256];
+  GString buffer;
 #ifdef REIMPLEMENT_STRERROR
   const char *errname = "Unknown libc error";
   if (errno>0 && errno<sys_nerr)
@@ -232,10 +232,10 @@ errmsg()
 #else
 #ifndef UNDER_CE
   const char *errname = strerror(errno);
-  sprintf(buffer,"%s (errno = %d)", errname, errno);
+  buffer.format("%s (errno = %d)", errname, errno);
 #else
   const char *errname = "Unknown error from GOS.cpp under Windows CE" ;
-  sprintf(buffer,"%s (errno = %d)", errname, -1);
+  buffer.format("%s (errno = %d)", errname, -1);
 #endif
 #endif
   return buffer;
@@ -427,46 +427,46 @@ int main(int argc, char **argv)
   if (argc>1) 
     op = argv[1];
   if (op == "is_file" && argc==3) {
-      printf("%d\n", GOS::is_file(argv[2])?1:0);
+      DjVuPrint("%d\n", GOS::is_file(argv[2])?1:0);
       return 0;
   } else if (op =="is_dir" && argc==3) {
-    printf("%d\n", GOS::is_dir(argv[2]));
+    DjVuPrint("%d\n", GOS::is_dir(argv[2]));
     return 0;
   } else if (op == "dirname" && argc==3) {
-    printf("%s\n", (const char*)GOS::dirname(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::dirname(argv[2]));
     return 0;
   } else if (op == "basename" && argc==3) {
-    printf("%s\n", (const char*)GOS::basename(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::basename(argv[2]));
     return 0;
   } else if (op == "basename" && argc==4) {
-    printf("%s\n", (const char*)GOS::basename(argv[2], argv[3]));
+    DjVuPrint("%s\n", (const char*)GOS::basename(argv[2], argv[3]));
     return 0;
   } else if (op == "cwd" && argc==2) {
-    printf("%s\n", (const char*)GOS::cwd());
+    DjVuPrint("%s\n", (const char*)GOS::cwd());
     return 0;
   } else if (op == "cwd" && argc==3) {
-    printf("%s\n", (const char*)GOS::cwd(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::cwd(argv[2]));
     return 0;
   } else if (op == "cleardir" && argc==3) {
-    printf("%d\n", GOS::cleardir(argv[2]));
+    DjVuPrint("%d\n", GOS::cleardir(argv[2]));
     return 0;
   } else if (op == "expand_name" && argc==3) {
-    printf("%s\n", (const char*)GOS::expand_name(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::expand_name(argv[2]));
     return 0;
   } else if (op == "expand_name" && argc==4) {
-    printf("%s\n", (const char*)GOS::expand_name(argv[2], argv[3]));
+    DjVuPrint("%s\n", (const char*)GOS::expand_name(argv[2], argv[3]));
     return 0;
   } else if (op == "ticks" && argc==2) {
-    printf("%lu\n", GOS::ticks());
+    DjVuPrint("%lu\n", GOS::ticks());
     return 0;
   } else if (op == "sleep" && argc==3) {
     GOS::sleep(atoi(argv[2]));
     return 0;
   } else if (op == "filename_to_url" && argc==3) {
-    printf("%s\n", (const char*)GOS::filename_to_url(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::filename_to_url(argv[2]));
     return 0;
   } else if (op == "url_to_filename" && argc==3) {
-    printf("%s\n", (const char*)GOS::url_to_filename(argv[2]));
+    DjVuPrint("%s\n", (const char*)GOS::url_to_filename(argv[2]));
     return 0;
   }
   DjVuPrintError("%s\n","syntax error");

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDumpHelper.cpp,v 1.18 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuDumpHelper.cpp,v 1.19 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -53,17 +53,6 @@ struct DjVmInfo
   GPMap<int,DjVmDir::File> map;
 };
 
-static void
-printf(ByteStream & str, const char * fmt, ...)
-{
-   va_list args;
-   va_start(args, fmt);
-
-   GString tmp;
-   tmp.format(fmt, args);
-   str.writall((const char *) tmp, tmp.length());
-}
-
 inline static void
 putchar(ByteStream & str, char ch)
 {
@@ -80,41 +69,41 @@ display_djvu_info(ByteStream & out_str, IFFByteStream &iff,
   DjVuInfo &info=*ginfo;
   info.decode(iff);
   if (size >= 4)
-    printf(out_str, "DjVu %dx%d", info.width, info.height);
+    out_str.format( "DjVu %dx%d", info.width, info.height);
   if (size >= 5)
-    printf(out_str, ", v%d", info.version);
+    out_str.format( ", v%d", info.version);
   if (size >= 8)
-    printf(out_str, ", %d dpi", info.dpi);
+    out_str.format( ", %d dpi", info.dpi);
   if (size >= 8)
-    printf(out_str, ", gamma=%3.1f", info.gamma);
+    out_str.format( ", gamma=%3.1f", info.gamma);
 }
 
 static void
 display_djbz(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-  printf(out_str, "JB2 shared dictionary");
+  out_str.format( "JB2 shared dictionary");
 }
 
 static void
 display_fgbz(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-  printf(out_str, "JB2 colors data");
+  out_str.format( "JB2 colors data");
 }
 
 static void
 display_sjbz(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-  printf(out_str, "JB2 bilevel data");
+  out_str.format( "JB2 bilevel data");
 }
 
 static void
 display_smmr(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-  printf(out_str, "G4/MMR stencil data");
+  out_str.format( "G4/MMR stencil data");
 }
 
 static void
@@ -135,11 +124,11 @@ display_iw4(ByteStream & out_str, IFFByteStream &iff,
   
   if (iff.readall((void*)&primary, sizeof(primary)) == sizeof(primary))
     {
-      printf(out_str, "IW4 data #%d, %d slices", primary.serial+1, primary.slices);
+      out_str.format( "IW4 data #%d, %d slices", primary.serial+1, primary.slices);
       if (primary.serial==0)
         if (iff.readall((void*)&secondary, sizeof(secondary)) == sizeof(secondary))
           {
-            printf(out_str, ", v%d.%d (%s), %dx%d", secondary.major&0x7f, secondary.minor,
+            out_str.format( ", v%d.%d (%s), %dx%d", secondary.major&0x7f, secondary.minor,
                    (secondary.major & 0x80 ? "b&w" : "color"),
                    (secondary.xhi<<8)+secondary.xlo,
                    (secondary.yhi<<8)+secondary.ylo  );
@@ -156,15 +145,15 @@ display_djvm_dirm(ByteStream & out_str, IFFByteStream & iff,
   GPList<DjVmDir::File> list = dir->get_files_list();
   if (dir->is_indirect())
   {
-    printf(out_str, "Document directory (indirect, %d files %d pages)", 
+    out_str.format( "Document directory (indirect, %d files %d pages)", 
 	                  dir->get_files_num(), dir->get_pages_num());
     for (GPosition p=list; p; ++p)
-      printf(out_str, "\n%s%s -> %s", (const char*)head, 
+      out_str.format( "\n%s%s -> %s", (const char*)head, 
                       (const char*)list[p]->id, (const char*)list[p]->name );
   }
   else
   {
-    printf(out_str, "Document directory (bundled, %d files %d pages)", 
+    out_str.format( "Document directory (bundled, %d files %d pages)", 
 	                  dir->get_files_num(), dir->get_pages_num());
     djvminfo.dir = dir;
     djvminfo.map.empty();
@@ -196,9 +185,9 @@ display_th44(ByteStream & out_str, IFFByteStream & iff,
       }
    }
    if (start_page>=0)
-      printf(out_str, "Thumbnail icon for page %d", start_page+counter+1);
+      out_str.format( "Thumbnail icon for page %d", start_page+counter+1);
    else
-      printf(out_str, "Thumbnail icon");
+      out_str.format( "Thumbnail icon");
 }
 
 static void
@@ -209,27 +198,27 @@ display_incl(ByteStream & out_str, IFFByteStream & iff,
    char ch;
    while(iff.read(&ch, 1) && ch!='\n')
      name += ch;
-   printf(out_str, "Indirection chunk --> {%s}", (const char *) name);
+   out_str.format( "Indirection chunk --> {%s}", (const char *) name);
 }
 
 static void
 display_anno(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-   printf(out_str, "Page annotation");
+   out_str.format( "Page annotation");
    GString id;
    iff.short_id(id);
-   printf(out_str, " (hyperlinks, etc.)");
+   out_str.format( " (hyperlinks, etc.)");
 }
 
 static void
 display_text(ByteStream & out_str, IFFByteStream &iff,
 	     GString, size_t, DjVmInfo&, int)
 {
-   printf(out_str, "Hidden text");
+   out_str.format( "Hidden text");
    GString id;
    iff.short_id(id);
-   printf(out_str, " (text, etc.)");
+   out_str.format( " (text, etc.)");
 }
 
 struct displaysubr
@@ -285,13 +274,13 @@ display_chunks(ByteStream & out_str, IFFByteStream &iff,
     
     GString msg;
     msg.format("%s%s [%d] ", (const char *)head, (const char *)id, size);
-    printf(out_str, "%s", (const char *)msg);
+    out_str.format( "%s", (const char *)msg);
     // Display DJVM is when adequate
     if (djvminfo.dir)
     {
       GP<DjVmDir::File> rec = djvminfo.map[rawoffset];
       if (rec)
-        printf(out_str, "{%s}", (const char*) rec->id);
+        out_str.format( "{%s}", (const char*) rec->id);
     }
     // Test chunk type
     iff.full_id(fullid);
@@ -300,13 +289,13 @@ display_chunks(ByteStream & out_str, IFFByteStream &iff,
       {
         int n = msg.length();
         while (n++ < 14+(int) head.length()) putchar(out_str, ' ');
-        if (!iff.composite()) printf(out_str, "    ");
+        if (!iff.composite()) out_str.format( "    ");
         (*disproutines[i].subr)(out_str, iff, head2,
                                 size, djvminfo, counters[id]);
         break;
       }
       // Default display of composite chunk
-      printf(out_str, "\n");
+      out_str.format( "\n");
       if (iff.composite())
         display_chunks(out_str, iff, head2, djvminfo);
       // Terminate

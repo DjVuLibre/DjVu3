@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.cpp,v 1.22 2001-01-10 19:45:51 bcr Exp $
+// $Id: DjVuToPS.cpp,v 1.23 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1162,11 +1162,10 @@ DjVuToPS::print(ByteStream & str, const GP<DjVuDocument> & doc,
   
   int doc_pages=doc->get_pages_num();
   
-  char buffer[128];
+  GString buffer;
   if (!page_range)
   {
-    page_range=buffer;
-    sprintf(buffer, "1-%d", doc_pages);
+    page_range=buffer.format("1-%d", doc_pages);
   }
   
   // Allocate the arrays telling what pages to print

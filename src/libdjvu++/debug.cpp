@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.18 2001-01-25 20:09:04 bcr Exp $
+// $Id: debug.cpp,v 1.19 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -39,6 +39,9 @@
 
 #include "debug.h"
 #include "GString.h"
+#include "ByteStream.h"
+#include "GURL.h"
+
 #if ( DEBUGLVL > 0 )
 
 #include "GThreads.h"
@@ -68,10 +71,8 @@ static int              debug_level = 0;
 static int              debug_level = DEBUGLVL;
 #endif
 static int              debug_id;
-#ifdef UNIX
-static FILE            *debug_file;
+static GP<ByteStream>   debug_file;
 static int              debug_file_count;
-#endif
 
 #if THREADMODEL==NOTHREADS
 static DjVuDebug debug_obj;
@@ -91,8 +92,8 @@ DjVuDebug::~DjVuDebug()
 #ifdef UNIX
   if (--debug_file_count == 0)
     {
-      if (debug_file && (debug_file != stderr))
-        fclose(debug_file);
+//      if (debug_file && (debug_file != stderr))
+//        fclose(debug_file);
       debug_file = 0;
     }
 #endif
@@ -109,13 +110,17 @@ DjVuDebug::format(const char *fmt, ... )
       vsprintf(buffer, fmt, ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
-#ifdef UNIX
-      fprintf(debug_file, "%s", buffer);
-      fflush(debug_file);
-#endif
+      if(debug_file)
+      {
+        debug_file->format("%s", buffer);
+        debug_file->flush();
+      }
 #ifdef WIN32
-      USES_CONVERSION;
-      OutputDebugString(A2CT(buffer));
+      else
+      {
+        USES_CONVERSION;
+        OutputDebugString(A2CT(buffer));
+      }
 #endif
     }
 }
@@ -127,28 +132,33 @@ DjVuDebug::set_debug_level(int lvl)
 }
 
 void
-DjVuDebug::set_debug_file(const char *fname)
+DjVuDebug::set_debug_url(const GURL &url)
 {
-#ifdef UNIX
-  GCriticalSectionLock glock(&debug_lock);
-  if (debug_file && (debug_file != stderr))
-    fclose(debug_file);
+// #ifdef UNIX
+//  GCriticalSectionLock glock(&debug_lock);
+//  if (debug_file && (debug_file != stderr))
+//    fclose(debug_file);
   debug_file = 0;
-  if (fname)
-    debug_file = fopen(fname, "w");
-  if (! debug_file)
-    debug_file = stderr;
-#endif
+  if (!url.is_empty())
+  {
+    debug_file = ByteStream::create(url, "w");
+    if (! debug_file)
+      debug_file = ByteStream::create(2,0,false);
+  }else
+  {
+    debug_file = ByteStream::create(2,0,false);
+  }
+// #endif
 }
 
 void
 DjVuDebug::set_debug_file(FILE * file)
 {
 #ifdef UNIX
-  GCriticalSectionLock glock(&debug_lock);
-  if (debug_file && (debug_file != stderr))
-    fclose(debug_file);
-  debug_file = file;
+//  GCriticalSectionLock glock(&debug_lock);
+//  if (debug_file && (debug_file != stderr))
+//    fclose(debug_file);
+  debug_file = ByteStream::create(file,"w",(file!=stderr));
 #endif
 }
 

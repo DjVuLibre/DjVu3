@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.58 2001-04-04 22:12:11 bcr Exp $
+// $Id: ByteStream.cpp,v 1.59 2001-04-05 16:06:26 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -1183,6 +1183,20 @@ DjVuPrintError(const char *fmt, ... )
     va_start(args, fmt); 
     GString message;
     errout->writestring(message.format(fmt, args));
+  }
+}
+
+void
+DjVuPrint(const char *fmt, ... )
+{
+  static GP<ByteStream> strout=ByteStream::create(1,0,false);
+  if(strout)
+  {
+    strout->cp=ByteStream::NATIVE;
+    va_list args;
+    va_start(args, fmt);
+    GString message;
+    strout->writestring(message.format(fmt,args));
   }
 }
 

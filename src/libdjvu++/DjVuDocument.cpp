@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.152 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.153 2001-04-05 16:06:26 bcr Exp $
 // $Name:  $
 
 
@@ -454,9 +454,8 @@ DjVuDocument::get_int_prefix(void)
       // assigned some permanent name. After '?' there should be the real
       // file's URL. Please note, that output of this function is used only
       // as name for DjVuPortcaster. Not as a URL.
-   char buffer[128];
-   sprintf(buffer, "document_%p%d?", this, hash((GString) (const char*)init_url));
-   return buffer;
+   GString retval;
+   return retval.format("document_%p%d?", this, hash((GString) (const char*)init_url));
 }
 
 void
@@ -1525,8 +1524,8 @@ DjVuDocument::get_url_names(void)
           get_portcaster()->notify_error(this, ex.get_cause()); 
 /*              Original preserved in case I screw things up
           static const char emsg[]="Excluding page %d form the file list due to errors.\n";
-          char buf[sizeof(emsg)+20];
-          sprintf(buf,emsg,i+1);
+          GString buf;
+          buf.format(emsg,i+1);
           get_portcaster()->notify_error(this,buf);
 */
           GString emsg = "DjVuDocument.exclude_page\t" + (i+1);
@@ -1611,8 +1610,8 @@ DjVuDocument::get_djvm_doc()
               get_portcaster()->notify_error(this, ex.get_cause());
               /*    Preserving original in case I screw things up
               static const char emsg[]="Skipping page %d due to errors.\n";
-              char buf[sizeof(emsg)+20];
-              sprintf(buf,emsg,page_num+1);
+              GString buf;
+              buf.format(emsg,page_num+1);
               get_portcaster()->notify_error(this,buf); 
               */
               GString emsg = "DjVuDocument.skip_page\t" + (page_num+1);

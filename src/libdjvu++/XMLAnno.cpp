@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.10 2001-04-04 22:12:11 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.11 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -215,7 +215,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
                 y-=(int)(hs*(double)raw_coords[raw_pos]+0.5);
               }
               coords.append(y);
-//            printf("Coords (%d,%d)\n",x,y);
+//            DjVuPrint("Coords (%d,%d)\n",x,y);
             }
           }
         }
@@ -264,9 +264,9 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL &url,const GString &id,c
             ymin=xx[1];
             ymax=xx[3];
           }
-//          printf("xmin=%d ymin=%d xmax=%d,ymax=%d\n",xmin,ymin,xmax,ymax);
+//          DjVuPrint("xmin=%d ymin=%d xmax=%d,ymax=%d\n",xmin,ymin,xmax,ymax);
           GRect rect(xmin,ymin,xmax-xmin,ymax-ymin);
-//          printf("xmin=%d ymin=%d width=%u height=%u\n",xmin,ymin,rect.width(),rect.height());
+//          DjVuPrint("xmin=%d ymin=%d width=%u height=%u\n",xmin,ymin,rect.width(),rect.height());
           a=GMapRect::create(rect);
         }else if(shape == "circle")
         {
@@ -410,7 +410,7 @@ lt_XMLAnno::save(void)
     DjVuDocument &doc=*(docs[pos]);
     GURL url=doc.get_init_url();
 //    GString name=GOS::url_to_filename(url);
-//    printf("Saving file '%s' with new annotations.\n",(const char *)url);
+//    DjVuPrint("Saving file '%s' with new annotations.\n",(const char *)url);
     const bool bundle=doc.is_bundled()||(doc.get_doc_type()==DjVuDocument::SINGLE_PAGE);
     doc.save_as(url,bundle);
   }

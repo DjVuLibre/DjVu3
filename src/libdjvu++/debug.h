@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.h,v 1.16 2001-01-25 20:09:04 bcr Exp $
+// $Id: debug.h,v 1.17 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #ifndef _DEBUG_H_
@@ -45,6 +45,8 @@
 #include <atlbase.h> // USES_CONVERSION, A2CT macro
 #include <windows.h> // OutputDebugString
 #endif 
+class GURL;
+
 /** @name debug.h
 
     Files #"debug.h"# and #"debug.cpp"# implement means to print debug
@@ -92,7 +94,7 @@
     @memo 
     Macros for printing debug messages.
     @version 
-    #$Id: debug.h,v 1.16 2001-01-25 20:09:04 bcr Exp $#
+    #$Id: debug.h,v 1.17 2001-04-05 16:06:27 bcr Exp $#
     @author
     Andrew Erofeev <eaf@geocities.com> -- initial implementation \\
     Leon Bottou <leonb@research.att.com> -- cleanups */
@@ -132,7 +134,7 @@ public:
   ~DjVuDebug();
   // access
   static void   set_debug_level(int lvl);
-  static void   set_debug_file(const char *fname);
+  static void   set_debug_url(const GURL &url);
   static void	set_debug_file(FILE * file);
   void          modify_indent(int rindent);
   static DjVuDebug& lock(int lvl, int noindent);

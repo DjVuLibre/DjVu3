@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.70 2001-03-08 16:19:29 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.71 2001-04-05 16:06:26 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -176,14 +176,13 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
   int aldel_cur_pos=0;
   if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; }
   
-  char buffer[1024];
+  GString buffer;
   GTArray<char> buffer_str;
   const char * to_print=0;
   switch(type)
   {
   case NUMBER:
-    sprintf(buffer, "%d", number);
-    to_print=buffer;
+    to_print=buffer.format("%d",number);
     break;
   case STRING:
     {
@@ -202,12 +201,10 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
     }
     break;
   case SYMBOL:
-    sprintf(buffer, "%s", (const char *) symbol);
-    to_print=buffer;
+    to_print=buffer.format("%s",(const char *)symbol);
     break;
   case LIST:
-    sprintf(buffer, "(%s", (const char *) name);
-    to_print=buffer;
+    to_print=buffer.format("(%s",(const char *)name);
     break;
   case INVALID:
     break;
@@ -891,14 +888,14 @@ DjVuANT::del_all_items(const char * name, GLParser & parser)
 GString
 DjVuANT::encode_raw(void) const
 {
-   char buffer[512];
+   GString buffer;
    GLParser parser;
 
       //*** Background color
    del_all_items(BACKGROUND_TAG, parser);
    if (bg_color!=0xffffffff)
    {
-      sprintf(buffer, "(" BACKGROUND_TAG " #%02X%02X%02X)",
+      buffer.format("(" BACKGROUND_TAG " #%02X%02X%02X)",
 	      (unsigned int)((bg_color & 0xff0000) >> 16),
 	      (unsigned int)((bg_color & 0xff00) >> 8),
 	      (unsigned int)(bg_color & 0xff));
@@ -909,11 +906,16 @@ DjVuANT::encode_raw(void) const
    del_all_items(ZOOM_TAG, parser);
    if (zoom!=ZOOM_UNSPEC)
    {
-      if (zoom==ZOOM_STRETCH) strcpy(buffer, "(" ZOOM_TAG " stretch)");
-      else if (zoom==ZOOM_ONE2ONE) strcpy(buffer, "(" ZOOM_TAG " one2one)");
-      else if (zoom==ZOOM_WIDTH) strcpy(buffer, "(" ZOOM_TAG " width)");
-      else if (zoom==ZOOM_PAGE) strcpy(buffer, "(" ZOOM_TAG " page)");
-      else sprintf(buffer, "(" ZOOM_TAG " d%d)", zoom);
+      if (zoom==ZOOM_STRETCH)
+        buffer="(" ZOOM_TAG " stretch)";
+      else if (zoom==ZOOM_ONE2ONE)
+        buffer="(" ZOOM_TAG " one2one)";
+      else if (zoom==ZOOM_WIDTH)
+        buffer="(" ZOOM_TAG " width)";
+      else if (zoom==ZOOM_PAGE)
+        buffer="(" ZOOM_TAG " page)";
+      else
+        buffer.format("(" ZOOM_TAG " d%d)", zoom);
       parser.parse(buffer);
    }
 
@@ -921,10 +923,14 @@ DjVuANT::encode_raw(void) const
    del_all_items(MODE_TAG, parser);
    if (mode!=MODE_UNSPEC)
    {
-      if (mode==MODE_COLOR) strcpy(buffer, "(" MODE_TAG " color)");
-      else if (mode==MODE_FORE) strcpy(buffer, "(" MODE_TAG " fore)");
-      else if (mode==MODE_BACK) strcpy(buffer, "(" MODE_TAG " back)");
-      else if (mode==MODE_BW) strcpy(buffer, "(" MODE_TAG " bw)");
+      if (mode==MODE_COLOR)
+        buffer="(" MODE_TAG " color)";
+      else if (mode==MODE_FORE)
+        buffer="(" MODE_TAG " fore)";
+      else if (mode==MODE_BACK)
+        buffer="(" MODE_TAG " back)";
+      else if (mode==MODE_BW)
+        buffer="(" MODE_TAG " bw)";
       parser.parse(buffer);
    }
 
@@ -932,15 +938,23 @@ DjVuANT::encode_raw(void) const
    del_all_items(ALIGN_TAG, parser);
    if (hor_align!=ALIGN_UNSPEC || ver_align!=ALIGN_UNSPEC)
    {
-      strcpy(buffer, "(" ALIGN_TAG " ");
-      if (hor_align==ALIGN_LEFT) strcat(buffer, "left ");
-      else if (hor_align==ALIGN_CENTER) strcat(buffer, "center ");
-      else if (hor_align==ALIGN_RIGHT) strcat(buffer, "right ");
-      else strcat(buffer, "default ");
-      if (ver_align==ALIGN_TOP) strcat(buffer, "top)");
-      else if (ver_align==ALIGN_CENTER) strcat(buffer, "center)");
-      else if (ver_align==ALIGN_BOTTOM) strcat(buffer, "bottom)");
-      else strcat(buffer, "default)");
+      buffer="(" ALIGN_TAG " ";
+      if (hor_align==ALIGN_LEFT)
+        buffer+="left ";
+      else if (hor_align==ALIGN_CENTER)
+        buffer+="center ";
+      else if (hor_align==ALIGN_RIGHT)
+        buffer+="right ";
+      else
+        buffer+="default ";
+      if (ver_align==ALIGN_TOP)
+        buffer+="top)";
+      else if (ver_align==ALIGN_CENTER)
+        buffer+="center)";
+      else if (ver_align==ALIGN_BOTTOM)
+        buffer+="bottom)";
+      else
+        buffer+="default)";
       parser.parse(buffer);
    }
    

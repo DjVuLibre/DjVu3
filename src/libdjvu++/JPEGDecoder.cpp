@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.cpp,v 1.17 2001-03-06 19:55:42 bcr Exp $
+// $Id: JPEGDecoder.cpp,v 1.18 2001-04-05 16:06:27 bcr Exp $
 // $Name:  $
 
 #include "JPEGDecoder.h"
@@ -80,7 +80,6 @@ JPEGDecoder::decode(ByteStream & bs )
 
   JSAMPARRAY buffer;    /* Output row buffer */
   int row_stride;   /* physical row width in output buffer */
-  char tempBuf[50];
   int full_buf_size;
   int isGrey,i;
 
@@ -118,11 +117,10 @@ JPEGDecoder::decode(ByteStream & bs )
   buffer = (*cinfo.mem->alloc_sarray)
     ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-  sprintf(tempBuf,"P6\n%d %d\n%d\n",cinfo.output_width, 
-                                 cinfo.output_height,255);
   GP<ByteStream> goutputBlock=ByteStream::create();
   ByteStream &outputBlock=*goutputBlock;
-  outputBlock.write((char *)tempBuf,strlen(tempBuf));
+  outputBlock.format("P6\n%d %d\n%d\n",cinfo.output_width, 
+                                 cinfo.output_height,255);
 
   isGrey = ( cinfo.out_color_space == JCS_GRAYSCALE) ? 1 : 0; 
 
