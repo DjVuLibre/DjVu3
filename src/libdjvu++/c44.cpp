@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: c44.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $
+//C- $Id: c44.cpp,v 1.17 1999-10-22 14:58:53 leonb Exp $
 
 
 /** @name c44
@@ -111,7 +111,7 @@
     Disables encoding of the chrominance.  Only the luminance information will
     be encoded. The resulting image will show in shades of gray.
     \end{description}
-          
+
     {\bf Advanced Options} ---
     Program #c44# also recognizes the following options:
     \begin{description}
@@ -127,6 +127,15 @@
     pixel in the input file is irrelevant.  The DjVu IW44 Encoder will replace
     the masked pixels by a color value whose coding cost is minimal (see
     \URL{http://www.research.att.com/~leonb/DJVU/mask}).
+    \end{description}
+
+    {\bf Generating Photo DjVu instead of IW44} ---
+    Photo DjVu images have thje additional capability to store the resolution
+    and gamma correction information.  Using any of the following options will
+    generate a Photo DjVu Image instead of a IW44 file.
+    \begin{description}
+    \item[-dpi n]  Sets the resolution information for a Photo DjVu image.
+    \item[-gamma n] Sets the gamma correction information for a Photo DjVu image.
     \end{description}
 
     {\bf Performance} ---
@@ -151,7 +160,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.16 1999-09-20 23:12:59 leonb Exp $# */
+    #$Id: c44.cpp,v 1.17 1999-10-22 14:58:53 leonb Exp $# */
 //@{
 //@}
 
@@ -160,6 +169,8 @@
 #include "GString.h"
 #include "GException.h"
 #include "IWImage.h"
+#include "DjVuInfo.h"
+#include "IFFByteStream.h"
 #include "GOS.h"
 
 // command line data
@@ -175,7 +186,9 @@ int flag_slice = 0;
 int flag_decibel = 0;
 int flag_crcbdelay = -1;
 int flag_crcbmode = -1;  
-float flag_dbfrac = -1;
+double flag_dbfrac = -1;
+int flag_dpi = -1;
+double flag_gamma = -1;
 int argc_bpp = 0;
 int argc_size = 0;
 int argc_slice = 0;
@@ -230,6 +243,11 @@ usage()
          "    -crcbnone     -- do not encode chrominance at all\n"
          "    -crcbdelay n  -- select chrominance coding delay (default 10)\n"
          "                     for -crcbnormal and -crcbhalf modes\n"
+         "\n"
+         "You can generating a Photo DjVu image instead of a IW44 image\n"
+         "by using any of the following options:\n"
+         "    -dpi n        -- sets the image resolution\n"
+         "    -gamma n      -- sets the image gamma correction\n"
          "\n");
   exit(1);
 }
@@ -464,7 +482,7 @@ parse(int argc, char **argv)
               if (flag_dbfrac>0)
                 THROW("c44: multiple dbfrac specification");                
               char *ptr;
-              flag_dbfrac = (float)strtod(argv[i], &ptr);
+              flag_dbfrac = strtod(argv[i], &ptr);
               if (flag_dbfrac<=0 || flag_dbfrac>1 || *ptr)
                 THROW("c44: illegal dbfrac specification");
             }
@@ -507,6 +525,28 @@ parse(int argc, char **argv)
               if (*ptr || flag_crcbdelay<0 || flag_crcbdelay>=100)
                 THROW("c44: illegal argument for option '-crcbdelay'");
             }
+          else if (!strcmp(argv[i],"-dpi"))
+            {
+              if (++i >= argc)
+                THROW("c44: no argument for option '-dpi'");
+              if (flag_dpi>0)
+                THROW("c44: duplicate dpi option");
+              char *ptr; 
+              flag_dpi = strtol(argv[i], &ptr, 10);
+              if (*ptr || flag_dpi<25 || flag_dpi>4800)
+                THROW("c44: illegal argument for option '-dpi'");
+            }
+          else if (!strcmp(argv[i],"-gamma"))
+            {
+              if (++i >= argc)
+                THROW("c44: no argument for option '-gamma'");
+              if (flag_gamma > 0)
+                THROW("c44: duplicate gamma option");
+              char *ptr; 
+              flag_gamma = strtod(argv[i], &ptr);
+              if (*ptr || flag_gamma<=0.25 || flag_gamma>=5)
+                THROW("c44: illegal gamma specification");
+            }
           else
             usage();
         }
@@ -526,7 +566,10 @@ parse(int argc, char **argv)
       int dot = base.rsearch('.');
       if (dot >= 1)
         base = base.substr(0,dot);
-      iw4file = GOS::expand_name(base,dir) + ".iw4";
+      if (flag_dpi>0 || flag_gamma>0)
+        iw4file = GOS::expand_name(base,dir) + ".djvu";
+      else
+        iw4file = GOS::expand_name(base,dir) + ".iw4";
     }
 }
 
@@ -547,6 +590,36 @@ getmask(int w, int h)
   return msk8;
 }
 
+
+static void 
+create_photo_djvu_file(IWPixmap *iwp, IWBitmap *iwb, int w, int h,
+                       IFFByteStream &iff, int nchunks, IWEncoderParms *parms)
+{
+  // Prepare info chunk
+  DjVuInfo info;
+  info.width = w;
+  info.height = h;
+  info.dpi = (flag_dpi>0 ? flag_dpi : 100);
+  info.gamma = (flag_gamma>0 ? flag_gamma : 2.2);
+  // Write djvu header and info chunk
+  iff.put_chunk("FORM:DJVU", 1);
+  iff.put_chunk("INFO");
+  info.encode(iff);
+  iff.close_chunk();
+  // Write all chunks
+  int flag = 1;
+  for (int i=0; flag && i<nchunks; i++)
+    {
+      iff.put_chunk("BG44");
+      if (iwp)
+        flag = iwp->encode_chunk(iff, parms[i]);
+      else
+        flag = iwb->encode_chunk(iff, parms[i]);
+      iff.close_chunk();
+    }
+  // Close djvu chunk
+  iff.close_chunk();
+}
 
 
 int
@@ -626,9 +699,14 @@ main(int argc, char **argv)
           if (flag_crcbdelay >= 0)
             iwp->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
-            iwp->parm_dbfrac(flag_dbfrac);
+            iwp->parm_dbfrac((float)flag_dbfrac);
           int nchunk = resolve_quality(w*h);
-          iwp->encode_iff(iff, nchunk, parms);
+          if (flag_gamma>0 || flag_dpi>0)
+            // Create djvu file
+            create_photo_djvu_file(iwp, 0, w, h, iff, nchunk, parms);
+          else
+            // Create iw44 file
+            iwp->encode_iff(iff, nchunk, parms);
         }
       else if (iwb)
         {
@@ -636,9 +714,14 @@ main(int argc, char **argv)
           StdioByteStream obs(iw4file,"wb");
           IFFByteStream iff(obs);
           if (flag_dbfrac > 0)
-            iwb->parm_dbfrac(flag_dbfrac);
+            iwb->parm_dbfrac((float)flag_dbfrac);
           int nchunk = resolve_quality(w*h);
-          iwb->encode_iff(iff, nchunk, parms);
+          if (flag_gamma>0 || flag_dpi>0)
+            // Create djvu file
+            create_photo_djvu_file(0, iwb, w, h, iff, nchunk, parms);
+          else
+            // Create iw44 file
+            iwb->encode_iff(iff, nchunk, parms);
         }
       // Cleanup memory
       delete iwp;
