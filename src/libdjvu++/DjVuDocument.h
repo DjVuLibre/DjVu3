@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.36 1999-11-06 16:16:26 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.37 1999-11-11 21:47:45 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.36 1999-11-06 16:16:26 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.37 1999-11-11 21:47:45 eaf Exp $#
 */
 
 //@{
@@ -540,10 +540,13 @@ public:
 	  is "bundled" into one file and this file is written into the
 	  passed stream.
 
+	  If #force_djvm# is #TRUE# then even one page documents will be
+	  saved in the #DJVM BUNDLED# format (inside a #FORM:DJVM#);
+
 	  {\bf Plugin Warning}. This function will read contents of the whole
 	  document. Thus, if you call it from the main thread (the thread,
 	  which transfers data from Netscape), the plugin will block. */
-   void			write(ByteStream & str);
+   void			write(ByteStream & str, bool force_djvm=false);
       /** Saves the document in the {\em new indirect} format when every
 	  page and component are stored in separate files. This format
 	  is ideal for web publishing because it allows direct access to
