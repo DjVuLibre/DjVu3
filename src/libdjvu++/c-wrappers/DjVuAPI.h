@@ -1,4 +1,4 @@
-/* File "$Id: DjVuAPI.h,v 1.18 2000-01-06 04:28:09 bcr Exp $"
+/* File "$Id: DjVuAPI.h,v 1.19 2000-01-06 04:34:03 bcr Exp $"
  *
  * The main header file for the DjVu API
  */
@@ -8,8 +8,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.18  2000-01-06 04:28:09  bcr
- * Somehow the DjVuAPI file was overwritten (again)!
+ * Revision 1.19  2000-01-06 04:34:03  bcr
+ * Don't ask me.
+ *
+ * Revision 1.17  2000/01/05 19:39:48  praveen
+ * *** empty log message ***
  *
  * Revision 1.16  2000/01/05 19:34:24  bcr
  * Generic header file.
@@ -154,6 +157,8 @@
 #include <sys/types.h>
 #endif
 
+#include "DjVu.h"
+
 /*
  *  ------------------------------------------------------------------------
  */
@@ -169,25 +174,6 @@ extern "C" {
  *  ------------------------------------------------------------------------
  * DYNAMIC LINK LIBRARY STUFF
  */
-
-/*define DJVU_STATIC_LIBRARY */
-
-#ifndef DJVU_STATIC_LIBRARY
-#ifdef WIN32 
-#define DLLIMPORT __declspec(dllimport)
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif
-#else /* DJVU_STATIC_LIBRARY */
-#define DLLIMPORT /**/
-#define DLLEXPORT /**/
-#endif /* DJVU_STATIC_LIBRARY */
-
-#ifndef DJVUAPI
-#define DJVUAPI DLLIMPORT
-#endif
 
 typedef enum {
   asciiBW='1',
@@ -767,20 +753,6 @@ typedef enum {
 typedef void
 djvu_error_callback ( const char cause[], const char file[], const int line);
 
-#ifndef HAS_DJVU_PROGRESS_CALLBACKS
-#define HAS_DJVU_PROGRESS_CALLBACKS
-typedef void
-djvu_progress_callback (const char [],unsigned long,unsigned long);
-#endif
-
-#ifndef HAS_DJVU_CALLBACKS
-#define HAS_DJVU_CALLBACKS
-  typedef void djvu_free_callback (void *);
-  typedef void *djvu_realloc_callback (void *, size_t);
-  typedef void *djvu_malloc_callback (size_t);
-  typedef void *djvu_calloc_callback (size_t,size_t);
-#endif
-
 /* DjVu Error Handling
  *
  * 	See DjVuAPI-2_0.html#DjVu Error Handling
@@ -791,23 +763,6 @@ djvu_progress_callback (const char [],unsigned long,unsigned long);
              DJVUAPI djvu_error_callback *
              djvu_set_error_callback( djvu_error_callback *callback);
 		
-/*
- * Progress call back function
- */
-             DJVUAPI djvu_progress_callback *
-             djvu_set_progress_callback( djvu_progress_callback *callback );
-
-/*
- * Memory related call back functions
- */
-
-        DJVUAPI int 
-        djvu_set_memory_callbacks(
-           djvu_free_callback *,
-           djvu_realloc_callback *,
-           djvu_malloc_callback *,
-           djvu_calloc_callback *);
-
 /* 
  * ----------------------------------------------------------------------------
  * 
