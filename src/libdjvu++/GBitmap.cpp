@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.23 2000-01-17 07:34:15 bcr Exp $
+//C- $Id: GBitmap.cpp,v 1.24 2000-01-17 20:35:27 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 #include "GThreads.h"
 
-// File "$Id: GBitmap.cpp,v 1.23 2000-01-17 07:34:15 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.24 2000-01-17 20:35:27 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 
@@ -402,7 +402,8 @@ GBitmap::change_grays(int ngrays)
   for (int row=0; row<nrows; row++)
     {
       unsigned char *p = (*this)[row];
-      for (int n=0; n<ncolumns; n++,p++)
+//      for (int n=0; n<ncolumns; n++,p++)
+      for (int n=0; n<ncolumns; n++)
         p[n] = conv[ p[n] ];
     }
 }
@@ -415,7 +416,8 @@ GBitmap::binarize_grays(int threshold)
   for (int row=0; row<nrows; row++)
     {
       unsigned char *p = (*this)[row];
-      for (int n=0; n<ncolumns; n++,p++)
+//      for (int n=0; n<ncolumns; n++,p++)
+      for (int n=0; n<ncolumns; n++)
         *p = (*p>threshold ? 1 : 0);
     }
   grays = 2;
