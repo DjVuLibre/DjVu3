@@ -35,6 +35,10 @@ LIBDJVUDECODEXX=$(LIBPATH)/libdjvudecode.a
 LIBDJVUDECODEXX_LINK=-ldjvudecode
 LIBDJVUDECODEXX_INC=-I./TOPDIR/src/libapi/libdjvudecode -I./TOPDIR/SRCDIR/src/libapi/libdjvudecode
 
+LIBDJVURENDER=$(LIBPATH)/libdjvurender.a
+LIBDJVURENDER_LINK=-ldjvurender
+LIBDJVURENDER_INC=-I./TOPDIR/src/libapi/libdjvurender -I./TOPDIR/SRCDIR/src/libapi/libdjvurender
+
 LIBDJVUBITONAL=$(LIBPATH)/libdjvubitonal.a
 LIBDJVUBITONAL_LINK=-ldjvubitonal
 LIBDJVUBITONAL_INC=-I./TOPDIR/src/libapi/libdjvubitonal -I./TOPDIR/SRCDIR/src/libapi/libdjvubitonal
