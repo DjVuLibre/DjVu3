@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.19 2001-04-05 16:06:27 bcr Exp $
+// $Id: debug.cpp,v 1.20 2001-04-05 19:19:23 bcr Exp $
 // $Name:  $
 
 #ifdef NO_DEBUG
@@ -106,20 +106,20 @@ DjVuDebug::format(const char *fmt, ... )
     {
       va_list ap;
       va_start(ap, fmt);
-      char buffer[256];
-      vsprintf(buffer, fmt, ap);
+      GString buffer;
+      buffer.format(fmt,ap);
       va_end(ap);
       GCriticalSectionLock glock(&debug_lock);
       if(debug_file)
       {
-        debug_file->format("%s", buffer);
+        debug_file->writestring(buffer);
         debug_file->flush();
       }
 #ifdef WIN32
       else
       {
         USES_CONVERSION;
-        OutputDebugString(A2CT(buffer));
+        OutputDebugString(A2CT((const char *)buffer));
       }
 #endif
     }
@@ -191,7 +191,7 @@ DjVuDebug::lock(int lvl, int noindent)
       if (threads_num>1) dbg.format("[T%d] ", dbg.id);
       int ind = dbg.indent;
       char buffer[257];
-      memset(buffer,' ', sizeof(buffer));
+      memset(buffer,' ', sizeof(buffer)-1);
       buffer[sizeof(buffer)-1] = 0;
       while (ind > (int)sizeof(buffer)-1)
         {
@@ -237,17 +237,12 @@ OP(const void * const, "0x%08x")
 
 DjVuDebug& DjVuDebug::operator<<(const char * const ptr) 
 {
-  char buffer[256];
-  const char *s = ptr;
-  char *d = buffer;
-  while (s && *s && d<buffer+sizeof(buffer)-4)
-    *d++ = *s++;
-  if (! s)
-    strcpy(d, "(null)");
-  else if (* s)
-    strcpy(d, "...");
-  *d = 0;
-  format("%s", buffer);
+  GString buffer(ptr?ptr:"(null)");
+  if(buffer.length() > 255)
+  {
+    buffer=buffer.substr(0,252)+"...";
+  }
+  format("%s", (const char *)buffer);
   return *this; 
 }
 

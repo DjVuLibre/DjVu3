@@ -74,10 +74,10 @@ compare_GBitmap(const GBitmap  &bm1, const GBitmap &bm2)
 
 
 #define COMPBM(bm1, bm2) \
- printf("%s==%s --> %d\n", #bm1, #bm2, compare_GBitmap(bm1, bm2))
+ DjVuPrint("%s==%s --> %d\n", #bm1, #bm2, compare_GBitmap(bm1, bm2))
 
 #define PRI(i) \
- printf("%s --> %d\n", #i, i)
+ DjVuPrint("%s --> %d\n", #i, i)
 
 int 
 main(void)

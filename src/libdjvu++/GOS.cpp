@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GOS.cpp,v 1.50 2001-04-05 16:06:27 bcr Exp $
+// $Id: GOS.cpp,v 1.51 2001-04-05 19:19:23 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -427,46 +427,46 @@ int main(int argc, char **argv)
   if (argc>1) 
     op = argv[1];
   if (op == "is_file" && argc==3) {
-      DjVuPrint("%d\n", GOS::is_file(argv[2])?1:0);
+      DjVuPrintMessage("%d\n", GOS::is_file(argv[2])?1:0);
       return 0;
   } else if (op =="is_dir" && argc==3) {
-    DjVuPrint("%d\n", GOS::is_dir(argv[2]));
+    DjVuPrintMessage("%d\n", GOS::is_dir(argv[2]));
     return 0;
   } else if (op == "dirname" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::dirname(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::dirname(argv[2]));
     return 0;
   } else if (op == "basename" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::basename(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::basename(argv[2]));
     return 0;
   } else if (op == "basename" && argc==4) {
-    DjVuPrint("%s\n", (const char*)GOS::basename(argv[2], argv[3]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::basename(argv[2], argv[3]));
     return 0;
   } else if (op == "cwd" && argc==2) {
-    DjVuPrint("%s\n", (const char*)GOS::cwd());
+    DjVuPrintMessage("%s\n", (const char*)GOS::cwd());
     return 0;
   } else if (op == "cwd" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::cwd(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::cwd(argv[2]));
     return 0;
   } else if (op == "cleardir" && argc==3) {
-    DjVuPrint("%d\n", GOS::cleardir(argv[2]));
+    DjVuPrintMessage("%d\n", GOS::cleardir(argv[2]));
     return 0;
   } else if (op == "expand_name" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::expand_name(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::expand_name(argv[2]));
     return 0;
   } else if (op == "expand_name" && argc==4) {
-    DjVuPrint("%s\n", (const char*)GOS::expand_name(argv[2], argv[3]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::expand_name(argv[2], argv[3]));
     return 0;
   } else if (op == "ticks" && argc==2) {
-    DjVuPrint("%lu\n", GOS::ticks());
+    DjVuPrintMessage("%lu\n", GOS::ticks());
     return 0;
   } else if (op == "sleep" && argc==3) {
     GOS::sleep(atoi(argv[2]));
     return 0;
   } else if (op == "filename_to_url" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::filename_to_url(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::filename_to_url(argv[2]));
     return 0;
   } else if (op == "url_to_filename" && argc==3) {
-    DjVuPrint("%s\n", (const char*)GOS::url_to_filename(argv[2]));
+    DjVuPrintMessage("%s\n", (const char*)GOS::url_to_filename(argv[2]));
     return 0;
   }
   DjVuPrintError("%s\n","syntax error");

@@ -12,19 +12,19 @@
 
 
 
-#define PRS(expr)  printf("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  printf("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  printf("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 // #define THOROUGH
 #ifdef THOROUGH
 void *operator new(size_t sz) {
   void *x = malloc(sz);
-  printf("new %d = %x\n", sz, x);
+  DjVuPrint("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  printf("delete %x\n", x);
+  DjVuPrint("delete %x\n", x);
   free(x);
 }
 #endif

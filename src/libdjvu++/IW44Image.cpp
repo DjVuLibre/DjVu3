@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IW44Image.cpp,v 1.7 2001-04-05 16:06:27 bcr Exp $
+// $Id: IW44Image.cpp,v 1.8 2001-04-05 19:19:23 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 08/1998
@@ -1062,7 +1062,7 @@ IW44Image::Codec::decode_buckets(ZPCodec &zp, int bit, int band,
       if (zp.decoder(ctxRoot))
         bbstate |= NEW;
 #ifdef TRACE
-      DjVuPrint("bbstate[bit=%d,band=%d] = %d\n", bit, band, bbstate);
+      DjVuPrintMessage("bbstate[bit=%d,band=%d] = %d\n", bit, band, bbstate);
 #endif
     }
   
@@ -1102,7 +1102,7 @@ IW44Image::Codec::decode_buckets(ZPCodec &zp, int bit, int band,
             if (zp.decoder( ctxBucket[band][ctx] ))
               bucketstate[buckno] |= NEW;
 #ifdef TRACE
-            DjVuPrint("  bucketstate[bit=%d,band=%d,buck=%d] = %d\n", 
+            DjVuPrintMessage("  bucketstate[bit=%d,band=%d,buck=%d] = %d\n", 
                    bit, band, buckno, bucketstate[buckno]);
 #endif
           }
@@ -1178,7 +1178,7 @@ IW44Image::Codec::decode_buckets(ZPCodec &zp, int bit, int band,
                       gotcha -= 1;
 #endif
 #ifdef TRACE
-                    DjVuPrint("    coeffstate[bit=%d,band=%d,buck=%d,c=%d] = %d\n", 
+                    DjVuPrintMessage("    coeffstate[bit=%d,band=%d,buck=%d,c=%d] = %d\n", 
                            bit, band, buckno, i, cstate[i]);
 #endif
                   }

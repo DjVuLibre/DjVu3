@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.48 2001-04-04 22:12:11 bcr Exp $
+// $Id: ByteStream.h,v 1.49 2001-04-05 19:19:22 bcr Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
@@ -62,7 +62,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.48 2001-04-04 22:12:11 bcr Exp $# */
+    #$Id: ByteStream.h,v 1.49 2001-04-05 19:19:22 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -189,6 +189,8 @@ public:
   size_t copy(ByteStream &bsfrom, size_t size=0);
   /// Allows printf() type operations to a bytestream.
   size_t format(const char *fmt, ... );
+  /// Allows scanf() type operations on a bytestream.
+  int scanf(const char *fmt, ... );
   /** Writes the string as is, to the specified stream. */
   size_t writestring(const GString &s);
   /** Converts the string to native and writes it to the specified stream. */

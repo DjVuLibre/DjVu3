@@ -15,37 +15,37 @@
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  printf("new %d = %x\n", sz, x);
+  DjVuPrint("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  printf("delete %x\n", x);
+  DjVuPrint("delete %x\n", x);
   free(x);
 }
 #endif
 
 
-#define PRS(expr)  printf("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  printf("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  printf("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
 PMAPSI(const GMap<GString,int> &map)
 {
   GString gs;
-  printf("( ");
+  DjVuPrint("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    printf("%s:%d ", (const char*)map.key(pos), map[pos]);
-  printf(")\n");
+    DjVuPrint("%s:%d ", (const char*)map.key(pos), map[pos]);
+  DjVuPrint(")\n");
 }
 
 void
 PMAPIS(const GMap<int,GString> &map)
 {
-  printf("( ");
+  DjVuPrint("( ");
   for (GPosition pos=map.firstpos(); pos; ++pos)
-    printf("%d:%s ", map.key(pos), (const char*)map[pos]);
-  printf(")\n");
+    DjVuPrint("%d:%s ", map.key(pos), (const char*)map[pos]);
+  DjVuPrint(")\n");
 }
 
 int

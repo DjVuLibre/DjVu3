@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.60 2001-04-05 19:02:02 praveen Exp $
+// $Id: ByteStream.cpp,v 1.61 2001-04-05 19:19:22 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -256,6 +256,13 @@ private:
 
 ByteStream::~ByteStream()
 {
+}
+
+int 
+ByteStream::scanf(const char *fmt, ...)
+{
+  G_THROW("ByteStream.not_implimented"); // This is a place holder function.
+  return 0;
 }
 
 size_t 
@@ -1188,7 +1195,7 @@ DjVuPrintError(const char *fmt, ... )
 }
 
 void
-DjVuPrint(const char *fmt, ... )
+DjVuPrintMessage(const char *fmt, ... )
 {
   static GP<ByteStream> strout=ByteStream::create(1,0,false);
   if(strout)

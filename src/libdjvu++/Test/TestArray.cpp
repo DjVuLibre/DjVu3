@@ -11,19 +11,19 @@
 #include "GString.h"
 
 
-#define PRS(expr)  printf("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  printf("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  printf("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 // #define THOROUGH
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  printf("new %d = %x\n", sz, x);
+  DjVuPrint("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  printf("delete %x\n", x);
+  DjVuPrint("delete %x\n", x);
   free(x);
 }
 #endif
@@ -32,8 +32,8 @@ void
 PARR(GArray<int> &ga)
 {
   for(int i=ga.lbound();i<=ga.hbound();i++)
-    printf("%d ", ga[i]);
-  printf("\n");
+    DjVuPrint("%d ", ga[i]);
+  DjVuPrint("\n");
 }
 
 void
@@ -116,7 +116,7 @@ test_string()
   for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
 #if 0
   gb.sort();
-  printf("sorted\n");
+  DjVuPrint("sorted\n");
   for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
 #endif
 }

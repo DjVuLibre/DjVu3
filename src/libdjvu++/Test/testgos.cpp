@@ -45,38 +45,38 @@ const char * invalid_dir = "C:\\xxx";
 int
 main()
 {
-   FILE *out = fopen("out.txt", "w");
-   char msg[500];
-   char  fullmsg[4024];
-   if (GOS::is_file(valid_file))
-      sprintf (msg,"Valid file, %s is recognized as a file\n",valid_file);
+   GP<ByteStream> out = ByteStream::create(GURL::Filename::UTF8("out.txt"), "w", true);
+   GString msg;
+   GString  fullmsg;
+   if (GURL::Filename::UTF8(valid_file).is_file())
+      msg.format("Valid file, %s is recognized as a file\n",valid_file);
    else
-      sprintf (msg,"FAILURE:  Valid file, %s is not recognized as a file\n",valid_file);
-   strcpy(fullmsg, msg);
+      msg.format("FAILURE:  Valid file, %s is not recognized as a file\n",valid_file);
+   fullmsg=msg;
 
-   if (GOS::is_dir(valid_dir))
-      sprintf (msg,"Valid dir, %s is recognized as a directory\n",valid_dir);
+   if (GURL::Filename::UTF8(valid_dir).is_dir())
+      msg.format("Valid dir, %s is recognized as a directory\n",valid_dir);
    else
-      sprintf (msg,"FAILURE:  Valid dir, %s is not recognized as a directory\n",valid_dir);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Valid dir, %s is not recognized as a directory\n",valid_dir);
+   fullmsg+=msg;
 
-   if (! GOS::is_file(invalid_file))
-      sprintf (msg,"Invalid file, %s is recognized as an invalid file\n",invalid_file);
+   if (! GURL::Filename::UTF8(invalid_file).is_file())
+      msg.format("Invalid file, %s is recognized as an invalid file\n",invalid_file);
    else
-      sprintf (msg,"FAILURE:  Invalid file, %s is not recognized as an invalid file\n",invalid_file);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Invalid file, %s is not recognized as an invalid file\n",invalid_file);
+   fullmsg+=msg;
 
-   if (! GOS::is_dir(invalid_dir))
-      sprintf (msg,"Invalid dir, %s is recognized as an invalid directory\n",invalid_dir);
+   if (! GURL::Filename::UTF8(invalid_dir).is_dir())
+      msg.format("Invalid dir, %s is recognized as an invalid directory\n",invalid_dir);
    else
-      sprintf (msg,"FAILURE:  Invalid dir, %s is incorrectly recognized as a directory\n",invalid_dir);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Invalid dir, %s is incorrectly recognized as a directory\n",invalid_dir);
+   fullmsg+=msg;
 
-   if ( GOS::mkdir (invalid_dir))
-      sprintf (msg,"Created directory, %s.  Verify it really exists.\n",invalid_dir);
+   if ( GOS::Filename::UTF8(invalid_dir).mkdir())
+      msg.format("Created directory, %s.  Verify it really exists.\n",invalid_dir);
    else
-      sprintf (msg,"FAILURE:  Could not create directory, %s.\n",invalid_dir);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Could not create directory, %s.\n",invalid_dir);
+   fullmsg+=msg;
 
 //MBCS start additional tests
 // basename(filename[, suffix])
@@ -85,20 +85,20 @@ main()
 //GString GOS::basename(const char *fname, const char *suffix)
    GString gsname;
    gsname = GOS::basename (valid_dir);
-   sprintf (msg,"basename file, %s, gsname = %s.  Verify gsname.\n",valid_dir,(const char*)gsname);
-   strcat(fullmsg, msg);
+   msg.format("basename file, %s, gsname = %s.  Verify gsname.\n",valid_dir,(const char*)gsname);
+   fullmsg+=msg;
 // expand_name(filename[, fromdirname])
 // -- returns the full path name of filename interpreted
 //    relative to fromdirname.  Use current working dir when
 //    fromdirname is null.
 //GString GOS::expand_name(const char *fname, const char *from)
-   gsname = GOS::expand_name (valid_file, valid_dir);
-   sprintf (msg,"expand_name file, %s directory, %s, gsname = %s. Verify gsname.\n",valid_file,valid_dir, (const char*)gsname);
-   strcat(fullmsg, msg);
+   gsname = GURL::expand_name(valid_file, valid_dir);
+   msg.format("expand_name file, %s directory, %s, gsname = %s. Verify gsname.\n",valid_file,valid_dir, (const char*)gsname);
+   fullmsg+=msg;
 
-   gsname = GOS::expand_name (valid_file);
-   sprintf (msg,"expand_name file, %s, gsname = %s.  Verify gsname.\n",valid_file,(const char*)gsname);
-   strcat(fullmsg, msg);
+   gsname = GURL::expand_name (valid_file);
+   msg.format("expand_name file, %s, gsname = %s.  Verify gsname.\n",valid_file,(const char*)gsname);
+   fullmsg+=msg;
 
 // filename_to_url --
 // -- Returns a url for accessing a given file.
@@ -106,56 +106,50 @@ main()
 //    but will not be understood by some versions if IE.
 //GString GOS::filename_to_url(const char *filename, const char *useragent)
    GString url;
-   url = GOS::filename_to_url (valid_dir);
-   sprintf (msg,"filename_to_url directory, %s, url = %s.  Verify url.\n",valid_dir,(const char *)url);
-   strcat(fullmsg, msg);
+   url = GURL::Filename::UTF8(valid_dir);
+   msg.format("filename_to_url directory, %s, url = %s.  Verify url.\n",valid_dir,(const char *)url);
+   fullmsg+=msg;
 // url_to_filename --
 // -- Applies heuristic rules to convert a url into a valid file name.  
 //    Returns a simple basename in case of failure.
 //GString GOS::url_to_filename(const char *url)
-   gsname = GOS::url_to_filename (url);
-   sprintf (msg,"url_to_filename directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
-   strcat(fullmsg, msg);
+   gsname = GURL::UTF8(url).UTF8Filename();
+   msg.format("url_to_filename directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
+   fullmsg+=msg;
 //GString GOS::encode_reserved(const char * filename)
-   url = GOS::encode_reserved (valid_dir);
-   sprintf (msg,"encode_reserved directory, %s, gsname = %s.  Verify url.\n",valid_dir,(const char *)url);
-   strcat(fullmsg, msg);
+//   url = GOS::encode_reserved (valid_dir);
+//   sprintf (msg,"encode_reserved directory, %s, gsname = %s.  Verify url.\n",valid_dir,(const char *)url);
+//   strcat(fullmsg, msg);
 //GString GOS::decode_reserved(const char * url)
-   gsname = GOS::decode_reserved (url);
-   sprintf (msg,"decode_reserved directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
-   strcat(fullmsg, msg);
+//   gsname = GOS::decode_reserved (url);
+//   sprintf (msg,"decode_reserved directory, %s, gsname = %s.  Verify gsname.\n",(const char *)url,(const char*)gsname);
+//   strcat(fullmsg, msg);
 
-   if ( GOS::deletefile (valid_file))
-      sprintf (msg,"Deleted file, %s.  Verify it's gone.\n",valid_file);
+   if ( GURL::Filename::UTF8(valid_file).deletefile())
+      msg.format("Deleted file, %s.  Verify it's gone.\n",valid_file);
    else
-      sprintf (msg,"FAILURE:  Could not delete file, %s\n",valid_file);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Could not delete file, %s\n",valid_file);
+   fullmsg+=msg;
 
-   if ( GOS::deletefile (valid_dir))
-      sprintf (msg,"Deleted directory, %s.  Verify it's gone.\n",valid_dir);
+   if ( GURL::Filename::UTF8(valid_dir).deletefile ())
+      msg.format("Deleted directory, %s.  Verify it's gone.\n",valid_dir);
    else
-      sprintf (msg,"FAILURE:  Could not delete directory, %s\n",valid_dir);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Could not delete directory, %s\n",valid_dir);
+   fullmsg+=msg;
 
 //int GOS::cleardir(const char * dirname)
-   if ( ! GOS::cleardir (clear_dir))
-      sprintf (msg,"cleardir directory, %s.  Verify it's gone.\n",clear_dir);
+   if ( ! GURL::Filename::UTF8(clear_dir).cleardir ())
+      msg.format("cleardir directory, %s.  Verify it's gone.\n",clear_dir);
    else
-      sprintf (msg,"FAILURE:  Could not cleardir directory, %s\n",clear_dir);
-   strcat(fullmsg, msg);
+      msg.format("FAILURE:  Could not cleardir directory, %s\n",clear_dir);
+   fullmsg+=msg;
 
 //MBCS end
 
-#ifdef UNDER_CE
-   WCHAR temp[1024];
-   wsprintf(temp,L"%S",fullmsg);
-   //MessageBox (NULL,temp, L"TestGOS",MB_OK);
-   OutputDebugStringW(temp) ;
-#else
-   printf("%s",fullmsg);
-   fprintf(out,"%s", fullmsg);
-   fclose(out);
+#ifndef UNDER_CE
+  DjVuPrint("%s",fullmsg);
 #endif
+  out->writestring(fullmsg);
   return 0;
 }
 
@@ -165,8 +159,6 @@ int WINAPI WinMain (HINSTANCE hInstance,
                      LPTSTR lpCmdLine,
                      int nCmdShow)
 {
-   main();
-
-   return 0;
+   return main();
 }
 #endif

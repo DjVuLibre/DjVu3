@@ -26,18 +26,18 @@ public:
 Test::Test()
 {
   id = genid++;
-  printf("creating test-%c\n", id);
+  DjVuPrint("creating test-%c\n", id);
 }
 
 Test::~Test()
 {
-  printf("deleting test-%c\n", id);
+  DjVuPrint("deleting test-%c\n", id);
 }
 
 void
 Test::show(char *s)
 {
-  printf("%s contains test-%c with counter %d\n", 
+  DjVuPrint("%s contains test-%c with counter %d\n", 
          s, id, count);
 }
 

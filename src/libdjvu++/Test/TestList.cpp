@@ -15,36 +15,36 @@
 #ifdef THOROUGH
 void * operator new(size_t sz) {
   void *x = malloc(sz);
-  printf("new %d = %x\n", sz, x);
+  DjVuPrint("new %d = %x\n", sz, x);
   return x;
 }
 void operator delete(void *x) {
-  printf("delete %x\n", x);
+  DjVuPrint("delete %x\n", x);
   free(x);
 }
 #endif
 
 
-#define PRS(expr)  printf("%s :=\"%s\"\n", #expr, (const char*)(expr))
-#define PRI(expr)  printf("%s :=%d\n", #expr, (int)(expr))
-#define PRC(expr)  printf("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
+#define PRS(expr)  DjVuPrint("%s :=\"%s\"\n", #expr, (const char*)(expr))
+#define PRI(expr)  DjVuPrint("%s :=%d\n", #expr, (int)(expr))
+#define PRC(expr)  DjVuPrint("%s :=%d '%c'\n", #expr, (char)(expr), (char)(expr))
 
 void
 PCONTI(GList<int> &ga)
 {
-  printf("( ");
+  DjVuPrint("( ");
   for (GPosition pos=ga; pos; ++pos)
-    printf("%d ", ga[pos]);
-  printf(")\n");
+    DjVuPrint("%d ", ga[pos]);
+  DjVuPrint(")\n");
 }
 
 void
 PCONTS(GList<GString> &ga)
 {
-  printf("( ");
+  DjVuPrint("( ");
   for (GPosition pos=ga; pos; ++pos)
-    printf("\"%s\" ", (const char*)(ga[pos]));
-  printf(")\n");
+    DjVuPrint("\"%s\" ", (const char*)(ga[pos]));
+  DjVuPrint(")\n");
 }
 
 
@@ -104,9 +104,9 @@ main()
   pos = gl1.firstpos();
   n = gl1.search("two",pos);
   PRI(n);
-  printf("( ");
+  DjVuPrint("( ");
   for (pos=gl2.lastpos(); pos; --pos)
-    printf("'%s' ", (const char*)gl2[pos]);
-  printf(")\n");
+    DjVuPrint("'%s' ", (const char*)gl2[pos]);
+  DjVuPrint(")\n");
   return 0;
 }
