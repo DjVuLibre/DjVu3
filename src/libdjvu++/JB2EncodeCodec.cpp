@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.6 2001-03-06 19:55:42 bcr Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.7 2001-03-08 21:30:28 bcr Exp $
 // $Name:  $
 
 #ifndef NEED_DECODER_ONLY
@@ -340,7 +340,7 @@ JB2Dict::JB2Codec::Encode::code(GP<JB2Dict> gjim)
           // Code shape
           JB2Shape &jshp = jim.get_shape(shapeno);
           rectype=(jshp.parent >= 0)
-            ?NEW_MARK_LIBRARY_ONLY:MATCHED_REFINE_LIBRARY_ONLY;
+            ?MATCHED_REFINE_LIBRARY_ONLY:NEW_MARK_LIBRARY_ONLY;
           code_record(rectype, gjim, &jshp);
           add_library(shapeno, jshp);
 	  // Check numcoder status
