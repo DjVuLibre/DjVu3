@@ -21,6 +21,12 @@
 
 <DL>
 <P><DL>
+<DT><H3>Public Fields</H3><DD><DT>
+<A HREF="#DOC.1.5.13.1.11"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>bool <B>has_magic</B>
+<DD><I><TT>has_magic</TT> is true if the stream has the DjVu file magic</I>
+</DL></P>
+
+<P><DL>
 <DT><H3>Public Methods</H3><DD><DT>
 <A HREF="#DOC.1.5.13.1.1"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A> <B>IFFByteStream</B>(<!1><A HREF="ByteStream.html">ByteStream</A> &amp;bs)
 <DD><I>Constructs an IFFByteStream object attached to ByteStream <TT>bs</TT>.</I>
@@ -28,7 +34,7 @@
 <A HREF="#DOC.1.5.13.1.2"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>int <B>get_chunk</B>(<!1><A HREF="GString.html">GString</A> &amp;chkid, int *rawoffsetptr=0, int *rawsizeptr=0)
 <DD><I>Enters a chunk for reading.</I>
 <DT>
-<A HREF="#DOC.1.5.13.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>put_chunk</B>(const char *chkid, int insertatt=0)
+<A HREF="#DOC.1.5.13.1.3"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>put_chunk</B>(const char *chkid, int insertmagic=0)
 <DD><I>Enters a chunk for writing.</I>
 <DT>
 <A HREF="#DOC.1.5.13.1.4"><IMG ALT="[more]" BORDER=0 SRC=icon1.gif></A>void <B>close_chunk</B>()
@@ -192,12 +198,12 @@ the chunk data.
 <DL><DT><DD></DL><P>
 <A NAME="put_chunk">
 <A NAME="DOC.1.5.13.1.3">
-<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void put_chunk(const char *chkid, int insertatt=0)</B></TT>
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>void put_chunk(const char *chkid, int insertmagic=0)</B></TT>
 <DD>Enters a chunk for writing.  Function <TT>put_chunk</TT> prepares a chunk
 header and positions the IFFByteStream at the beginning of the chunk
 data.  Argument <TT>chkid</TT> defines a extended chunk identifier for this
 chunk.  The chunk data can then be written using function <TT>write</TT>.  The
-chunk is terminated by a matching call to function <TT>close_chunk</TT>.  When<P><TT>&quot;AT&amp;T&quot;</TT> before the chunk header, as discussed in
+chunk is terminated by a matching call to function <TT>close_chunk</TT>.  When<P>0x41, 0x54, 0x26, 0x54 before the chunk header, as discussed in
 <!1><A HREF="IFFByteStream.h.html">IFFByteStream.h</A>. 
 <DL><DT><DD></DL><P>
 <A NAME="close_chunk">
@@ -258,6 +264,11 @@ It returns <TT>0</TT> if this is a legal identifier for a regular chunk.  It
 returns <TT>+1</TT> if this is a reserved composite chunk identifier.  It
 returns <TT>-1</TT> if this is an illegal or otherwise reserved identifier
 which should not be used.  
+<DL><DT><DD></DL><P>
+<A NAME="has_magic">
+<A NAME="DOC.1.5.13.1.11">
+<DT><IMG ALT="o" BORDER=0 SRC=icon2.gif><TT><B>bool has_magic</B></TT>
+<DD><TT>has_magic</TT> is true if the stream has the DjVu file magic
 <DL><DT><DD></DL><P></DL>
 
 <HR><DL><DT><B>This class has no child classes.</B></DL>
@@ -266,7 +277,7 @@ which should not be used.
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-DjVu is a trademark of LizardTech.   
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
