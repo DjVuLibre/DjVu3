@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.21 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.22 1999-09-03 23:35:40 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.21 1999-09-03 23:03:06 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.22 1999-09-03 23:35:40 leonb Exp $#
 */
 
 //@{
@@ -142,7 +142,7 @@
     with \Ref{DjVuDocument}. So please review the documentation on this class
     too. */
 
-class DjVuFile : public GPEnabled, public DjVuPort
+class DjVuFile : public DjVuPort
 {
 public:
    enum { DECODING=1, DECODE_OK=2, DECODE_FAILED=4, DECODE_STOPPED=8,
@@ -175,7 +175,10 @@ public:
    int			file_size;
       //@}
 
-      /** Constructs #DjVuFile# object. This is a simplified constructor,
+   DjVuFile(void);
+   virtual ~DjVuFile(void);
+
+      /** Initializes a #DjVuFile# object. This is a simplified initializer,
 	  which is not supposed to be used for decoding or creating
 	  #DjVuFile#s, which include other files.
 
@@ -188,10 +191,10 @@ public:
 	  it has been constructed.
 
 	  @param str The stream containing data for the file. */
-   DjVuFile(ByteStream & str);
+   void init(ByteStream & str);
    
-      /** Constructs #DjVuFile# object. As you can notice, the data is not
-	  directly passed to the constructor. The #DjVuFile# will ask for it
+      /** Initializes a #DjVuFile# object. As you can notice, the data is not
+	  directly passed to this function. The #DjVuFile# will ask for it
 	  through the \Ref{DjVuPort} mechanism before the constructor
 	  finishes. If the data is stored locally on the hard disk then the
 	  pointer to \Ref{DjVuPort} may be set to #ZERO#, which will make
@@ -219,8 +222,7 @@ public:
 		 of \Ref{DjVuSimplePort} for accessing local files and
 		 reporting errors. It can later be disabled by means
 		 of \Ref{disable_standard_port}() function. */
-   DjVuFile(const GURL & url, DjVuPort * port=0);
-   virtual ~DjVuFile(void);
+   void init(const GURL & url, GP<DjVuPort> port=0);
 
       /** Specifies what function should be called when this instance
 	  of #DjVuFile# is about to be destroyed. */
@@ -393,6 +395,7 @@ private:
       DestroyCB(void (* cb)(const DjVuFile *, void *), void * cl_data) :
 	    cb(cb), cl_data(cl_data) {};
    };
+   bool                 initialized;
    GMonitor		status_mon;
    int			status;
 
@@ -403,7 +406,7 @@ private:
    GP<DjVuFile>		decode_life_saver;
    GP<DataPool>		decode_data_pool;
 
-   DjVuPort		* simple_port;
+   GP<DjVuPort>		simple_port;
 
    GMonitor		chunk_mon, finish_mon;
 

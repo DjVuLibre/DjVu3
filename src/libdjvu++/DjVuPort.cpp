@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.10 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.11 1999-09-03 23:35:40 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -18,40 +18,96 @@
 #include "DjVuPort.h"
 #include "GOS.h"
 
-static DjVuPortcaster * pcaster;
+
+
+//****************************************************************************
+//******************************* Globals ************************************
+//****************************************************************************
+
+
+static DjVuPortcaster *pcaster;
 
 DjVuPortcaster *
-get_portcaster(void)
+DjVuPort::get_portcaster(void)
 {
-   if (!pcaster) pcaster=new DjVuPortcaster();
+   if (!pcaster) pcaster = new DjVuPortcaster();
    return pcaster;
 }
 
-DjVuPortcaster::DjVuPortcaster(void) : DjVuPort(1)
+
+//****************************************************************************
+//******************************* DjVuPort ***********************************
+//****************************************************************************
+
+void *
+DjVuPort::operator new (size_t sz)
+{
+  void *addr = ::operator new (sz);
+  DjVuPortcaster *pcaster = get_portcaster();
+  GCriticalSectionLock lock(& pcaster->map_lock );
+  pcaster->cont_map[addr] = 0;
+  return addr;
+}
+
+
+DjVuPort::DjVuPort()
+{
+  DjVuPortcaster *pcaster = get_portcaster();
+  GCriticalSectionLock lock(& pcaster->map_lock );
+  GPosition p = pcaster->cont_map.contains(this);
+  if (!p) THROW("DjVuPort was not allocated on the heap");
+  pcaster->cont_map[p] = (void*)this;
+}
+
+DjVuPort::DjVuPort(const DjVuPort & port)
+{
+  DjVuPortcaster *pcaster = get_portcaster();
+  GCriticalSectionLock lock(& pcaster->map_lock );
+  GPosition p = pcaster->cont_map.contains(this);
+  if (!p) THROW("DjVuPort was not allocated on the heap");
+  pcaster->cont_map[p] = (void*)this;
+  pcaster->copy_routes(this, &port);
+}
+
+DjVuPort &
+DjVuPort::operator=(const DjVuPort & port)
+{
+   if (this != &port)
+      get_portcaster()->copy_routes(this, &port);
+   return *this;
+}
+
+DjVuPort::~DjVuPort(void)
+{
+   get_portcaster()->del_port(this);
+}
+
+
+//****************************************************************************
+//**************************** DjVuPortcaster ********************************
+//****************************************************************************
+
+
+
+DjVuPortcaster::DjVuPortcaster(void)
 {
 }
 
 DjVuPortcaster::~DjVuPortcaster(void)
 {
    GCriticalSectionLock lock(&map_lock);
-   
    for(GPosition pos=route_map;pos;++pos)
       delete (GList<void *> *) route_map[pos];
 }
 
-bool
-DjVuPortcaster::is_port_alive(const DjVuPort * port)
+GP<DjVuPort>
+DjVuPortcaster::is_port_alive(DjVuPort *port)
 {
    GCriticalSectionLock lock(&map_lock);
-   return cont_map.contains(port);
-}
-
-void
-DjVuPortcaster::add_port(const DjVuPort * port)
-{
-   GCriticalSectionLock lock(&map_lock);
-   
-   cont_map[port]=0;
+   GPosition pos = cont_map.contains(port);
+   if (pos && cont_map[pos] == port)
+     return GP<DjVuPort>( (DjVuPort*) port );
+   return 0;
 }
 
 void
@@ -142,29 +198,26 @@ void
 DjVuPortcaster::add_to_closure(GMap<const void *, void *> & set,
 			       const DjVuPort * dst, int distance)
 {
-      // Assuming that the map's already locked
-      // GCriticalSectionLock lock(&map_lock);
-   
-   set[dst]=(void *) distance;
-
-   if (route_map.contains(dst))
-   {
+  // Assuming that the map's already locked
+  // GCriticalSectionLock lock(&map_lock);
+  set[dst]=(void *) distance;
+  if (route_map.contains(dst))
+    {
       GList<void *> & list=*(GList<void *> *) route_map[dst];
       for(GPosition pos=list;pos;++pos)
-      {
-	 DjVuPort * new_dst=(DjVuPort *) list[pos];
-	 if (!set.contains(new_dst)) add_to_closure(set, new_dst, distance+1);
-      }
+        {
+          DjVuPort * new_dst=(DjVuPort *) list[pos];
+          if (!set.contains(new_dst)) 
+            add_to_closure(set, new_dst, distance+1);
+        }
    }
 }
 
 void
-DjVuPortcaster::compute_closure(GMap<const void *, void *> & set,
-				const DjVuPort * src)
+DjVuPortcaster::compute_closure(const DjVuPort * src, GPList<DjVuPort> &list, bool sorted)
 {
    GCriticalSectionLock lock(&map_lock);
-   
-   set.empty();
+   GMap<const void*, void*> set;
    if (route_map.contains(src))
    {
       GList<void *> & list=*(GList<void *> *) route_map[src];
@@ -175,273 +228,179 @@ DjVuPortcaster::compute_closure(GMap<const void *, void *> & set,
 	 else add_to_closure(set, dst, 1);
       }
    }
-}
-
-void
-DjVuPortcaster::sort_closure(const GMap<const void *, void *> & set,
-			     GList<const void *> & list)
-      // Will copy 'set' to 'list' putting elements closest to the source
-      // the first (the distance is encoded as map's value)
-{
-   list.empty();
-
-   int max_dist=0;
+   // Compute list
    GPosition pos;
-   for(pos=set;pos;++pos)
-      if (max_dist<(int) set[pos])
-	 max_dist=(int) set[pos];
-
-      // Not using GArray<> to avoid instantiation of another template
-   GList<const void *> * lists=new GList<const void *>[max_dist+1];
-   TRY {
-      for(pos=set;pos;++pos)
-	 lists[(int) set[pos]].append(set.key(pos));
-
-      for(int dist=0;dist<=max_dist;dist++)
-	 for(pos=lists[dist];pos;++pos)
-	    list.append(lists[dist][pos]);
-      
-      delete [] lists; lists=0;
-   } CATCH(exc) {
-      delete [] lists; lists=0;
-      RETHROW;
-   } ENDCATCH;
+   if (sorted)
+     {
+       // Sort in depth order
+       int max_dist=0;
+       for(pos=set;pos;++pos)
+         if (max_dist < (int) set[pos])
+           max_dist = (int) set[pos];
+       GArray<GList<const void*> > lists(0,max_dist);
+       for(pos=set;pos;++pos)
+         lists[(int) set[pos]].append(set.key(pos));
+       for(int dist=0;dist<=max_dist;dist++)
+         for(pos=lists[dist];pos;++pos)
+           list.append( (DjVuPort*) lists[dist][pos] );
+     }
+   else
+     {
+       // Gather ports without order
+       for(pos=set;pos;++pos)
+         list.append( (DjVuPort*) set.key(pos) );
+     }
 }
 
 GURL
 DjVuPortcaster::id_to_url(const DjVuPort * source, const char * id)
 {
-   GMap<const void *, void *> set;
-   GList<const void *> list;
-   compute_closure(set, source);
-   sort_closure(set, list);
-
+   GPList<DjVuPort> list;
+   compute_closure(source, list, true);
    GURL url;
    for(GPosition pos=list;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) list[pos];
-      if (is_port_alive(port))
-      {
-	 url=port->id_to_url(source, id);
-	 if (!url.is_empty()) break;
-      }
-   }
+     {
+       url = list[pos]->id_to_url(source, id);
+       if (!url.is_empty()) break;
+     }
    return url;
 }
 
 GPBase
 DjVuPortcaster::get_cached_file(const DjVuPort * source, const GURL & url)
 {
-      // NOTE: We traverse the list from the end!
-   GMap<const void *, void *> set;
-   GList<const void *> list;
-   compute_closure(set, source);
-   sort_closure(set, list);
-
+  // NOTE: We traverse the list from the end!
+   GPList<DjVuPort> list;
+   compute_closure(source, list, true);
    GPBase file;
    for(GPosition pos=list;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) list[pos];
-      if (is_port_alive(port))
-	 if ((file=port->get_cached_file(source, url)).get())
-	    break;
-   }
+     if ((file = list[pos]->get_cached_file(source, url)).get())
+       break;
    return file;
 }
 
 void
 DjVuPortcaster::cache_djvu_file(const DjVuPort * source, class DjVuFile * file)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->cache_djvu_file(source, file);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->cache_djvu_file(source, file);
 }
 
 GP<DataPool>
 DjVuPortcaster::request_data(const DjVuPort * source, const GURL & url)
 {
-   GMap<const void *, void *> set;
-   GList<const void *> list;
-   compute_closure(set, source);
-   sort_closure(set, list);
-
+   GPList<DjVuPort> list;
+   compute_closure(source, list, true);
    GP<DataPool> data;
    for(GPosition pos=list;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) list[pos];
-      if (is_port_alive(port))
-	 if ((data=port->request_data(source, url)))
-	    break;
-   }
+     if ((data = list[pos]->request_data(source, url)))
+       break;
    return data;
 }
 
 bool
 DjVuPortcaster::notify_error(const DjVuPort * source, const char * msg)
 {
-   GMap<const void *, void *> set;
-   GList<const void *> list;
-   compute_closure(set, source);
-   sort_closure(set, list);
-
+   GPList<DjVuPort> list;
+   compute_closure(source, list, true);
    for(GPosition pos=list;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) list[pos];
-      if (is_port_alive(port))
-	 if (port->notify_error(source, msg))
-	    return 1;
-   }
+     if (list[pos]->notify_error(source, msg))
+       return 1;
    return 0;
 }
 
 bool
 DjVuPortcaster::notify_status(const DjVuPort * source, const char * msg)
 {
-   GMap<const void *, void *> set;
-   GList<const void *> list;
-   compute_closure(set, source);
-   sort_closure(set, list);
-
+   GPList<DjVuPort> list;
+   compute_closure(source, list, true);
    for(GPosition pos=list;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) list[pos];
-      if (is_port_alive(port))
-	 if (port->notify_status(source, msg))
-	    return 1;
-   }
+     if (list[pos]->notify_status(source, msg))
+       return 1;
    return 0;
 }
 
 void
 DjVuPortcaster::notify_redisplay(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_redisplay(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_redisplay(source);
 }
 
 void
 DjVuPortcaster::notify_relayout(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_relayout(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_relayout(source);
 }
 
 void
 DjVuPortcaster::notify_chunk_done(const DjVuPort * source, const char * name)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_chunk_done(source, name);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_chunk_done(source, name);
 }
 
 void
 DjVuPortcaster::notify_file_done(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_file_done(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_file_done(source);
 }
 
 void
 DjVuPortcaster::notify_file_stopped(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_file_stopped(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_file_stopped(source);
 }
 
 void
 DjVuPortcaster::notify_file_failed(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_file_failed(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_file_failed(source);
 }
 
 void
 DjVuPortcaster::notify_decode_progress(const DjVuPort * source, float done)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_decode_progress(source, done);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_decode_progress(source, done);
 }
 
 void
 DjVuPortcaster::notify_file_data_received(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_file_data_received(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_file_data_received(source);
 }
 
 void
 DjVuPortcaster::notify_all_data_received(const DjVuPort * source)
 {
-   GMap<const void *, void *> set;
-   compute_closure(set, source);
-
-   for(GPosition pos=set;pos;++pos)
-   {
-      DjVuPort * port=(DjVuPort *) set.key(pos);
-      if (is_port_alive(port))
-	 port->notify_all_data_received(source);
-   }
+   GPList<DjVuPort> list;
+   compute_closure(source, list);
+   for(GPosition pos=list; pos; ++pos)
+     list[pos]->notify_all_data_received(source);
 }
 
 //****************************************************************************
@@ -493,9 +452,14 @@ DjVuPort::notify_file_data_received(const DjVuPort *) {}
 void
 DjVuPort::notify_all_data_received(const DjVuPort *) {}
 
+
+
+
+
 //****************************************************************************
 //*************************** DjVuSimplePort *********************************
 //****************************************************************************
+
 
 GP<DataPool>
 DjVuSimplePort::request_data(const DjVuPort * source, const GURL & url)
@@ -534,14 +498,20 @@ DjVuSimplePort::notify_status(const DjVuPort * source, const char * msg)
    return 1;
 }
 
+
+
+
+
 //****************************************************************************
 //*************************** DjVuMemoryPort *********************************
 //****************************************************************************
 
+
+
 GP<DataPool>
 DjVuMemoryPort::request_data(const DjVuPort * source, const GURL & url)
 {
-   GCriticalSectionLock lk(&lock);
+  GCriticalSectionLock lk(&lock);
    for(GPosition pos=list;pos;++pos)
       if (list[pos]->url==url)
 	 return list[pos]->pool;

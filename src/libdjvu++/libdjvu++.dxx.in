@@ -341,8 +341,9 @@
     the decoding to finish. This can be done the best with
     \Ref{DjVuImage::wait_for_decoder}.
     \begin{verbatim}
-      DjVuDocument doc( GOS::filename_to_url("file.djvu") );
-      GP<DjVuImage> dimg = doc.get_page(2);
+      GP<DjVuDocument> doc = new DjVuDocument;
+      doc->init(GOS::filename_to_url("file.djvu"));
+      GP<DjVuImage> dimg = doc->get_page(2);
       if (! dimg->wait_for_decoder() )
         THROW("A decoding error has occured");
     \end{verbatim}

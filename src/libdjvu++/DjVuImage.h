@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.14 1999-06-08 21:33:30 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.15 1999-09-03 23:35:40 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.14 1999-06-08 21:33:30 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.15 1999-09-03 23:35:40 leonb Exp $# */
 //@{
 
 
@@ -95,7 +95,7 @@ public:
     rendering functions then can use the available components to compute a
     pixel representation of the desired segment of the DjVu image. */
 
-class DjVuImage : public GPEnabled, protected DjVuPort
+class DjVuImage : public DjVuPort
 {
 public:
   // CONSTRUCTION

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.31 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.32 1999-09-03 23:35:40 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -70,11 +70,21 @@ private:
    ProgressByteStream & operator=(const ProgressByteStream &);
 };
 
-DjVuFile::DjVuFile(ByteStream & str) : status(0), simple_port(0)
+
+DjVuFile::DjVuFile()
+  : file_size(0), initialized(false), status(0)
+{
+}
+
+void 
+DjVuFile::init(ByteStream & str)
 {
    DEBUG_MSG("DjVuFile::DjVuFile(): ByteStream constructor\n");
    DEBUG_MAKE_INDENT(3);
-   
+
+   if (initialized)
+     THROW("DjVuFile is already initialized");
+   initialized = 1;
    file_size=0;
    decode_thread=0;
 
@@ -96,12 +106,16 @@ DjVuFile::DjVuFile(ByteStream & str) : status(0), simple_port(0)
    get_portcaster()->cache_djvu_file(this, this);
 }
 
-DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port) :
-      url(xurl), status(0), simple_port(0)
+void
+DjVuFile::init(const GURL & xurl, GP<DjVuPort> port) 
 {
    DEBUG_MSG("DjVuFile::DjVuFile(): url='" << url << "'\n");
    DEBUG_MAKE_INDENT(3);
-   
+
+   if (initialized)
+     THROW("DjVuFile is already initialized");
+   url = xurl;
+   initialized = 1;
    file_size=0;
    decode_thread=0;
    
@@ -109,12 +123,9 @@ DjVuFile::DjVuFile(const GURL & xurl, DjVuPort * port) :
    
       // We need it 'cause we're waiting for our own termination in stop_decode()
    pcaster->add_route(this, this);
-   if (port) pcaster->add_route(this, port);
-   else
-   {
-      simple_port=new DjVuSimplePort();
-      pcaster->add_route(this, simple_port);
-   }
+   if (!port)
+     port = simple_port = new DjVuSimplePort();
+   pcaster->add_route(this, port);
       
    if (!(data_pool=pcaster->request_data(this, url)))
       THROW("Failed get data for URL '"+url+"'");
@@ -133,10 +144,8 @@ DjVuFile::~DjVuFile(void)
       GCriticalSectionLock lock(&trigger_lock);
       data_pool->del_trigger(static_trigger_cb, this);
    }
-   
-   stop_decode(1);
 
-   if (simple_port) { delete simple_port; simple_port=0; }
+   stop_decode(1);
 }
 
 
@@ -505,8 +514,12 @@ DjVuFile::process_incl_chunk(ByteStream & str)
       GP<DjVuFile> file;
       TRY {
 	 GPBase tmpfile=pcaster->get_cached_file(this, incl_url);
-	 file=(DjVuFile *) tmpfile.get();
-	 if (!file) file=new DjVuFile(incl_url, this);
+	 file = (DjVuFile *) tmpfile.get();
+	 if (!file) 
+           {
+             file = new DjVuFile;
+             file->init(incl_url, this);
+           }
 	 else pcaster->add_route(file, this);
       } CATCH(exc) {
 	 THROW("Failed to include file '"+incl_url+"'");

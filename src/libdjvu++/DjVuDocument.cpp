@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.25 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.26 1999-09-03 23:35:40 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -20,30 +20,37 @@
 #include "GOS.h"
 #include "debug.h"
 
-DjVuDocument::DjVuDocument(const GURL & url, DjVuPort * xport,
-			   GCache<GURL, DjVuFile> * xcache):
-      cache(xcache), simple_port(0), doc_type(BUNDLED),
-      dummy_ndir(true), init_url(url)
-{
-   DEBUG_MSG("DjVuDocument::DjVuDocument(): initializing class...\n");
-   DEBUG_MAKE_INDENT(3);
-   
-   DjVuPortcaster * pcaster=get_portcaster();
-   if (xport) pcaster->add_route(this, xport);
-   else
-   {
-      simple_port=new DjVuSimplePort();
-      pcaster->add_route(this, simple_port);
-   }
-   
-   pcaster->add_route(this, this);
 
+DjVuDocument::DjVuDocument(void)
+  : initialized(false), cache(0), doc_type(BUNDLED), dummy_ndir(false)
+{
+}
+
+
+void
+DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
+                   GCache<GURL, DjVuFile> * xcache)
+{
+   if (initialized)
+     THROW("DjVuDocument is already initialized");
+   initialized = true;
+   DEBUG_MSG("DjVuDocument::init(): initializing class...\n");
+   DEBUG_MAKE_INDENT(3);
+   // Initialize
+   cache = xcache;
+   doc_type = BUNDLED;
+   dummy_ndir = true;
+   init_url = url;
+   DjVuPortcaster * pcaster=get_portcaster();
+   if (!xport) 
+     xport = simple_port = new DjVuSimplePort();
+   pcaster->add_route(this, xport);
+   pcaster->add_route(this, this);
    detect_doc_type(url);
 }
 
 DjVuDocument::~DjVuDocument(void)
 {
-   delete simple_port; simple_port=0;
 }
 
 void
@@ -508,7 +515,11 @@ DjVuDocument::get_djvu_file(const GURL & url)
    
    GPBase tmpfile=pcaster->get_cached_file(this, url);
    GP<DjVuFile> file=(DjVuFile *) tmpfile.get();
-   if (!file) file=new DjVuFile(url, this);
+   if (!file) 
+     {
+       file= new DjVuFile;
+       file->init(url, this);
+     }
    else
    {
       pcaster->add_route(file, this);

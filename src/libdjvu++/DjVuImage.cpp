@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.cpp,v 1.21 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuImage.cpp,v 1.22 1999-09-03 23:35:40 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -19,6 +19,7 @@
 #include "DjVuImage.h"
 #include "GScaler.h"
 #include "DjVuDocument.h"
+#include "GSmartPointer.h"
 #include <stdarg.h>
 
 //// DJVUIMAGE: CONSTRUCTION
@@ -273,27 +274,27 @@ DjVuImage::get_long_description() const
 //// DJVUIMAGE: OLD-STYLE DECODING
 
 
-class _DjVuImageNotifier : public DjVuPort
+class DjVuImageNotifier : public DjVuPort
 {
   friend class DjVuImage;
   DjVuInterface  *notifier;
   GP<DataPool>	  stream_pool;
   GURL		  stream_url;
 public:
-  _DjVuImageNotifier(DjVuInterface *notifier);
+  DjVuImageNotifier(DjVuInterface *notifier);
   GP<DataPool> request_data(const DjVuPort *src, const GURL & url);
   void notify_redisplay(const DjVuPort *);
   void notify_relayout(const DjVuPort *);
   void notify_chunk_done(const DjVuPort *, const char *);
 };
 
-_DjVuImageNotifier::_DjVuImageNotifier(DjVuInterface *notifier)
-: notifier(notifier)
+DjVuImageNotifier::DjVuImageNotifier(DjVuInterface *notifier)
+  : notifier(notifier)
 {
 }
 
 GP<DataPool> 
-_DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
+DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 {
   if (url!=stream_url)
     THROW("This stream cannot be decoded the old way.");
@@ -301,21 +302,21 @@ _DjVuImageNotifier::request_data(const DjVuPort *src, const GURL & url)
 }
 
 void
-_DjVuImageNotifier::notify_redisplay(const DjVuPort *)
+DjVuImageNotifier::notify_redisplay(const DjVuPort *)
 {
   if (notifier)
     notifier->notify_redisplay();
 }
 
 void 
-_DjVuImageNotifier::notify_relayout(const DjVuPort *)
+DjVuImageNotifier::notify_relayout(const DjVuPort *)
 {
   if (notifier)
     notifier->notify_relayout();
 }
 
 void 
-_DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
+DjVuImageNotifier::notify_chunk_done(const DjVuPort *, const char *name)
 {
   if (notifier)
     notifier->notify_chunk(name, "");
@@ -328,16 +329,18 @@ DjVuImage::decode(ByteStream & str, DjVuInterface *notifier)
   DEBUG_MAKE_INDENT(3);
   if (file) 
     THROW("To decode old way you should have been used default constructor.");
-  _DjVuImageNotifier port(notifier);
-  port.stream_url="internal://fake_url_for_old_style_decoder";
-  port.stream_pool=new DataPool();
+  
+  GP<DjVuImageNotifier> pport = new DjVuImageNotifier(notifier);
+  pport->stream_url="internal://fake_url_for_old_style_decoder";
+  pport->stream_pool=new DataPool();
   int length;
   char buffer[1024];
   while((length=str.read(buffer, 1024)))
-    port.stream_pool->add_data(buffer, length);
-  port.stream_pool->set_eof();
+    pport->stream_pool->add_data(buffer, length);
+  pport->stream_pool->set_eof();
 
-  GP<DjVuDocument> doc = new DjVuDocument( port.stream_url, &port );
+  GP<DjVuDocument> doc = new DjVuDocument;
+  doc->init(pport->stream_url, (DjVuImageNotifier*)pport);
   GP<DjVuImage> dimg=doc->get_page(-1);
   file=dimg->get_djvu_file();
   file->wait_for_finish();

@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   $Revision: 1.2 $
- *   $Date: 1999-08-18 16:12:12 $
- *   @(#) $Id: djvmcvt.cpp,v 1.2 1999-08-18 16:12:12 eaf Exp $
+ *   $Revision: 1.3 $
+ *   $Date: 1999-09-03 23:35:40 $
+ *   @(#) $Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $
  *
  *****************************************************************************/
 
@@ -77,9 +77,9 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.2 1999-08-18 16:12:12 eaf Exp $# */
+    #$Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $# */
 
-static char RCSVersion[]="@(#) $Id: djvmcvt.cpp,v 1.2 1999-08-18 16:12:12 eaf Exp $";
+static char RCSVersion[]="@(#) $Id: djvmcvt.cpp,v 1.3 1999-09-03 23:35:40 leonb Exp $";
 
 #ifdef __GNUC__
 #pragma implementation
@@ -110,24 +110,27 @@ static void
 do_bundled(int argc, char ** argv)
       // <progname> -b[undled] <file_in> <file_out>
 {
-   if (argc!=4) { Usage(); exit(1); }
-
-   DjVuDocument doc(GOS::filename_to_url(argv[2]));
+   if (argc!=4) 
+     { Usage(); exit(1); }
+   GP<DjVuDocument> doc = new DjVuDocument;
+   doc->init(GOS::filename_to_url(argv[2]));
    StdioByteStream str(argv[3], "wb");
-   doc.write(str);
+   doc->write(str);
 }
 
 static void
 do_indirect(int argc, char ** argv)
       // <progname> -i[ndirect] <file_in> <dir_out> <idx_fname>
 {
-   if (argc!=5) { Usage(); exit(1); }
-
-   DjVuDocument doc(GOS::filename_to_url(argv[2]));
-   doc.expand(argv[3], argv[4]);
+   if (argc!=5) 
+     { Usage(); exit(1); }
+   GP<DjVuDocument> doc = new DjVuDocument;
+   doc->init(GOS::filename_to_url(argv[2]));
+   doc->expand(argv[3], argv[4]);
 }
 
-int main(int argc, char ** argv)
+int 
+main(int argc, char ** argv)
 {
    char * ptr;
    for(progname=ptr=argv[0];*ptr;ptr++)

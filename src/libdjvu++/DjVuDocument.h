@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.14 1999-09-03 23:03:06 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.15 1999-09-03 23:35:40 leonb Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.14 1999-09-03 23:03:06 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.15 1999-09-03 23:35:40 leonb Exp $#
 */
 
 //@{
@@ -101,7 +101,7 @@
     \end{enumerate}
 */
     
-class DjVuDocument : public GPEnabled, public DjVuPort
+class DjVuDocument : public DjVuPort
 {
 public:
       /** There are 4 DjVu multipage formats, which are currently recognized
@@ -119,7 +119,11 @@ public:
           \end{enumerate} */
    enum DOC_TYPE { OLD_BUNDLED=1, INDEXED, BUNDLED, INDIRECT };
    
-      /** Constructs the #DjVuDocument# object using an existing document.
+   DjVuDocument(void);
+   virtual ~DjVuDocument(void);
+
+      /** Initializes the #DjVuDocument# object using an existing document.
+          This function should be called once after creating the object.
 	  The #url# should point to the real data, and the creator of the
 	  document should be ready to return this data to the document
 	  if it's not stored locally (in which case #DjVuDocument# can
@@ -161,9 +165,8 @@ public:
 		 because #DjVuDocument# can access such files itself.
 	  @param cache It's used to cache decoded \Ref{DjVuFile}s and
 	         is actually useful in the plugin only. */
-   DjVuDocument(const GURL & url, DjVuPort * port=0,
-		GCache<GURL, DjVuFile> * cache=0);
-   virtual ~DjVuDocument(void);
+   void         init(const GURL & url, GP<DjVuPort> port=0, 
+                     GCache<GURL, DjVuFile> * cache=0);
 
       /** Returns type of the document: #DjVuDocument::OLD_BUNDLED# or
 	  #DjVuDocument::INDEXED# or #DjVuDocument:BUNDLED# or
@@ -288,8 +291,9 @@ protected:
    GCriticalSection	active_files_lock;
    virtual void		file_destroyed(const DjVuFile *);
 private:
-   GCache<GURL, DjVuFile> * cache;
-   DjVuSimplePort	* simple_port;
+   bool                 initialized;
+   GCache<GURL, DjVuFile> *cache;
+   GP<DjVuSimplePort>	simple_port;
    int			doc_type;
 
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
