@@ -32,12 +32,13 @@
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #C- 
 #
-# $Id: pstodjvu.pl,v 1.2 2001-03-22 22:19:25 debs Exp $
+# $Id: pstodjvu.pl,v 1.3 2001-03-23 15:58:31 debs Exp $
 # $Name:  $
 
 # Perl libs to use
 use File::Basename;
 use Cwd;
+use File::Find;
 
 # slash conversion for Win32
 if ( $ENV{'windir'} ) {
@@ -301,14 +302,14 @@ $tfile2=sprintf("${tmpdir}/${name}-%04d.djvu");
 ## close SFILE;
 ## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $script $tfile $tfile2";
 ## $cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input; $djvucommand $args $tfile $tfile2";
-$cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=$tfile $input";
+$cmdstr="gswin32c -dBATCH -dNOPAUSE -q -sDEVICE=$outputdev -r$rdpi -sOutputFile=" . '"' . $tfile . '" "' . $input . '"';
 if ( $verbose ) { print "$cmdstr\n"; }
 system($cmdstr);
-$cmdstr="$djvucommand $args $tfile $tfile2";
+$cmdstr="$djvucommand $args " . '"' . $tfile . '" "' . $tfile2 . '"';
 if ( $verbose ) { print "$cmdstr\n"; }
 system($cmdstr);
 
-foreach $file (<$tmpdir/$name-*>) { $filelist="$filelist $file"; }
+find(\&wanted,$tmpdir);
 
 if ( ! "$joincommand$bundlecommand" )
 {
@@ -326,11 +327,11 @@ if ( $free )
     $cmdstr="$combine -c $tmpdir/bundled.djvu $filelist";
     print "$cmdstr\n";
     system("$cmdstr");
-    $cmdstr="$split -i $tmpdir/bundled.djvu $output";
+    $cmdstr="$split -i $tmpdir/bundled.djvu " . '"' . $output . '"';
     print "$cmdstr\n";
     system("$cmdstr");
   } else {
-    $cmdstr="$combine -c $output $filelist";
+    $cmdstr="$combine -c " . '"' . $output . '" ' . $filelist;
     print "$cmdstr\n";
     system("$cmdstr");
   }
@@ -343,9 +344,13 @@ if ( $free )
     $combine="$bundlecommand";
   }
   unlink $output;
-  $cmdstr="$combine $cargs $filelist $output";
+  $cmdstr="$combine $cargs $filelist " . '"' . $output . '"';
   if ( $verbose ) { print "$cmdstr\n"; }
   system("$cmdstr");
 }
 foreach $file (<$tmpdir/*>) { unlink $file; }
 rmdir $tmpdir;
+
+sub wanted {
+    /^$name-.*$/ && {$filelist = "$filelist" . '"' . "$tmpdir/$_" . '" '};
+}
