@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.92 1999-11-22 03:38:43 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.93 1999-11-23 18:20:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1764,6 +1764,8 @@ DjVuFile::unlink_file(const char * id)
 
       // Remove the file from the list of included files
    {
+      GURL url=DjVuPort::get_portcaster()->id_to_url(this, id);
+      if (url.is_empty()) url=DjVuFile::url.base()+id;
       GCriticalSectionLock lock(&inc_files_lock);
       for(GPosition pos=inc_files_list;pos;)
 	 if (inc_files_list[pos]->get_url()==url)
