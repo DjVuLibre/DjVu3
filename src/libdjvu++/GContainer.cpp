@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.cpp,v 1.15 1999-10-07 23:33:33 leonb Exp $
+//C- $Id: GContainer.cpp,v 1.16 2000-01-04 21:56:02 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -67,8 +67,10 @@ GArrayBase::~GArrayBase()
 GArrayBase &
 GArrayBase::operator= (const GArrayBase &ga)
 {
+#ifndef NO_DEBUG
   if (&traits != &ga.traits)
     THROW("Assignment of incompatible arrays.");
+#endif
   if (this == &ga)
     return *this;
   empty();
@@ -86,8 +88,10 @@ GArrayBase::operator= (const GArrayBase &ga)
 void
 GArrayBase::steal(GArrayBase &ga)
 {
+#ifndef NO_DEBUG
   if (&traits != &ga.traits)
     THROW("Assignment of incompatible arrays.");
+#endif
   if (this != &ga)
     {
       empty();
@@ -544,8 +548,10 @@ GListBase::empty()
 GListBase & 
 GListBase::operator= (const GListBase & ref)
 {
+#ifndef NO_DEBUG
   if (&traits != &ref.traits)
     THROW("Assignment of incompatible lists.");
+#endif
   if (this == &ref)
     return *this;
   empty();
@@ -690,8 +696,10 @@ GSetBase::rehash(int newbuckets)
 GSetBase& 
 GSetBase::operator=(const GSetBase &ref)
 {
+#ifndef NO_DEBUG
   if (&traits != &ref.traits)
     THROW("Assignment of incompatible maps.");
+#endif
   if (this == &ref) 
     return *this;
   empty();
