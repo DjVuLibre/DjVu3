@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.14 2000-03-05 18:13:37 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.15 2000-03-07 00:01:17 bcr Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -26,7 +26,10 @@
 
 /*
  * $Log: DjVuPhotoAPI.h,v $
- * Revision 1.14  2000-03-05 18:13:37  bcr
+ * Revision 1.15  2000-03-07 00:01:17  bcr
+ * Updated the document api documentation to build correctly.
+ *
+ * Revision 1.14  2000/03/05 18:13:37  bcr
  * More comment changes.
  *
  */
@@ -143,7 +146,11 @@ inline phototodjvu_options_struct();
 
 typedef struct phototodjvu_options_struct phototodjvu_options;
 
-struct djvu_parse;
+struct djvu_parse
+#if 0
+{}
+#endif
+;
 
 /** @name DjVuPhotoAPI C function calls
  */
@@ -174,11 +181,7 @@ DJVUAPI
 ;
 #endif
 /** ++ This function converts the photo input files to a multipage DjVu document
-    according to the options structure.
-    Depending on the type of the input data, the function uses the proper
-    stream derived from \Ref{DjVu_Stream} for decoding, while 
-    \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h}, 
-    \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
+    according to the options structure.  A non-zero return value indicates a
     fatal error. */
 int phototodjvu(phototodjvu_options[1]);
 

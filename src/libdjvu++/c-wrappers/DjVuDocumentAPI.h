@@ -7,42 +7,52 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.24 2000-03-01 18:33:42 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.25 2000-03-07 00:01:16 bcr Exp $
  */
 
-#ifndef _DJVUDOC_H_
-#define _DJVUDOC_H_
+#ifndef _DJVUDOCUMENT_H_
+#define _DJVUDOCUMENT_H_
 
 #include "DjVuBitonalAPI.h"
 #include "DjVuPhotoAPI.h"
 
 /** @name DjVuDocumentAPI.h
-      functions used to convert multiple documents (contains color text or
-      images with text) to DjVu multipage documents.
+
+    #DjVuDocumentAPI.h# defines the API for encoding document files.  Document
+    files consist of both a foreground layer with text and a background layer
+    with images.
+    @author
+    Bill C Riemers <bcr@att.com>
 */
+
+/*
+ * $Log: DjVuDocumentAPI.h,v $
+ * Revision 1.25  2000-03-07 00:01:16  bcr
+ * Updated the document api documentation to build correctly.
+ *
+ */
+
+
+/*@{*/
 
 #ifdef __cplusplus
 extern "C"
 {
 #ifndef __cplusplus
-}
+};
 #endif
 #endif
 
-  /*@{*/
-
-/** List of options for the foreground image.
-
-    Whereas the background image can use the #libdjvuphoto# wavelet options,
-    the foreground image has specific constraints, as it may be encoded
-    within the JB2 image.
+/** @memo #djvu_foreground_options# define foreground color compression options.
 
     When encoded as wavelet, options such as the number of chunks or the
     crcbdelay would be an overkill.
-    
-*/
 
-typedef struct djvu_foreground_options_struct
+    Whereas the background image can use the \Ref{djvu_iw44_options} options,
+    the foreground image has specific constraints, as it may be encoded
+    within the JB2 image.
+*/
+struct djvu_foreground_options_struct
 { 
 
   /** Foreground colors are coded as a palette in the JB2Matcher */
@@ -64,12 +74,19 @@ typedef struct djvu_foreground_options_struct
   inline djvu_foreground_options_struct();
 #endif
   
-} djvu_foreground_options;
+};
+
+typedef struct djvu_foreground_options_struct djvu_foreground_options;
 
 
-/** List of djvu_segmenter options. */
+/** @memo #djvu_segmenter_options# define document segmentation options. 
 
-typedef struct djvu_segmenter_options_struct
+    This structure allows complete control over the segmenation process
+    that separates the foreground and background layers for each page.
+    Adjusting the values here effect speed, compression quality, and
+    compression ratio.
+*/
+struct djvu_segmenter_options_struct
 {
   /** @name Quality slider options
 
@@ -401,16 +418,20 @@ typedef struct djvu_segmenter_options_struct
   inline djvu_segmenter_options_struct();
 #endif 
 
-} djvu_segmenter_options;
+};
 
-/** @name documenttodjvu_options struct
-    @memo Options used in the documenttodjvu function
+typedef struct djvu_segmenter_options_struct djvu_segmenter_options;
+
+/** @memo #documenttodjvu_options# -- options corresponding to documenttodjvu.
+
+    The values of the #documenttodjvu_options# structure control all aspects
+    of document encoding.
 */
-
-typedef struct documenttodjvu_options_struct
+struct documenttodjvu_options_struct
 {
-  /** The #djvu_process_options struct# defines the pages to be parsed,
-    input, and output, and contains the pointer for storing errors. */
+  /** The \Ref{djvu_process_options} structure #process# defines the pages to
+    be parsed, input, and output, and contains the pointer for storing
+    errors. */
   djvu_process_options process;
 
   /** These are the transformation options.  These will take place before
@@ -436,71 +457,107 @@ typedef struct documenttodjvu_options_struct
 inline documenttodjvu_options_struct();
 #endif /* __cplusplus */
 
-} documenttodjvu_options;
+};
 
-struct djvu_parse;
+typedef struct documenttodjvu_options_struct documenttodjvu_options;
 
-/** @name documenttodjvu_options_alloc function
-    This is the primary allocation routine for documenttodjvu_options.
+struct djvu_parse
+#if 0
+{}
+#endif
+;
+
+/** @name DjVuDocumentAPI C function calls
+ */
+
+/*@{*/
+
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ This is the primary allocation routine for documenttodjvu_options.
     Even if the values specified are illegal, an options structure
     will be returned. */
-DJVUAPI
 documenttodjvu_options *
 documenttodjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
 
-/** @name documenttodjvu_options_free function
-    Deallocates the fields of the documenttodjvu_options structure.
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ Deallocates the fields of the documenttodjvu_options structure.
     You should always use the free option, even if you did not use alloc
     so the data pointed to by priv is freed. */
 DJVUAPI
 void documenttodjvu_options_free(documenttodjvu_options *);
 
-/** @name documenttodjvu function
-    This function converts the photo input files to a multipage DjVu document
-    according to the options structure.
-    Depending on the type of the input data, the function uses the proper
-    stream derived from \Ref{DjVu_Stream} for decoding, while
-    \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h},
-    \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
-    fatal error. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This function converts the photo input files to a multipage DjVu
+    document according to the options structure.  A non-zero return value
+    indicates a fatal error. */
 int documenttodjvu(documenttodjvu_options[1]);
 
-/** A non-zero value indicates there are error messages.  Error
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are error messages.  Error
     messages are generated for both fatal errors, and errors
     that are recovered from.  */
-DJVUAPI
 int documenttodjvu_haserror(const documenttodjvu_options [1]);
 
-/** A non-zero value indicates there are warning messages.  Waring
+DJVUAPI
+#if 0
+;
+#endif
+/** ++ A non-zero value indicates there are warning messages.  Waring
     messages are generated for non-fatal problems, that may be an
     error, or could just be abnormal usage. */
-DJVUAPI
 int documenttodjvu_haswarning(const documenttodjvu_options [1]);
 
-/** Returns a string of the first error message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first error message on the stack.  Each
+    call erases the previous return value. */
 const char * documenttodjvu_error(documenttodjvu_options [1]);
 
-/** Returns a string of the first warning message on the stack.  Each
-    call erases the previous return value. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Returns a string of the first warning message on the stack.  Each
+    call erases the previous return value. */
 const char * documenttodjvu_warning(documenttodjvu_options [1]);
 
-/** Prints all the errors to stderr */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ Prints all the errors to stderr */
 void documenttodjvu_perror(documenttodjvu_options [1],const char *mesg);
 
-/** This will print usage instructions to the specified output. */
 DJVUAPI
+#if 0
+;
+#endif
+/** ++ This will print usage instructions to the specified output. */
 void documenttodjvu_usage(int fd,const char *prog);
+
+/*@}*/
+
+/*@}*/
 
 #ifdef __cplusplus
 #ifndef __cplusplus
 {
 #endif
-}
+};
 
 inline
 djvu_foreground_options_struct::djvu_foreground_options_struct() :
@@ -518,8 +575,6 @@ inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
   resolution_multiplier(1), high_variation_foreground(false), masksub_refine(true) {}
 
 #endif
-  /*@}*/
 
-
-#endif /* _DJVUDOC_H_ */
+#endif /* _DJVUDOCUMENT_H_ */
 
