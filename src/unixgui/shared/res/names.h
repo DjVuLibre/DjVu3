@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: names.h,v 1.16 2001-08-31 21:48:53 docbill Exp $
+// $Id: names.h,v 1.17 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_NAMES
 #define HDR_NAMES
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #define REV_PIPE_NAME	".pipe"
 #ifdef hpux

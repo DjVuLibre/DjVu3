@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: Arrays.cpp,v 1.19 2001-07-24 17:52:03 bcr Exp $
+// $Id: Arrays.cpp,v 1.20 2001-10-12 17:58:29 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "Arrays.h"

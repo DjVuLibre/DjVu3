@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.73 2001-09-26 00:25:55 leonb Exp $
+// $Id: DjVuMessage.cpp,v 1.74 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuMessage.h"
@@ -84,31 +84,29 @@ static const char messagestring[]="MESSAGE";
 static const char localestring[]="locale";
 
 
+// directory names for searching messages
 static const char opensourcedir[]="osi";
-// append to the executable directory, its parent, 
-// and its parent's parent
+#ifdef AUTOCONF
+static const char DjVuDataDir[] = DIR_DATADIR "/djvu";
+static const char ModuleDjVuDir[] ="share/djvu";
+#else /* !AUTOCONF */
 static const char ModuleDjVuDir[] ="profiles";
-
+#endif /* !AUTOCONF */
+static const char LocalDjVuDir[] =".DjVu";      // relative to ${HOME}
+static const char RootDjVuDir[] ="/etc/DjVu/";  // global last resort
+#ifdef LT_DEFAULT_PREFIX
+static const char DjVuPrefixDir[] = LT_DEFAULT_PREFIX "/profiles";
+#endif
+#ifndef NO_DEBUG
+static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles";
+#endif
 #ifdef WIN32
 static const char RootDjVuDir[] ="C:/Program Files/LizardTech/Profiles";
 static const TCHAR registrypath[]= TEXT("Software\\LizardTech\\DjVu\\Profile Path");
-#else
-// appended to the home directory.
-static const char LocalDjVuDir[] =".DjVu";
-// appended to the home directory.
-static const char RootDjVuDir[] ="/etc/DjVu/";
 #endif
 
-#ifdef LT_DEFAULT_PREFIX
-static const char DjVuPrefixDir[]=LT_DEFAULT_PREFIX "/profiles";
-#endif
+static const char DjVuEnv[] = "DJVU_CONFIG_DIR";
 
-#if !defined(NO_DEBUG) && defined(UNIX)
-  // appended to the executable directory directory.
-static const char DebugModuleDjVuDir[] ="../TOPDIR/SRCDIR/profiles";
-#endif
-
-static const char DjVuEnv[]="DJVU_CONFIG_DIR";
 //  The name of the message file
 static const char DjVuMessageFileName[] = "message";
 static const char MessageFile[]="messages.xml";
@@ -163,10 +161,6 @@ GetModulePath( void )
   return retval;
 }
 #elif defined(UNIX)
-#ifndef NO_DEBUG
-extern char **environ;
-static char **e=environ-1;
-#endif // NO_DEBUG
 
 static GList<GURL>
 parsePATH(void)
@@ -192,25 +186,11 @@ parsePATH(void)
   return retval;
 }
 
-
 static GURL
 GetModulePath( void )
 {
  GURL retval;
  GUTF8String &xprogramname=DjVuMessage::programname();
-#if 0
-#ifndef NO_DEBUG
- if(!xprogramname.length())
- {
-   char **argv=e;
-   int argc;
-   for(argc=0;*(int *)&(argv[-1]) != argc;argc++,argv--)
-     EMPTY_LOOP;
-   if(argc>=1)
-     xprogramname=GNativeString(argv[0]);
- }
-#endif // NO_DEBUG
-#endif
  if(xprogramname.length())
  {
    if(xprogramname[1]=='/'
@@ -219,10 +199,7 @@ GetModulePath( void )
    {
      retval=GURL::Filename::UTF8(xprogramname);
    }
-   if(!retval.is_empty()&&retval.is_file())
-   {
-     retval=retval.base();
-   }else
+   if(retval.is_empty() || !retval.is_file())
    {
      GList<GURL> paths(parsePATH());
      GMap<GUTF8String,void *> pathMAP;
@@ -233,59 +210,61 @@ GetModulePath( void )
        if(!pathMAP.contains(path))
        {
          if(retval.is_file())
-         {
-           retval=retval.base();
            break;
-         }
          pathMAP[path]=0;
        }
      }
    }
+   if (! retval.is_empty() )
+     retval = retval.follow_symlinks();
+   if (! retval.is_empty() )
+     retval = retval.base();
  }
  return retval;
 }
 #endif
 
 static void
-appendPath(
-  const GURL &url, GMap<GUTF8String,void *> &map,GList<GURL> &list)
+appendPath(const GURL &url, 
+           GMap<GUTF8String,void *> &map,
+           GList<GURL> &list)
 {
-  if(!url.is_empty()&&!map.contains(url.get_string())&&url.is_dir())
-  {
-    map[url.get_string()]=0;
-    list.append(url);
-  }
+  if( !url.is_empty() 
+      && !map.contains(url.get_string()) && url.is_dir() )
+    {
+      map[url.get_string()]=0;
+      list.append(url);
+    }
 }
 
 GList<GURL>
 DjVuMessage::GetProfilePaths(void)
 {
   static bool first=true;
-  static GList<GURL> &realpaths=
-    GList<GURL>::static_reference();
+  static GList<GURL> &realpaths = GList<GURL>::static_reference();
   if(first)
   {
     first=false;
     GMap<GUTF8String,void *> pathsmap;
     GList<GURL> paths;
     GURL path;
-#ifndef UNDER_CE
+#if !defined(UNDER_CE)
     const GUTF8String envp(GOS::getenv(DjVuEnv));
     if(envp.length())
-    {
       appendPath(GURL::Filename::UTF8(envp),pathsmap,paths);
-    }
+#endif
+#if defined(AUTOCONF)
+    GURL dpath = GURL::Filename::UTF8(DjVuDataDir);
+    appendPath(dpath,pathsmap,paths);
 #endif
 #if defined(WIN32) || defined(UNIX)
     GURL mpath(GetModulePath());
     if(!mpath.is_empty() && mpath.is_dir())
     {
-#if !defined(NO_DEBUG) && defined(UNIX)
+#if defined(UNIX) && !defined(AUTOCONF) && !defined(NO_DEBUG)
       appendPath(GURL::UTF8(DebugModuleDjVuDir,mpath),pathsmap,paths);
-#endif // !defined(NO_DEBUG) && defined(UNIX)
+#endif
       appendPath(mpath,pathsmap,paths);
-      mpath=mpath.base();
-      appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
       mpath=mpath.base();
       appendPath(GURL::UTF8(ModuleDjVuDir,mpath),pathsmap,paths);
       mpath=mpath.base();
@@ -297,16 +276,14 @@ DjVuMessage::GetProfilePaths(void)
     appendPath(RegOpenReadConfig(HKEY_LOCAL_MACHINE),pathsmap,paths);
 #else
     GUTF8String home=GOS::getenv("HOME");
-    struct passwd *pw=0;
-    if(home.length())
-    {
-      pw=getpwuid(getuid());
-      if(pw)
+    if (! home.length()) {
+      struct passwd *pw=0;
+      if ((pw = getpwuid(getuid())))
         home=GNativeString(pw->pw_dir);
     }
-    if(home.length())
-    {
-      appendPath(GURL::UTF8(LocalDjVuDir,GURL::Filename::UTF8(home)),pathsmap,paths);
+    if (home.length()) {
+      GURL hpath = GURL::UTF8(LocalDjVuDir,GURL::Filename::UTF8(home));
+      appendPath(hpath,pathsmap,paths);
     }
 #endif
 #ifdef LT_DEFAULT_PREFIX
@@ -435,10 +412,7 @@ DjVuMessage::GetProfilePaths(void)
     for(pos=paths;pos;++pos)
     {
       path=GURL::UTF8(opensourcedir,paths[pos]);
-      if(path.is_dir())
-      {
-        appendPath(path,pathsmap,realpaths);
-      }
+      appendPath(path,pathsmap,realpaths);
     }
   }
   return realpaths;

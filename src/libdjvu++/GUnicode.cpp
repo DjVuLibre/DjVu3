@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GUnicode.cpp,v 1.30 2001-09-21 20:09:07 leonb Exp $
+// $Id: GUnicode.cpp,v 1.31 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "GString.h"
@@ -306,13 +306,8 @@ GStringRep::Unicode::create(
             GPBuffer<char> gutf8buf(utf8buf,pleft);
             char *p=utf8buf;
             unsigned char const *last=ptr;
-#if (HAS_ICONV == 2)
-            for(;iconv(cv,&(char *)ptr,&ptrleft,&p,&pleft);last=ptr)
+            for(;iconv(cv, (const char **)&ptr, &ptrleft, &p, &pleft);last=ptr)
               EMPTY_LOOP;
-#else
-            for(;iconv(cv,&(const char *)ptr,&ptrleft,&p,&pleft);last=ptr)
-              EMPTY_LOOP;
-#endif
             iconv_close(cv);
             retval=create(utf8buf,(size_t)last-(size_t)buf,t);
             retval->set_remainder(last,(size_t)eptr-(size_t)last,e);

@@ -30,17 +30,17 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GThreads.cpp,v 1.63 2001-07-24 17:52:04 bcr Exp $
+// $Id: GThreads.cpp,v 1.64 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #include "GThreads.h"
 #include "GException.h"
@@ -1071,7 +1071,7 @@ GThread::cotask::cotask(const int xstacksize)
   ,ehctx(xehctx)
 #endif
 {
-  memset(regs,0,sizeof(regs));
+  memset(&regs,0,sizeof(regs));
 }
 
 static GThread::cotask *maintask = 0;
@@ -1086,10 +1086,10 @@ GThread::cotask::~cotask()
 {
   gstack.resize(0);
 #ifndef NO_LIBGCC_HOOKS
-  if (task->ehctx)
-    free(task->ehctx);
+  if (ehctx)
+    free(ehctx);
+  ehctx = 0;
 #endif
-  task->ehctx = 0;
 }
 
 static void 

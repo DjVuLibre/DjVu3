@@ -580,7 +580,7 @@ In einem mehrseitigen Dokument ist nur eine Datei mit Kommentaren zulässig.
 <MESSAGE name="DjVuFile.JB2_fg" number="12545"
   value="%3!5.1f! KB '%4!4s!' JB2-Vordergrundfarben (%1!d! Farben, %2!d! ccs)." />
 <MESSAGE name="DjVuFile.IW44_data1" number="12546"
-  value="[1-%0!05u!] %4!5.1f! KB '%5!4s!' IW44-Daten (%1!d!x%2!d!, %3!d! dpi)." />
+  value="%4!5.1f! KB '%5!4s!' IW44-Daten (%1!d!x%2!d!, %3!d! dpi)." />
 <MESSAGE name="DjVuFile.IW44_data2" number="12547"
   value="%3!5.1f! KB '%4!4s!' IW44-Daten (Teil %1!d!, %2!d! dpi)." />
 <MESSAGE name="DjVuFile.nav_dir" number="12548"

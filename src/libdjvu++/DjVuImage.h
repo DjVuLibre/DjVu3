@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.h,v 1.48 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuImage.h,v 1.49 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 
 /** @name DjVuImage.h
@@ -73,13 +76,10 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.48 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: DjVuImage.h,v 1.49 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuFile.h"
 #include "DjVuAnno.h"

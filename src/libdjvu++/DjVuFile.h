@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.85 2001-09-21 20:09:07 leonb Exp $
+// $Id: DjVuFile.h,v 1.86 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DjVuInfo.h"
 #include "DjVuPalette.h"
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.85 2001-09-21 20:09:07 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.86 2001-10-12 17:58:30 leonb Exp $#
 */
 
 //@{

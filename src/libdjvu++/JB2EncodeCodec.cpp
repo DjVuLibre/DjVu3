@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2EncodeCodec.cpp,v 1.11 2001-08-27 17:01:34 docbill Exp $
+// $Id: JB2EncodeCodec.cpp,v 1.12 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #ifndef NEED_DECODER_ONLY
 
 #include "JB2Image.h"

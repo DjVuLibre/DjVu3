@@ -30,13 +30,13 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.93 2001-08-31 23:08:44 docbill Exp $
+// $Id: DataPool.cpp,v 1.94 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DataPool.h"
 #include "IFFByteStream.h"

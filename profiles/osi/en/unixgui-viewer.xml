@@ -33,7 +33,10 @@
 [3-%0!05u!] Page &apos;%1!s!&apos; is not in this document. 
 </MESSAGE>
 <MESSAGE name="QDViewer.no_child_errmsg" number="20202">
-[3-%0!05u!] Failed to read error message from child process
+[3-%0!05u!] Failed to read error message from child process.
+</MESSAGE>
+<MESSAGE name="QDViewer.corrupt" number="20203">
+[3-%0!05u!] Input file is corrupted.
 </MESSAGE>
 </BODY>
 </DjVuMessages>

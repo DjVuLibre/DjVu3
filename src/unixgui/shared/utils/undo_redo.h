@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: undo_redo.h,v 1.15 2001-08-24 21:50:10 docbill Exp $
+// $Id: undo_redo.h,v 1.16 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_UNDO_REDO
 #define HDR_UNDO_REDO
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "GString.h"
 #include "GContainer.h"

@@ -5,6 +5,9 @@
 //C-
 //C-
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "..\GOS.h"
 #ifdef WIN32
 #include <tchar.h>

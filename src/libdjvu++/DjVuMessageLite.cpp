@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessageLite.cpp,v 1.9 2001-09-21 20:09:07 leonb Exp $
+// $Id: DjVuMessageLite.cpp,v 1.10 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "DjVuMessageLite.h"
@@ -60,22 +60,27 @@
 #endif
 #include <locale.h>
 
-const DjVuMessageLite& (*DjVuMessageLite::create)(void)=DjVuMessageLite::create_lite; 
+const DjVuMessageLite& (*DjVuMessageLite::create)(void) = 
+  DjVuMessageLite::create_lite; 
 
-static const char *failed_to_parse_XML=ERR_MSG("DjVuMessage.failed_to_parse_XML");
-
-static const char *unrecognized=ERR_MSG("DjVuMessage.Unrecognized");
-static const char *uparameter=ERR_MSG("DjVuMessage.Parameter");
+static const char *failed_to_parse_XML=
+  ERR_MSG("DjVuMessage.failed_to_parse_XML");
+static const char *unrecognized=
+  ERR_MSG("DjVuMessage.Unrecognized");
+static const char *uparameter=
+  ERR_MSG("DjVuMessage.Parameter");
 #ifdef LIZARDTECH_1_800_NUMBER
 static const char unrecognized_default[] =
-  "** Unrecognized DjVu Message: [Contact LizardTech at " LIZARDTECH_1_800_NUMBER " \n"
+  "** Unrecognized DjVu Message: [Contact LizardTech at " 
+  LIZARDTECH_1_800_NUMBER " \n"
   "\t** Message name:  %1!s!";
 #else
 static const char unrecognized_default[] =
   "** Unrecognized DjVu Message:\n"
   "\t** Message name:  %1!s!";
 #endif
-static const char uparameter_default[]="\t   Parameter: %1!s!";
+static const char uparameter_default[] = 
+  "\t   Parameter: %1!s!";
 static const char failed_to_parse_XML_default[]=
   "Failed to parse XML message file:&#10;&#09;&apos;%1!s!&apos;.";
 
@@ -192,6 +197,10 @@ DjVuMessageLite::LookUp( const GUTF8String & MessageList ) const
 GUTF8String
 DjVuMessageLite::LookUpSingle( const GUTF8String &Single_Message ) const
 {
+#if HAS_CTRL_C_IN_ERR_MSG
+  if (Single_Message[0] != '\003')
+    return Single_Message;
+#endif
   //  Isolate the message ID and get the corresponding message text
   int ending_posn = Single_Message.contains("\t\v");
   if( ending_posn < 0 )
@@ -206,7 +215,6 @@ DjVuMessageLite::LookUpSingle( const GUTF8String &Single_Message ) const
   {
     if(message == unrecognized)
     {
-      //  Didn't find anything, fabricate a message
       msg_text = unrecognized_default;
     }else if(message == uparameter)
     {
@@ -216,15 +224,9 @@ DjVuMessageLite::LookUpSingle( const GUTF8String &Single_Message ) const
       msg_text = failed_to_parse_XML_default;
     }else
     {
-      return LookUpSingle(unrecognized+("\t"+Single_Message));
+      return LookUpSingle(unrecognized + ("\t" + Single_Message));
     }
   }
-#ifndef NO_DEBUG
-  else
-  {
-    msg_text = "{!" + msg_text + "!}";    // temporary debug to show the message was translated
-  }
-#endif
     
   //  Insert the parameters (if any)
   unsigned int param_num = 0;
@@ -256,12 +258,20 @@ DjVuMessageLite::LookUpSingle( const GUTF8String &Single_Message ) const
 // the beginning of the translated message, if found; and an empty string
 // otherwise.
 void
-DjVuMessageLite::LookUpID( const GUTF8String &msgID,
+DjVuMessageLite::LookUpID( const GUTF8String &xmsgID,
                        GUTF8String &message_text,
                        GUTF8String &message_number ) const
 {
   if(!Map.isempty())
   {
+    GUTF8String msgID = xmsgID;
+#if HAS_CTRL_C_IN_ERR_MSG
+    int start = 0;
+    while (msgID[start] == '\003') 
+      start ++;
+    if (start > 0)
+      msgID = msgID.substr(start, msgID.length() - start);
+#endif
     GPosition pos=Map.contains(msgID);
     if(pos)
     {
@@ -360,7 +370,7 @@ DjVuMessageLite::InsertArg( GUTF8String &message,
     //  Not found, fake it
     if( ArgId != 0 )
     {
-      message += "\n"+LookUpSingle(uparameter+("\t"+arg))+"\n";
+      message += "\n"+LookUpSingle(uparameter+("\t"+arg));
     }
   }
 }

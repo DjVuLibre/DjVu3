@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qlib.cpp,v 1.4 2001-07-25 17:10:41 mchen Exp $
+// $Id: qlib.cpp,v 1.5 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #define INCLUDE_MENUITEM_DEF
 
@@ -83,7 +83,7 @@
 //******************************** QeExcMessage ******************************
 //****************************************************************************
 
-static GNativeString 
+static GUTF8String 
 getExcMsg(const char *exc_cause)
 {
    GUTF8String exc_tag;
@@ -109,7 +109,7 @@ getExcMsg(const char *exc_cause)
       exc_tag="DjVuMessage.Unrecognized";
    }
 
-   GNativeString exc_msg=DjVuMessage::LookUpNative(exc_tag);
+   GNativeString exc_msg=DjVuMessage::LookUpUTF8(exc_tag);
 
    if ( exc_sep )
       exc_msg += GNativeString(exc_cause+exc_tag_len);

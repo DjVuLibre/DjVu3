@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.cpp,v 1.60 2001-08-27 17:01:34 docbill Exp $
+// $Id: JB2Image.cpp,v 1.61 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "JB2Image.h"
@@ -747,6 +747,8 @@ JB2Dict::JB2Codec::Decode::code_absolute_mark_size(GBitmap &bm, int border)
 {
   int xsize=CodeNum(0, BIGPOSITIVE, abs_size_x);
   int ysize=CodeNum(0, BIGPOSITIVE, abs_size_y);
+  if ((xsize!=(unsigned short)xsize) || (ysize!=(unsigned short)ysize))
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
   bm.init(ysize, xsize, border);
 }
 
@@ -755,7 +757,11 @@ JB2Dict::JB2Codec::Decode::code_relative_mark_size(GBitmap &bm, int cw, int ch, 
 {
   int xdiff=CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_size_x);
   int ydiff=CodeNum(BIGNEGATIVE, BIGPOSITIVE, rel_size_y);
-  bm.init(ch + ydiff, cw + xdiff, border);
+  int xsize = cw + xdiff;
+  int ysize = ch + ydiff;
+  if ((xsize!=(unsigned short)xsize) || (ysize!=(unsigned short)ysize))
+    G_THROW( ERR_MSG("JB2Image.bad_number") );
+  bm.init(ysize, xsize, border);
 }
 
 

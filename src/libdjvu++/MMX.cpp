@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMX.cpp,v 1.18 2001-07-24 17:52:04 bcr Exp $
+// $Id: MMX.cpp,v 1.19 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "MMX.h"
 #include <stdio.h>
 #include <stdlib.h>

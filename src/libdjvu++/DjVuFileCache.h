@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFileCache.h,v 1.17 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVuFileCache.h,v 1.18 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVUFILECACHE_H
 #define _DJVUFILECACHE_H
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DjVuFile.h"
 
@@ -62,7 +62,7 @@
     
     @memo Simple DjVuFile caching class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuFileCache.h,v 1.17 2001-07-24 17:52:03 bcr Exp $#
+    @version #$Id: DjVuFileCache.h,v 1.18 2001-10-12 17:58:30 leonb Exp $#
 */
 
 //@{

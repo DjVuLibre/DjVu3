@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.cpp,v 1.7 2001-09-26 15:10:03 leonb Exp $
+// $Id: qd_print_dialog.cpp,v 1.8 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "qd_print_dialog.h"
 #include "qlib.h"

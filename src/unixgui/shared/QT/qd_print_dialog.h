@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_print_dialog.h,v 1.4 2001-07-31 17:37:12 mchen Exp $
+// $Id: qd_print_dialog.h,v 1.5 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_PRINT_DIALOG
 #define HDR_QD_PRINT_DIALOG
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "DjVuImage.h"
 #include "DjVuDocument.h"

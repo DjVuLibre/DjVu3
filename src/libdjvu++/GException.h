@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GException.h,v 1.31 2001-09-26 18:29:46 leonb Exp $
+// $Id: GException.h,v 1.32 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _GEXCEPTION_H_
 #define _GEXCEPTION_H_
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 #ifndef no_return
 #ifdef __GNUC__
 #define no_return __attribute__ ((noreturn))
@@ -92,7 +92,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.31 2001-09-26 18:29:46 leonb Exp $# */
+    #$Id: GException.h,v 1.32 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

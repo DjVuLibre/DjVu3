@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JB2Image.h,v 1.36 2001-08-27 17:01:34 docbill Exp $
+// $Id: JB2Image.h,v 1.37 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name JB2Image.h
 
@@ -129,7 +132,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.36 2001-08-27 17:01:34 docbill Exp $#
+    #$Id: JB2Image.h,v 1.37 2001-10-12 17:58:30 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -137,9 +140,6 @@
     L\'eon Bottou <leonb@research.att.com> -- this implementation */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GString.h"
 #include "ZPCodec.h"
@@ -559,7 +559,7 @@ public:
   typedef unsigned int NumContext;
   struct LibRect
   {
-    short top,left,right,bottom;
+    int top,left,right,bottom;
     void compute_bounding_box(const GBitmap &cbm);
   };
   virtual ~JB2Codec();

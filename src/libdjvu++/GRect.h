@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GRect.h,v 1.29 2001-08-02 23:54:05 bcr Exp $
+// $Id: GRect.h,v 1.30 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _GRECT_H_
 #define _GRECT_H_
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 /** @name GRect.h
     Files #"GRect.h"# and #"GRect.cpp"# implement basic operations on
@@ -51,7 +51,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GRect.h,v 1.29 2001-08-02 23:54:05 bcr Exp $# */
+    #$Id: GRect.h,v 1.30 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"

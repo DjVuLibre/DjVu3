@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuToPS.h,v 1.15 2001-07-31 16:15:38 bcr Exp $
+// $Id: DjVuToPS.h,v 1.16 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVU_TO_PS_H_
 #define _DJVU_TO_PS_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name DjVuToPS.h
     Files #"DjVuToPS.h"# and #"DjVuToPS.cpp"# implement code that can be
@@ -45,13 +48,10 @@
     @author Andrei Erofeev <eaf@geocities.com> \\
             Florin Nicsa <Florin.Nicsa@insa-lyon.fr>
     @version
-    #$Id: DjVuToPS.h,v 1.15 2001-07-31 16:15:38 bcr Exp $#
+    #$Id: DjVuToPS.h,v 1.16 2001-10-12 17:58:30 leonb Exp $#
 */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 #include "DjVuGlobal.h"
 #include "GRect.h"
 #include "DjVuDocument.h"

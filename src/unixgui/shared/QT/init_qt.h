@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: init_qt.h,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: init_qt.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_INIT_QT
 #define HDR_INIT_QT
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 // QT wants qapplication be included before Xlib.h to avoid redefinition
 // of TrueColor define.

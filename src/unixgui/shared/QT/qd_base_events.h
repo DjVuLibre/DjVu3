@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qd_base_events.h,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qd_base_events.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QD_BASE_EVENTS
 #define HDR_QD_BASE_EVENTS
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "qd_base.h"
 

@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GSmartPointer.cpp,v 1.27 2001-07-24 17:52:04 bcr Exp $
+// $Id: GSmartPointer.cpp,v 1.28 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 // - Author: Leon Bottou, 05/1997
 
 #if 0 // Put this into *one* file, which instantiates all the required containers
-#ifdef __GNUC__
-#pragma implementation
-#endif 
 #endif
 
 #include <string.h>

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: GString.h,v 1.98 2001-09-21 20:09:07 leonb Exp $
+// $Id: GString.h,v 1.99 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
 #define _GSTRING_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name GString.h
 
@@ -64,12 +67,9 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.98 2001-09-21 20:09:07 leonb Exp $# */
+    #$Id: GString.h,v 1.99 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "DjVuGlobal.h"
 #include "GContainer.h"

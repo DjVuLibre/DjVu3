@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: mime_check.cpp,v 1.3 2001-07-25 17:10:41 mchen Exp $
+// $Id: mime_check.cpp,v 1.4 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "prefs.h"
 #include "mime_check.h"

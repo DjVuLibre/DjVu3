@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qlib.h,v 1.2 2001-07-25 17:10:41 mchen Exp $
+// $Id: qlib.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_QLIB
 #define HDR_QLIB
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "GException.h"
 #include "GRect.h"

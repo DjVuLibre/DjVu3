@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: JPEGDecoder.h,v 1.18 2001-08-24 21:50:10 docbill Exp $
+// $Id: JPEGDecoder.h,v 1.19 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _JPEGDECODER_H_
 #define _JPEGDECODER_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "GSmartPointer.h"
 
@@ -42,19 +45,6 @@ class ByteStream;
 class GPixmap;
 
 #ifdef NEED_JPEG_DECODER
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdio.h>
-#include <jconfig.h>
-#include <jpeglib.h>
-#include <jerror.h>
-
-#ifdef __cplusplus
-}
-#endif
 
 #include <string.h>
 #include <setjmp.h>
@@ -65,7 +55,7 @@ extern "C" {
     @memo
     Decoding interface to the IJG JPEG library.
     @version
-    #$Id: JPEGDecoder.h,v 1.18 2001-08-24 21:50:10 docbill Exp $#
+    #$Id: JPEGDecoder.h,v 1.19 2001-10-12 17:58:30 leonb Exp $#
     @author
     Parag Deshmukh <parag@sanskrit.lz.att.com> 
 */

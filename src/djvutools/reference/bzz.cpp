@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $
+// $Id: bzz.cpp,v 1.26 2001-10-12 17:58:29 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 // BZZ -- a frontend for BSByteStream
 
@@ -58,7 +61,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $ */
+    $Id: bzz.cpp,v 1.26 2001-10-12 17:58:29 leonb Exp $ */
 //@{
 //@}
 

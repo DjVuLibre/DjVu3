@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.29 2001-07-24 17:52:04 bcr Exp $
+// $Id: GMapAreas.h,v 1.30 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "GSmartPointer.h"
 #include "GContainer.h"
@@ -65,7 +65,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.29 2001-07-24 17:52:04 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.30 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
 

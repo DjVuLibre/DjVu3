@@ -4,9 +4,12 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: Npwin.cpp,v 1.14 2001-08-24 21:50:10 docbill Exp $
+// $Id: Npwin.cpp,v 1.15 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 /* npwin.cpp */
 
 // THIS IS THE UNMODIFIED NETSCAPE SDK PROTOCOL

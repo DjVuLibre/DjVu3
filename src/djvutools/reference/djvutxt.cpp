@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $
+// $Id: djvutxt.cpp,v 1.26 2001-10-12 17:58:29 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 // DJVUTXT -- DjVu TXT extractor
 
 /** @name djvutxt
@@ -69,7 +72,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.25 2001-09-21 20:21:30 leonb Exp $# */
+    #$Id: djvutxt.cpp,v 1.26 2001-10-12 17:58:29 leonb Exp $# */
 //@{
 //@}
 

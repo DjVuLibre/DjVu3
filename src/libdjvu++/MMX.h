@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: MMX.h,v 1.16 2001-08-02 23:54:05 bcr Exp $
+// $Id: MMX.h,v 1.17 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _MMX_H_
 #define _MMX_H_
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "DjVuGlobal.h"
 
@@ -71,7 +74,7 @@
     @memo
     Essential support for MMX.
     @version 
-    #$Id: MMX.h,v 1.16 2001-08-02 23:54:05 bcr Exp $#
+    #$Id: MMX.h,v 1.17 2001-10-12 17:58:30 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> -- initial implementation */
 //@{

@@ -32,15 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_pnote.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qt_pnote.cpp,v 1.3 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-static char RCSVersion[]="@(#) $Id: qt_pnote.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $";
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
+static char RCSVersion[]="@(#) $Id: qt_pnote.cpp,v 1.3 2001-10-12 17:58:31 leonb Exp $";
+
 
 #include "qt_pnote.h"
 #include "exc_misc.h"

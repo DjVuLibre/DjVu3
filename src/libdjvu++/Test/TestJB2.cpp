@@ -5,6 +5,9 @@
 //C-
 //C-
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <stdio.h>
 #include <locale.h>
 #include "JB2Image.h"

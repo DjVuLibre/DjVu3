@@ -4,9 +4,12 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvuprintmeta.cpp,v 1.2 2001-09-21 20:21:30 leonb Exp $
+// $Id: djvuprintmeta.cpp,v 1.3 2001-10-12 17:58:29 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "DjVuDocument.h"
 #include "GOS.h"
 #include "DjVuMessage.h"

@@ -30,11 +30,11 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GBitmap.cpp,v 1.55 2001-07-24 17:52:04 bcr Exp $
+// $Id: GBitmap.cpp,v 1.56 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include "GBitmap.h"
@@ -45,7 +45,7 @@
 #include "GException.h"
 #include <string.h>
 
-// File "$Id: GBitmap.cpp,v 1.55 2001-07-24 17:52:04 bcr Exp $"
+// File "$Id: GBitmap.cpp,v 1.56 2001-10-12 17:58:30 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 

@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.h,v 1.59 2001-09-04 20:07:59 leonb Exp $
+// $Id: ByteStream.h,v 1.60 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _BYTESTREAM_H
 #define _BYTESTREAM_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 /** @name ByteStream.h
     
@@ -62,12 +65,9 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation\\
     Andrei Erofeev <eaf@geocities.com> -- 
     @version
-    #$Id: ByteStream.h,v 1.59 2001-09-04 20:07:59 leonb Exp $# */
+    #$Id: ByteStream.h,v 1.60 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "Arrays.h"
 #include <stdio.h>

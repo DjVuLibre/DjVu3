@@ -30,9 +30,12 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: debug.cpp,v 1.26 2001-07-26 20:42:08 mchen Exp $
+// $Id: debug.cpp,v 1.27 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #ifdef NO_DEBUG
 #undef NO_DEBUG
 #endif
@@ -52,9 +55,6 @@
 #include <errno.h>
 #endif
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 
 #ifndef UNIX
 #ifndef WIN32

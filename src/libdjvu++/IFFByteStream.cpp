@@ -30,15 +30,15 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: IFFByteStream.cpp,v 1.32 2001-07-24 17:52:04 bcr Exp $
+// $Id: IFFByteStream.cpp,v 1.33 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
-#ifdef __GNUC__
-#pragma implementation
-#endif
 #ifndef UNDER_CE
 #include <assert.h>
 #endif

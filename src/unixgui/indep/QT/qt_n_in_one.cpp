@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_n_in_one.cpp,v 1.4 2001-09-25 22:47:02 leonb Exp $
+// $Id: qt_n_in_one.cpp,v 1.5 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #ifdef QT1
 #include <qgmanager.h>

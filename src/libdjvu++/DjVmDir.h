@@ -30,11 +30,14 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.h,v 1.40 2001-07-24 17:52:03 bcr Exp $
+// $Id: DjVmDir.h,v 1.41 2001-10-12 17:58:30 leonb Exp $
 // $Name:  $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 
 /** @name DjVmDir.h
@@ -84,13 +87,10 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.40 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: DjVmDir.h,v 1.41 2001-10-12 17:58:30 leonb Exp $# */
 //@{
 
 
-#ifdef __GNUC__
-#pragma interface
-#endif
 
 #include "GString.h"
 #include "GThreads.h"
@@ -221,7 +221,7 @@ public:
 
   /** Check for filenames that are not valid for the native encoding,
       and change them. */
-  const GUTF8String &check_save_name(const bool is_bundled);
+  const GUTF8String &check_save_name(const bool as_bundled);
 
   /** File name.  The optional file name must be unique and is the name
       that will be used when the document is saved to an indirect file.
@@ -425,18 +425,19 @@ DjVmDir::File::set_title(const GUTF8String &xtitle) { title=xtitle; }
 
 
 inline bool
-DjVmDir::is_indirect(void) const
+DjVmDir::is_bundled(void) const
 {
-  GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-  return files_list.size() && files_list[files_list] != 0 &&
-     files_list[files_list]->offset==0;
+  return ! is_indirect();
 }
 
 inline bool
-DjVmDir::is_bundled(void) const
+DjVmDir::is_indirect(void) const
 {
-  return !is_indirect();
+  GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+  return ( files_list.size() && files_list[files_list] != 0 &&
+           files_list[files_list]->offset==0 );
 }
+
 
 
 // ----- THE END

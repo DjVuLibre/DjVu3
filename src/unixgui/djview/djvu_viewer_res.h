@@ -32,16 +32,15 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: djvu_viewer_res.h,v 1.2 2001-07-25 17:10:41 mchen Exp $
+// $Id: djvu_viewer_res.h,v 1.3 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
-
 
 #ifndef HDR_DJVU_VIEWER_RES
 #define HDR_DJVU_VIEWER_RES
-
-#ifdef __GNUC__
-#pragma interface
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 #include "djvu_base_res.h"
 

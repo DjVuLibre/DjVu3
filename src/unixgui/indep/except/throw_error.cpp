@@ -32,13 +32,13 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: throw_error.cpp,v 1.4 2001-08-02 23:54:06 bcr Exp $
+// $Id: throw_error.cpp,v 1.5 2001-10-12 17:58:31 leonb Exp $
 // $Name:  $
 
-
-#ifdef __GNUC__
-#pragma implementation
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
 
 // GCC 2.8.1 on RedHat 4.0 can't compile this file with -DDEBUG_i and -O2
 // Disable debug messages locally.
