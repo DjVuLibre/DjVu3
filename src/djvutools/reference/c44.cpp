@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.32 2001-08-24 22:23:23 docbill Exp $
+// $Id: c44.cpp,v 1.33 2001-08-24 22:27:31 docbill Exp $
 // $Name:  $
 
 
@@ -185,7 +185,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.32 2001-08-24 22:23:23 docbill Exp $# */
+    #$Id: c44.cpp,v 1.33 2001-08-24 22:27:31 docbill Exp $# */
 //@{
 //@}
 
@@ -343,7 +343,6 @@ parse_size(const char *q,const int size=0)
       if (*ptr && *ptr!='+' && *ptr!=',')
         G_THROW( ERR_MSG("c44.size_comma_expected") );
       q = (*ptr ? ptr+1 : ptr);
-      fprintf(stderr,"%d,%d,%d\n",size,x,size?((x*size)/100):x);
       argv_size[argc_size++] = size?((x*size)/100):x;
       if (argc_size>=MAXCHUNKS)
         G_THROW( ERR_MSG("c44.size_too_many") );
