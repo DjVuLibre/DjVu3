@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GSmartPointer.cpp,v 1.6 1999-09-09 21:38:42 leonb Exp $
+//C- $Id: GSmartPointer.cpp,v 1.7 2000-01-19 22:29:59 bcr Exp $
 
-// File "$Id: GSmartPointer.cpp,v 1.6 1999-09-09 21:38:42 leonb Exp $"
+// File "$Id: GSmartPointer.cpp,v 1.7 2000-01-19 22:29:59 bcr Exp $"
 // - Author: Leon Bottou, 05/1997
 
 /* Put this into *one* file, which instantiates all the required containers
@@ -45,6 +45,15 @@ GPEnabled::destroy()
   if (count >= 0)
     THROW("Suspicious destruction of referenced GPEnabled object");
   delete this;
+}
+
+void 
+GPEnabled::OnlyCopy() const
+{
+  gcsCounter.lock();
+  int retval=(count<2);
+  gcsCounter.unlock();
+  return retval;
 }
 
 void 
