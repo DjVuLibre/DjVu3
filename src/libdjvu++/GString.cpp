@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.84 2001-04-26 01:10:47 praveen Exp $
+// $Id: GString.cpp,v 1.85 2001-04-26 16:03:21 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -47,6 +47,15 @@
 #ifndef UNDER_CE
 #include <wctype.h>
 #include <locale.h>
+#ifdef iswspace
+#undef iswspace
+#endif
+#ifdef iswupper
+#undef iswupper
+#endif
+#ifdef iswlower
+#undef iswlower
+#endif
 #endif
 #include <wchar.h>
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.166 2001-04-25 21:30:05 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.167 2001-04-26 16:03:21 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -789,6 +789,7 @@ is_text(GUTF8String chkid)
 GUTF8String
 DjVuFile::decode_chunk(const GUTF8String &id, GP<ByteStream> gbs, bool djvi, bool djvu, bool iw44)
 {
+  DEBUG_MSG("DjVuFile::decode_chunk()\n");
   ByteStream &bs=*gbs;
   check();
   
@@ -1464,6 +1465,7 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
                           int level, int & max_level,
                           GMap<GURL, void *> & map)
 {
+  DEBUG_MSG("DjVuFile::get_merged_anno()\n");
   GURL url=file->get_url();
   if (!map.contains(url))
   {
@@ -1545,6 +1547,7 @@ DjVuFile::get_merged_anno(const GList<GURL> & ignore_list,
                           // Will do the same thing as get_merged_anno(int *), but will
                           // ignore DjVuFiles with URLs from the ignore_list
 {
+  DEBUG_MSG("DjVuFile::get_merged_anno()\n");
   GP<ByteStream> gstr=ByteStream::create();
   ByteStream &str=*gstr;
   GMap<GURL, void *> map;
@@ -1585,6 +1588,7 @@ void
 DjVuFile::get_text(const GP<DjVuFile> & file,
                           GP<ByteStream> gstr_out)
 {
+  DEBUG_MSG("DjVuFile::get_text()\n");
   ByteStream &str_out=*gstr_out;
   if (!file->is_data_present() ||
     file->is_modified() && file->text)
@@ -1634,6 +1638,7 @@ DjVuFile::get_text(const GP<DjVuFile> & file,
 GP<ByteStream>
 DjVuFile::get_text(void)
 {
+  DEBUG_MSG("DjVuFile::get_text(void)\n");
   GP<ByteStream> gstr=ByteStream::create();
   ByteStream &str=*gstr;
   get_text(this, gstr);
@@ -2126,6 +2131,7 @@ DjVuFile::get_text(ByteStream &out)
 void
 DjVuFile::remove_anno(void)
 {
+  DEBUG_MSG("DjVuFile::remove_anno()\n");
   GP<ByteStream> str_in=data_pool->get_stream();
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
@@ -2166,6 +2172,7 @@ DjVuFile::remove_anno(void)
 void
 DjVuFile::remove_text(void)
 {
+  DEBUG_MSG("DjVuFile::remove_text()\n");
   GP<ByteStream> str_in=data_pool->get_stream();
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
@@ -2219,6 +2226,7 @@ DjVuFile::unlink_file(const GP<DataPool> & data, const GUTF8String &name)
 // Will process contents of data[] and remove any INCL chunk
 // containing 'name'
 {
+  DEBUG_MSG("DjVuFile::unlink_file()\n");
   GP<ByteStream> gstr_out=ByteStream::create();
   ByteStream &str_out=*gstr_out;
   GP<IFFByteStream> giff_out=IFFByteStream::create(gstr_out);
@@ -2417,6 +2425,7 @@ DjVuFile::unlink_file(const GUTF8String &id)
 void
 DjVuFile::change_text(GP<DjVuTXT> txt,const bool do_reset)
 {
+  DEBUG_MSG("DjVuFile::change_text()\n");
   GP<DjVuText> gtext_c=DjVuText::create();
   DjVuText &text_c=*gtext_c;
   if(contains_text())
