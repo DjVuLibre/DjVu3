@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.44 2000-03-20 20:28:01 praveen Exp $
+//C- $Id: DataPool.cpp,v 1.45 2000-03-21 01:09:25 parag Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -814,9 +814,15 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	 // If we attempt to read beyond the [0, length[, ZERO bytes will be
 	 // returned. Otherwise an "EOF" exception will be thrown.
       if (eof_flag)
-	 if (length>0 && offset<length) THROW("EOF");
-	 else return 0;
-   
+      {
+	 if (length>0 && offset<length) 
+         {
+           THROW("EOF");
+	 }else 
+         {
+           return 0;
+         }
+      } 
 	 // Some data is still expected => add this reader to the
 	 // list of readers and call virtual wait_for_data()
       DEBUG_MSG("DataPool::get_data(): There is no data in the pool.\n");

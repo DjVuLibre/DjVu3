@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.45 2000-02-16 07:38:19 bcr Exp $
+//C- $Id: DjVuAnno.cpp,v 1.46 2000-03-21 01:09:25 parag Exp $
 
 
 #ifdef __GNUC__
@@ -636,12 +636,25 @@ DjVuANT::get_zoom(GLParser & parser)
 	 GString zoom=(*obj)[0]->get_symbol();
 	 DEBUG_MSG("zoom='" << zoom << "'\n");
 
-	 if (zoom=="stretch") return ZOOM_STRETCH;
-	 else if (zoom=="one2one") return ZOOM_ONE2ONE;
-	 else if (zoom=="width") return ZOOM_WIDTH;
-	 else if (zoom=="page") return ZOOM_PAGE;
-	 else if (zoom[0]!='d') THROW("Illegal zoom specification");
-	 else return atoi((const char *) zoom+1);
+	 if (zoom=="stretch") 
+         {
+           return ZOOM_STRETCH;
+	 }else if (zoom=="one2one")
+         {
+           return ZOOM_ONE2ONE;
+	 }else if (zoom=="width")
+         {
+           return ZOOM_WIDTH;
+	 }else if (zoom=="page")
+         {
+           return ZOOM_PAGE;
+         }else if (zoom[0]!='d')
+         {
+           THROW("Illegal zoom specification");
+	 }else 
+         {
+           return atoi((const char *) zoom+1);
+         }
       } else { DEBUG_MSG("can't find any.\n"); }
    } CATCH(exc) {} ENDCATCH;
    DEBUG_MSG("resetting zoom to 0 (UNSPEC)\n");

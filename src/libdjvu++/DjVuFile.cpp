@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.119 2000-03-15 15:26:42 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.120 2000-03-21 01:09:25 parag Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -487,7 +487,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
       }
       CATCH(ex) {
 	 unlink_file(incl_str);
-	 RETHROW;
+	 EXTHROW(ex);
       }
       ENDCATCH;
       if (!file)
@@ -663,7 +663,7 @@ DjVuFile::get_fgjd(int block)
       }
    } CATCH(exc) {
       chunk_mon.leave();
-      RETHROW;
+      EXTHROW(exc);
    } ENDCATCH;
    chunk_mon.leave();
    if (is_decode_stopped()) THROW("STOP");
@@ -1105,7 +1105,7 @@ DjVuFile::start_decode(void)
       flags.leave();
       get_portcaster()->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
       delete thread_to_delete;
-      RETHROW;
+      EXTHROW(exc);
    } ENDCATCH;
    flags.leave();
    delete thread_to_delete;
@@ -1163,7 +1163,7 @@ DjVuFile::stop_decode(bool sync)
       flags&=~DONT_START_DECODE;
    } CATCH(exc) {
       flags&=~DONT_START_DECODE;
-      RETHROW;
+      EXTHROW(exc);
    } ENDCATCH;
 }
 
