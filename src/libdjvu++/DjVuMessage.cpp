@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuMessage.cpp,v 1.11 2000-12-08 18:47:41 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.12 2000-12-22 18:00:10 fcrary Exp $
 // $Name:  $
 
 
@@ -140,8 +140,9 @@ DjVuMessage::LookUpSingle( const GString &Single_Message ) const
   {
     //  Didn't find anything, fabricate a message
     msg_text = GString("** Unrecognized DjVu Message: [Contact LizardTech for assistance]\n") + 
-               "\tMessage name:  " +
-               Single_Message.substr(0,ending_posn);
+               "\tMessage name:  \"" +
+               Single_Message.substr(0,ending_posn)
+               + "\"";
   }
 #ifdef _DEBUG
   else
