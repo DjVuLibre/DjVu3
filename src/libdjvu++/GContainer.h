@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.27 1999-11-19 23:44:18 bcr Exp $
+//C- $Id: GContainer.h,v 1.28 2000-02-17 17:56:16 praveen Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -44,6 +44,8 @@
 #define GCONTAINER_NO_MEMBER_TEMPLATES 1
 #elif defined(_MSC_VER) && !defined(__ICL)
 #define GCONTAINER_NO_MEMBER_TEMPLATES 1
+#elif defined(macintosh)
+#define GCONTAINER_NO_MEMBER_TEMPLATES 1
 #else
 #define GCONTAINER_NO_MEMBER_TEMPLATES 0
 #endif
@@ -69,7 +71,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.27 1999-11-19 23:44:18 bcr Exp $# */
+    #$Id: GContainer.h,v 1.28 2000-02-17 17:56:16 praveen Exp $# */
 //@{
 
 
