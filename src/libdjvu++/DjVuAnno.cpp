@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.37 1999-10-28 17:20:22 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.38 1999-10-28 21:26:09 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -1363,15 +1363,18 @@ DjVuAnno::encode(ByteStream &bs)
   IFFByteStream iff(bs);
   if (ant)
     {
-      iff.put_chunk("ANTa");
-      ant->encode(iff);
-      iff.close_chunk();/*
+#ifdef RELEASE
       iff.put_chunk("ANTz");
       {
 	BSByteStream bsiff(iff, 50);
 	ant->encode(bsiff);
       }
-      iff.close_chunk();*/
+      iff.close_chunk();
+#else
+      iff.put_chunk("ANTa");
+      ant->encode(iff);
+      iff.close_chunk();
+#endif
     }
   if (txt)
     {
