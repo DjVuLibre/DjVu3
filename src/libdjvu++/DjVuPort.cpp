@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.20 1999-09-22 18:12:13 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.21 1999-09-30 21:48:36 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -120,7 +120,7 @@ DjVuPortcaster::set_name(const DjVuPort * port, const char * name)
    if (p2n_map.contains(port, pos))
    {
       n2p_map.del((const char *) p2n_map[pos]);
-      delete (const char *) p2n_map[pos];
+      delete (char *) p2n_map[pos];
       p2n_map.del(pos);
    }
    p2n_map[port] = strdup(name);
@@ -180,7 +180,7 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    if (p2n_map.contains(port, pos))
    {
       name=(const char *) p2n_map[pos];
-      delete (const char *) p2n_map[pos];
+      delete (char *) p2n_map[pos];
       p2n_map.del(pos);
    }
 

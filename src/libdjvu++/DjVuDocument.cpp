@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.55 1999-09-30 15:44:37 leonb Exp $
+//C- $Id: DjVuDocument.cpp,v 1.56 1999-09-30 21:48:36 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -890,7 +890,7 @@ unlink_file(const GP<DataPool> & data, const char * name)
 	 {
 	    GString tmp=((const char *) incl_str)+1; incl_str=tmp;
 	 }
-	 while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
+	 while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
 	    incl_str.setat(incl_str.length()-1, 0);
 	    
 	 if (incl_str!=name)

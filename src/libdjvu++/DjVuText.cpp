@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.cpp,v 1.4 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVuText.cpp,v 1.5 1999-09-30 21:48:36 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -19,7 +19,13 @@
 #include "DjVuText.h"
 #include "BSByteStream.h"
 
+const char DjVuText::end_of_column    = 013;      // VT: Vertical Tab
+const char DjVuText::end_of_region    = 035;      // GS: Group Separator
+const char DjVuText::end_of_paragraph = 037;      // US: Unit Separator
+const char DjVuText::end_of_line      = 012;      // LF: Line Feed
 
+
+const int DjVuText::Zone::version=0;
 
 DjVuText::Zone::Zone()
   : ztype(DjVuText::PAGE), text_start(0), text_length(0)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.8 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.9 1999-09-30 21:48:35 praveen Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.8 1999-09-28 19:56:18 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.9 1999-09-30 21:48:35 praveen Exp $# */
 //@{
 
 
@@ -69,7 +69,7 @@
 class DjVmDir : public GPEnabled
 {
 public:
-  static const int version=0;
+  static const int version;
   /** This class represents the directory records managed by 
       class \Ref{DjVmDir}. */
   class File : public GPEnabled
@@ -132,19 +132,19 @@ public:
       (where everything is bundled into one file.) */
   bool is_bundled(void) const;
   /** Translates page numbers to file records. */
-  GP<DjVmDir::File> page_to_file(int page_num) const;
+  GP<File> page_to_file(int page_num) const;
   /** Translates file names to file records. */
-  GP<DjVmDir::File> name_to_file(const GString & name) const;
+  GP<File> name_to_file(const GString & name) const;
   /** Translates file IDs to file records. */
-  GP<DjVmDir::File> id_to_file(const char * id) const;
+  GP<File> id_to_file(const char * id) const;
   /** Translates file shortcuts to file records. */
-  GP<DjVmDir::File> title_to_file(const char * title) const;
+  GP<File> title_to_file(const char * title) const;
   /** Returns position of the file in the directory. */
   int get_file_pos(const File * f) const;
   /** Returns position of the given page in the directory. */
   int get_page_pos(int page_num) const;
   /** Returns a copy of the list of file records. */
-  GPList<DjVmDir::File> get_files_list(void) const;
+  GPList<File> get_files_list(void) const;
   /** Returns the number of file records. */
   int get_files_num(void) const;
   /** Returns the number of file records which represent pages. */
@@ -167,7 +167,7 @@ inline bool
 DjVmDir::is_indirect(void) const
 {
   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-  return files_list.size() && files_list[files_list] &&
+  return files_list.size() && files_list[files_list] != 0 &&
      files_list[files_list]->offset==0;
 }
 

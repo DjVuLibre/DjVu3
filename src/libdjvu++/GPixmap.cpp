@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GPixmap.cpp,v 1.10 1999-09-28 17:33:51 leonb Exp $
+//C- $Id: GPixmap.cpp,v 1.11 1999-09-30 21:48:36 praveen Exp $
 
-// File "$Id: GPixmap.cpp,v 1.10 1999-09-28 17:33:51 leonb Exp $"
+// File "$Id: GPixmap.cpp,v 1.11 1999-09-30 21:48:36 praveen Exp $"
 // -- Implements class PIXMAP
 // Author: Leon Bottou 07/1997
 
@@ -196,7 +196,7 @@ GPixmap::init(const GBitmap &ref, const GPixel *userramp)
     }
     // Free ramp
     if (!userramp)
-      delete [] ramp;
+      delete [] (GPixel*)ramp;
   }
 }
 
@@ -226,7 +226,7 @@ GPixmap::init(const GBitmap &ref, const GRect &rect, const GPixel *userramp)
     }
     // free ramp
     if (!userramp)
-      delete [] ramp;
+      delete [] (GPixel*) ramp;
   }
 }
 

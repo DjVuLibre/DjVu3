@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GURL.cpp,v 1.9 1999-08-18 18:20:58 leonb Exp $
+//C- $Id: GURL.cpp,v 1.10 1999-09-30 21:48:36 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -173,7 +173,7 @@ GURL::operator+(const char * name) const
 	 if (*ptr==';' || *ptr=='?') break;
 
       GString str(url, ptr-url);
-      if (str[str.length()-1]!='/') str+='/';
+      if (str[(int)str.length()-1]!='/') str+='/';
       str+=name;
       str+=ptr;
 

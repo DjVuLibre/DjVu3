@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.h,v 1.2 1999-09-02 19:21:58 leonb Exp $
+//C- $Id: DjVuText.h,v 1.3 1999-09-30 21:48:36 praveen Exp $
 
 
 #ifndef _DJVUTEXT_H_
@@ -42,7 +42,7 @@
     @memo 
     Encoding of textual information for a DjVu image.
     @version 
-    #$Id: DjVuText.h,v 1.2 1999-09-02 19:21:58 leonb Exp $# 
+    #$Id: DjVuText.h,v 1.3 1999-09-30 21:48:36 praveen Exp $# 
     @author: 
     Steven Pigeon <pigeon@research.att.com> -- initial implementation \\
     L\'eon Bottou <leonb@research.att.com> -- made it square 
@@ -88,7 +88,7 @@ public:
     friend class DjVuText;
     void cleartext();
     void normtext(const char *instr, GString &outstr);
-    static const int version = 0;
+    static const int version;
     void encode(ByteStream &bs) const;
     void decode(ByteStream &bs, int maxtext);
   };
@@ -106,10 +106,10 @@ public:
         {\tt DjVuText::end_of_line}      & 012 & LF: Line Feed
       \end{tabular} */
   GString textUTF8;
-  static const char end_of_column    = 013;      // VT: Vertical Tab
-  static const char end_of_region    = 035;      // GS: Group Separator
-  static const char end_of_paragraph = 037;      // US: Unit Separator
-  static const char end_of_line      = 012;      // LF: Line Feed
+  static const char end_of_column   ;      // VT: Vertical Tab
+  static const char end_of_region    ;      // GS: Group Separator
+  static const char end_of_paragraph ;      // US: Unit Separator
+  static const char end_of_line      ;      // LF: Line Feed
   /** Main zone in the document.
       This zone represent the page. */
   Zone main;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.24 1999-09-29 20:12:41 eaf Exp $
+//C- $Id: DataPool.h,v 1.25 1999-09-30 21:48:35 praveen Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.24 1999-09-29 20:12:41 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.25 1999-09-30 21:48:35 praveen Exp $#
 */
 
 //@{
@@ -187,9 +187,9 @@ private:
    class Incrementor
    {
    private:
-      DataPool::Counter	& counter;
+      Counter	& counter;
    public:
-      Incrementor(DataPool::Counter & counter);
+      Incrementor(Counter & counter);
       ~Incrementor(void);
    };
    class Reader : public GPEnabled

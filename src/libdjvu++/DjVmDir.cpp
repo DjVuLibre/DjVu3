@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.6 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.7 1999-09-30 21:48:35 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -21,6 +21,9 @@
 #include "debug.h"
 
 #include <ctype.h>
+
+
+const int DjVmDir::version=0;
 
 /* Directory file format
 

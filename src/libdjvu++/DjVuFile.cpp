@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.68 1999-09-30 16:21:35 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.69 1999-09-30 21:48:36 praveen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -438,7 +438,7 @@ DjVuFile::process_incl_chunk(ByteStream & str, int file_num)
    {
       GString tmp=((const char *) incl_str)+1; incl_str=tmp;
    }
-   while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
+   while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
       incl_str.setat(incl_str.length()-1, 0);
 
    if (incl_str.length()>0)
@@ -1456,7 +1456,7 @@ DjVuFile::unlink_file(const char * id)
 	    {
 	       GString tmp=((const char *) incl_str)+1; incl_str=tmp;
 	    }
-	    while(incl_str.length()>0 && incl_str[incl_str.length()-1]=='\n')
+	    while(incl_str.length()>0 && incl_str[(int)incl_str.length()-1]=='\n')
 	       incl_str.setat(incl_str.length()-1, 0);
 	    if (incl_str!=id)
 	    {

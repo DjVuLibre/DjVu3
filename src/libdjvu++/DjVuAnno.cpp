@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.16 1999-09-30 19:16:13 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.17 1999-09-30 21:48:35 praveen Exp $
 
 
 #ifdef __GNUC__
@@ -159,7 +159,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
       case STRING:
 	 if (1)
 	 {
-	    unsigned int src=0, dst=0;
+	    int src=0, dst=0;
 	    buffer_str.resize(string.length()*2);
 	    buffer_str[dst++]='"';
 	    for(src=0;src<string.length();src++)
@@ -345,7 +345,7 @@ GLParser::get_token(const char * & start)
            if (!ch) THROW("EOF");
            if (ch=='"')
              {
-	       if (str.length()>0 && str[str.length()-1]=='\\')
+	       if (str.length()>0 && str[(int)str.length()-1]=='\\')
                  str.setat(str.length()-1, '"');
 	       else break;
              } else str+=ch;
