@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm.cpp,v 1.28 1999-11-04 00:02:47 bcr Exp $
+//C- $Id: djvutopnm.cpp,v 1.29 1999-11-04 00:05:04 bcr Exp $
 
 
 /** @name djvutopnm
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm.cpp,v 1.28 1999-11-04 00:02:47 bcr Exp $# */
+    #$Id: djvutopnm.cpp,v 1.29 1999-11-04 00:05:04 bcr Exp $# */
 //@{
 //@}
 
@@ -358,7 +358,7 @@ main(int argc, char *argv[], char *[])
       duplicates[0]=Opts.GetVarToken("scale");
       duplicates[1]=Opts.GetVarToken("size");
       duplicates[2]=Opts.GetVarToken("subsample");
-      duplicates[3]=0;
+      duplicates[3]=-1;
       switch(Opts.GetBest(duplicates))
       {
         case 0: // scale
@@ -399,7 +399,7 @@ main(int argc, char *argv[], char *[])
       duplicates[1]=Opts.GetVarToken("black");
       duplicates[2]=Opts.GetVarToken("foreground");
       duplicates[3]=Opts.GetVarToken("background");
-      duplicates[4]=0;
+      duplicates[4]=-1;
       switch(Opts.GetBest(duplicates))
       {
         case 0:  // layer
