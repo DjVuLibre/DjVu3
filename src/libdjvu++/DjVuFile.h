@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.1.2.4 1999-05-03 19:21:23 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.1.2.5 1999-05-03 21:55:39 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -117,6 +117,8 @@ private:
 
    GPList<DjVuFile>	inc_files_list;
    GCriticalSection	inc_files_lock;
+
+   GCriticalSection	trigger_lock;
    
    GThread		* decode_thread;
    GP<DjVuFile>		decode_life_saver;
