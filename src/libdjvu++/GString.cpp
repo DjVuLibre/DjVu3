@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.97 2001-05-16 22:37:18 fcrary Exp $
+// $Id: GString.cpp,v 1.98 2001-05-16 22:49:11 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -158,7 +158,7 @@ GStringRep::substr(const char *s,const int start,const int len) const
     const char *startptr, *endptr;
     if(start<0)
     {
-      startptr=s+length-start;
+      startptr=s+length+start;
       if(startptr<s)
         startptr=s;
     }else
@@ -812,11 +812,15 @@ GStringRep::rsearch(char c, int from) const
 int 
 GStringRep::rsearch(char const *ptr, int from) const
 {
-  int retval=(-1);
-  while((from=search(ptr,from)) >= 0)
+  if(from<0)
   {
-    retval=from;
+    from+=size;
+    if(from<0)
+      G_THROW( ERR_MSG("GString.bad_subscript") );
   }
+  int retval=(-1);
+  for(int loc=from;(loc=search(ptr,loc)) >= 0;++loc)
+    retval=loc;
   return retval;
 }
 
