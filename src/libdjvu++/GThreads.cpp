@@ -7,10 +7,10 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GThreads.cpp,v 1.9 1999-03-05 20:51:04 leonb Exp $
+//C-  $Id: GThreads.cpp,v 1.10 1999-03-06 00:05:00 leonb Exp $
 
 
-// **** File "$Id: GThreads.cpp,v 1.9 1999-03-05 20:51:04 leonb Exp $"
+// **** File "$Id: GThreads.cpp,v 1.10 1999-03-06 00:05:00 leonb Exp $"
 // This file defines machine independent classes
 // for running and synchronizing threads.
 // - Author: Leon Bottou, 01/1998
@@ -490,7 +490,20 @@ GEvent::wait(int timeout)
 #include <sys/time.h>
 
 
-// -- context switch
+// -------------------------------------- constants
+
+// Minimal stack size
+#define MINSTACK   (32*1024)
+// Default stack size
+#define DEFSTACK   (127*1024)
+// Maxtime between checking fdesc (ms)
+#define MAXWAIT    (200)
+// Maximum penalty for hog task (ms)
+#define MAXPENALTY (1000)
+
+
+
+// -------------------------------------- context switch code
 
 struct mach_state { 
   jmp_buf buf; 
@@ -604,7 +617,40 @@ int main() {
 #endif
 
 
-// -- data structures
+
+// -------------------------------------- select
+
+struct coselect {
+  int nfds;
+  fd_set rset;
+  fd_set wset;
+  fd_set eset;
+};
+
+static void 
+coselect_merge(coselect *dest, coselect *from)
+{
+  int i;
+  int nfds = from->nfds;
+  if (nfds > dest->nfds)
+    dest->nfds = nfds;
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->rset)) FD_SET(i, &dest->rset);
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->wset)) FD_SET(i, &dest->wset);
+  for (i=0; i<nfds; i++) if (FD_ISSET(i, &from->eset)) FD_SET(i, &dest->eset);
+}
+
+static int
+coselect_test(coselect *c)
+{
+  static timeval tmzero = {0,0};
+  fd_set copyr = c->rset;
+  fd_set copyw = c->wset;
+  fd_set copye = c->eset;
+  return select(c->nfds, &copyr, &copyw, &copye, &tmzero);
+}
+
+
+// -------------------------------------- cotask
 
 struct cotask {
   struct cotask *next;
@@ -616,77 +662,231 @@ struct cotask {
   int stacksize;
   // egcs exception support
   void *ehctx;
-  // waiting on event
+  // timing information
+  unsigned long over;
+  // waiting information
   int *wchan;
-  // waiting on select
-  int nfds;
-  fd_set *rdfds;
-  fd_set *wrfds;
-  fd_set *exfds;
-  // waiting timeout
-  struct timeval wakup;
+  coselect *wselect;
+  unsigned long *maxwait;
 };
 
 static cotask *maintask = 0;
-static cotask *curtask = 0;
+static cotask *curtask  = 0;
+static unsigned long globalmaxwait = 0;
 
-// Minimum and default stack size
-#define MINSTACK (32*1024)
-#define DEFSTACK (127*1024)
+
+// -------------------------------------- time
+
+static unsigned long
+time_elapsed(int reset=1)
+{
+  static timeval base;
+  timeval tm;
+  unsigned long  elapsed;
+  gettimeofday(&tm, NULL);
+  elapsed = (tm.tv_sec-base.tv_sec)*1000 + (tm.tv_usec-base.tv_usec)/1000;
+  if (reset && elapsed>0)
+    base = tm;
+  return elapsed;
+}
+
+// -------------------------------------- scheduler
+
+static int
+cotask_yield()
+{
+  // ok
+  if (! maintask)
+    return -1;
+  // get elapsed time and return immediately when it is too small
+  unsigned long elapsed = time_elapsed();
+  if (elapsed==0 && curtask->wchan==0 && curtask->prev && curtask->next)
+    return 0;
+  // adjust task running time
+  curtask->over += elapsed;
+  if (curtask->over > MAXPENALTY)
+    curtask->over = MAXPENALTY;
+  // start scheduling
+ reschedule:
+  // try unblocking tasks
+  cotask *n = curtask->next;
+  cotask *q = n;
+  do 
+    { 
+      if (q->wchan)
+        {
+          if ( (*q->wchan>0) ||
+               (q->maxwait && *q->maxwait<=elapsed) ||
+               (q->wselect && globalmaxwait<=elapsed && coselect_test(q->wselect)) )
+            { 
+              q->wchan=0; 
+              q->maxwait=0; 
+              q->wselect=0; 
+              q->over = 0;
+            }
+          if (q->maxwait)
+            *q->maxwait -= elapsed;
+        }
+      q = q->next;
+    } 
+  while (q!=n);
+  // adjust globalmaxwait
+  if (globalmaxwait < elapsed)
+    globalmaxwait = MAXWAIT;
+  else
+    globalmaxwait -= elapsed;
+  // find best candidate
+  static int count;
+  unsigned long best = 0;
+  cotask *r = 0;
+  count = 0;
+  q = n;
+  do 
+    { 
+      if (! q->wchan)
+        {
+          count += 1;
+          if (r==0 || best>r->over) 
+            {
+              r = q;
+              best = r->over;
+            } 
+        }
+      q = q->next;
+    } 
+  while (q != n);
+  // found
+  if (count > 0)
+    {
+      // adjust over 
+      q = n;
+      do 
+        { 
+          if (! q->wchan)
+            q->over = q->over - best;
+          q = q->next;
+        } 
+      while (q != n);
+      // switch
+      if (r != curtask)
+        {
+          cotask *old = curtask;
+          curtask = r;
+          mach_switch(&old->regs, &curtask->regs);
+        }
+      // return 
+      if (count == 1)
+        return 1;
+      return 0;
+    }
+  // no task ready
+  count = 0;
+  unsigned long minwait = 1000000;
+  coselect allfds;
+  allfds.nfds = 1;
+  FD_ZERO(&allfds.rset);
+  FD_ZERO(&allfds.wset);
+  FD_ZERO(&allfds.eset);
+  q = n;
+  do 
+    {
+      if (q->maxwait || q->wselect)
+        count += 1;
+      if (q->maxwait && *q->maxwait<minwait)
+        minwait = *q->maxwait;
+      if (q->wselect)
+        coselect_merge(&allfds, q->wselect);
+      q = q->next;
+    } 
+  while (q != n);
+  // abort on deadlock
+  if (count == 0) {
+    fprintf(stderr,"PANIC: Cothreads deadlock\n");
+    abort();
+  }
+  // select
+  timeval tm;
+  tm.tv_sec = minwait/1000;
+  tm.tv_usec = 1000*(minwait-1000*tm.tv_sec);
+  select(allfds.nfds,&allfds.rset, &allfds.wset, &allfds.eset, &tm);
+  // reschedule
+  globalmaxwait = 0;
+  elapsed = time_elapsed();
+  goto reschedule;
+}
+
+
+// -------------------------------------- select
+
+static int
+cotask_select(int nfds, 
+              fd_set *rfds, fd_set *wfds, fd_set *efds,
+              struct timeval *tm)
+{
+  // bypass
+  if (maintask==0 || (tm && tm->tv_sec==0 && tm->tv_usec<1000))
+    return select(nfds, rfds, wfds, efds, tm);
+  // copy parameters
+  int chan = 0;
+  unsigned long maxwait = 0;
+  coselect parm;
+  // set waiting info
+  curtask->wchan = &chan;
+  if (rfds || wfds || efds)
+    {
+      parm.nfds = nfds;
+      if (rfds) { parm.rset=*rfds; } else { FD_ZERO(&parm.rset); }
+      if (wfds) { parm.wset=*wfds; } else { FD_ZERO(&parm.wset); }
+      if (efds) { parm.eset=*efds; } else { FD_ZERO(&parm.eset); }
+      curtask->wselect = &parm;
+    }
+  if (tm) 
+    {
+      maxwait = time_elapsed(0) + tm->tv_sec*1000 + tm->tv_usec/1000;
+      curtask->maxwait = &maxwait;
+    }
+  // reschedule
+  cotask_yield();
+  // call select to update masks
+  return select(nfds, rfds, wfds, efds, tm);
+}
+
+
+// -------------------------------------- utilities
+
+static void
+cotask_unblock_wchan(int *wchan)
+{
+  cotask *n = curtask->next;
+  cotask *q = n;
+  do 
+    { 
+      if (q->wchan == wchan)
+        {
+          q->wchan=0; 
+          q->maxwait=0; 
+          q->wselect=0; 
+          q->over = 0;
+        }
+      q = q->next;
+    } 
+  while (q!=n);
+  cotask_yield();
+}
+
+
+// -------------------------------------- libgcc hook
 
 #ifndef NO_LIBGCC_HOOKS
-  // These are exported by Leon's patched version of libgcc.a
-  // Let's hope that the egcs people will include the patch in
-  // the distributions.
+// These are exported by Leon's patched version of libgcc.a
+// Let's hope that the egcs people will include the patch in
+// the distributions.
 extern "C" 
 {
   extern void* (*__get_eh_context_ptr)(void);
   extern void* __new_eh_context(void);
 }
-#endif
 
-
-
-
-// -- cotask support
-
-static int
-cotask_switch(cotask *thr)
-{
-  if (thr != curtask)
-    {
-      cotask *old = curtask;
-      curtask = thr;
-      curtask->wchan = 0;
-      mach_switch(&old->regs, &curtask->regs);
-      return 0;
-    }
-  return 1;
-}
-
-static void
-cotask_release_all(int *wchan)
-{
-  int again = 0;
-  if (maintask && curtask)
-    again = 1;
-  while (again)
-    {
-      again = 0;
-      cotask *p = curtask;
-      do {
-        if (p->wchan == wchan)
-          {
-            cotask_switch(p);
-            again = 1;
-            break;
-          }
-        p = p->next;
-      } while (p != curtask);
-    }
-}
-
-#ifndef NO_LIBGCC_HOOKS
 // This function is called via the pointer __get_eh_context_ptr
 // by the internal mechanisms of egcs.  It must return the 
 // per-thread event handler context.  This is necessary to
@@ -704,67 +904,9 @@ cotask_get_eh_context()
 }
 #endif
 
-static int
-tmcmp(const struct timeval *tp1, const struct timeval *tp2)
-{
-  if (tp1->tv_sec < tp2->tv_sec)
-    return -1;
-  if (tp1->tv_sec > tp2->tv_sec)
-    return  1;
-  if (tp1->tv_usec < tp2->tv_usec)
-    return -1;
-  if (tp1->tv_usec > tp2->tv_usec)
-    return  1;
-  return 0;
-}
-
-static void
-tmadd(struct timeval *tp1, const struct timeval *tp2)
-{
-  tp1->tv_sec += tp2->tv_sec;
-  tp1->tv_usec += tp2->tv_usec;
-  if (tp1->tv_usec > 1000000)
-    {
-      tp1->tv_usec -= 1000000;
-      tp1->tv_sec += 1;
-    }
-}
-
-static void
-tmsub(struct timeval *tp1, const struct timeval *tp2)
-{
-  if (tp1->tv_usec < tp2->tv_usec)
-    {
-      tp1->tv_usec += 1000000;
-      tp1->tv_sec -= 1;
-    }
-  tp1->tv_usec -= tp2->tv_usec;
-  tp1->tv_sec -= tp2->tv_sec;
-}
-
-static struct timeval tmzero = {0,0};
-
-static void
-fdadd(fd_set *set1, fd_set *set2, int nfds)
-{
-  if (set2)
-    for (int i=0; i<nfds; i++)
-      if (FD_ISSET(i, set2))
-        FD_SET(i, set1);
-}
-
-static int 
-pollselect(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
-{
-  fd_set copyr; FD_ZERO(&copyr); if (rfds) copyr = *rfds;
-  fd_set copyw; FD_ZERO(&copyw); if (wfds) copyw = *wfds;
-  fd_set copye; FD_ZERO(&copye); if (efds) copye = *efds;
-  return ::select(nfds, &copyr, &copyw, &copye, &tmzero);
-}
 
 
-
-// -- GThread
+// -------------------------------------- GThread
 
 static void (*scheduling_callback)(int) = 0;
 
@@ -793,6 +935,7 @@ GThread::GThread(int stacksize)
       memset(maintask, 0, sizeof(cotask));
       maintask->next = maintask;
       maintask->prev = maintask;
+      time_elapsed();
 #ifndef NO_LIBGCC_HOOKS
       maintask->ehctx =  (*__get_eh_context_ptr)();
       __get_eh_context_ptr = cotask_get_eh_context;
@@ -876,7 +1019,7 @@ startone(void)
 int 
 GThread::create(void (*entry)(void*), void *arg)
 {
-  if (task->prev)
+  if (task->next || task->prev)
     return -1;
   xentry = entry;
   xarg = arg;
@@ -901,108 +1044,31 @@ GThread::terminate()
     return;
   if (task==maintask)
     abort();
-  if (task->next)
+  if (task->prev && task->next)
     {
       if (scheduling_callback)
         (*scheduling_callback)(CallbackTerminate);
       task->prev->next = task->next;
       task->next->prev = task->prev;
-      task->next = 0;
+      task->prev = 0;
       if (task == curtask)
-        yield();
+        cotask_yield();
     }
 }
 
 int
 GThread::yield()
 {
-  // Before initializing
-  if (! maintask)
-    return -1;
-  // Initialize variables
-  cotask *next = curtask->next;
-  if (! next)
-    // This is happening when a cotask calls terminate() itself
-    next = curtask->prev->next;
-  // Scheduling loop
- reschedule:
-  struct timeval cur;
-  cur.tv_sec = 0;
-  cur.tv_usec = 0;
-  cotask *p = next;
-  do 
-    {
-      if (p->wchan == 0)
-        return cotask_switch(p);
-      // check if waiting event set
-      if (*p->wchan > 0)
-        return cotask_switch(p);
-      // check if waiting timeout elapsed
-      if (p->wakup.tv_sec > 0)
-        {
-          if (cur.tv_sec==0)
-            gettimeofday(&cur, NULL);
-          if (tmcmp(&cur, &p->wakup) >= 0)
-            return cotask_switch(p);
-        }
-      // check if waiting file descriptors ready
-      if (p->nfds > 0)
-        if (pollselect(p->nfds, p->rdfds, p->wrfds, p->exfds))
-          return cotask_switch(p);            
-      p = p->next;
-    }
-  while (p != next);
-  // all tasks are waiting
-  struct timeval wakup;
-  cotask *waiter = 0 ;
-  fd_set rdfds, wrfds, exfds;
-  int nfds = 0;
-  FD_ZERO(&rdfds);
-  FD_ZERO(&wrfds);
-  FD_ZERO(&exfds);
-  // loop over task
-  p = next;
-  do 
-    {
-      // compute union of waiting file descriptors
-      if (p->wchan && p->nfds>0)
-        {
-          if (p->nfds > nfds)
-            nfds = p->nfds;
-          fdadd(&rdfds, p->rdfds, nfds);
-          fdadd(&wrfds, p->wrfds, nfds);
-          fdadd(&exfds, p->exfds, nfds);
-        }
-      // compute earliest wakup time
-      if (p->wchan && p->wakup.tv_sec>0)
-        if (waiter==0 || tmcmp(&p->wakup, &wakup) <= 0) 
-          {
-            waiter = p;
-            wakup = p->wakup;
-          }
-      // next task
-      p = p->next;
-    } 
-  while (p!=next);
-  // check for deadlock
-  if (waiter==0 && nfds==0)
-    {
-      fprintf(stderr,"panic: COTHREADS deadlock\n");
-      abort();
-    }
-  // check if timeout has expired
-  if (waiter)
-    {
-      gettimeofday(&cur, NULL);
-      if (tmcmp(&wakup, &cur) <= 0)
-        goto reschedule;
-      tmsub(&wakup, &cur);
-    }
-  // whole process waits.
-  ::select(nfds, &rdfds, &wrfds, &exfds, (waiter ? &wakup : 0));
-  goto reschedule;
+  return cotask_yield();
 }
 
+int 
+GThread::select(int nfds, 
+                fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+                struct timeval *timeout)
+{
+  return cotask_select(nfds, readfds, writefds, exceptfds, timeout);
+}
 
 void*
 GThread::current()
@@ -1012,48 +1078,8 @@ GThread::current()
   return (void*)0;
 }
 
-int 
-GThread::select(int nfds, 
-                fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-                struct timeval *timeout)
-{
-  if (! maintask)
-    return ::select(nfds, readfds, writefds, exceptfds, timeout);
-  // Compute wakup date
-  struct timeval wakup = tmzero; 
-  if (timeout)
-    {
-      gettimeofday(&wakup, NULL);
-      tmadd(&wakup, timeout);
-    }
-  // Check if data is ready now
-  if (pollselect(nfds, readfds, writefds, exceptfds) == 0)
-    {
-      // Wait
-      int event = 0;
-      curtask->nfds = nfds;
-      curtask->rdfds = readfds;
-      curtask->wrfds = writefds;
-      curtask->exfds = exceptfds;
-      curtask->wakup = wakup;
-      curtask->wchan = &event;
-      yield();
-    }
-  // Compute remaining waiting time (as select does)
-  if (timeout)
-    {
-      *timeout = wakup;
-      gettimeofday(&wakup, 0);
-      if (tmcmp(timeout, &wakup) > 0)
-        tmsub(timeout, &wakup);
-      else
-        *timeout = tmzero;
-    }
-  // Run the real select in order to modify the masks.
-  return ::select(nfds, readfds, writefds, exceptfds, &tmzero);
-}
 
-// -- GCriticalSection
+// -------------------------------------- GCriticalSection
 
 GCriticalSection::GCriticalSection() 
   : count(1), locker(0) 
@@ -1064,7 +1090,7 @@ GCriticalSection::GCriticalSection()
 GCriticalSection::~GCriticalSection()
 {	
   ok = 0;
-  cotask_release_all(&count);
+  cotask_unblock_wchan(&count);
 }
 
 void 
@@ -1079,10 +1105,8 @@ GCriticalSection::lock()
     if (locker==curtask) {
       count -= 1;
     } else if (ok) {
-      curtask->nfds = 0;
-      curtask->wakup.tv_sec = 0;
       curtask->wchan = &count;
-      GThread::yield();
+      cotask_yield();
       count = 0;
       locker = curtask;
     }
@@ -1107,7 +1131,7 @@ GCriticalSection::unlock()
     }
 }
 
-// -- GEvent
+// -------------------------------------- GEvent
 
 GEvent::GEvent() 
   : status(0) 
@@ -1118,7 +1142,7 @@ GEvent::GEvent()
 GEvent::~GEvent() 
 {
   ok = 0;
-  cotask_release_all(&status);
+  cotask_unblock_wchan(&status);
 }
 
 void
@@ -1134,10 +1158,8 @@ GEvent::wait()
 {
   if (ok && status<=0)
     {
-      curtask->nfds = 0;
-      curtask->wakup.tv_sec = 0;
       curtask->wchan = &status;
-      GThread::yield();
+      cotask_yield();
     }
   status = 0;
 }
@@ -1147,20 +1169,12 @@ GEvent::wait(int timeout)
 {
   if (ok && status<=0) 
     {
-      gettimeofday(&curtask->wakup, NULL);
-      curtask->wakup.tv_sec += timeout/1000;
-      curtask->wakup.tv_usec += (timeout%1000)*1000;
-      if (curtask->wakup.tv_usec > 1000000) 
-        {
-          curtask->wakup.tv_usec -= 1000000;
-          curtask->wakup.tv_sec += 1;
-        }
-      curtask->nfds = 0;
+      unsigned long maxwait = timeout;
+      curtask->maxwait = &maxwait;
       curtask->wchan = &status;
-      GThread::yield();
+      cotask_yield();
     }
   status = 0;
 }
 
 #endif
-
