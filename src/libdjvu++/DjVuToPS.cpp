@@ -9,9 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuToPS.cpp,v 1.1 2000-03-19 22:12:34 eaf Exp $
-
-// "$Id: DjVuToPS.cpp,v 1.1 2000-03-19 22:12:34 eaf Exp $"
+//C- $Id: DjVuToPS.cpp,v 1.2 2000-03-19 22:33:25 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -245,7 +243,7 @@ DjVuToPS::store_doc_setup(ByteStream & str)
 	 "\n"
 	 "%% Build a temporary dictionary\n"
 	 "40 dict begin\n"
-	 "\n", options.copies);
+	 "\n", options.get_copies());
 
    write(str, "\
 %% Very simple rectstroke & rectfill emulation (in case if we have level 1)\n\
