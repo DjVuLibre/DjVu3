@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.86 1999-11-15 23:07:22 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.87 1999-11-17 18:36:23 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -351,6 +351,7 @@ DjVuFile::static_decode_func(void * cl_data)
 	       for the termination of the decoding from the ~DjVuFile() called
 	       from the decoding thread) or coredump. */
    GP<DjVuFile> life_saver=th;
+   th->decode_life_saver=0;
    TRY {
       th->decode_func();
    } CATCH(exc) {
@@ -946,6 +947,7 @@ DjVuFile::start_decode(void)
 	    // We want to create it right here to be able to stop the
 	    // decoding thread even before its function is called (it starts)
 	 decode_data_pool=new DataPool(data_pool);
+	 decode_life_saver=this;
 	 
 	 delete decode_thread; decode_thread=0;
 	 decode_thread=new GThread();
