@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.99 1999-12-13 20:03:26 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.100 1999-12-19 07:36:47 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1550,12 +1550,17 @@ copy_chunks(ByteStream *from, IFFByteStream &ostr)
   from->seek(0);
   IFFByteStream iff(*from);
   GString chkid;
-  while (iff.get_chunk(chkid))
+  int chksize;
+  while ((chksize=iff.get_chunk(chkid)))
     {
       ostr.put_chunk(chkid);
-      ostr.copy(iff);
+      int ochksize=ostr.copy(iff);
       ostr.close_chunk();
-      iff.close_chunk();
+      iff.seek_close_chunk();
+      if(ochksize != chksize)
+      {
+        THROW("EOF");
+      }
     }
 }
 
@@ -1628,6 +1633,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           if(ochksize != chksize)
           {
             iff.seek_close_chunk();
+            if(recover_errors == SKIP_CHUNKS) THROW("bcr: opps");
             if (chunks_number < 0)
               chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
             THROW("EOF");
