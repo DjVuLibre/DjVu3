@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.46 2000-02-29 03:39:07 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.47 2000-02-29 07:04:48 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,11 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.46  2000-02-29 03:39:07  bcr
+ * Revision 1.47  2000-02-29 07:04:48  bcr
+ * Added in an "optimization" that decreases the amount of preprocess time.
+ * Fixed a bug in PnmStream rotated output.
+ *
+ * Revision 1.46  2000/02/29 03:39:07  bcr
  * Added a 'Strict' option to the Native() method.  Then this option is false we
  * don't require color and gray to be bottom-up.
  *
@@ -439,14 +443,15 @@ typedef struct _djvu_image_priv * djvu_image_priv;
       ((IMAGE)->orientation==DJVU_BULRNR)&&((IMAGE)->type!=DJVU_RGB)&&\
       ((IMAGE)->pixsize==(unsigned int)((IMAGE)->type==DJVU_GRAY)?1:3))))
 
-/* Nearly Native is the same as Native, but bottom up is not required.
+/* This is a slightly less restrictive form of native.  We accept either
+ * top down or bottom up, and accept RGB as well as BGR.
  */
 #define DJVU_IMAGE_NEARLY_NATIVE(IMAGE) \
   (((IMAGE)->start_alloc == (IMAGE)->data)&&\
     (((IMAGE)->type==DJVU_RLE)?((IMAGE)->orientation==DJVU_TDLRNR):\
     (((IMAGE)->rowsize==((IMAGE)->w)*((IMAGE)->pixsize))&&\
       (((IMAGE)->orientation==DJVU_BULRNR)||\
-        ((IMAGE)->orientation==DJVU_TDLRNR))&&((IMAGE)->type!=DJVU_RGB)&&\
+        ((IMAGE)->orientation==DJVU_TDLRNR))&&\
       ((IMAGE)->pixsize==(unsigned int)((IMAGE)->type==DJVU_GRAY)?1:3))))
 
 /* This macro will set the flags to indicate a the specified rotation.
