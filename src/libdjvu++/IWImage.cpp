@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IWImage.cpp,v 1.3 1999-02-05 22:48:32 leonb Exp $
+//C-  $Id: IWImage.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.3 1999-02-05 22:48:32 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -487,6 +487,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
           delete [] sdata;
           delete [] smask;
           forward(data16, w, h, rowsize, scale, end);
+          DJVU_PROGRESS("masking", 999999);
           return;
         }
       // Copy coefficients from sdata buffer
@@ -519,6 +520,8 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   // Free buffers
   delete [] sdata;
   delete [] smask;
+  // Progress
+  DJVU_PROGRESS("masking", 999999);
 }
 
 

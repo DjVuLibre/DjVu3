@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.h,v 1.2 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GException.h,v 1.3 1999-02-08 19:38:36 leonb Exp $
 
 
 #ifndef _GEXCEPTION_H_
@@ -60,7 +60,7 @@
     Leon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- fixed message memory allocation.
     @version 
-    #$Id: GException.h,v 1.2 1999-02-01 18:32:32 leonb Exp $# */
+    #$Id: GException.h,v 1.3 1999-02-08 19:38:36 leonb Exp $# */
 //@{
 
 #include "DjVuGlobal.h"
@@ -118,6 +118,8 @@ public:
   /** Returns the line number from which the exception was thrown.
       A zero is returned if no line number is available. */
   int get_line(void) const { return line; };
+  //  Magic cause string
+  static const char * const outofmemory;
 private:
   const char *cause;
   const char *file;
@@ -193,7 +195,7 @@ public:
                       { GExceptionHandler::head = &__exh;
 
 #define G_CATCH(n) } else { GExceptionHandler::head = __exh.next; \
-                          GException& n = __exh.current;
+                            GException& n = __exh.current;
 
 #define G_ENDCATCH } } while(0)
 

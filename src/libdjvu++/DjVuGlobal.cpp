@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: DjVuGlobal.cpp,v 1.2 1999-02-05 23:44:08 leonb Exp $
+//C-  $Id: DjVuGlobal.cpp,v 1.3 1999-02-08 19:38:36 leonb Exp $
 
 
 
@@ -16,15 +16,12 @@
 
 #define NEED_DJVU_MEMORY_IMPLEMENTATION
 #include "DjVuGlobal.h"
-#include "GOS.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 
 // ----------------------------------------
 
 #ifdef NEED_DJVU_MEMORY
+#include "GException.h"
 
 static djvu_new_callback *newptr = (djvu_new_callback*) & ::operator new;
 static djvu_delete_callback *delptr = (djvu_delete_callback*) & ::operator delete;
@@ -32,13 +29,16 @@ static djvu_delete_callback *delptr = (djvu_delete_callback*) & ::operator delet
 void *
 _djvu_new(size_t sz)
 {
-  return (*newptr)(sz);
+  void *addr = (*newptr)(sz);
+  if (! addr) THROW(GException::outofmemory);
+  return addr;
 }
 
 void  
 _djvu_delete(void *addr)
 {
-  if (addr) (*delptr)(addr);
+  if (addr) 
+    (*delptr)(addr);
 }
 
 void 
@@ -55,6 +55,10 @@ _djvu_memory_callback(djvu_delete_callback *dp, djvu_new_callback *np)
 // ----------------------------------------
 
 #ifdef NEED_DJVU_PROGRESS
+#include "GOS.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 static DjVuProgressScale       *p_scale  = 0;
 static djvu_progress_callback  *p_cb     = 0;

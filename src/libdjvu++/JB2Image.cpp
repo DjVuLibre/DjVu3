@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: JB2Image.cpp,v 1.2 1999-02-05 22:48:33 leonb Exp $
+//C-  $Id: JB2Image.cpp,v 1.3 1999-02-08 19:38:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1326,6 +1326,8 @@ JB2Image::JB2Codec::code(JB2Image *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL, NULL); 
       zp.ZPCodec::~ZPCodec();
+      // Progress
+      DJVU_PROGRESS("code_record", 999);
     }
   else
     // -------------------------

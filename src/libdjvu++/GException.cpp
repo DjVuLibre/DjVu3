@@ -7,7 +7,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: GException.cpp,v 1.3 1999-02-01 18:32:32 leonb Exp $
+//C-  $Id: GException.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,16 +22,16 @@
 #include "debug.h"
 
 
-// File "$Id: GException.cpp,v 1.3 1999-02-01 18:32:32 leonb Exp $"
+// File "$Id: GException.cpp,v 1.4 1999-02-08 19:38:36 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
-
-static const char *outofmemory = "Out of memory";
 
 GException::GException() 
   : cause(0), file(0), func(0), line(0)
 {
 }
 
+const char * const
+GException::outofmemory = "Out of memory";
 
 GException::GException(const GException & exc) 
   : cause(0), file(exc.file), func(exc.func), line(exc.line)
@@ -145,52 +145,19 @@ GExceptionHandler::emthrow(const GException &gex)
 
 
 
-// ------ HACK TO SET NEW HANDLER
+// ------ MEMORY MANAGEMENT HANDLER
 
-
+#ifndef NEED_DJVU_MEMORY
+// This is not activated when C++ memory management
+// is overidden.  The overriding functions handle
+// memory exceptions by themselves.
 #if defined(_MSC_VER)
-
-
-static int __cdecl  
-throw_memory_error(size_t) 
-{
-  THROW(outofmemory);
-  return 0;
-}
-
-class _SetNewHandler { // DJVU_CLASS
-  int (*old_handler)(size_t);
-public:
-  _SetNewHandler() {
-    old_handler = _set_new_handler(throw_memory_error);
-  }
-  ~_SetNewHandler() {
-    _set_new_handler(old_handler);
-  }
-};
-
-
-
-#else // ! MICROSOFT
-
-
-static void 
-throw_memory_error() 
-{
-  THROW(outofmemory);
-}
-
-class _SetNewHandler {  // DJVU_CLASS
-  void (*old_handler)();
-public:
-  _SetNewHandler() {
-    old_handler = set_new_handler(throw_memory_error);
-  }
-  ~_SetNewHandler() {
-    set_new_handler(old_handler);
-  }
-};
-
-#endif
-
-static _SetNewHandler junk;
+// Microsoft is different!
+static int __cdecl throw_memory_error() { THROW(GException::outofmemory); }
+static int (*old_handler)() = _set_new_handler(throw_memory_error);
+#else // !_MSC_VER
+// Standard C++
+static void throw_memory_error() { THROW(GException::outofmemory); }
+static void (*old_handler)() = set_new_handler(throw_memory_error);
+#endif // !_MSC_VER
+#endif // !NEED_DJVU_MEMORY
