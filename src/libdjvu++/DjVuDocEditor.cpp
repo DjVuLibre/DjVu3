@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.85 2001-07-09 19:38:05 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.86 2001-07-10 23:49:05 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -511,35 +511,30 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
   if (name2id.contains(file_url.fname()))
     return true;
 
-  GUTF8String errors;
-  G_TRY
+  GP<DataPool> file_pool(DataPool::create(file_url));
+
+  if(!source)
+    source=this;
+
+  if(file_url.is_empty()||file_url.is_local_file_url())
   {
-    const GP<DjVmDir> dir(get_djvm_dir());
-
-    GP<DataPool> file_pool(DataPool::create(file_url));
-
-    if(!source)
-      source=this;
-
-    if(file_url.is_empty()||file_url.is_local_file_url())
+    file_pool=DataPool::create(file_url);
+  }else
+  {
+    file_pool=source->request_data(source, file_url);
+    if(source != this)
     {
-      file_pool=DataPool::create(file_url);
-    }else
-    {
-      file_pool=source->request_data(source, file_url);
-      if(source != this)
-      {
-        file_pool=DataPool::create(file_pool->get_stream());
-      }
+      file_pool=DataPool::create(file_pool->get_stream());
     }
+  }
        // Create DataPool and see if the file exists
-    if(file_pool && !file_url.is_empty() && DjVuDocument::djvu_import_codec)
-    {
+  if(file_pool && !file_url.is_empty() && DjVuDocument::djvu_import_codec)
+  {
       (*DjVuDocument::djvu_import_codec)(file_pool,file_url,needs_compression_flag,can_compress_flag);
-    }
+  }
 
          // Oh. It does exist... Check that it has IFF structure
-    {
+  {
        const GP<IFFByteStream> giff(
          IFFByteStream::create(file_pool->get_stream()));
        IFFByteStream &iff=*giff;
@@ -559,8 +554,22 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
            return false;
          iff.close_chunk();
        }
-    }
+  }
+  return insert_file(file_pool,file_url,is_page,file_pos,name2id,source);
+}
 
+bool
+DjVuDocEditor::insert_file(const GP<DataPool> &file_pool,
+  const GURL &file_url, bool is_page,
+  int & file_pos, GMap<GUTF8String, GUTF8String> & name2id,
+  DjVuPort *source)
+{
+  GUTF8String errors;
+  if(file_pool)
+  {
+    const GP<DjVmDir> dir(get_djvm_dir());
+    G_TRY
+    {
          // Now get a unique name for this file.
          // Check the name2id first...
       const GUTF8String name=file_url.fname();
@@ -710,18 +719,22 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
          GCriticalSectionLock lock(&files_lock);
          files_map[id]->pool=new_file_pool;
       }
-   } G_CATCH(exc) {
-      if (errors.length()) errors+="\n\n";
+    } G_CATCH(exc) {
+      if (errors.length())
+        errors+="\n\n";
       errors+=exc.get_cause();
       G_THROW(errors);
-   } G_ENDCATCH;
+    } G_ENDCATCH;
 
       // The only place where we intercept exceptions is when we process
       // included files. We want to process all of them even if we failed to
       // process one. But here we need to let the exception propagate...
-   if (errors.length()) G_THROW(errors);
+    if (errors.length())
+      G_THROW(errors);
 
-   return true;
+    return true;
+  }
+  return false;
 }
 
 void
@@ -1952,12 +1965,17 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
          const GP<File> file_rec(files_map[pos]);
          if (file_rec->pool && (!file_rec->file ||
                                 !file_rec->file->is_modified()))
-            file_pool=file_rec->pool;
-         else if (file_rec->file) file_pool=file_rec->file->get_djvu_data(false);
+         {
+           file_pool=file_rec->pool;
+         }else if (file_rec->file)
+         {
+           file_pool=file_rec->file->get_djvu_data(false);
+         }
        }
        // Even if file has not been modified (pool==0) we still want
        // to save it.
-       if (!file_pool) file_pool=pcaster->request_data(this, file_url);
+       if (!file_pool)
+         file_pool=pcaster->request_data(this, file_url);
        if (file_pool)
        {
          DEBUG_MSG("Saving '" << file_url << "' to '" << save_doc_url << "'\n");

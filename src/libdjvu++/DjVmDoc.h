@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.h,v 1.27 2001-06-28 19:42:58 bcr Exp $
+// $Id: DjVmDoc.h,v 1.28 2001-07-10 23:49:05 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVMDOC_H
@@ -53,7 +53,7 @@ class GUTF8String;
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.27 2001-06-28 19:42:58 bcr Exp $#
+    @version #$Id: DjVmDoc.h,v 1.28 2001-07-10 23:49:05 bcr Exp $#
 */
 
 //@{
@@ -102,6 +102,19 @@ public:
       */
    void		insert_file(
      ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
+     const GUTF8String &name, const GUTF8String &id,
+     const GUTF8String &title=GUTF8String(), int pos=-1 );
+      /** Inserts a file into the document.
+          @param pool  Data pool containing file data.
+          @param file_type Describes the type of the file to be inserted.
+	  	 See \Ref{DjVmDir::File} for details.
+          @param name  Name of the file in the document (e.g. an URL).
+          @param id    Identifier of the file (as used in INCL chunks).
+          @param title Optional title of the file (shown in browsers).
+          @param pos   Position of the file in the document (default is append).
+      */
+   void		insert_file(
+     const GP<DataPool> &pool, DjVmDir::File::FILE_TYPE file_type,
      const GUTF8String &name, const GUTF8String &id,
      const GUTF8String &title=GUTF8String(), int pos=-1 );
 

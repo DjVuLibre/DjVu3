@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.51 2001-07-06 21:48:53 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.52 2001-07-10 23:49:05 bcr Exp $
 // $Name:  $
 
 
@@ -154,14 +154,15 @@ DjVmDoc::insert_file(const GP<DjVmDir::File> & f,
    dir->insert_file(f, pos);
 }
 
-void		
+void
 DjVmDoc::insert_file(
   ByteStream &data, DjVmDir::File::FILE_TYPE file_type,
   const GUTF8String &name, const GUTF8String &id, const GUTF8String &title,
   int pos)
 {
-   GP<DjVmDir::File> file=DjVmDir::File::create(name, id, title, file_type);
-   GP<DataPool> pool = DataPool::create();
+   const GP<DjVmDir::File> file(
+     DjVmDir::File::create(name, id, title, file_type));
+   const GP<DataPool> pool(DataPool::create());
       // Cannot connect to a bytestream.
       // Must copy data into the datapool.
    int nbytes;
@@ -169,6 +170,18 @@ DjVmDoc::insert_file(
    while ((nbytes = data.read(buffer, sizeof(buffer))))
       pool->add_data(buffer, nbytes);
    pool->set_eof();
+      // Call low level insert
+   insert_file(file, pool, pos);
+}
+
+void
+DjVmDoc::insert_file(
+  const GP<DataPool> &pool, DjVmDir::File::FILE_TYPE file_type,
+  const GUTF8String &name, const GUTF8String &id, const GUTF8String &title,
+  int pos)
+{
+   const GP<DjVmDir::File> file(
+     DjVmDir::File::create(name, id, title, file_type));
       // Call low level insert
    insert_file(file, pool, pos);
 }

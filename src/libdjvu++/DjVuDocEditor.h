@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.46 2001-07-03 17:02:32 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.47 2001-07-10 23:49:05 bcr Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.46 2001-07-03 17:02:32 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.47 2001-07-10 23:49:05 bcr Exp $#
 */
 
 //@{
@@ -388,6 +388,11 @@ private:
                   DjVmDir::File::FILE_TYPE page_type,
 		  int & file_pos,
                   GMap<GUTF8String, GUTF8String> & name2id);
+   bool		insert_file( const GP<DataPool> &pool,
+                  const GURL &file_url, bool is_page,
+		  int & file_pos,
+                  GMap<GUTF8String,GUTF8String> & name2id,
+                  DjVuPort *source=0 );
    bool		insert_file(
                   const GURL &file_url, bool is_page,
 		  int & file_pos,
