@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.34 1999-09-17 19:00:49 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.35 1999-09-17 20:21:07 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.34 1999-09-17 19:00:49 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.35 1999-09-17 20:21:07 eaf Exp $#
 */
 
 //@{
@@ -302,13 +302,19 @@ public:
 	  just signal the thread to stop and will return immediately.
 	  Decoding of all included files will be stopped too. */
    void		stop_decode(bool sync);
-      /** Stops any data-related operations. In addition to what is
-	  done by \Ref{stop_decode}() (decoding stops) this function
-	  interrupts any operations with the #DjVuFile# data and makes
-	  sure, that all further requests for data will end immediately
-	  with #STOP# exception. This operation is synchronous (by the
-          moment the function returns everything will be stopped). */
-   void		stop(void);
+      /** Stops data-related operations.
+
+	  Depending on the value of #only_blocked# flag this works as follows:
+	  \begin{itemize}
+	     \item If #only_blocked# is #TRUE#, the function will make sure,
+	           that any further access to the file's data will result
+		   in a #STOP# exception if not enough data is available
+		   (and the thread would normally block).
+	     \item If #only_blocked# is #FALSE#, then {\bf any} further
+	           access to the file's data will result in immediate
+		   #STOP# exception.
+	  \end{itemize} */
+   void		stop(bool only_blocked);
       /** Wait for the decoding to finish. This will wait for the
 	  termination of included files too. */
    void		wait_for_finish(void);

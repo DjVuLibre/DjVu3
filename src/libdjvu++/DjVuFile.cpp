@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.54 1999-09-16 23:21:33 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.55 1999-09-17 20:21:07 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -155,7 +155,8 @@ DjVuFile::~DjVuFile(void)
    get_portcaster()->del_port(this);
    
    if (data_pool) data_pool->del_trigger(static_trigger_cb, this);
-   stop();
+   stop_decode(true);	// Synchronous stop
+   stop(true);		// Stop DataPool for "blocked" operations
    
    GMonitorLock lock(&decode_thread_flags);
    while((decode_thread_flags & STARTED) &&
@@ -334,7 +335,10 @@ DjVuFile::static_decode_func(void * cl_data)
       th->decode_func();
 	 // Don't do ANYTHING below this line.
    } CATCH(exc) {
+      th->decode_thread_flags=th->decode_thread_flags | FINISHED;
+	 // Don't do ANYTHING below this line.
    } ENDCATCH;
+   // Don't do ANYTHING below this line.
 }
 
 void
@@ -933,17 +937,15 @@ DjVuFile::stop_decode(bool sync)
 }
 
 void
-DjVuFile::stop(void)
+DjVuFile::stop(bool only_blocked)
 {
    DEBUG_MSG("DjVuFile::stop(): Stopping everything\n");
    DEBUG_MAKE_INDENT(3);
 
-   stop_decode(true);
-   
-   if (data_pool) data_pool->stop();
+   if (data_pool) data_pool->stop(only_blocked);
    GCriticalSectionLock lock(&inc_files_lock);
    for(GPosition pos=inc_files_list;pos;++pos)
-      inc_files_list[pos]->stop();
+      inc_files_list[pos]->stop(only_blocked);
 }
 
 GP<DjVuNavDir>
