@@ -8,7 +8,7 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C- "$Id: DjVuPhotoAPI.h,v 1.4 2000-01-21 03:16:20 bcr Exp $"
+//C- "$Id: DjVuPhotoAPI.h,v 1.5 2000-01-21 05:02:44 bcr Exp $"
 //C- -- Photo To DjVu
 //C- Author: Parag Deshmukh (Dec 99), Andrei Erofeev (Jan 2000), Bill C Riemers (Jan 2000)
 #endif  /* __cplusplus */
@@ -215,9 +215,20 @@ struct djvutophoto_options_struct
 /** This keeps a string delimited by hypens(-) and commas(,) */
   const char *page_range;
 
-/** This option should be non-zero, if we want to force the application
-    to avoid color images */
-  int disable_mask;
+/** This option should be non-zero, if we want to force color images to
+    be reduced to gray scale */
+  int togray;
+
+/** Boolian values specified whether a vflip, hflip, should be done.
+  vflip means to flip on the vertical axis, and hflip the horizontal
+  axis., and invert means to reverse black and white. */
+  int vflip, hflip;
+
+/** Specify the angle the input image should be rotated.  This may be any
+    multiple of 90 degrees.  Rotation is clockwise and takes place after
+    any vflip or hflip commands. */
+  int rotateAngle;
+
 /** logfileno should be non-zero to print verbose processing details */
   int logfileno;
 
