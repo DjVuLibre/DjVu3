@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.8 2000-01-26 21:51:13 bcr Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.9 2000-01-26 21:58:28 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -404,13 +404,71 @@ inline documenttodjvu_options_struct();
 
 } documenttodjvu_options;
 
+struct djvu_parse;
+
+/** @name documenttodjvu_options_alloc function
+    This is the primary allocation routine for documenttodjvu_options.
+    Even if the values specified are illegal, an options structure
+    will be returned. */
+DJVUAPI
+documenttodjvu_options *
+documenttodjvu_options_alloc(struct djvu_parse *,int,const char * const argv[]);
+
+/** @name documenttodjvu_options_free function
+    Deallocates the fields of the documenttodjvu_options structure.
+    You should always use the free option, even if you did not use alloc
+    so the data pointed to by priv is freed. */
+DJVUAPI
+void documenttodjvu_options_free(documenttodjvu_options *);
+
+/** @name documenttodjvu function
+    This function converts the photo input files to a multipage DjVu document
+    according to the options structure.
+    Depending on the type of the input data, the function uses the proper
+    stream derived from \Ref{DjVu_Stream} for decoding, while
+    \Ref{DjVu_PixImage.h} for transformations and \Ref{DjVmDoc.h},
+    \Ref{JB2Matcher.h} for encoding.  A non-zero return value indicates a
+    fatal error. */
+DJVUAPI
+int documenttodjvu(documenttodjvu_options[1]);
+
+/** A non-zero value indicates there are error messages.  Error
+    messages are generated for both fatal errors, and errors
+    that are recovered from.  */
+DJVUAPI
+int documenttodjvu_haserror(const documenttodjvu_options [1]);
+
+/** A non-zero value indicates there are warning messages.  Waring
+    messages are generated for non-fatal problems, that may be an
+    error, or could just be abnormal usage. */
+DJVUAPI
+int documenttodjvu_haswarning(const documenttodjvu_options [1]);
+
+/** Returns a string of the first error message on the stack.  Each
+    call erases the previous return value. */
+DJVUAPI
+const char * documenttodjvu_error(documenttodjvu_options [1]);
+
+/** Returns a string of the first warning message on the stack.  Each
+    call erases the previous return value. */
+DJVUAPI
+const char * documenttodjvu_warning(documenttodjvu_options [1]);
+
+/** Prints all the errors to stderr */
+DJVUAPI
+void documenttodjvu_perror(documenttodjvu_options [1],const char *mesg);
+
+/** This will print usage instructions to the specified output. */
+DJVUAPI
+void documenttodjvu_usage(int fd,const char *prog);
+
 #ifdef __cplusplus
 #ifndef __cplusplus
 {
 #endif
 }
 
-inline documenttodjvu_options_struct::phototodjvu_options_struct() :
+inline documenttodjvu_options_struct::documenttodjvu_options_struct() :
   process(), transform(), segment(), foreground(), jb2(), iw44() {}
 
 inline djvu_segmenter_options_struct::djvu_segmenter_options_struct() :
