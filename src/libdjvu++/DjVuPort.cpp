@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPort.cpp,v 1.49 2001-04-12 17:05:32 fcrary Exp $
+// $Id: DjVuPort.cpp,v 1.50 2001-04-24 00:25:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -289,7 +289,7 @@ DjVuPortcaster::prefix_to_ports(const GUTF8String &prefix)
     {
       GCriticalSectionLock lock(&map_lock);
       for(GPosition pos=a2p_map;pos;++pos)
-        if (GUTF8String::ncmp(a2p_map.key(pos), prefix, length))
+        if (!prefix.cmp(a2p_map.key(pos), length))
         {
           DjVuPort * port=(DjVuPort *) a2p_map[pos];
           GP<DjVuPort> gp_port=is_port_alive(port);

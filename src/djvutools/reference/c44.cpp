@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $
+// $Id: c44.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $# */
+    #$Id: c44.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $# */
 //@{
 //@}
 
@@ -691,13 +691,13 @@ main(int argc, char **argv)
           h = ibm.rows();
           iw = IW44Image::create_encode(ibm, getmask(w,h));
         }
-      else if (GString::ncmp(prefix,"AT&TFORM",8) || GString::ncmp(prefix,"FORM",4))
+      else if (!GStringRep::cmp(prefix,"AT&TFORM",8) || !GStringRep::cmp(prefix,"FORM",4))
         {
           char *s = (prefix[0]=='F' ? prefix+8 : prefix+12);
           GP<IFFByteStream> giff=IFFByteStream::create(gibs);
           IFFByteStream &iff=*giff;
-          const bool color=GString::ncmp(s,"PM44",4);
-          if (color || GString::ncmp(s,"BM44",4))
+          const bool color=!GStringRep::cmp(s,"PM44",4);
+          if (color || !GStringRep::cmp(s,"BM44",4))
             {
               iw = IW44Image::create_encode(IW44Image::COLOR);
               iw->decode_iff(iff);

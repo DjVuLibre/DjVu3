@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $
+// $Id: djvuextract.cpp,v 1.18 2001-04-24 00:25:49 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.17 2001-04-21 00:16:57 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.18 2001-04-24 00:25:49 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -217,7 +217,7 @@ main(int argc, char **argv)
       // Process page number
       int page_num=0;
       for(i=1;i<argc;i++)
-	 if (dargv[i].ncmp("-page=", 6))
+	 if (!dargv[i].cmp("-page=", 6))
            {
               page_num = dargv[i].substr(6,dargv[i].length()).toInt() - 1; // atoi(6+(const char *)dargv[i]) - 1;
              for(int j=i;j<argc-1;j++) 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.76 2001-04-23 18:14:22 bcr Exp $
+// $Id: GString.cpp,v 1.77 2001-04-24 00:25:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -273,16 +273,16 @@ GStringRep::concat(const char *s1,const char *s2) const
   return retval;
 }
 
-const char *GString::nullstr = "";
+const char *GBaseString::nullstr = "";
 
 void
-GString::empty( void )
+GBaseString::empty( void )
 {
-  (*this) = GStringRep::create((size_t)0);
+  init(GStringRep::create((size_t)0));
 }
 
 char *
-GString::getbuf(int n)
+GBaseString::getbuf(int n)
 {
   const char *s = (const char*)(*this);
   if (n < 0)  
@@ -297,98 +297,97 @@ GString::getbuf(int n)
     if ((*d++ = *s)) 
       s += 1;
   r.data[n] = 0;
-  (*this) = rep;
+  init(rep);
   return r.data;
 }
 
-
-GP<GStringRep>
-GStringRep::upcase( void ) const
+static inline int
+xiswupper(wint_t w)
 {
-  GP<GStringRep> retval=const_cast<GStringRep *>(this);
-#if 0
-  unsigned long *buf;
-  GPBuffer<unsigned char> gbuf(buf,size+1);
-  bool changed=false;
-  int n=0,i=0;
-  while(n<size)
-  {
-    unsigned long w=0;
-    const int len=getUCS4(w,n);
-    if(len>0)
-    {
-      n+=len;
-      if(islower((wchar_t)w))
-      {
-        buf[i++]=towupper(w);
-        changed=true;
-      }else
-      {
-        buf[i++]=w;
-      }
-    }else
-    {
-      buf[i++]=data[n++];
-    }
-  }
-#endif
+  return iswupper(w);
+}
 
-  for(const unsigned char *d=(const unsigned char *)data;*d;d++)
-  {
-    if(islower(*d))
-    {
-      const GP<GStringRep> newval=blank(size);
-      unsigned char *s=(unsigned char *)(newval->data);
-      for(const unsigned char *e=(const unsigned char *)data;e!=d;e++,s++)
-      {
-        s[0]=e[0];
-      }
-      s++[0] = toupper(d++[0]);
-      for(;*d;s++,d++)
-      {
-        if(islower(*d))
-        {
-          s[0] = toupper(d[0]);
-        }else
-        {
-          s[0] = d[0];
-        }
-      }
-      retval=newval;
-      break;
-    }
-  }
-  return retval;
+static inline wint_t
+xtowupper(wint_t w)
+{
+  return towupper(w);
 }
 
 GP<GStringRep>
-GStringRep::downcase( void ) const
+GStringRep::upcase(void) const
 {
-  GP<GStringRep> retval=const_cast<GStringRep *>(this);
-  for(const unsigned char *d=(const unsigned char *)data;*d;d++)
+  return tocase(xiswupper,xtowupper);
+}
+
+static inline int
+xiswlower(wint_t w)
+{
+  return iswlower(w);
+}
+
+static inline wint_t
+xtowlower(wint_t w)
+{
+  return towlower(w);
+}
+
+GP<GStringRep>
+GStringRep::downcase(void) const
+{
+  return tocase(xiswlower,xtowlower);
+}
+
+GP<GStringRep>
+GStringRep::tocase(
+  int (*xiswcase)(wint_t wc), wint_t (*xtowcase)(wint_t wc)) const
+{
+  GP<GStringRep> retval;
+  char const * const eptr=data+size;
+  char const *ptr=data;
+  while(ptr<eptr)
   {
-    if(isupper(*d))
+    char const * const xptr=ptr;
+    const unsigned long w=getValidUCS4(ptr);
+    if(ptr == xptr)
     {
-      const GP<GStringRep> newval=blank(size);
-      unsigned char *s=(unsigned char *)(newval->data);
-      for(const unsigned char *e=(const unsigned char *)data;e!=d;e++,s++)
-      {
-        s[0]=e[0];
-      }
-      s++[0] = tolower(d++[0]);
-      for(;*d;s++,d++)
-      {
-        if(isupper(*d))
-        {
-          s[0] = tolower(d[0]);
-        }else
-        {
-          s[0] = d[0];
-        }
-      }
-      retval=(const GP<GStringRep> &)newval;
+      ptr=eptr;
       break;
     }
+    if(!xiswcase((wchar_t)w))
+      break;
+  }
+  if(ptr<eptr)
+  {
+    const int n=(int)((size_t)ptr-(size_t)data);
+    unsigned char *buf;
+    GPBuffer<unsigned char> gbuf(buf,n+(1+size-n)*6);
+    if(n)
+    {
+      strncpy((char *)buf,data,n);
+    }
+    unsigned char *buf_ptr=buf+n;
+    for(char const *ptr=data;ptr<eptr;)
+    {
+      char const * const xptr=ptr;
+      const unsigned long w=getValidUCS4(ptr);
+      if(ptr == xptr)
+        break;
+      if(((sizeof(wchar_t) == 2)&&(w>=0xffff))||(xiswcase((wchar_t)w)))
+      {
+        const int len=(int)((size_t)ptr-(size_t)xptr);
+        strncpy((char *)buf_ptr,xptr,len);
+        buf_ptr+=len;
+      }else
+      {
+        mbstate_t ps;
+        buf_ptr=UCS4toString(w,buf_ptr,&ps);
+      }
+      buf_ptr[0]=0;
+    }
+    retval=substr((const char *)buf,0,(int)((size_t)buf_ptr-(size_t)buf));
+  }else
+  {
+    retval=const_cast<GStringRep *>(this);
   }
   return retval;
 }
@@ -562,7 +561,7 @@ GUTF8String::fromEscaped(void) const
 
 
 void
-GString::setat(int n, char ch)
+GBaseString::setat(int n, char ch)
 {
   int len = length();
   if (n < 0) 
@@ -592,14 +591,6 @@ GString::setat(int n, char ch)
 #define USE_VSNPRINTF vsnprintf
 #endif
 #endif
-
-GString &
-GString::format(const char fmt[], ... )
-{
-  va_list args;
-  va_start(args, fmt);
-  return init(GStringRep::create(fmt,args));
-}
 
 GUTF8String &
 GUTF8String::format(const char fmt[], ... )
@@ -644,104 +635,159 @@ GStringRep::Native::create_format(const char fmt[],...)
 GP<GStringRep>
 GStringRep::format(va_list &args) const
 {
-  int buflen=32768;
-  char *buffer;
-  GPBuffer<char> gbuffer(buffer,buflen);
-
-  ChangeLocale(LC_ALL,(isNative()?0:"C"));
-  // Format string
-#ifdef USE_VSNPRINTF
-  while(USE_VSNPRINTF(buffer, buflen, data, args)<0)
+  GP<GStringRep> retval;
+  if(size)
   {
-    gbuffer.resize(0);
-    gbuffer.resize(buflen+32768);
-  }
-  va_end(args);
-#else
-  buffer[buflen-1] = 0;
-  vsprintf(buffer, data, args);
-  va_end(args);
-  if (buffer[buflen-1])
-  {
-    // This isn't as fatal since it is on the stack, but we
-    // definitely should stop the current operation.
-    G_THROW( ERR_MSG("GString.overwrite") );
-  }
+#ifndef WIN32
+    char *nfmt;
+    GPBuffer<char> gnfmt(nfmt,size+1);
+    nfmt[0]=0;
+    int start=0;
 #endif
+    int from=0;
+    while((from=search('%',from)) >= 0)
+    {
+      if(data[++from] != '%')
+      {
+        int m,n=0;
+        sscanf(data+from,"%d!%n",&m,&n);
+        if(n)
+        {
+#ifdef WIN32
+          LPCTSTR lpszFormat=data;
+          LPTSTR lpszTemp;
+          if((!::FormatMessage(
+            FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ALLOCATE_BUFFER,
+              lpszFormat, 0, 0, (LPTSTR)&lpszTemp,0,&args))
+            || !lpszTemp)
+          {
+            G_THROW(GException::outofmemory);
+          }
+          va_end(args); 
+          retval=strdup((const char *)lpszTemp);
+          LocalFree(lpszTemp);
+          break;
+#else
+          from+=n;
+          const int end=search('!',from);
+          if(end>=0)
+          {
+            strncat(nfmt,data+start,(int)(end-start));
+            strncat(nfmt,"$",1);
+            start=from=end+1;
+          }else
+          {
+            gnfmt.resize(0);
+            from=(-1);
+            break;
+          }
+#endif
+        }else
+        {
+#ifndef WIN32
+          gnfmt.resize(0);
+#endif
+          from=(-1);
+          break;
+        }
+      }
+    }
+    if(from < 0)
+    {
+#ifndef WIN32
+      const char *fmt=(nfmt&&nfmt[0])?nfmt:data;
+#else
+      cosnt char *fmt=data;
+#endif
+      int buflen=32768;
+      char *buffer;
+      GPBuffer<char> gbuffer(buffer,buflen);
+
+      ChangeLocale(LC_ALL,(isNative()?0:"C"));
+      // Format string
+#ifdef USE_VSNPRINTF
+      while(USE_VSNPRINTF(buffer, buflen, fmt, args)<0)
+      {
+        gbuffer.resize(0);
+        gbuffer.resize(buflen+32768);
+      }
+      va_end(args);
+#else
+      buffer[buflen-1] = 0;
+      vsprintf(buffer, fmt, args);
+      va_end(args);
+      if (buffer[buflen-1])
+      {
+        // This isn't as fatal since it is on the stack, but we
+        // definitely should stop the current operation.
+        G_THROW( ERR_MSG("GString.overwrite") );
+      }
+#endif
+      retval=strdup((const char *)buffer);
+    }
+  }
   // Go altering the string
-  return strdup((const char *)buffer); 
+  return retval;
 }
 
 int 
-GString::search(char c, int from) const
+GStringRep::search(char c, int from) const
 {
-  const char *src = (const char*)(*this);
-  int len = strlen(src);
   if (from<0)
-    from += len;
-  if (from<0 || from>=len)
-    return -1;
-  const char *str = (const char*)(*this);
-  char *s = strchr(&str[from], c);
-  return (s ? s - str : -1);
-}
-
-int 
-GString::search(const char *str, int from) const
-{
-  const char *src = (const char*)(*this);
-  int len = strlen(src);
-  if (from<0)
-    from += len;
+    from += size;
   int retval=(-1);
-  if (from>=0 && from<len)
+  if (from>=0 && from<size)
   {
-    const char *s = strstr(src+from, str);
-    retval=(s ? s - src : -1);
+    char const *const s = strchr(data+from,c);
+    if(s)
+      retval=(int)((size_t)s-(size_t)data);
   }
   return retval;
 }
 
 int 
-GString::rsearch(char c, int from) const
+GStringRep::search(char const *ptr, int from) const
 {
-  const char *src = (const char*)(*this);
-  int len = strlen(src);
   if (from<0)
-    from += len;
-  if (from<0 || from>=len)
-    return -1;
-  int ans = -1;
-  const char *s = src;
-  while ((s=strchr(s,c)) && (s<=src+from))
-    {
-      ans = s - src;
-      s += 1;
-    }
-  return ans;
+    from += size;
+  int retval=(-1);
+  if (from>=0 && from<size)
+  {
+    char const *const s = strstr(data+from,ptr);
+    if(s)
+      retval=(int)((size_t)s-(size_t)data);
+  }
+  return retval;
 }
 
 int 
-GString::rsearch(const char *str, int from) const
+GStringRep::rsearch(char c, int from) const
 {
-  const char *src = (const char*)(*this);
-  int len = strlen(src);
   if (from<0)
-    from += len;
-  if (from<0 || from>=len)
-    return -1;
-  int ans = -1;
-  const char *s = src;
-  while ((s=strstr(s,str)) && (s<=src+from))
-    {
-      ans = s - src;
-      s += 1;
-    }
-  return ans;
+    from += size;
+  int retval=(-1);
+  if (from>=0 && from<size)
+  {
+    char const *const s = strrchr(data+from,c);
+    if(s)
+      retval=(int)((size_t)s-(size_t)data);
+  }
+  return retval;
+}
+
+int 
+GStringRep::rsearch(char const *ptr, int from) const
+{
+  int retval=(-1);
+  while((from=search(ptr,from)) >= 0)
+  {
+    retval=from;
+  }
+  return retval;
 }
 
 int
-GString::contains(const char accept[],const int from) const
+GBaseString::contains(const char accept[],const int from) const
 {
   int retval=(-1);
   if(accept && strlen(accept) && (from < (int)length()))
@@ -756,65 +802,40 @@ GString::contains(const char accept[],const int from) const
   return retval;
 }
 
-GString& 
-GString::operator+= (char ch)
+bool
+GBaseString::is_int(void) const
 {
-  if(ptr)
+  bool isLong=!!ptr;
+  if(isLong)
   {
-    const char *str1 = (const char*)(*this);
-    const GP<GStringRep> rep = (*this)->blank((str1?strlen(str1):0) + 1);
-    GStringRep &r=*rep;
-    strcpy(r.data, str1);
-    int len = strlen(r.data);
-    r.data[len] = ch;
-    r.data[len+1] = 0;
-    (*this) = rep;
-  }else
-  {
-    return (*this)=GString(ch);
+    GP<GStringRep> eptr;
+    (*this)->toLong(eptr,isLong);
+    if(isLong && eptr)
+    {
+      isLong=(eptr->nextNonSpace(0) == eptr->size);
+    }
   }
-  return (*this);
-}
-
-
-GString& 
-GString::operator+= (const char *str2)
-{
-  if(str2&&str2[0])
-  {
-    (*this)=(*this)->concat(*this,GStringRep::create(str2)); 
-  }
-  return (*this);
-}
-
-GString& 
-GString::operator+= (const GString &str2)
-{
-  GP<GStringRep> retval=(*this);
-  retval=retval->concat(retval,str2);
-  return ((*this)=retval);
+  return isLong;
 }
 
 bool
-GString::is_int(void) const
+GBaseString::is_float(void) const
 {
-   bool isLong;
-   GString endptr;
-   toLong(endptr, isLong, 10);
-   return isLong?(endptr.nextNonSpace(0) == (int)endptr.length()):false;
-}
-
-bool
-GString::is_float(void) const
-{
-   bool isDouble;
-   GString endptr;
-   toDouble(endptr, isDouble);
-   return isDouble?(endptr.nextNonSpace(0) == (int)endptr.length()):false;
+  bool isDouble=!!ptr;
+  if(isDouble)
+  {
+    GP<GStringRep> eptr;
+    (*this)->toDouble(eptr,isDouble);
+    if(isDouble && eptr)
+    {
+      isDouble=(eptr->nextNonSpace(0) == eptr->size);
+    }
+  }
+  return isDouble;
 }
 
 unsigned int 
-hash(const GString &str)
+hash(const GBaseString &str)
 {
   unsigned int x = 0;
   const char *s = (const char*)str;
@@ -824,7 +845,7 @@ hash(const GString &str)
 }
 
 void 
-GString::throw_illegal_subscript()
+GBaseString::throw_illegal_subscript()
 {
   G_THROW( ERR_MSG("GString.bad_subscript") );
 }
@@ -834,14 +855,14 @@ class DjVuIconv {
 private:
   char *buf;
   GPBuffer<char> gbuf;
-  GMap<GString,iconv_t> iconv_map;
-  GList<GString> codes;
+  GMap<GBaseString,iconv_t> iconv_map;
+  GList<GBaseString> codes;
   DjVuIconv() : gbuf(buf) {}
 public:
-  static size_t iconv_string(const GString &fromcode,const GString &tocode,
+  static size_t iconv_string(const GBaseString &fromcode,const GBaseString &tocode,
     const char *fromstr, const size_t fromstr_len, char *&retval,
     size_t &retval_len,GPBuffer<char> &);
-  iconv_t getmap(const GString &fromcode, const GString &tocode);
+  iconv_t getmap(const GBaseString &fromcode, const GBaseString &tocode);
   ~DjVuIconv();
 };
 
@@ -858,9 +879,9 @@ DjVuIconv::~DjVuIconv()
 }
 
 iconv_t
-DjVuIconv::getmap(const GString &tocode, const GString &fromcode)
+DjVuIconv::getmap(const GBaseString &tocode, const GBaseString &fromcode)
 {
-  GString code(tocode+fromcode);
+  GBaseString code(tocode+fromcode);
   GPosition pos;
   iconv_t retval;
   if(!(pos=iconv_map.contains(code)))
@@ -878,7 +899,7 @@ DjVuIconv::getmap(const GString &tocode, const GString &fromcode)
 }
 
 size_t
-DjVuIconv::iconv_string(const GString &tocode,const GString &fromcode,
+DjVuIconv::iconv_string(const GBaseString &tocode,const GBaseString &fromcode,
   const char *fromstr, const size_t fromstr_len, char *&outbuf, size_t &outbuf_len,GPBuffer<char> &gbufout)
 {
   static DjVuIconv conv;
@@ -899,32 +920,38 @@ DjVuIconv::iconv_string(const GString &tocode,const GString &fromcode,
   }
   return retval;
 }
-#if 0
-static GString locale_charset(void)
-{
-  GString retval;
-  GString glocale_charset=setlocale(LC_CTYPE,0);
-  const int at=glocale_charset.search('@');
-  if(at > -1)
-  {
-    glocale_charset.setat(at,0);
-    const int dot=glocale_charset.search('.');
-    if(dot > -1)
-    {
-      retval=glocale_charset.substr(dot+1,glocale_charset.length());
-    }
-  }
-  return retval;
-}
-#endif
+
 #endif /* HAS_ICONV */
+
+unsigned char *
+GStringRep::UCS4toString(
+  const unsigned long w0,unsigned char *ptr, void *ps) const
+{
+  ptr[0]=(unsigned char)(w0);
+  return (ptr+1);
+}
+
+unsigned char *
+GStringRep::UTF8::UCS4toString(
+  const unsigned long w0,unsigned char *ptr, void *ps) const
+{
+  return UCS4toUTF8(w0,ptr);
+}
+
+unsigned char *
+GStringRep::Native::UCS4toString(
+  const unsigned long w0,unsigned char *ptr, void *ps) const
+{
+  return UCS4toNative(w0,ptr,ps);
+}
 
 // Convert a UCS4 to a multibyte string in the value bytes.  
 // The data pointed to by ptr should be long enough to contain
 // the results with a nill termination.  (Normally 7 characters
 // is enough.)
 unsigned char *
-GStringRep::UCS4toNative(const unsigned long w0,unsigned char *ptr, void *ps)
+GStringRep::UCS4toNative(
+  const unsigned long w0,unsigned char *ptr, void *ps)
 {
   unsigned short w1, w2;
   for(int count=(sizeof(wchar_t) == sizeof(w1))?UCS4toUTF16(w0,w1,w2):1;
@@ -1065,7 +1092,7 @@ GStringRep::UTF8::toUTF8(const bool nothrow) const
 }
 
 GNativeString
-GString::UTF8ToNative(const bool currentlocale) const
+GBaseString::UTF8ToNative(const bool currentlocale) const
 {
   const char *source=(*this);
   GP<GStringRep> retval;
@@ -1091,7 +1118,7 @@ GString::UTF8ToNative(const bool currentlocale) const
 
 /*MBCS*/
 GNativeString
-GString::getUTF82Native(char* tocode) const
+GBaseString::getUTF82Native(char* tocode) const
 { //MBCS cvt
   GNativeString retval;
 
@@ -1139,7 +1166,7 @@ GString::getUTF82Native(char* tocode) const
 }
 
 GUTF8String
-GString::NativeToUTF8(void) const
+GBaseString::NativeToUTF8(void) const
 {
   GP<GStringRep> retval;
   if(length())
@@ -1168,7 +1195,7 @@ GString::NativeToUTF8(void) const
 }
 
 GUTF8String
-GString::getNative2UTF8(const char *fromcode) const
+GBaseString::getNative2UTF8(const char *fromcode) const
 { //MBCS cvt
 
    // We don't want to do a transform this
@@ -1932,71 +1959,5 @@ GStringRep::UTF16toUCS4(
     }
   }
   return retval;
-}
-
-GString::GString(const GString &fmt, va_list &args)
-{
-  if(fmt.length())
-  {
-#ifndef WIN32
-    GString nfmt;
-    int start=0;
-#endif
-    int from=0;
-    while((from=fmt.search('%',from+1)) >= 0)
-    {
-      if(fmt[++from] != '%')
-      {
-        int m,n=0;
-        sscanf(((const char *)fmt)+from,"%d!%n",&m,&n);
-        if(n)
-        {
-#ifdef WIN32
-          LPCTSTR lpszFormat=(const char *)fmt;
-          LPTSTR lpszTemp;
-          if((!::FormatMessage(
-            FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ALLOCATE_BUFFER,
-              lpszFormat, 0, 0, (LPTSTR)&lpszTemp,0,&args))
-            || !lpszTemp)
-          {
-            G_THROW(GException::outofmemory);
-          }
-          va_end(args); 
-          init(fmt->strdup((const char *)lpszTemp));
-          LocalFree(lpszTemp);
-          return;
-#else
-          from+=n;
-          const int end=fmt.search('!',from);
-          if(end>=0)
-          {
-            nfmt+=fmt.substr(start,end-start);
-            nfmt.setat(from-1,'$');
-            start=from=end+1;
-          }else
-          {
-            nfmt.empty();
-            break;
-          }
-#endif
-        }else
-        {
-#ifndef WIN32
-          nfmt.empty();
-#endif
-          break;
-        }
-      }
-    }
-#ifndef WIN32
-    if(nfmt.length())
-    {
-      init(nfmt->format(args));
-    }else
-#endif
-    {
-      init(fmt->format(args));
-    }
-  }
 }
 

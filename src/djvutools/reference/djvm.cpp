@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvm.cpp,v 1.13 2001-04-21 00:16:57 bcr Exp $
+// $Id: djvm.cpp,v 1.14 2001-04-24 00:25:49 bcr Exp $
 // $Name:  $
 
 /** @name djvm
@@ -99,7 +99,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.13 2001-04-21 00:16:57 bcr Exp $# */
+    #$Id: djvm.cpp,v 1.14 2001-04-24 00:25:49 bcr Exp $# */
 //@{
 //@}
 
@@ -272,10 +272,10 @@ main(int argc, char ** argv)
    
    G_TRY {
       if (argc<2) { usage(); exit(1); }
-      if (dargv[1].ncmp("-c", 2)) create(dargv);
-      else if (dargv[1].ncmp("-i", 2)) insert(dargv);
-      else if (dargv[1].ncmp("-d", 2)) del(dargv);
-      else if (dargv[1].ncmp("-l", 2)) list(dargv);
+      if (!dargv[1].cmp("-c", 2)) create(dargv);
+      else if (!dargv[1].cmp("-i", 2)) insert(dargv);
+      else if (!dargv[1].cmp("-d", 2)) del(dargv);
+      else if (!dargv[1].cmp("-l", 2)) list(dargv);
       else { usage(); exit(1); }
    } G_CATCH(exc) {
       exc.perror();

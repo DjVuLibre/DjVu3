@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.73 2001-04-21 23:22:04 mchen Exp $
+// $Id: DjVuImage.cpp,v 1.74 2001-04-24 00:25:50 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -396,18 +396,18 @@ void
 DjVuImage::notify_chunk_done(const DjVuPort *, const GUTF8String & name)
 {
    if (!relayout_sent &&
-     ( GUTF8String::ncmp("INFO",name, 4) ||
-       GUTF8String::ncmp("PMxx",name, 2) ||
-       GUTF8String::ncmp("BMxx",name, 2)  ) )
+     ( !name.cmp("INFO", 4) ||
+       !name.cmp("PMxx", 2) ||
+       !name.cmp("BMxx", 2)  ) )
    {
       DjVuPort::get_portcaster()->notify_relayout(this);
       relayout_sent=true;
    } 
-   else if (GUTF8String::ncmp("Sxxx", name, 1) ||
-            GUTF8String::ncmp("BGxx", name, 2) ||
-            GUTF8String::ncmp("FGxx", name, 2) ||
-            GUTF8String::ncmp("BMxx", name, 2) ||
-            GUTF8String::ncmp("PMxx", name, 2)  )
+   else if (!name.cmp("Sxxx", 1) ||
+            !name.cmp("BGxx", 2) ||
+            !name.cmp("FGxx", 2) ||
+            !name.cmp("BMxx", 2) ||
+            !name.cmp("PMxx", 2)  )
      DjVuPort::get_portcaster()->notify_redisplay(this);
 }
 

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.18 2001-04-21 00:16:57 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.19 2001-04-24 00:25:49 bcr Exp $# */
 //@{
 //@}
 
@@ -304,18 +304,18 @@ CRLEImage::read_integer(char &c, ByteStream &bs)
           // Analyze comment flags
           for (s = buffer; *s; s++) 
             {
-              if (GString::ncmp(s, "bg-", 3))
+              if (!GStringRep::cmp(s, "bg-", 3))
                 {
-                  if (GString::ncmp(s+3,"bw",2)   ||
-                      GString::ncmp(s+3,"gray",4) ||
-                      GString::ncmp(s+3,"color",5)  )
+                  if (!GStringRep::cmp(s+3,"bw",2)   ||
+                      !GStringRep::cmp(s+3,"gray",4) ||
+                      !GStringRep::cmp(s+3,"color",5)  )
                     bg_flags = s[3];
                 }
-              else if (GString::ncmp(s, "fg-", 3))
+              else if (!GStringRep::cmp(s, "fg-", 3))
                 {
-                  if (GString::ncmp(s+3,"bw",2) ||
-                      GString::ncmp(s+3,"gray",4) ||
-                      GString::ncmp(s+3,"color",5)  )
+                  if (!GStringRep::cmp(s+3,"bw",2) ||
+                      !GStringRep::cmp(s+3,"gray",4) ||
+                      !GStringRep::cmp(s+3,"color",5)  )
                     fg_flags = s[3];
                 }
             }
