@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuAPI.h,v 1.44 2000-02-26 18:53:20 bcr Exp $
+ *C- $Id: DjVuAPI.h,v 1.45 2000-02-28 04:07:57 bcr Exp $
  *
  * The main header file for the DjVu API
  */
@@ -17,7 +17,10 @@
 
 /* 
  * $Log: DjVuAPI.h,v $
- * Revision 1.44  2000-02-26 18:53:20  bcr
+ * Revision 1.45  2000-02-28 04:07:57  bcr
+ * Added missing functions.
+ *
+ * Revision 1.44  2000/02/26 18:53:20  bcr
  * Changes to the DOC++ comments.
  *
  */
@@ -99,6 +102,7 @@ typedef enum djvuio_type_enum
   DjVuIO_GIF,
   DjVuIO_DJVU,
   DjVuIO_RAW,
+  DjVuIO_CALLBACK,
   DjVuIO_UNKNOWN
 } djvuio_type;
 
