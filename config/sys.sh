@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: sys.sh,v 1.24 2001-01-09 17:29:22 bcr Exp $
+# $Id: sys.sh,v 1.25 2001-01-25 20:19:30 bcr Exp $
 # $Name:  $
 
 # This sets the variable SYS INCS JOBJ and DEFS
@@ -81,6 +81,7 @@ if [ -z "$SYS_SET" ] ; then
       SYS=linux-libc5
     fi
     SENTINAL=src/3rd-party/sentinal_lm_60/linux
+    SENTINAL_NEED_LIB="/usr/lib/libcrypt.a"
   elif [ "$SYS" = "SunOS" ] ; then
     s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
     WHOLEARCHIVESEP=","
