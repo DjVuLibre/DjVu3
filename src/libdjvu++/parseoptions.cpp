@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.3 1999-11-03 06:16:00 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.4 1999-11-03 15:20:19 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -233,34 +233,46 @@ DjVuParseOptions::GetBestToken
   const char *r=0;
   int retval=(-1);
   int i;
-  for(i=0;!r&&(i<listsize);
-    r=Arguments->GetValue(tokens[i++]));
-  if(i<listsize)
-  for(retval=tokens[i];r&&(i<listsize);i++)
+  for(i=0;!r&&(i<listsize);r=Arguments->GetValue(tokens[i++]));
+  if(r)
   {
-    const char *s=Arguments->GetValue(tokens[i]);
-    if(s) AmbiguousOptions(retval,r,tokens[i],s);
-  }
-  if(!r)
+    for(retval=tokens[i-1];i<listsize;i++)
+    {
+      const char *s=Arguments->GetValue(tokens[i]);
+      if(s)
+      {
+        AmbiguousOptions(retval,r,tokens[i],s);
+      }
+    }
+  }else
   {
     for(i=0;!r&&(i<listsize);
       r=Configuration->GetValue(currentProfile,tokens[i++]));
-    if(i<listsize)
-    for(retval=tokens[i];r&&(i<listsize);i++)
+    if(r)
     {
-      const char *s=Configuration->GetValue(currentProfile,tokens[i]);
-      if(s) AmbiguousOptions(retval,r,tokens[i],s);
-    }
-  }
-  if(!r)
-  {
-    for(i=0;!r&&(i<listsize);
-      r=Configuration->GetValue(defaultProfile,tokens[i++]));
-    if(i<listsize)
-    for(retval=tokens[i];r&&(i<listsize);i++)
+      for(retval=tokens[i-1];i<listsize;i++)
+      {
+        const char *s=Configuration->GetValue(currentProfile,tokens[i]);
+        if(s)
+        {
+          AmbiguousOptions(retval,r,tokens[i],s);
+        }
+      }
+    }else
     {
-      const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
-      if(s) AmbiguousOptions(retval,r,tokens[i],s);
+      for(i=0;!r&&(i<listsize);
+        r=Configuration->GetValue(defaultProfile,tokens[i++]));
+      if(r)
+      {
+        for(retval=tokens[i-1];i<listsize;i++)
+        {
+          const char *s=Configuration->GetValue(defaultProfile,tokens[i]);
+          if(s)
+          {
+            AmbiguousOptions(retval,r,tokens[i],s);
+          }
+        }
+      }
     }
   }
   return retval;
