@@ -7,14 +7,13 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.15 1999-12-15 04:02:18 bcr Exp $
+# C- $Id: Makefile.in,v 1.16 1999-12-28 15:13:19 bcr Exp $
 
 %%%include <paths>
 
 SHELL=/bin/sh
 prefix=@%prefix%@
 bindir=@%PROJECT_PREFIX%@/bin
-VPATH=./SRCDIR
 CXX=@%CXX%@
 CXXOPT=@%CXXOPT%@ @%CXXUNROLL%@
 CXXWARN=@%CXXWARN%@
@@ -31,7 +30,7 @@ MAKESHLIB=@%make_shlib%@
 
 # Defs
 
-LIB= ../libdjvu++.a
+LIB= $(LIBDJVUXX)
 TARG= TestString TestException TestArray TestList TestMap\
       TestBitmap TestSmartPointer TestJB2 TestThreads
 

@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.72 1999-12-15 19:06:53 haffner Exp $
+# C- $Id: Makefile.in,v 1.73 1999-12-28 15:13:19 bcr Exp $
 
 %%%include <paths>
 
@@ -16,7 +16,6 @@ prefix=@%prefix%@
 bindir=@%PROJECT_PREFIX%@/bin
 libdir=@%PROJECT_PREFIX%@/lib
 incdir=@%PROJECT_PREFIX%@/include
-VPATH=./SRCDIR
 CXX=@%CXX%@
 CXXOPT=@%CXXOPT%@ @%CXXUNROLL%@
 CXXWARN=@%CXXWARN%@
@@ -37,7 +36,7 @@ NAM= libdjvu++
 VER= 3.0
 
 # This 
-LIB= libdjvu++.a
+LIB= $(LIBDJVUXX)
 PROG= djvudump c44 d44 djvutopnm djvumake djvuextract ppmcoco bzz djvmcvt # djvm
 
 # Makefile for libdjvu++.a
@@ -146,7 +145,7 @@ tex:  libdjvu++.dxx
 
 clean:
 	-$(RM) 2>>/dev/null -rf $(PROG) ; true
-	-$(RM) 2>>/dev/null *.o *.a *.out *.rpo *.dep ii_files ; true
+	-$(RM) 2>>/dev/null $(LIB) *.o *.a *.out *.rpo *.dep ii_files ; true
 	if [ -d Test ] ; then ( cd Test ; $(MAKE) clean ) ; fi
 
 realclean:

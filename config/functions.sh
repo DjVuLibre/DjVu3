@@ -827,6 +827,7 @@ generate_makefile()
 {
   TOPSRCDIR=`unescape $TOPSRCDIR`
   TOPBUILDDIR=`unescape $TOPBUILDDIR`
+  ${mkdirp} "$TOPBUILDDIR/lib"
   while [ -n "$1" ]
   do
     # compute xtopsrcdir
