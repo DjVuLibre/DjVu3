@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.82 1999-11-09 17:41:22 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.83 1999-11-11 19:28:48 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -580,17 +580,30 @@ DjVuFile::get_dpi(int w, int h)
    return (dpi ? dpi : 300)/red;
 }
 
+
+static inline bool
+is_annotation(GString chkid)
+{
+  if (chkid=="ANTa" ||
+      chkid=="ANTz" ||
+      chkid=="TXTa" ||
+      chkid=="TXTz" ||
+      chkid=="FORM:ANNO" ) 
+    return true;
+  return false;
+}
+
+
 GString
 DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bool iw44)
 {
   check();
    
-  GString chkid = id;
   GString desc = "Unrecognized chunk";
+  GString chkid = id;
   DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
   
   // INFO  (information chunk for djvu page)
-  
   if (chkid == "INFO" && (djvu || djvi))
     {
       if (DjVuFile::info)
@@ -610,45 +623,7 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
               STRINGIFY(DJVUVERSION_TOO_NEW) );
     }
 
-  // FORM:ANNO and ANTa (annotation)
-
-  else if (chkid == "FORM:ANNO") 
-    {
-      GCriticalSectionLock lock(&anno_lock);
-      if (! anno) anno = new MemoryByteStream;
-      anno->seek(0,SEEK_END);
-      if (anno->tell() & 1)  anno->write((void*)"", 1);
-      // Copy data
-      anno->copy(iff);
-      desc.format("Page annotations");
-    }
-
-  else if (chkid == "ANTa")
-    {
-      GCriticalSectionLock lock(&anno_lock);
-      if (! anno) anno = new MemoryByteStream;
-      anno->seek(0,SEEK_END);
-      if (anno->tell() & 1) anno->write((const void*)"", 1);
-      // Recreate chunk header
-      IFFByteStream iffout(*anno);
-      iffout.put_chunk(id);
-      iffout.copy(iff);
-      iffout.close_chunk();
-      desc.format("Page annotations");
-    }
-  
-  // NDIR (obsolete navigation chunk)
-  
-  else if (chkid == "NDIR")
-    {
-      GP<DjVuNavDir> dir=new DjVuNavDir(url);
-      dir->decode(iff);
-      DjVuFile::dir=dir;
-      desc.format("Navigation directory (obsolete)");
-    }
-  
   // INCL (inclusion chunk)
-
   else if (chkid == "INCL" && (djvi || djvu))
     {
       GP<DjVuFile> file=process_incl_chunk(iff);
@@ -680,7 +655,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
 
   // Djbz (JB2 Dictionary)
-
   else if (chkid == "Djbz" && (djvu || djvi))
     {
       if (DjVuFile::fgjd)
@@ -694,7 +668,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
 
   // Sjbz (JB2 encoded mask)
-
   else if (chkid=="Sjbz" && (djvu || djvi))
     {
       if (DjVuFile::fgjb)
@@ -710,7 +683,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
  
   // Smmr (MMR-G4 encoded mask)
-
   else if (chkid=="Smmr" && (djvu || djvi))
     {
       if (DjVuFile::fgjb)
@@ -720,7 +692,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
   
   // BG44 (background wavelets)
-  
   else if (chkid == "BG44" && (djvu || djvi))
     {
       if (!bg44)
@@ -745,7 +716,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     }
 
   // FG44 (foreground wavelets)
-
   else if (chkid == "FG44" && (djvu || djvu))
     {
       if (fgpm)
@@ -759,7 +729,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
 
   // BGjp (background JPEG)
-
   else if (chkid == "BGjp" && (djvu || djvi))
     {
       if (bg44 || bgpm)
@@ -775,7 +744,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
   
   // FGjp (foreground JPEG)
-  
   else if (chkid == "FGjp" && (djvu || djvi))
     {
       if (fgpm)
@@ -791,7 +759,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
   
   // BG2k (background JPEG-2000) Note: JPEG2K bitstream not finalized.
-
   else if (chkid == "BG2k" && (djvu || djvi))
     {
       if (bg44)
@@ -800,7 +767,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
 
   // FG2k (foreground JPEG-2000) Note: JPEG2K bitstream not finalized.
-  
   else if (chkid == "FG2k" && (djvu || djvi))
     {
       if (fgpm)
@@ -809,7 +775,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
     } 
 
   // BM44/PM44 (IW44 data)
-
   else if ((chkid == "PM44" || chkid=="BM44") && iw44)
     {
       if (!bg44)
@@ -835,6 +800,46 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 		      bg44->get_serial(),
 		      get_dpi(bg44->get_width(), bg44->get_height()));
         }
+    }
+
+  // NDIR (obsolete navigation chunk)
+  else if (chkid == "NDIR")
+    {
+      GP<DjVuNavDir> dir=new DjVuNavDir(url);
+      dir->decode(iff);
+      DjVuFile::dir=dir;
+      desc.format("Navigation directory (obsolete)");
+    }
+  
+  // FORM:ANNO (obsolete) (must be before other annotations)
+  else if (chkid == "FORM:ANNO") 
+    {
+      GCriticalSectionLock lock(&anno_lock);
+      if (! anno) anno = new MemoryByteStream;
+      anno->seek(0,SEEK_END);
+      if (anno->tell() & 1)  anno->write((void*)"", 1);
+      // Copy data
+      anno->copy(iff);
+      desc.format("Annotations (bundled)");
+    }
+  
+  // ANTa/ANTx/TXTa/TXTz annotations
+  else if (is_annotation(chkid))  // but not FORM:ANNO
+    {
+      GCriticalSectionLock lock(&anno_lock);
+      if (! anno) anno = new MemoryByteStream;
+      anno->seek(0,SEEK_END);
+      if (anno->tell() & 1) anno->write((const void*)"", 1);
+      // Recreate chunk header
+      IFFByteStream iffout(*anno);
+      iffout.put_chunk(id);
+      iffout.copy(iff);
+      iffout.close_chunk();
+      desc.format("Annotations");
+      if (chkid == "ANTa" || chkid == "ANTz")
+        desc = desc + " (hyperlinks, etc.)";
+      else if (chkid == "TXTa" || chkid == "TXTz")
+        desc = desc + " (text, etc.)";
     }
 
   // Return description
@@ -1142,17 +1147,15 @@ DjVuFile::get_merged_anno(const GP<DjVuFile> & file,
 	       {
 		  GP<DjVuFile> inc_file=file->process_incl_chunk(iff);
 		  if (inc_file) get_merged_anno(inc_file, str_out, map);
-	       } else if (chkid == "FORM:ANNO")
+	       } 
+               else if (chkid == "FORM:ANNO")
 	       {
 		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
 		  str_out.copy(iff);
-	       } else if (chkid == "ANTa" ||
-			  chkid == "ANTz" ||
-			  chkid == "TXTa" ||
-			  chkid == "TXTz")
+	       } 
+               else if (is_annotation(chkid)) // but not FORM:ANNO
 	       {
 		  if (str_out.tell() & 1) str_out.write((void *) "", 1);
-	       
 		  IFFByteStream iff_out(str_out);
 		  iff_out.put_chunk(chkid);
 		  iff_out.copy(iff);
@@ -1357,6 +1360,22 @@ DjVuFile::contains_chunk(const char * chunk_name)
 //****************************** Save routines ********************************
 //*****************************************************************************
 
+static void
+copy_chunks(ByteStream *from, IFFByteStream &ostr)
+{
+  from->seek(0);
+  IFFByteStream iff(*from);
+  GString chkid;
+  while (iff.get_chunk(chkid))
+    {
+      ostr.put_chunk(chkid);
+      ostr.copy(iff);
+      ostr.close_chunk();
+      iff.close_chunk();
+    }
+}
+
+
 void
 DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 			bool included_too, bool no_ndir)
@@ -1384,21 +1403,19 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
           GP<DjVuFile> file = process_incl_chunk(iff);
           if (file) file->add_djvu_data(ostr, map, included_too, no_ndir);
         } 
-      else if ((chkid=="ANTa" || chkid=="FORM:ANNO") && anno && anno->size())
+      else if (is_annotation(chkid) && anno && anno->size())
         {
           if (!processed_annotation)
             {
               processed_annotation = true;
               GCriticalSectionLock lock(&anno_lock);
-              ostr.put_chunk("FORM:ANNO");
-              anno->seek(0);
-              ostr.copy(*anno);
-              ostr.close_chunk();
+              copy_chunks(anno, ostr);
             }
         }
       else if (chkid=="NDIR" && dir && !no_ndir)
         {
-#ifndef NEED_DECODER_ONLY   // Decoder should never generate old NDIR chunks
+#ifndef NEED_DECODER_ONLY   
+          // Decoder should never generate old NDIR chunks
           if (dir && !no_ndir)
             {
               ostr.put_chunk(chkid);
@@ -1418,11 +1435,9 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
    // Otherwise, writes annotation at the end (annotations could be big)
    if (!processed_annotation && anno && anno->size())
      {
+       processed_annotation = true;
        GCriticalSectionLock lock(&anno_lock);
-       ostr.put_chunk("FORM:ANNO");
-       anno->seek(0);
-       ostr.copy(*anno);
-       ostr.close_chunk();
+       copy_chunks(anno, ostr);
      }
    // Close iff
    if (top_level) 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvudump.cpp,v 1.7 1999-11-05 18:59:43 eaf Exp $
+//C- $Id: djvudump.cpp,v 1.8 1999-11-11 19:28:48 leonb Exp $
 
 
 
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.7 1999-11-05 18:59:43 eaf Exp $# */
+    #$Id: djvudump.cpp,v 1.8 1999-11-11 19:28:48 leonb Exp $# */
 //@{
 //@}
 
@@ -186,13 +186,19 @@ display_incl(IFFByteStream & iff, GString, size_t, DjVmInfo& )
    char ch;
    while(iff.read(&ch, 1) && ch!='\n')
      name += ch;
-   printf("Indirection chunk (%s)", (const char *) name);
+   printf("Indirection chunk --> {%s}", (const char *) name);
 }
 
 void
-display_anta(IFFByteStream &, GString, size_t, DjVmInfo& )
+display_anno(IFFByteStream &iff, GString, size_t, DjVmInfo& )
 {
    printf("Page annotation");
+   GString id;
+   iff.short_id(id);
+   if (id=="ANTa" || id=="ANTz")
+     printf(" (hyperlinks, etc.)");
+   if (id=="TXTa" || id=="TXTz")
+     printf(" (text, etc.)");
 }
 
 struct displaysubr
@@ -217,7 +223,10 @@ disproutines[] =
   { "DJVM.DIRM", display_djvm_dirm },
   { "THUM.TH44", display_th44 },
   { "INCL", display_incl },
-  { "ANTa", display_anta },
+  { "ANTa", display_anno },
+  { "ANTz", display_anno },
+  { "TXTa", display_anno },
+  { "TXTz", display_anno },
   { 0, 0 },
 };
 
