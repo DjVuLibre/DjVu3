@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuPalette.cpp,v 1.22 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVuPalette.cpp,v 1.23 2001-03-28 22:07:18 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -192,7 +192,7 @@ int
 DjVuPalette::compute_palette(int maxcolors, int minboxsize)
 {
   if (!hcube)
-    G_THROW("DjVuPalette.no_color	");
+    G_THROW("DjVuPalette.no_color");
   if (maxcolors<1 || maxcolors>MAXPALETTESIZE)
     G_THROW("DjVuPalette.many_colors");
   

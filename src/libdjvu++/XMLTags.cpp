@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLTags.cpp,v 1.6 2001-03-13 21:33:22 bcr Exp $
+// $Id: XMLTags.cpp,v 1.7 2001-03-28 22:07:18 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -183,7 +183,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
 {
   if(!get_count())
   {
-    G_THROW("Not secured by a GP pointer");
+    G_THROW("XMLTags.no_GP");
   }
   GPList<lt_XMLTags> level;
   GMap<GString,GPList<lt_XMLTags> > allTags;
@@ -192,7 +192,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
   if(!isspaces((unsigned long const *)raw))
   {
     GString mesg;
-    mesg.format("Raw string '%s' found outside document scope.",(const char *)raw);
+    mesg.format("XMLTags.raw_string\t%s",(const char *)raw);
     G_THROW(mesg);
   }
   while((tag=xmlbs.gets(0,'>',true))[0])
@@ -201,7 +201,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
     while(tag[len-1] != '>')
     {
       GString mesg;
-      mesg.format("Unterminated Tag %s",(const char *)tag);
+      mesg.format("XMLTags.bad_tag\t%s",(const char *)tag);
       G_THROW(mesg);
     }
     switch(tag[1])
@@ -214,7 +214,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           if(!cont[0])
           { 
             GString mesg;
-            mesg.format("Unterminated Processing Instruction: %s",(const char *)tag);
+            mesg.format("XMLTags.bad_PI\t%s",(const char *)tag);
             G_THROW(mesg);
           }
           len=((tag+=cont).length());
@@ -240,7 +240,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
             if(!cont[0])
             { 
               GString mesg;
-              mesg.format("Unterminated Comment: %s",(const char *)tag);
+              mesg.format("XMLTags.bad_comment\t%s",(const char *)tag);
               G_THROW(mesg);
             }
             len=((tag+=cont).length());
@@ -262,7 +262,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.del(last);
         }else
         {
-          GString mesg("Well formed errror.  Too many end tags.");
+          GString mesg("XMLTags.bad_form");
           G_THROW(mesg);
         }
         break;
@@ -290,7 +290,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
           level.append(t);
         }else
         {
-          GString mesg("No body");
+          GString mesg("XMLTags.no_body");
           G_THROW(mesg);
         }
         allTags[t->name].append(t);
@@ -311,8 +311,7 @@ lt_XMLTags::init(XMLByteStream &xmlbs)
       }else if(!isspaces((unsigned long const *)raw))
       {
         GString mesg;
-        mesg.format("Raw string '%s' found outside document scope.",
-          (const char *)raw);
+        mesg.format("XMLTags.raw_string\t%s", (const char *)raw);
         G_THROW(mesg);
       }
     }

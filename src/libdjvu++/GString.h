@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $
+// $Id: GString.h,v 1.28 2001-03-28 22:07:18 fcrary Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.27 2001-03-13 01:34:50 bcr Exp $# */
+    #$Id: GString.h,v 1.28 2001-03-28 22:07:18 fcrary Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -234,8 +234,7 @@ public:
   /** Converts strings containing HTML/XML escaped characters (e.g.,
       "&lt;" for "<") into their unescaped forms. The conversion is partially
       defined by the ConvMap argument which specifies the conversion strings
-      to be recognized. [The function BasicMap() is available to produce a list
-      which inverts the actions of toEscaped().] Numeric representations of
+      to be recognized. Numeric representations of
       characters (e.g., "&#38;" or "&#x26;" for "*") are always converted. */
   GString fromEscaped( const GMap<GString,GString> ConvMap ) const;
 
@@ -252,14 +251,14 @@ public:
   char *getbuf(int n = -1);
   /** Initializes a string with a formatted string (as in #printf#).  The
       string is re-initialized with the characters generated according to the
-      specified format #fmt# and using the optional arguments.  See the Ansi-C
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
       function #printf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
   void format(const char *fmt, ... );
   /** Initializes a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
-      specified format #fmt# and using the optional arguments.  See the Ansi-C
+      specified format #fmt# and using the optional arguments.  See the ANSI-C
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLAnno.cpp,v 1.7 2001-03-08 23:57:26 bcr Exp $
+// $Id: XMLAnno.cpp,v 1.8 2001-03-28 22:07:18 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -95,7 +95,7 @@ convertToColor(const char s[])
   }else if(s[0])
   {
     GString mesg;
-    mesg.format("Color %s is not supported",s);
+    mesg.format("XMLAnno.bad_color\t%s",s);
     G_THROW(mesg);
   }
   return i;
@@ -129,7 +129,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
   GP<DjVuFile> dfile=doc.get_djvu_file(xid,true);
   if(!dfile)
   {
-    G_THROW("Failed to get specified page");
+    G_THROW("XMLAnno.bad_page");
   }
   dfile->start_decode();
   dfile->wait_for_finish();
@@ -242,7 +242,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           }
           if(i!=4)
           {
-            G_THROW("Too few coords for  rectangular region");
+            G_THROW("XMLAnno.bad_rect");
           }
           int xmin,xmax; 
           if(xx[0]>xx[2])
@@ -283,7 +283,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           }
           if(i!=4)
           {
-            G_THROW("Too few coords for circular region");
+            G_THROW("XMLAnno.bad_circle");
           }
           int x=xx[0],y=xx[1],rx=xx[2],ry=(h-xx[3])-1;
           GRect rect(x-rx,y-ry,2*rx,2*ry);
@@ -298,7 +298,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           }
           if(i!=4)
           {
-            G_THROW("Too few coords for oval region");
+            G_THROW("XMLAnno.bad_oval");
           }
           int xmin,xmax; 
           if(xx[0]>xx[2])
@@ -337,7 +337,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
           a=p;
         }else
         {
-          GString mesg("Unknown shape ");
+          GString mesg("XMLAnno.unknown_shape\t");
           mesg+=shape;
           G_THROW(mesg);
         }
@@ -365,7 +365,7 @@ lt_XMLAnno::ChangeAnno(const lt_XMLTags &map,const GURL url,const GString id,con
               a->border_type=typeMap[pos];
             }else
             {
-              GString mesg("Unrecongized border type ");
+              GString mesg("XMLAnno.unknown_border\t");
               mesg+=b;
               G_THROW(mesg);
             }
@@ -442,12 +442,12 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
  
   if(!pos || (pos != Body.lastpos()))
   {
-    G_THROW("Exactly one <BODY></BODY> pair is needed");
+    G_THROW("XMLAnno.extra_body");
   }
   GP<lt_XMLTags> & GBody =Body[pos];
   if(!GBody)
   {
-    G_THROW("No <BODY></BODY> pair found");
+    G_THROW("XMLAnno.no_body");
   }
   GMap<GString,GP<lt_XMLTags> > Maps;
   lt_XMLTags::getMaps("MAP","name",Body,Maps);
@@ -561,7 +561,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             GPosition mappos=Maps.contains(mapname);
             if(!mappos)
             {
-              GString mesg("Failed to find specify map ");
+              GString mesg("XMLAnno.map_find\t");
               mesg+=mapname;
               G_THROW(mesg);
             }else
@@ -578,7 +578,7 @@ lt_XMLAnno::parse(const lt_XMLTags &tags)
             GP<DjVuDocument> doc=DjVuDocument::create_wait(url);
             if(! doc->wait_for_complete_init())
             {
-              GString mesg("Failed to initialize ");
+              GString mesg("XMLAnno.fail_init\t");
               mesg+=GString((const char *)url);
               G_THROW(mesg);
             }

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDoc.cpp,v 1.41 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVmDoc.cpp,v 1.42 2001-03-28 22:07:18 fcrary Exp $
 // $Name:  $
 
 
@@ -115,7 +115,7 @@ DjVmDoc::delete_file(const char * id)
    DEBUG_MAKE_INDENT(3);
    
    if (!data.contains(id))
-      G_THROW(GString(".cant_delete\t") + id);      //  There is no file with ID 'xxx' to delete.
+      G_THROW(GString("DjVmDoc.cant_delete\t") + id);      //  There is no file with ID 'xxx' to delete.
    
    data.del(id);
    dir->delete_file(id);
