@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.78 2001-07-12 18:21:32 lchen Exp $
+// $Id: GURL.cpp,v 1.79 2001-07-12 22:54:28 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1571,7 +1571,8 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
 {
   const char *fname=xfname;
   GUTF8String retval;
-  char * const string_buffer = retval.getbuf(MAXPATHLEN+10);
+  const size_t maxlen=xfname.length()*9+MAXPATHLEN+10;
+  char * const string_buffer = retval.getbuf(maxlen);
   // UNIX implementation
 #ifdef UNIX
   // Perform tilde expansion
@@ -1650,8 +1651,10 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       while (*fname &&(*fname!= slash))
       {
         *s = *fname++;
-        if ((++s)-string_buffer > MAXPATHLEN)
+        if ((size_t)((++s)-string_buffer) > maxlen)
+        {
           G_THROW( ERR_MSG("GURL.big_name") );
+        }
       }
       *s = 0;
       for(;fname[0]== slash;fname++)
@@ -1705,7 +1708,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
           drv[1]=colon;
           drv[2]= dot ;
           drv[3]=0;
-          GetFullPathName(drv, MAXPATHLEN, string_buffer, &s);
+          GetFullPathName(drv, maxlen, string_buffer, &s);
 		  strcpy(string_buffer,(const char *)GUTF8String(string_buffer).getNative2UTF8());
           s = string_buffer;
         }
@@ -1764,7 +1767,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
         while (*fname && *fname!= slash && *fname!=backslash)
         {
           *s = *fname++;
-          if ((++s)-string_buffer > MAXPATHLEN)
+          if ((++s)-string_buffer > maxlen)
             G_THROW( ERR_MSG("GURL.big_name") );
         }
         *s = 0;
@@ -1782,7 +1785,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       while (*fname && (*fname!= slash) && (*fname!=backslash))
       {
         *s = *fname++;
-        if ((++s)-string_buffer > MAXPATHLEN)
+        if ((++s)-string_buffer > maxlen)
           G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
@@ -1832,7 +1835,7 @@ GURL::expand_name(const GUTF8String &xfname, const char *from)
       while (*fname!=0 && *fname!=colon)
       {
         *s = *fname++;
-        if ((++s)-string_buffer > MAXPATHLEN)
+        if ((++s)-string_buffer > maxlen)
           G_THROW( ERR_MSG("GURL.big_name") );
       }
       *s = 0;
