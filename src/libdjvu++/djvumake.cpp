@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.15 2000-02-14 22:34:30 leonb Exp $
+//C- $Id: djvumake.cpp,v 1.16 2000-02-28 23:23:51 haffner Exp $
 
 /** @name djvumake
 
@@ -131,7 +131,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.15 2000-02-14 22:34:30 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.16 2000-02-28 23:23:51 haffner Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -144,6 +144,28 @@
 #include "DjVuImage.h"
 #include "MMRDecoder.h"
 
+#include "GPixmap.h"
+#include "GBitmap.h"
+  static void 
+  processForeground(const GPixmap* image, const JB2Image *mask,
+                    GPixmap& subsampled_image, GBitmap& subsampled_mask);
+  
+  static void 
+  processBackground(const GPixmap* image, const JB2Image *mask,
+                    GPixmap& subsampled_image, GBitmap& subsampled_mask, int bg_sub);
+
+
+  static void 
+  maskedSubsample(const GPixmap *p_img,
+                  const GBitmap *p_mask,
+                  GPixmap& subsampled_image,
+                  GBitmap& subsampled_mask,
+                  int gridwidth, 
+                  int inverted_mask = 0, 
+                  int incr_flag = 0, 
+                  int minpixels = 1 );
+  
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -155,10 +177,10 @@ int flag_contains_fg      = 0;
 int flag_contains_bg      = 0;
 int flag_contains_stencil = 0;
 int flag_contains_bg44    = 0;
-
 IFFByteStream *bg44iff    = 0;
 GP<MemoryByteStream> jb2stencil = 0;
 GP<MemoryByteStream> mmrstencil = 0;
+GP<JB2Image> stencil=0;
 
 int w = -1;
 int h = -1;
@@ -177,6 +199,7 @@ usage()
          "   Sjbz=jb2file                --  Create a JB2 stencil chunk\n"
          "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
          "   BG44=[iw4file][:nchunks]    --  Create one or more IW44 background chunks\n"
+         "   ppm=ppmfile[:bg-subsample]  --  Using  jb2file, extracts the foreground and the background from raw ppmfile"
          "\n"
          "You may omit the specification of the information chunk. An information\n"
          "chunk will be created using the image size of the first stencil chunk\n"
@@ -211,13 +234,13 @@ analyze_jb2_chunk(char *filename)
   if (!jb2stencil)
     {
       StdioByteStream bs(filename,"rb");
-      JB2Image image;
+      stencil=new(JB2Image);
       jb2stencil = new MemoryByteStream();
       jb2stencil->copy(bs);
       jb2stencil->seek(0);
-      image.decode(*jb2stencil);
-      int jw = image.get_width();
-      int jh = image.get_height();
+      stencil->decode(*jb2stencil);
+      int jw = stencil->get_width();
+      int jh = stencil->get_height();
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
@@ -441,7 +464,86 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     fprintf(stderr,"djvumake: no more chunks in BG44 file\n");
 }
 
+void masksub(IFFByteStream &iff, char *filespec)
+{
+  char *s = strchr(filespec, ':');
+  if (s == filespec)
+    THROW("djvumake: no filename specified in first ppm specification");
+  if (!s)
+    s = filespec + strlen(filespec);
+  GString filename(filespec, s-filespec);
+  int bg_sub=3;
+  if (*s == ':')
+    bg_sub = atol(s+1);
 
+  if (!stencil)
+    THROW("The use of a raw ppm image requires a stencil");
+  StdioByteStream ibs(filename, "rb");
+  GPixmap raw_pm;
+  raw_pm.init(ibs);
+  
+  if (bg_sub<1)
+    THROW("background subsampling must be >=1");
+
+  if ((int) stencil->get_width() != (int) raw_pm.columns())
+    THROW("Stencil and raw image have different widths!");
+  if ((int) stencil->get_height() != (int) raw_pm.rows())
+    THROW("Stencil and raw image have different heights!");
+  // foreground
+  {
+    GPixmap fg_img;
+    GBitmap fg_mask;
+    processForeground(&raw_pm, stencil, fg_img, fg_mask);
+    GP<IWPixmap> fg_pm = new IWPixmap(&fg_img, &fg_mask, IWPixmap::CRCBfull);
+    IWEncoderParms parms[8];
+    iff.put_chunk("FG44");
+    parms[0].slices = 100;
+    fg_pm->encode_chunk(iff, parms[0]);
+    iff.close_chunk();
+  }
+  
+  // backgound
+  {
+    GPixmap bg_img;
+    GBitmap bg_mask;
+    processBackground(&raw_pm, stencil, bg_img, bg_mask, bg_sub);
+    GP<IWPixmap> bg_pm = new IWPixmap(&bg_img, &bg_mask, IWPixmap::CRCBnormal);
+    IWEncoderParms parms[8];
+    // could make  quality=75accessible
+    int nchunks=4; int quality=75; 
+    //  int base=72+ (int) (log(bg_subsampling/3.0)/log(3.0)*10);
+    //
+    // The following is the precalculated values of the above formula for 
+    // the meaningfull ranges of bg_subsampling.
+    static const int base_offset[]={72,61,68,72,74,76,78,79,80,82};
+
+    int base= base_offset[bg_sub];
+    int linear_quality;
+    if (quality >= 75)
+      linear_quality = (quality - 75) * 2 + 50;
+    else
+      linear_quality = (quality * 2) / 3;
+    
+    int n=0;
+    switch (nchunks) {
+    case 4:
+      parms[0].bytes = 10000;
+      parms[n++].slices = base + linear_quality / 25;
+    case 3:
+      parms[n++].slices = base + linear_quality / 4;
+    case 2:
+      parms[n++].slices = base + linear_quality / 3;
+    case 1:
+      parms[n++].slices = base + linear_quality / 2;
+    }
+    for (int i=0; i<nchunks; i++)
+      {
+        iff.put_chunk("BG44");
+        bg_pm->encode_chunk(iff, parms[i]);
+        iff.close_chunk();
+      }
+  }
+}
 
 int
 main(int argc, char **argv)
@@ -509,7 +611,19 @@ main(int argc, char **argv)
               create_raw_chunk(iff, argv[i], argv[i]+5);
               flag_contains_fg = 1;
             }
-          else
+          else if (! strncmp(argv[i],"ppm=",4))
+            {
+              
+              if (flag_contains_bg)
+                fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
+              if (flag_contains_bg)
+                fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
+              masksub(iff, argv[i]+4 );
+
+              flag_contains_bg = 1;
+              flag_contains_fg = 1;
+            }
+          else 
             {
               fprintf(stderr,"djvumake: illegal argument : ``%s'' (ignored)\n", argv[i]);
             }
@@ -545,3 +659,291 @@ main(int argc, char **argv)
   ENDCATCH;
   return 0;
 }
+
+// Returns a dilated version (1 pixel, 8-neighborhood) of the original GBitmap
+// (width and height of resulting GBitmap are logically 2 pixels more)
+
+static GP<GBitmap> 
+dilate8(const GBitmap *p_bm)
+{
+  const GBitmap& bm = *p_bm;
+  GP<GBitmap> p_newbm = new GBitmap(bm.rows()+2,bm.columns()+2); 
+  GBitmap& newbm = *p_newbm;
+  for(unsigned int y=0; y<bm.rows(); y++)
+    {
+      for(unsigned int x=0; x<bm.columns(); x++)
+        {
+          if(bm[y][x]) 
+            {
+              // Set all the 8-neighborhood to black
+              newbm[y][x]=1;
+              newbm[y][x+1]=1;
+              newbm[y][x+2]=1;
+              newbm[y+1][x]=1;
+              newbm[y+1][x+1]=1;
+              newbm[y+1][x+2]=1;
+              newbm[y+2][x]=1;
+              newbm[y+2][x+1]=1;
+              newbm[y+2][x+2]=1;
+            }
+        }
+    }
+  return p_newbm;
+}
+
+
+// Returns an eroded version (1-pixel, 8 neighborhood) of the original GBitmap
+// (width and height of resulting GBitmap are logically 2 pixels less)
+
+static GP<GBitmap> 
+erode8(const GBitmap *p_bm)
+{
+  const GBitmap& bm = *p_bm;
+  int newnrows = bm.rows()-2;
+  int newncolumns = bm.columns()-2;
+  if(newnrows<=0 || newncolumns<=0) // then return an empty GBitmap 
+    return new GBitmap;
+    
+  GP<GBitmap> p_newbm = new GBitmap(newnrows,newncolumns); 
+  GBitmap& newbm = *p_newbm;
+  for(int y=0; y<newnrows; y++)
+    {
+      for(int x=0; x<newncolumns; x++)
+        {
+          // Check if there's a white pixel in the 8-neighborhood
+          if(   !( bm[y  ][x] && bm[y  ][x+1] && bm[y  ][x+2]
+                && bm[y+1][x] && bm[y+1][x+1] && bm[y+1][x+2]
+                && bm[y+2][x] && bm[y+2][x+1] && bm[y+2][x+2]))
+            newbm[y][x] = 0; // then set current to white
+          else
+            newbm[y][x] = 1; // else set current to black
+        }
+    }
+  return p_newbm;
+}
+
+// Returns a new JB2Image that is a copy of the original with every blit dilated (8 neighborhod)
+
+GP<JB2Image> 
+dilate8(const JB2Image *im)
+{
+  int i;
+  GP<JB2Image> newim = new JB2Image;
+  newim->set_dimension(im->get_width(),im->get_height());
+  for(i=0; i<im->get_shape_count(); i++)
+    {
+      const JB2Shape* shape = im->get_shape(i);
+      JB2Shape newshape;
+      newshape.parent = shape->parent;
+      if (shape->bits) 
+        newshape.bits = dilate8(shape->bits);
+      else
+        newshape.bits = 0;
+      newim->add_shape(newshape);
+    }
+  for(i=0; i<im->get_blit_count(); i++)
+    {
+      const JB2Blit* blit = im->get_blit(i);
+      JB2Blit newblit;
+      newblit.bottom = blit->bottom - 1;
+      newblit.left = blit->left - 1;
+      newblit.shapeno = blit->shapeno;
+      newim->add_blit(newblit);
+    }
+  return newim;
+}
+
+// Returns a new JB2Image that is a copy of the original with every blit eroded (8-neighborhood)
+GP<JB2Image> 
+erode8(const JB2Image *im)
+{
+  int i;
+  GP<JB2Image> newim = new JB2Image;
+  newim->set_dimension(im->get_width(),im->get_height());
+  for(i=0; i<im->get_shape_count(); i++)
+    {
+      const JB2Shape* shape = im->get_shape(i);
+      JB2Shape newshape;
+      newshape.parent = shape->parent;
+      if (shape->bits) 
+        newshape.bits = erode8(shape->bits);
+      else
+        newshape.bits = 0;
+      newim->add_shape(newshape);
+    }
+  for(i=0; i<im->get_blit_count(); i++)
+    {
+      const JB2Blit* blit = im->get_blit(i);
+      JB2Blit newblit;
+      newblit.bottom = blit->bottom + 1;
+      newblit.left = blit->left + 1;
+      newblit.shapeno = blit->shapeno;
+      newim->add_blit(newblit);
+    }
+  return newim;
+}
+
+
+
+
+
+// ************************************
+// * public static methods of MaskSub *
+// ************************************
+
+// maskedSubsample method:
+// Subsamples only the pixels of <image> that are not masked (<mask>).
+// This call resizes and fills the resulting <subsampled_image> and <subsampled_mask>.
+// Their dimension is the dimension of the original <image> divided by <gridwidth>
+// and rounded to the superior integer.
+// For each square grid (gridwidth times gridwidth) of the subsampling mesh
+// that contains at least <minpixels> non-masked pixels, their value is averaged 
+// to give the value of the corresponding <subsampled_image> pixel, and the
+// <subsampled_mask> is cleared at this position.
+// If <inverted_mask> is true, then pixels are considered to be masked when mask==0
+//
+// The <incr_flag> can be set to specify incremental mode.
+// This mode is used when calling maskedSubsample a second time 
+// with a different mask. This will only set the pixels that have not previously been 
+// set (i.e. for which the subsampled_mask hasn't been cleared). In this mode, the 
+// subsampled_image and subsampled_mask are expected to already have the correct size.
+// (See explanation in MaskSub::processBackground code to know how and why this is used)
+ 
+
+static void
+maskedSubsample(const GPixmap* img,
+                         const GBitmap *p_mask,
+                         GPixmap& subsampled_image,
+                         GBitmap& subsampled_mask,
+                         int gridwidth, int inverted_mask, 
+                         int incr_flag, int minpixels
+                         )
+{
+  const GPixmap& image= *img;
+  const GBitmap& mask = *p_mask;
+  int imageheight = image.rows();
+  int imagewidth = image.columns();
+  
+  // compute the size of the resulting subsampled image
+  int subheight = imageheight/gridwidth;
+  if(imageheight%gridwidth)
+    subheight++;
+  int subwidth = imagewidth/gridwidth;
+  if(imagewidth%gridwidth)
+    subwidth++;
+
+  if(!incr_flag) // set the sizes unless in incremental mode
+    {
+      subsampled_image.init(subheight, subwidth);
+      subsampled_mask.init(subheight, subwidth);
+    }
+
+  int row, col;  // row and col in the subsampled image
+  int posx, posxend, posy, posyend; // corresponding square in the original image
+
+  for(row=0, posy=0; row<subheight; row++, posy+=gridwidth)
+    {
+      GPixel* subsampled_image_row = subsampled_image[row]; // row row of subsampled image
+      unsigned char* subsampled_mask_row = subsampled_mask[row]; // row row of subsampled mask
+
+      posyend = posy+gridwidth;
+      if(posyend>imageheight)
+        posyend = imageheight;
+
+      for(col=0, posx=0; col<subwidth; col++, posx+=gridwidth) 
+        {
+          // Do not overwrite if in incremental mode
+          if(!(incr_flag && subsampled_mask_row[col]==0)) 
+            {
+              posxend = posx+gridwidth;
+              if(posxend>imagewidth)
+                posxend = imagewidth;
+
+              int count = 0;
+              int r = 0;
+              int g = 0;
+              int b = 0;
+              for(int y=posy; y<posyend; y++)
+                {
+                  const unsigned char* mask_y = mask[y]; // Row y of the mask
+                  for(int x=posx; x<posxend; x++)
+                    {
+                      unsigned char masked = (inverted_mask ? !mask_y[x] :mask_y[x]);
+                      if(!masked)
+                        {
+                          GPixel p = image[y][x];
+                          r += p.r;
+                          g += p.g;
+                          b += p.b;
+                          count ++;
+                        }
+                    }
+                }
+
+              /* minpixels pixels are enough to give the color */
+              /* so set it, and do not mask this point */
+              if(count >= minpixels)   
+                {
+                  GPixel p;
+                  p.r = r/count;
+                  p.g = g/count;
+                  p.b = b/count;
+                  subsampled_image_row[col] = p;
+                  subsampled_mask_row[col] = 0;
+                } 
+              else /* make it bright red and masked */ 
+                {
+                  subsampled_image_row[col] = GPixel::RED;
+                  subsampled_mask_row[col] = 1;
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+static void processForeground(const GPixmap* image, const JB2Image *mask,
+                                GPixmap& subsampled_image, GBitmap& subsampled_mask)
+{
+  GP<JB2Image> eroded_mask = erode8(mask);
+  maskedSubsample(image, eroded_mask->get_bitmap(), 
+                  subsampled_image, subsampled_mask, 12, TRUE);
+#ifdef DEBUG_SAVE
+  StdioByteStream mask_pbm("mask.pbm","wb");
+  mask->get_GBitmap()->save_pbm(mask_pbm);
+  StdioByteStream sub_fg_ppm("sub_fg.ppm","wb");
+  subsampled_image.save_ppm(sub_fg_ppm);
+  StdioByteStream sub_fg_mask_pbm("sub_fg_mask.pbm","wb");
+  subsampled_mask.save_pbm(sub_fg_mask_pbm);
+#endif
+}
+
+static void processBackground(const GPixmap* image, const JB2Image *mask,
+                           GPixmap& subsampled_image, GBitmap& subsampled_mask,
+                              int bg_sub)
+{
+  GP<JB2Image> dilated_mask1 = dilate8(mask);
+  GP<JB2Image> dilated_mask2 = dilate8(dilated_mask1);
+  maskedSubsample(image, dilated_mask2->get_bitmap(), subsampled_image, 
+                  subsampled_mask, bg_sub, FALSE);
+#ifdef TEMPORARY_DISABLED
+  // Now we call maskedSubsample in incremental mode to solve the following problem: 
+  // The problem may occur with N=2: if dilation removes all the pixels in a 3x3 box, 
+  // nothing is left to sample the background color
+  // One deletion will remove less backgound pixels.
+  maskedSubsample(image, dilated_mask1->get_GBitmap(), subsampled_image, 
+                  subsampled_mask, 3, FALSE, TRUE);
+#endif
+#ifdef DEBUG_SAVE
+  StdioByteStream sub_bg_ppm("sub_bg.ppm","wb");
+  subsampled_image.save_ppm(sub_bg_ppm);
+  StdioByteStream sub_bg_mask_pbm("sub_bg_mask.pbm","wb");
+  subsampled_mask.save_pbm(sub_bg_mask_pbm);
+#endif
+}
+
+
+
