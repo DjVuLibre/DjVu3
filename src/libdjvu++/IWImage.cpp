@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.20 1999-09-23 03:27:27 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.21 1999-09-27 15:25:32 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.20 1999-09-23 03:27:27 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.21 1999-09-27 15:25:32 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -186,7 +186,7 @@ static void
 forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
              const signed char *mask8, int mskrowsize )
 {
-  int i,j, rp;
+  int i,j;
   signed char *m;
   short *p;
   short *d;
@@ -2200,7 +2200,6 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   signed char *buffer = 0;
   TRY
     {
-      int i;
       buffer = new signed char[w*h];
       // Create maps
       ymap = new _IWMap(w,h);

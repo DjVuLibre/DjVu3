@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.21 1999-09-23 03:13:37 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.22 1999-09-27 15:25:32 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -1057,7 +1057,6 @@ void
 _JB2Codec::code_bitmap_by_cross_coding (GBitmap *bm, GBitmap *cbm, int libno)
 {
   int cw = cbm->columns();
-  int ch = cbm->rows();
   int dw = bm->columns();
   int dh = bm->rows();
   
@@ -1251,7 +1250,6 @@ _JB2Codec::code(JB2Dict *jim)
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
-      int i;
       int firstshape = jim->get_inherited_shape_count();
       int nshape = jim->get_shape_count();
       init_library(jim);

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.62 1999-09-27 14:03:39 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.63 1999-09-27 15:25:31 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -563,7 +563,6 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
    
   GString chkid = id;
   GString desc = "Unrecognized chunk";
-  DjVuPortcaster * pcaster=get_portcaster();
   DEBUG_MSG("DjVuFile::decode_chunk() : decoding " << id << "\n");
   
   // INFO  (information chunk for djvu page)
