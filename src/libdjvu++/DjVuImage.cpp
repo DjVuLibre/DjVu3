@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.58 2001-04-02 21:17:15 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.59 2001-04-03 20:26:17 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1064,9 +1064,9 @@ do_bitmap(const DjVuImage &dimg, BImager get,
     {
         GP<GBitmap> bm=(dimg.*get)(zrect, red, align);
         if(bm)
-            bm->rotate((4-dimg.get_rotate())%4);
+	   return bm->rotate((4-dimg.get_rotate())%4);
         else
-            return NULL;
+	   return NULL;
     }
   // Find best reduction
   for (red=15; red>1; red--)
@@ -1144,7 +1144,7 @@ do_pixmap(const DjVuImage &dimg, PImager get,
     {
         GP<GPixmap> pm = (dimg.*get)(zrect, red, gamma);
         if( pm ) 
-            pm->rotate((4-dimg.get_rotate())%4);
+            return pm->rotate((4-dimg.get_rotate())%4);
         else
             return NULL;
     }
