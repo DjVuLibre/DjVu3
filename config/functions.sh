@@ -519,12 +519,6 @@ generate_makefile()
     -e 's!@%docxx%@!'"doc++"'!g' \
     -e 's!@%make_stlib%@!'"$MAKE_STLIB"'!g' \
     -e 's!@%make_shlib%@!'"$MAKE_SHLIB"'!g'
-
-  # dependencies
-  if [ -r "$TOPSRCDIR/$1/Makefile.depend" ]
-  then
-    cat "$TOPSRCDIR/$1/Makefile.depend" >> "$TOPBUILDDIR/$1/Makefile"
-  fi
 }
 
 
