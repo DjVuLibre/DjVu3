@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.14 2000-01-19 23:34:28 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.15 2000-01-24 22:51:08 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@research.att.com>
     @version
-    #$Id: DjVmDir.h,v 1.14 2000-01-19 23:34:28 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.15 2000-01-24 22:51:08 leonb Exp $# */
 //@{
 
 
@@ -116,6 +116,10 @@ public:
 	     relevant in the {\em bundled} case only when everything is
 	     packed into one single file. */
       int size;
+         /** Tests whether a file ID is legal.
+             This function only checks that #id# is syntactically legal.
+             It does not check for duplicate file IDs in a directory. */  
+      static bool is_legal_id(const char *id);
 	 /** Tests if this file represents a page of the document. */
       bool is_page(void) const 
 	 { return (flags & TYPE_MASK)==PAGE; }

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.13 1999-12-03 23:36:00 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.14 2000-01-24 22:51:08 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -22,6 +22,28 @@
 
 #include <ctype.h>
 
+
+/* Test that a file id is legal (static). */
+
+bool
+DjVmDir::File::is_legal_id(const char *id)
+{
+  if (id==0 || id[0]==0 || id[0]=='.')
+    return false;
+  for(; *id; id++)
+    if (! ( (id[0]>='A' && id[0]<='Z')   ||
+            (id[0]>='a' && id[0]<='z')   ||
+            (id[0]>='0' && id[0]<='9')   ||
+            (id[0]=='_') || (id[0]=='-') ||
+            (id[0]=='~') || (id[0]=='@') ||
+            (id[0]=='.') ) )
+      return false;
+  // Should be ok.
+  return true;
+}
+
+
+
 /* DjVmDir::File */
 
 DjVmDir::File::File(void) 
@@ -33,19 +55,17 @@ DjVmDir::File::File(const char *name, const char *id,
 		    const char *title, FILE_TYPE file_type)
   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
-  // Ask Leon if you get this one!
-  if (id && id[0]=='#')
-    THROW("DjVm File IDs should not start with character '#'");
+  if (! File::is_legal_id(id) )
+    THROW("DjVm File ID '"+ GString(id) + "' contains illegal character(s)");
   flags=(file_type & TYPE_MASK);
 }
 
 DjVmDir::File::File(const char *name, const char *id,
 		    const char *title, bool page)
-   : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
+  : name(name), id(id), title(title), offset(0), size(0), page_num(-1)
 { 
-  // Ask Leon if you get this one!
-  if (id && id[0]=='#')
-    THROW("DjVm File IDs should not start with character '#'");
+  if (! File::is_legal_id(id) )
+    THROW("DjVm File ID '"+ GString(id) + "' contains illegal character(s)");
   flags=page ? PAGE : INCLUDE;
 }
    
@@ -388,18 +408,20 @@ DjVmDir::insert_file(File * file, int pos_num)
    if (pos_num<0) pos_num=files_list.size();
 
       // Modify maps
-   if (name2file.contains(file->name))
-      THROW("File with NAME '"+file->name+"' already exists in the DJVM directory.");
-   name2file[file->name]=file;
+   if (! File::is_legal_id(file->id))
+     THROW("DjVm File ID '" + file->id + "' contains illegal character(s)");
    if (id2file.contains(file->id))
-      THROW("File with ID '"+file->id+"' already exists in the DJVM directory.");
+     THROW("File with ID '" + file->id + "' already exists in the DJVM directory.");
+   if (name2file.contains(file->name))
+      THROW("File with NAME '" + file->name + "' already exists in the DJVM directory.");
+   name2file[file->name]=file;
    id2file[file->id]=file;
    if (file->title.length())
-   {
-      if (title2file.contains(file->title))
-	 THROW("File with TITLE '"+file->title+"' already exists in the DJVM directory.");
-      title2file[file->title]=file;
-   }
+     {
+       if (title2file.contains(file->title))  // duplicate titles make become ok some day
+         THROW("File with TITLE '" + file->title + "' already exists in the DJVM directory.");
+       title2file[file->title]=file;
+     }
    
       // Add the file to the list
    int cnt;
