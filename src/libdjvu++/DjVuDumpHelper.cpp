@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.cpp,v 1.1 2000-06-19 17:40:43 bcr Exp $
+//C- $Id: DjVuDumpHelper.cpp,v 1.2 2000-06-20 21:10:17 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -37,6 +37,9 @@ printf(ByteStream & str, const char * fmt, ...)
    str.writall((const char *) tmp, tmp.length());
 }
 
+#ifdef putchar
+#undef putchar
+#endif
 inline static void
 putchar(ByteStream & str, char ch)
 {
