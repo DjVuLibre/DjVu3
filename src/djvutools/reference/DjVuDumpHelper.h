@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.h,v 1.3 2000-09-18 17:10:09 bcr Exp $
+//C- $Id: DjVuDumpHelper.h,v 1.3 2000-10-03 17:42:35 mrosen Exp $
 
 #ifndef _DJVUDUMPHELPER_H
 #define _DJVUDUMPHELPER_H
@@ -26,7 +26,7 @@
     L\'eon Bottou <leonb@research.att.com>,
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuDumpHelper.h,v 1.3 2000-09-18 17:10:09 bcr Exp $# */
+    #$Id: DjVuDumpHelper.h,v 1.3 2000-10-03 17:42:35 mrosen Exp $# */
 //@{
 
 

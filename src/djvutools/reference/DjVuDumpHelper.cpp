@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDumpHelper.cpp,v 1.6 2000-09-21 22:37:06 bcr Exp $
+//C- $Id: DjVuDumpHelper.cpp,v 1.3 2000-10-03 17:42:35 mrosen Exp $
 
 #ifdef __GNUC__
 #pragma implementation
