@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.59 1999-11-06 16:16:26 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.60 1999-11-08 17:19:04 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -901,7 +901,7 @@ DjVuDocument::get_thumbnail(int page_num, bool dont_decode)
 	 // Predecoded thumbnails exist for new formats only
       GPList<DjVmDir::File> files_list=djvm_dir->get_files_list();
       GP<DjVmDir::File> thumb_file;
-      int thumb_start;
+      int thumb_start=0;
       int page_cnt=-1;
       for(GPosition pos=files_list;pos;++pos)
       {
