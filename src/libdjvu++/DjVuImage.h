@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuImage.h,v 1.19 1999-09-15 23:48:44 leonb Exp $
+//C- $Id: DjVuImage.h,v 1.20 1999-09-17 14:42:18 leonb Exp $
 
 #ifndef _DJVUIMAGE_H
 #define _DJVUIMAGE_H
@@ -51,7 +51,7 @@
     L\'eon Bottou <leonb@research.att.com> - initial implementation
     Andrei Erofeev <eaf@geocities.com> - multipage support
     @version
-    #$Id: DjVuImage.h,v 1.19 1999-09-15 23:48:44 leonb Exp $# */
+    #$Id: DjVuImage.h,v 1.20 1999-09-17 14:42:18 leonb Exp $# */
 //@{
 
 
@@ -132,11 +132,15 @@ public:
       This function returns a null pointer until the decoder
       actually processes an #"ANTa"# chunk. */
   GP<DjVuAnno>   get_anno() const;
-  /** Returns a pointer to the background component of a DjVu image. The
-      background component is always an IW44 image in this
-      implementation. This function returns a null pointer until the decoder
-      actually processes an #"BG44"# chunk. */
+  /** Returns a pointer to the IW44 encoded background component of a DjVu
+      image.  This function returns a null pointer until the decoder actually
+      processes an #"BG44"# chunk. */
   GP<IWPixmap>   get_bg44() const;
+  /** Returns a pointer to tthe raw background component of a DjVu image. The
+      background component is used for JPEG encoded backgrounds.  This
+      function returns a null pointer until the decoder actually processes an
+      #"BGjp"# chunk. */
+  GP<GPixmap>    get_bgpm() const;
   /** Returns a pointer to the mask of the foreground component of a DjVu
       image. The mask of the foreground component is always a JB2 image in
       this implementation. This function returns a null pointer until the
@@ -313,6 +317,7 @@ private:
    GP<DjVuInfo>		get_info(const GP<DjVuFile> & file) const;
    GP<DjVuAnno>		get_anno(const GP<DjVuFile> & file) const;
    GP<IWPixmap>		get_bg44(const GP<DjVuFile> & file) const;
+   GP<GPixmap>		get_bgpm(const GP<DjVuFile> & file) const;
    GP<JB2Image>		get_fgjb(const GP<DjVuFile> & file) const;
    GP<GPixmap>		get_fgpm(const GP<DjVuFile> & file) const;
    GP<DjVuNavDir>	get_dir(const GP<DjVuFile> & file) const;
