@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.22 1999-08-26 19:27:16 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.23 1999-08-26 23:07:13 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -354,7 +354,13 @@ DjVuFile::decode_func(void)
 	 if (f->is_decode_failed()) THROW("Decode of an included file failed.");
 	 if (f->is_decode_stopped()) THROW("STOP");
 	 if (!f->is_decode_ok())
+	 {
+	    DEBUG_MSG("this_url='" << url << "'\n");
+	    DEBUG_MSG("incl_url='" << f->get_url() << "'\n");
+	    DEBUG_MSG("decoding=" << f->is_decoding() << "\n");
+	    DEBUG_MSG("status='" << f->get_status() << "\n");
 	    THROW("Internal error: an included file has not finished yet.");
+	 }
       }
    } CATCH(exc) {
       TRY {
@@ -546,31 +552,31 @@ DjVuFile::decode(ByteStream & str)
 	    {
 	       GP<DjVuFile> file=process_incl_chunk(iff);
 	       if (file)
-		  if (!file->is_decoding() &&
-		      !file->is_decode_ok() &&
-		      !file->is_decode_failed()) file->start_decode();
-		  else
-		  {
-		     ByteStream * str=0;
-		     TRY {
-			str=file->data_range->get_stream();
-			int chksize;
-			GString chkid;
-			IFFByteStream iff(*str);
-			if (!iff.get_chunk(chkid)) 
-			   THROW("EOF");
+		  if (!file->is_decoding())
+		     if (!file->is_decode_ok() &&
+			 !file->is_decode_failed()) file->start_decode();
+		     else
+		     {
+			ByteStream * str=0;
+			TRY {
+			   str=file->data_range->get_stream();
+			   int chksize;
+			   GString chkid;
+			   IFFByteStream iff(*str);
+			   if (!iff.get_chunk(chkid)) 
+			      THROW("EOF");
 
-			while((chksize=iff.get_chunk(chkid)))
-			{
-			   get_portcaster()->notify_chunk_done(file, chkid);
-			   iff.close_chunk();
-			}
-		     } CATCH(exc) {
+			   while((chksize=iff.get_chunk(chkid)))
+			   {
+			      get_portcaster()->notify_chunk_done(file, chkid);
+			      iff.close_chunk();
+			   }
+			} CATCH(exc) {
+			   delete str; str=0;
+			   RETHROW;
+			} ENDCATCH;
 			delete str; str=0;
-			RETHROW;
-		     } ENDCATCH;
-		     delete str; str=0;
-		  }
+		     }
 	       desc.format(" %0.1f Kb\t'%s'\tIndirection chunk.\n",
 			   chksize/1024.0, (const char*)chkid);
 	    } else if (chkid=="NDIR")
@@ -706,30 +712,30 @@ DjVuFile::decode(ByteStream & str)
 	    {
 	       GP<DjVuFile> file=process_incl_chunk(iff);
 	       if (file)
-		  if (!file->is_decoding() &&
-		      !file->is_decode_ok() &&
-		      !file->is_decode_failed()) file->start_decode();
-		  else
-		  {
-		     ByteStream * str=0;
-		     TRY {
-			str=file->data_range->get_stream();
-			int chksize;
-			GString chkid;
-			IFFByteStream iff(*str);
-			if (!iff.get_chunk(chkid)) 
-			   THROW("EOF");
-			while((chksize=iff.get_chunk(chkid)))
-			{
-			   get_portcaster()->notify_chunk_done(file, chkid);
-			   iff.close_chunk();
-			}
-		     } CATCH(exc) {
+		  if (!file->is_decoding())
+		     if (!file->is_decode_ok() &&
+			 !file->is_decode_failed()) file->start_decode();
+		     else
+		     {
+			ByteStream * str=0;
+			TRY {
+			   str=file->data_range->get_stream();
+			   int chksize;
+			   GString chkid;
+			   IFFByteStream iff(*str);
+			   if (!iff.get_chunk(chkid)) 
+			      THROW("EOF");
+			   while((chksize=iff.get_chunk(chkid)))
+			   {
+			      get_portcaster()->notify_chunk_done(file, chkid);
+			      iff.close_chunk();
+			   }
+			} CATCH(exc) {
+			   delete str; str=0;
+			   RETHROW;
+			} ENDCATCH;
 			delete str; str=0;
-			RETHROW;
-		     } ENDCATCH;
-		     delete str; str=0;
-		  }
+		     }
 	       desc.format(" %0.1f Kb\t'%s'\tIndirection chunk (Unsupported).\n",
 			   chksize/1024.0, (const char*)chkid);
 	    } else if (chkid=="NDIR")
