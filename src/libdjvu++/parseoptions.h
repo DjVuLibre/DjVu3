@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.3 1999-11-03 19:59:19 bcr Exp $
+//C- $Id: parseoptions.h,v 1.4 1999-11-03 21:26:01 bcr Exp $
 
 #endif /* __cplusplus */
 
@@ -116,7 +116,7 @@
 // still passed by reference.  Consequently if you do something like:
 // 	int foo(DjVuParseOptions);
 // 	DjVuParseOptions Opts("Config");
-// 	Opts.ParseArguments(argc,argv,long_opts);
+// 	Opts.ParseArguments(argc,argv,long_opts,long_only);
 // 	foo(Opts);
 // the copy of Opts passed to foo will not contain any information from
 // the argv[] array.  But it will contain the profile information.
@@ -175,7 +175,7 @@
 //
 // \end{verbatim} */
 //** @memo parseoptions header file */
-//** @version $Id: parseoptions.h,v 1.3 1999-11-03 19:59:19 bcr Exp $ */
+//** @version $Id: parseoptions.h,v 1.4 1999-11-03 21:26:01 bcr Exp $ */
 //** @author: $Author: bcr $ */
 
 // First we include some C wrappers for our class.
@@ -380,7 +380,7 @@ public:
   void perror();
 
   //** This is the primary function for reading command  line arguments.  */
-  const int ParseArguments(const int,char * const [],const djvu_option []);
+  const int ParseArguments(const int,char * const [],const djvu_option [],const int=0);
 
 private:
   void Add(const char [],const int,const int,const int,const char []);
@@ -468,10 +468,11 @@ private:
   const char *name;
   char *optstring;
   const djvu_option *long_opts;
+  int long_only;  // This is usefull for allowing single - in arguments.
 public:
   const char *optarg;
   int getopt_long();
-  GetOpt(DjVuParseOptions *,const int,char * const [],const djvu_option []);
+  GetOpt(DjVuParseOptions *,const int,char * const[],const djvu_option[],const int=0);
 };
 #endif _PARSEOPTIONS_H_IMPLEMENTATION 
 

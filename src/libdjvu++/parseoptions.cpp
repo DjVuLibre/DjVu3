@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.5 1999-11-03 19:59:19 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.6 1999-11-03 21:26:01 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -339,9 +339,9 @@ DjVuParseOptions::GetInteger
 //
 const int
 DjVuParseOptions::ParseArguments
-(const int argc,char * const argv[],const djvu_option opts[])
+(const int argc,char * const argv[],const djvu_option opts[],const int long_only)
 {
-  GetOpt args(this,argc,argv,opts);
+  GetOpt args(this,argc,argv,opts,long_only);
   int i;
   while((i=args.getopt_long())>=0)
   {
@@ -1014,7 +1014,8 @@ DjVuParseOptions::GetOpt::GetOpt
 (DjVuParseOptions *xopt,
   const int xargc,
   char * const xargv[],
-  const djvu_option lopts[])
+  const djvu_option lopts[],
+  const int only)
 : optind(1),
   VarTokens(*(xopt->VarTokens)),
   Errors(*(xopt->Errors)),
@@ -1024,6 +1025,7 @@ DjVuParseOptions::GetOpt::GetOpt
   name(xopt->name),
   optstring(0),
   long_opts(lopts),
+  long_only(only),
   optarg(0)
 {
   int i;
@@ -1080,18 +1082,20 @@ DjVuParseOptions::GetOpt::getopt_long()
       }
     }
   }while(! argv[optind][nextchar]);
-  if(nextchar == 1 && argv[optind][nextchar] == '-')
+  const int has_dash=(argv[optind][nextchar] == '-');
+  if(nextchar == 1 && (has_dash || long_only))
   {
     int s;
+    if(has_dash) nextchar++;
     const djvu_option *opts;
-    if(!argv[optind][2])
+    if(has_dash&&!argv[optind][2])
     {
       optind++;
       return -1;
     }
     for(longindex=0,opts=long_opts;opts->name;++opts,++longindex)
     {
-      if(!strcmp(opts->name,argv[optind]+2))
+      if(!strcmp(opts->name,argv[optind]+nextchar))
       {
         if(!opts->has_arg)
           optarg=0;
@@ -1106,24 +1110,27 @@ DjVuParseOptions::GetOpt::getopt_long()
     {
       const char *ss=opts->name;
       s=strlen(opts->name);
-      if(!strncmp(ss,argv[optind]+2,s)
-        &&(argv[optind][2+s] == '=')
+      if(!strncmp(ss,argv[optind]+nextchar,s)
+        &&(argv[optind][nextchar+s] == '=')
       ) {
         if(!opts->has_arg)
           optarg=0;
         else
-          optarg=argv[optind]+3+s;
+          optarg=argv[optind]+nextchar+1+s;
         optind++;
         nextchar=1;
         return longindex;
       }
     }
-    static const char emesg[]="Unrecognized option '%s'";
-    char *ss=new char[sizeof(emesg)+strlen(argv[optind])];
-    sprintf(ss,emesg,argv[optind]);
-    Errors.AddError(ss);
-    delete [] ss;
-    return -1;
+    if(has_dash)
+    {
+      static const char emesg[]="Unrecognized option '%s'";
+      char *ss=new char[sizeof(emesg)+strlen(argv[optind])];
+      sprintf(ss,emesg,argv[optind]);
+      Errors.AddError(ss);
+      delete [] ss;
+      return -1;
+    }
   }
   optptr=strchr(optstring,argv[optind][nextchar]);
   if(!optptr)

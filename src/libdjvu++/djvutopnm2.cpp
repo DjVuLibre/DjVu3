@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvutopnm2.cpp,v 1.2 1999-11-03 19:59:19 bcr Exp $
+//C- $Id: djvutopnm2.cpp,v 1.3 1999-11-03 21:26:01 bcr Exp $
 
 
 /** @name djvutopnm
@@ -32,17 +32,17 @@
     {\bf Output Resolution} --- Three options control the resolution of the 
     output PNM image.  At most one of these three options can be specified.
     The default resolution, used when no other option is specified, is equivalent
-    to specifying #--scale 100#.
+    to specifying #-scale 100#.
     \begin{description}
     \item[-N] This option (e.g #"-3"# or #"-19"#) specifies a subsampling
        factor #N#.  Rendering the full DjVu image would create an image whose
        dimensions are #N# times smaller than the DjVu image size.
-    \item[--subsample N] Same as above.
-    \item[--scale N] This option takes advantage of the #dpi# field stored in
+    \item[-subsample N] Same as above.
+    \item[-scale N] This option takes advantage of the #dpi# field stored in
        the #"INFO"# chunk of the DjVu image (cf. \Ref{DjVuInfo}).  Argument
        #N# is a magnification percentage relative to the adequate resolution
        for a 100dpi device such as a screen.
-    \item[--size WxH] This option provides total control on the resolution and
+    \item[-size WxH] This option provides total control on the resolution and
        the aspect ratio of the image.  The vertical and horizontal resolutions
        will be separately adjusted in such a way that the complete DjVu image
        is rendered into a PNM file of width #W# and height #H#.
@@ -56,24 +56,24 @@
     because the resolution change gives better results with anti-aliasing.
     Three options alter this default behavior.
     \begin{description}
-    \item[--black] Renders only the foreground layer mask.  This mode does not
+    \item[-black] Renders only the foreground layer mask.  This mode does not
        work with IW44 files because these files have no foreground layer mask.
        The output file will be a PBM file if the subsampling factor is 1.
        Otherwise the output file will be an anti-aliased PGM file.
-    \item[--layer black] Same as above.
-    \item[--foreground] Renders only the foreground layer on a white
+    \item[-layer black] Same as above.
+    \item[-foreground] Renders only the foreground layer on a white
        background.  This mode works only with Compound DjVu files. The output
        file always is a PPM file.
-    \item[--layer foreground] Same as above.
-    \item[--background] Renders only the background layer. This mode works only
+    \item[-layer foreground] Same as above.
+    \item[-background] Renders only the background layer. This mode works only
        with Compound DjVu files and IW44 files. The output file always is a PPM
        file.
-    \item[--layer background] Same as above.
+    \item[-layer background] Same as above.
     \end{description}
 
     {\bf Other Options} --- The following two options are less commonly used:
     \begin{description}
-    \item[--segment WxH+X+Y] Selects an image segment to render. Conceptually,
+    \item[-segment WxH+X+Y] Selects an image segment to render. Conceptually,
        #djvutopnm# renders the full page using the specified resolution, and
        then extracts a subimage of width #W# and height #H#, starting at
        position (#X#,#Y#) relative to the bottom left corner of the page.
@@ -83,7 +83,7 @@
     \item[-v] Causes #djvutopnm# to print abundant information about the
        structure of the DjVu file, the compression ratios, the memory usage,
        and the decoding and rendering times.
-    \item[--page N] This can be used to decode a specific page of a multipage
+    \item[-page N] This can be used to decode a specific page of a multipage
        document. Page numbers start from #1#. If this option is omitted,
        #1# is assumed.
     \end{description}
@@ -94,7 +94,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvutopnm2.cpp,v 1.2 1999-11-03 19:59:19 bcr Exp $# */
+    #$Id: djvutopnm2.cpp,v 1.3 1999-11-03 21:26:01 bcr Exp $# */
 //@{
 //@}
 
@@ -241,17 +241,17 @@ usage()
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
           "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
-          "  --verbose           Prints various informational messages.\n"
-          "  --scale N           Selects display scale (default: 100%%).\n"
-          "  --size  WxH         Selects size of rendered image.\n"
-          "  --segment WxH+X+Y   Selects which segment of the rendered image\n"
-          "  --black             Only renders the stencil(s).\n"
-          "  --foreground        Only renders the foreground layer.\n"
-          "  --background        Only renders the background layer.\n"
-          "  --layer <layer>     Same as the above three options.\n"
+          "  -verbose           Prints various informational messages.\n"
+          "  -scale N           Selects display scale (default: 100%%).\n"
+          "  -size  WxH         Selects size of rendered image.\n"
+          "  -segment WxH+X+Y   Selects which segment of the rendered image\n"
+          "  -black             Only renders the stencil(s).\n"
+          "  -foreground        Only renders the foreground layer.\n"
+          "  -background        Only renders the background layer.\n"
+          "  -layer <layer>     Same as the above three options.\n"
           "  -#                  Subsampling factor from full resolution.\n"
-          "  --subsample N       Same as above.\n"
-	  "  --page <page>       Decode page <page> (for multipage documents).\n"
+          "  -subsample N       Same as above.\n"
+	  "  -page <page>       Decode page <page> (for multipage documents).\n"
           "\n"
           "The output will be a PBM, PGM or PPM file depending of its content."
           "If <pnmfile> is a single dash or omitted, the decompressed image\n"
@@ -317,7 +317,7 @@ main(int argc, char *argv[], char *[])
   TRY
     {
       DjVuParseOptions Opts("c44");
-      int nextarg=Opts.ParseArguments(argc,argv,long_options)-1;
+      int nextarg=Opts.ParseArguments(argc,argv,long_options,1)-1;
       argc -= nextarg;
       argv+=nextarg;
       // Process options
@@ -345,14 +345,14 @@ main(int argc, char *argv[], char *[])
           if (*r == '%') 
             r++;
           if (*r)
-            THROW("Illegal argument for option '--scale'");
+            THROW("Illegal argument for option '-scale'");
         }else if(token == Opts.GetVarToken(duplicates[1]))
         {
           const char *s=Opts.GetValue(token);
           geometry(s, fullrect);
           flag_size = 1;
           if (fullrect.xmin || fullrect.ymin)
-            THROW("Illegal --size specification");
+            THROW("Illegal -size specification");
         }else
         {
           int i=Opts.GetInteger(token,0);
@@ -389,7 +389,7 @@ main(int argc, char *argv[], char *[])
             flag_mode = 'b';
           }else
           {
-            THROW("Illegal --layer specification.");
+            THROW("Illegal -layer specification.");
           }
         }else if(Opts.GetInteger(duplicates2[token],0))
         {
