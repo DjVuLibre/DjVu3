@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.110 2001-06-21 21:38:14 bcr Exp $
+// $Id: GString.cpp,v 1.111 2001-06-28 23:43:56 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -495,52 +495,56 @@ GStringRep::tocase(
 GUTF8String
 GUTF8String::toEscaped( const bool tosevenbit ) const
 {
-  GUTF8String ret, special;
-  char const * const head=(*this);
-  char const *start=head;
-  char const *s=start;
-  char const *last=s;
-  for(unsigned long w;(w=(*this)->getValidUCS4(s));last=s)
+  GUTF8String ret;
+  if( length() )
   {
-    char const *ss=0;
-    switch(w)
+    GUTF8String special;
+    char const * const head=(*this);
+    char const *start=head;
+    char const *s=start;
+    char const *last=s;
+    for(unsigned long w; (w=(*this)->getValidUCS4(s)); last=s)
     {
-    case '<':
-      ss="&lt;";
-      break;
-    case '>':
-      ss="&gt;";
-      break;
-    case '&':
-      ss="&amp;";
-      break;
-    case '\47':
-      ss="&apos;";
-      break;
-    case '\42':
-      ss="&quot;";
-      break;
-    default:
-      if((w<' ')||(w>=0x7e && (tosevenbit || (w < 0x80))))
+      char const *ss=0;
+      switch(w)
       {
-        special.format("&#%lu;",w);
-        ss=special;
+      case '<':
+        ss="&lt;";
+        break;
+      case '>':
+        ss="&gt;";
+        break;
+      case '&':
+        ss="&amp;";
+        break;
+      case '\47':
+        ss="&apos;";
+        break;
+      case '\42':
+        ss="&quot;";
+        break;
+      default:
+        if((w<' ')||(w>=0x7e && (tosevenbit || (w < 0x80))))
+        {
+          special.format("&#%lu;",w);
+          ss=special;
+        }
+        break;
       }
-      break;
-    }
-    if(ss)
-    {
-      if(s!=start)
+      if(ss)
       {
-        ret+=substr((size_t)start-(size_t)head,(size_t)last-(size_t)start)+ss;
-      }else
-      {
-        ret+=ss;
+        if(s!=start)
+        {
+          ret+=substr((size_t)start-(size_t)head,(size_t)last-(size_t)start)+ss;
+        }else
+        {
+          ret+=ss;
+        }
+        start=s;
       }
-      start=s;
     }
+    ret+=start;
   }
-  ret+=start;
 //  DEBUG_MSG( "Escaped string is '" << ret << "'\n" );
   return (ret == *this)?(*this):ret;
 }
