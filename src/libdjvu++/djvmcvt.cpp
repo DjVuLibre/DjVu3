@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvmcvt.cpp,v 1.6 1999-12-14 18:13:45 eaf Exp $
+//C- $Id: djvmcvt.cpp,v 1.7 2000-01-13 22:13:19 eaf Exp $
 
 /** @name djvmcvt
 
@@ -26,7 +26,7 @@
     File #"djvmcvt.cpp"# and the program #djvmcvt# serve the purpose of
     convertion of obsolete DjVu documents into the new formats. The program
     can also read documents in the new formats, so you can use it to
-    do conversion between #BUNDLED# and #INDIRECT# formats. This is a
+    perform conversion between #BUNDLED# and #INDIRECT# formats. This is a
     simple illustration of the capabilities of \Ref{DjVuDocument} class.
 
     As a matter of fact, there are two ways to make conversion between
@@ -44,7 +44,7 @@
     {\bf Arguments} ---
     Depending on the output format, the number and types of arguments
     differ. The second argument though (#<doc_in.djvu>#) is the same in both
-    cases and depends on the format of input document:
+    cases, and depending on the format of input document, it means:
     \begin{itemize}
        \item {\bf OLD_BUNDLED} format: just name of the document
        \item {\bf OLD_INDEXED} format: name of any page of the document
@@ -71,7 +71,7 @@
 	     as described above, will convert it into the #INDIRECT#
 	     format and will save it into the #<dir_out># directory. Since
 	     DjVu multipage documents in the #INDIRECT# formats are
-	     represented by a bunch of files you have to specify a directory
+	     represented by a bunch of files, you have to specify a directory
 	     name where all of the files will be saved. In addition to these
 	     files the program will also create a top-level file named
 	     #<idx_fname.djvu># with the list of all pages and components
@@ -82,9 +82,9 @@
     @memo
     DjVu multipage document converter.
     @author
-    Andrei Erofeev <eaf@research.att.com>
+    Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvmcvt.cpp,v 1.6 1999-12-14 18:13:45 eaf Exp $# */
+    #$Id: djvmcvt.cpp,v 1.7 2000-01-13 22:13:19 eaf Exp $# */
 
 #ifdef __GNUC__
 #pragma implementation
@@ -102,12 +102,24 @@ static char * progname;
 static void Usage(void)
 {
    fprintf(stderr, "\
+DJVMCVT -- DjVu multipage document conversion utility\n\
+   Copyright (c) AT&T 1999.  All rights reserved\n\
+\n\
 Usage:\n\
 \n\
-   To convert any DjVu document into the new BUNDLED format:\n\
+   To convert any DjVu multipage document into the new BUNDLED format:\n\
 	%s -b[undled] <doc_in.djvu> <doc_out.djvu>\n\
-   To convert any DjVu document into the new INDIRECT format:\n\
+	where <doc_out.djvu> is the name of the output file.\n\
+\n\
+   To convert any DjVu multipage document into the new INDIRECT format:\n\
 	%s -i[ndirect] <doc_in.djvu> <dir_out> <idx_fname.djvu>\n\
+	where <dir_out> is the name of the output directory, and\n\
+	<idx_fname.djvu> is the name of the top-level document index file.\n\
+\n\
+   The <doc_in.djvu> specifies the document to be converted.\n\
+   For OLD_BUNDLED and BUNDLED formats, this is the name of the document file.\n\
+   For INDIRECT format, this is the name of the top-level index file.\n\
+   For OLD_INDEXED format, this is the name of any page file.\n\
 \n", progname, progname);
 }
 
