@@ -13,11 +13,15 @@
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuANT"></A>
-<B>class  GMapAreaclass  ByteStreamclass  </B><A HREF=DjVuANT.html><B>DjVuANT</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></B><DD><I>This class contains some trivial annotations of the page or of the document such as page border color, page alignment, initial zoom and display mode, hyperlinks and highlighted areas.</I>
+<B>class  </B><A HREF=DjVuANT.html><B>DjVuANT</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>This class contains some trivial annotations of the page or of the document such as page border color, page alignment, initial zoom and display mode, hyperlinks and highlighted areas.</I>
+<DT>
+
+<IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuTXT"></A>
+<B>class  </B><A HREF=DjVuTXT.html><B>DjVuTXT</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Description of the text contained in a DjVu page.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuAnno"></A>
-<B>class  </B><A HREF=DjVuAnno.html><B>DjVuAnno</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.1.2">GPEnabled</A></B><DD><I>This is a top-level class containing annotations of a DjVu document (or just a page).</I>
+<B>class  </B><A HREF=DjVuAnno.html><B>DjVuAnno</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>This is a top-level class containing annotations of a DjVu document (or just a page).</I>
 </DL>
 <A NAME="DOC.DOCU">
 <BLOCKQUOTE>
@@ -27,18 +31,18 @@ plugin about how the image should be displayed.  The exact format of
 annotations is not strictly defined. The only requirement is that they
 have to be stored as a sequence of chunks inside a <TT>FORM:ANNO</TT>.<P>This file implements annotations understood by the DjVu plugins 
 and encoders.<P>
-using: contents of <TT>ANT*</TT> chunks.<P>Contents of the <TT>FORM:ANNO</TT> should be passed to <!1><A HREF="DjVuAnno.html#DOC.1.4.24.2.1">decode</A>()
-for parsing, which initializes DjVuAnno::ANT 
+using: contents of <TT>ANT*</TT> and <TT>TXT*</TT> chunks.<P>Contents of the <TT>FORM:ANNO</TT> should be passed to <!1><A HREF="DjVuAnno.html#DOC.1.5.25.3.1">decode</A>()
+for parsing, which initializes DjVuAnno::ANT and DjVuAnno::TXT
 and fills them with decoded data. 
 </BLOCKQUOTE>
 <DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;
 
-<DT><B>Version:</B><DD><TT>$Id: DjVuAnno.h.html,v 1.11 2001-08-08 18:14:23 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: DjVuAnno.h.html,v 1.5 2001-08-08 17:58:32 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
