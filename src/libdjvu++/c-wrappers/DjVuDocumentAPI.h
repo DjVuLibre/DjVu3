@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.6 2000-01-26 15:38:33 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.7 2000-01-26 19:49:16 bcr Exp $
  */
 
 #ifndef _DJVUDOC_H_
@@ -38,8 +38,8 @@
 
 
 /** @name djvudocument.h
-      functions used to convert multiple photo images to DjVu multipage 
-      documents.
+      functions used to convert multiple documents (contains color text or
+      images with text) to DjVu multipage documents.
 */
 
 #ifdef __cplusplus
@@ -60,7 +60,8 @@ extern "C"
     
     The #gamma_correction# is set to the same value as the background image.
 */
-struct djvu_foreground_options_struct
+
+typedef struct djvu_foreground_options_struct
 { 
   /** Use a full resolution image when computing the foreground image, 
       to allow for a maximum color saturation */
@@ -73,25 +74,27 @@ struct djvu_foreground_options_struct
 
       This quality slider controls:
       \begin{description}
-      \item[Color JB2 foreground] The maximum number of colors allowed in the palette (up to 1024) (palette_ncolors) and the minimal size of the color cube area affected
-      to a color palette entry (palette_boxsize).
+      \item[Color JB2 foreground] The maximum number of colors allowed
+      in the palette (up to 1024) (palette_ncolors) and the minimal size
+      of the color cube area affected to a color palette entry
+      (palette_boxsize).
       \item[Wavelet foreground] The number of slices
       \end{description}
   */
   int quality;
-};
+} djvu_foreground_options;
 
-/** List of djvu_segmenter options.
- */
-struct djvu_segmenter_options_struct
+
+
+/** List of djvu_segmenter options. */
+
+typedef struct djvu_segmenter_options_struct
 {
   /** @name Quality slider options
 
       These options determine the output quality.
 
       Most are expressed as levels with values ranging from 0 to 100.
-
-      
    */
   /*@{*/
   
@@ -109,7 +112,11 @@ struct djvu_segmenter_options_struct
       \item[0] maximum foreground
       \item[100] maximum background
       \item[Default] 25
-      \item[Optimization] Default chosen to avoid dropping of characters (it is only acceptable to drop dots). Generally, the optimal pix_filter_level corresponds to the smaller file size. Unfortunately, the optimum varies on document. For most documents, it is 50, but it is 25 for 200dpi documents.
+      \item[Optimization] Default chosen to avoid dropping of characters
+      (it is only acceptable to drop dots). Generally, the optimal
+      pix_filter_level corresponds to the smaller file size. Unfortunately,
+      the optimum varies on document. For most documents, it is 50, but it
+      is 25 for 200dpi documents.
       \item[Command line] yes
       \end{description}
       
@@ -120,9 +127,11 @@ struct djvu_segmenter_options_struct
   /** Virtual threshold level.
 
       This threshold level parameter corresponds to the difference between the
-      foreground and the background standard deviations used by the foreback algorithm.
+      foreground and the background standard deviations used by the foreback
+      algorithm.
 
-      It is advisable to decrease the threshold when parts of characters are lost in the background.
+      It is advisable to decrease the threshold when parts of characters are
+      lost in the background.
 
 
       \begin{description}
@@ -131,7 +140,8 @@ struct djvu_segmenter_options_struct
       \item[0] maximum foreground
       \item[100] maximum background
       \item[Default] 50
-      \item[Optimization] Highly critical parameter. Current value best for 75% of documents.
+      \item[Optimization] Highly critical parameter. Current value best for
+      75% of documents.
       \item[Command line] yes
       \end{description}
 
@@ -146,11 +156,14 @@ struct djvu_segmenter_options_struct
       \item[0] maximum foreground (filter is off)
       \item[100] maximum background
       \item[Default] 50
-      \item[Optimization] Because of tremendous improvements in the foreback module, thus pare-meter is no longer so critical. Has not been optimized recently.
+      \item[Optimization] Because of tremendous improvements in the foreback
+      module, thus pare-meter is no longer so critical. Has not been optimized
+      recently.
       \item[Command line] no
       \end{description}
 
-      Mark (i.e. connected components) with a score higher than this filter level are kept.
+      Mark (i.e. connected components) with a score higher than this filter
+      level are kept.
   */
   int mark_filter_level;
   
@@ -158,10 +171,11 @@ struct djvu_segmenter_options_struct
   /** inhibit_foreback level.
 
       This inhibit_foreback level parameter corresponds to the an a-priori cost
-      added to the decision to peform foreground/background separation (vs. deciding that a given block should not be segmented).
+      added to the decision to peform foreground/background separation (vs.
+      deciding that a given block should not be segmented).
 
-      It is advisable to increase the inhibit_foreback to remove isolated speckles.
-
+      It is advisable to increase the inhibit_foreback to remove isolated
+      speckles.
 
       \begin{description}
       \item[Option type] quality slider.
@@ -185,7 +199,8 @@ struct djvu_segmenter_options_struct
       \item[0] no inversion
       \item[100] all inversion
       \item[Default] 25
-      \item[Optimization] Really case-by-case. This is still too much inversion for comics.
+      \item[Optimization] Really case-by-case. This is still too much
+      inversion for comics.
       \item[Command line] yes
       \end{description}
   */
@@ -207,17 +222,21 @@ struct djvu_segmenter_options_struct
       The reason to set them to different values are uncommon.
 
       \begin{description}
-      \item[render_size] could be smaller than the others when very small fonts are used in a 300dpi document
-      \item[smooth_size] can be reduced when the printing quality is excellent, and we do not want to lose the sharp edges.
-      \item[edge_size] can be reduced when both the printing and scanning qualities are excellent, and that we want a high quality 300dpi background up to the edges of the characters.
+      \item[render_size] could be smaller than the others when very small
+      fonts are used in a 300dpi document
+      \item[smooth_size] can be reduced when the printing quality is excellent,
+      and we do not want to lose the sharp edges.
+      \item[edge_size] can be reduced when both the printing and scanning
+      qualities are excellent, and that we want a high quality 300dpi
+      background up to the edges of the characters.
       \end{description}
       
   */
   /*@{*/
   /** Edge size parameter. 
 
-      
-      Defines the thickness (in pixel) of character edges, where the color is unreliable because of:
+      Defines the thickness (in pixel) of character edges, where the color is
+      unreliable because of:
       \begin{itemize}
       \item dithering in the printing process.
       \item bad color registration in the printer or the scanner
@@ -234,11 +253,13 @@ struct djvu_segmenter_options_struct
   */
   int edge_size;
 
-  /** Render Size: size of the "ideal" pixel, viewed at the standard rendering resolution.
+  /** Render Size: size of the "ideal" pixel, viewed at the standard rendering
+      resolution.
 
       Parameter type: resolution.
 
-      If is assumed that at this render size, characters have a reasonable size (typically more than 10 pixels and less than 100 pixels).
+      If is assumed that at this render size, characters have a reasonable
+      size (typically more than 10 pixels and less than 100 pixels).
       
 
       \begin{description}
@@ -255,9 +276,9 @@ struct djvu_segmenter_options_struct
 
   /** Smoothing size parameter. 
 
-      
-      Defines the size (in pixel) of smoothing convolutions applied in the segmenter.
-      Generally very similar to edge size, handling similar problems:
+      Defines the size (in pixel) of smoothing convolutions applied in the
+      segmenter.  Generally very similar to edge size, handling similar
+      problems:
       \begin{itemize}
       \item dithering in the printing process.
       \item noise in old documents
@@ -277,10 +298,11 @@ struct djvu_segmenter_options_struct
 
   /*@}*/
   
-  /** @name Options for the subsampling process that happens after the  extraction of the selector mask.
-  */
+  /** @name Options for the subsampling process that happens after the
+      extraction of the selector mask.  */
+
   /*@{*/
-   /** Subsampling for the foreground image.
+  /** Subsampling for the foreground image.
       
       \begin{description}
       \item[Option type] Pixel size.
@@ -288,11 +310,10 @@ struct djvu_segmenter_options_struct
       \item[Default] 12
       \item[Command line] yes
       \end{description}
-      
   */
   int fg_pixel_size;
-  /** Subsampling for the background image.      
 
+  /** Subsampling for the background image.      
 
       \begin{description}
       \item[Option type] Pixel size.
@@ -319,19 +340,19 @@ struct djvu_segmenter_options_struct
       \item[Default] 1
       \item[Command line] yes
       \end{description}
-      
   */
   int upsample_size;
+
   /*@}*/
 
  
-  /** @name Flags
-  */
+  /** @name Flags */
 
   /*@{*/
-  /** Indicates the color of the foreground characters  varies in the same line.
+  /** Indicates the color of the foreground characters varies in the same line.
 
-      Normally, it is assumed that over a width of 32 pixels, the foreground color does not vary too much.
+      Normally, it is assumed that over a width of 32 pixels, the foreground
+      color does not vary too much.
 
       However, this is not true in the following cases:
       \begin{itemize}
@@ -339,7 +360,6 @@ struct djvu_segmenter_options_struct
       \item A character is next to a vertical line of different color
       \item Command line: no
       \end{itemize}
-      
    */
   int high_variation_foreground;
 
@@ -353,10 +373,9 @@ struct djvu_segmenter_options_struct
   int masksub_refine;
 
   /*@}*/
-#ifdef __cplusplus
 
-  /** @name Profiles examples
-   */
+#ifdef __cplusplus
+  /** @name Profiles examples */
   /*@{*/
 
   /** Standard profile
@@ -365,7 +384,8 @@ struct djvu_segmenter_options_struct
     {
       threshold_level= 75;
       mark_filter_level= 50;
-      /* must be conservative here, other characters are lost on 200dpi images, or documents with small low-contrast fonts. */
+      /* must be conservative here, other characters are lost on 200dpi
+         images, or documents with small low-contrast fonts. */
       pix_filter_level= 25;
       inversion_level= 25;
 
@@ -385,8 +405,7 @@ struct djvu_segmenter_options_struct
       masksub_refine= true;
     }
   
-  /** Dpi600 profile
-   */
+  /** Dpi600 profile */
   void dpi600()
     {
       threshold_level= 75;
@@ -408,8 +427,7 @@ struct djvu_segmenter_options_struct
     }
   
 
-  /** Dpi200 profile
-   */
+  /** Dpi200 profile */
   void dpi200()
     {
       threshold_level= 75;
@@ -430,8 +448,7 @@ struct djvu_segmenter_options_struct
       masksub_refine= true;
     }
   
-  /** Dpi100 screen dump profile
-   */
+  /** Dpi100 screen dump profile */
   void dpi100()
     {
       threshold_level= 75;
@@ -487,7 +504,9 @@ struct djvu_segmenter_options_struct
   
   /** Ancient document profile.
 
-      The ink may  have become very pale, so the segmenter must be more sensitive. As there are no photos, ugly artifacts due to over-segmentation are less likely.
+      The ink may  have become very pale, so the segmenter must be more
+      sensitive. As there are no photos, ugly artifacts due to
+      over-segmentation are less likely.
 
       What differs from standard is:
       
@@ -533,7 +552,7 @@ struct djvu_segmenter_options_struct
       mark_filter_level= 50;
       pix_filter_level= 50;
       inversion_level= 25;
-       inhibit_foreback_level=40;
+      inhibit_foreback_level=40;
      
       edge_size= 1;
       render_size= 1;
@@ -551,9 +570,7 @@ struct djvu_segmenter_options_struct
   /** C++ constructor */
   djvu_segmenter_options_struct() {standard();};
 #endif
-};
-
-typedef struct djvu_segmenter_options_struct djvu_segmenter_options;
+} djvu_segmenter_options;
 
   /*@}*/
 
