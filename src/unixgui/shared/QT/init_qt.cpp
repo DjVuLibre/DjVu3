@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: init_qt.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: init_qt.cpp,v 1.2 2001-05-30 17:29:33 mchen Exp $
 // $Name:  $
 
 
@@ -17,7 +17,7 @@
 
 #include "djvu_file_cache.h"
 #include "init_qt.h"
-#include "qt_hack.h"
+//#include "qt_hack.h"
 #include "debug.h"
 #include "GString.h"
 #include "exc_msg.h"
@@ -181,13 +181,14 @@ InstallLangTranslator(void)
    QFont font;
    font.setCharSet(char_set);
 // for testing only 
+#if 0   
    if ( char_set == QFont::Set_Big5 ||
 	char_set == QFont::Big5 )
    {
       font.setPointSize(16);
       font.setWeight(50);
    }
-// end testing    
+#endif
    if ( font != QApplication::font() ) {
       //cout << "loading new font\n";
       QApplication::setFont( font, TRUE );
@@ -435,7 +436,7 @@ InitializeQT(int argc, char ** argv)
       QApplication::setStyle(windows);
    }      
   
-   HackQT();
+   //HackQT();
    QFont::setDefaultFont(QFont("Helvetica", 12, QFont::Normal,
 			       FALSE, QFont::Latin1));
    InstallErrorHandlers();

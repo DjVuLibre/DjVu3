@@ -3,7 +3,7 @@
 #C-              Unauthorized use prohibited.
 #C-
 #
-# $Id: Makefile.in,v 1.1 2001-05-29 22:05:28 bcr Exp $
+# $Id: Makefile.in,v 1.2 2001-05-30 17:29:32 mchen Exp $
 # $Name:  $
 
 %%%include <paths>
@@ -112,17 +112,15 @@ OBJS		+= $(OBJ_INDEP_UTILS)
 #############################################################################
 DIR_SHARED_QT	:= $(DIR_UNIXGUI)/shared/QT
 VPATH		:= $(VPATH):$(DIR_SHARED_QT)
-SRC_SHARED_QT 	:= qd_viewer_shell.cpp qd_wpaper.cpp qd_prefs.cpp\
-	qd_viewer_prefs.cpp qd_welcome.cpp qd_pane.cpp qd_base.cpp\
-	qd_base_paint.cpp qd_base_events.cpp qd_base_ant.cpp qd_viewer.cpp\
-	qd_viewer_menu.cpp MapAreas.cpp MapBorder.cpp MapDraw.cpp\
-	djvu_viewer.cpp qd_painter.cpp qd_doc_info.cpp qd_nav_goto_page.cpp\
-	qd_set_zoom.cpp qd_port.cpp qd_decoder.cpp qd_toolbutt.cpp\
-	qd_doc_saver.cpp qd_thumb.cpp qd_search_dialog.cpp\
-	qd_print_dialog.cpp qt_hack.cpp init_qt.cpp qd_messenger.cpp\
-	qd_mime_dialog.cpp qd_toolbar.cpp qd_tbar_mode_piece.cpp\
-	qd_tbar_nav_piece.cpp qd_tbar_print_piece.cpp \
-	qd_tbar_rotate_piece.cpp qd_page_saver.cpp
+SRC_SHARED_QT 	:= qd_wpaper.cpp qd_prefs.cpp qd_welcome.cpp qd_pane.cpp \
+                   qd_base.cpp qd_base_paint.cpp qd_base_events.cpp \
+                   qd_base_ant.cpp MapAreas.cpp MapBorder.cpp MapDraw.cpp \
+                   qd_painter.cpp qd_doc_info.cpp qd_nav_goto_page.cpp \
+                   qd_set_zoom.cpp qd_port.cpp qd_decoder.cpp qd_toolbutt.cpp \
+	           qd_doc_saver.cpp qd_thumb.cpp qd_search_dialog.cpp \
+	           qd_print_dialog.cpp init_qt.cpp qd_messenger.cpp \
+                   qd_toolbar.cpp qd_tbar_mode_piece.cpp qd_tbar_nav_piece.cpp \
+                   qd_tbar_print_piece.cpp qd_tbar_rotate_piece.cpp qd_page_saver.cpp
 ifeq ($(THREADS),co)
 SRC_SHARED_QT	+= qd_thr_yielder.cpp
 endif
@@ -175,14 +173,17 @@ OBJS		+= $(OBJ_CIN_DATA)
 #############################################################################
 DIR_DJVIEW	:= $(DIR_UNIXGUI)/djview
 VPATH		:= $(VPATH):$(DIR_DJVIEW)
-SRC_DJVIEW 	:= netscape.cpp dispatch.cpp mime_check.cpp main.cpp
-HDR_DJVIEW	:= netscape.h dispatch.h mime_check.h
+SRC_DJVIEW 	:= netscape.cpp dispatch.cpp mime_check.cpp \
+                qd_viewer.cpp qd_viewer_shell.cpp qd_viewer_prefs.cpp \
+		qd_viewer_menu.cpp djvu_viewer.cpp qd_mime_dialog.cpp 
+HDR_DJVIEW	:= $(patsubst %.cpp,%.h,$(SRC_DJVIEW))
+SRC_DJVIEW      += main.cpp
 OBJ_DJVIEW	:= $(patsubst %.cpp,%.o,$(SRC_DJVIEW))
 SRCS		+= $(SRC_DJVIEW)
 OBJS		+= $(OBJ_DJVIEW)
 PROGRAM		:= $(BINPATH)/djview
 
-FROM_MOC	:= $(HDR_INDEP_QT) $(HDR_SHARED_QT)\
+FROM_MOC	:= $(HDR_DJVIEW) $(HDR_INDEP_QT) $(HDR_SHARED_QT)\
 	qx_imager.cpp netscape.cpp dispatch.cpp qd_doc_saver.cpp\
 	qd_page_saver.cpp mime_check.cpp qd_toolbar.cpp
 ifeq ($(THREADS),co)

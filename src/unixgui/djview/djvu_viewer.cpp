@@ -4,7 +4,7 @@
 //C-              Unauthorized use prohibited.
 //C-
 // 
-// $Id: djvu_viewer.cpp,v 1.1 2001-05-29 22:05:30 bcr Exp $
+// $Id: djvu_viewer.cpp,v 1.1 2001-05-30 17:29:32 mchen Exp $
 // $Name:  $
 
 
