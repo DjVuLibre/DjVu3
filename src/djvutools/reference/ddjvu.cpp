@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.25 2001-07-24 17:52:03 bcr Exp $
+// $Id: ddjvu.cpp,v 1.26 2001-07-25 23:43:47 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.25 2001-07-24 17:52:03 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.26 2001-07-25 23:43:47 bcr Exp $# */
 //@{
 //@}
 
@@ -292,32 +292,34 @@ syntax_error(void)
   G_THROW( ERR_MSG("ddjvu.syntax"));
 }
 
-void
-geometry(const GUTF8String &s, GRect &rect)
+GRect
+geometry(const GUTF8String &s)
 {
-  int w,h;
-  rect.xmin = rect.ymin = 0;
   int pos;
-  w = s.toLong(0,pos);
+  const int w = s.toLong(0,pos);
   if (pos < 0 || w<=0 || s[pos] !='x')
     syntax_error();
-  h = s.toLong(pos,pos);
+  const int h = s.toLong(pos+1,pos);
   if((pos<0)||(h<=0))
     syntax_error();
-  if (pos<(int)s.length())
+  const int len=s.length();
+  int xmin=0;
+  int ymin=0;
+  if (pos<len)
   {
     if ((s[pos]!='+')&&(s[pos] !='-'))
       syntax_error();
-    rect.xmin = s.toLong(pos,pos);
-    if ((pos >= 0)&&(pos<(int)s.length())) 
+    xmin = s.toLong(pos+1,pos);
+    if ((pos >= 0)&&(pos<len)) 
     {
-      rect.ymin = s.toLong(pos,pos);
-      if ((pos >= 0)&&(pos<(int)s.length())) 
+      if ((s[pos]!='+')&&(s[pos] !='-'))
+        syntax_error();
+      ymin = s.toLong(pos+1,pos);
+      if ((pos >= 0)&&(pos<len)) 
         syntax_error();
     }
   }
-  rect.xmax = rect.xmin + w;
-  rect.ymax = rect.ymin + h;
+  return GRect(xmin,ymin,w,h);
 }
 
 
@@ -359,6 +361,8 @@ main(int argc, char **argv)
       while (argc>1 && dargv[1][0]=='-' && dargv[1][1])
         {
           GUTF8String s(dargv[1]);
+          int pos;
+          int n=s.toLong(0,pos);
           if (dargv[1] == GUTF8String("-v"))
             {
               flag_verbose = 1;
@@ -390,7 +394,7 @@ main(int argc, char **argv)
               if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
                 G_THROW( ERR_MSG("ddjvu.dupl_size"));
               argc -=1; dargv.shift(-1); s = dargv[1];
-              geometry(s, fullrect);
+              fullrect=geometry(s);
               flag_size = 1;
               if (fullrect.xmin || fullrect.ymin)
                 G_THROW( ERR_MSG("ddjvu.bad_size"));
@@ -402,7 +406,7 @@ main(int argc, char **argv)
               if (flag_segment>=0)
                 G_THROW( ERR_MSG("ddjvu.dupl_seg") );
               argc -=1; dargv.shift(-1); s = dargv[1];
-              geometry(s, segmentrect);
+              segmentrect=geometry(s);
               flag_segment = 1;
             }
           else if (s == "-black")
@@ -437,17 +441,11 @@ main(int argc, char **argv)
                 G_THROW( ERR_MSG("ddjvu.bad_page"));
 	      page_num--;
 	    }
-          else if (s[1]>='1' && s[1]<='9')
+          else if (n < 0 && pos == (int)s.length())
             {
-              int pos;
-              const int arg = s.substr(1,(unsigned int)(-1)).toULong(0,pos);
-              if ((arg<0)||(pos<0)||(pos<(int)s.length()))
-                usage();
-              if (flag_subsample>=0 || flag_scale>=0 || flag_size>=0)
-                G_THROW( ERR_MSG("ddjvu.dupl_scale") );
-              flag_subsample = arg;
+              flag_subsample=(-n);
             }
-          else
+          else if (s == "-scale")
             {
               usage();
             }
@@ -605,7 +603,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
           "  -v                  Prints various informational messages.\n"
           "  -scale N            Selects display scale (default: 100%%).\n"
           "  -size  WxH          Selects size of rendered image.\n"
-          "  -segment WxH+X+Y    Selects which segment of the rendered image\n"
+          "  -segment WxH+X-Y    Selects which segment of the rendered image\n"
           "  -black              Only renders the stencil(s).\n"
           "  -foreground         Only renders the foreground layer.\n"
           "  -background         Only renders the background layer.\n"
