@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djthumb.cpp,v 1.1 2000-01-13 21:56:04 eaf Exp $
+//C- $Id: djthumb.cpp,v 1.2 2000-01-13 22:15:31 eaf Exp $
 
 // DJTHUMB -- DjVu thumbnails generator
 
@@ -46,7 +46,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djthumb.cpp,v 1.1 2000-01-13 21:56:04 eaf Exp $# */
+    #$Id: djthumb.cpp,v 1.2 2000-01-13 22:15:31 eaf Exp $# */
 //@{
 //@}
 
@@ -65,13 +65,16 @@ static void
 usage(void)
 {
    fprintf(stderr, "\
+DJTHUMB -- DjVu thumbnails generating utility\n\
+   Copyright (c) AT&T 1999.  All rights reserved\n\
+\n\
 Usage:\n\
 	%s [options] <djvu_file_in> <djvu_file_out>\n\
 \n\
 Options:\n\
-	-v[erbose]	- Verbose\n\
-	-s[ize] <size>	- How big (in pixels) thumbnails shoul be\n\
-			  Default is 128 pixels\n\
+	-v[erbose]	- Verbose operation.\n\
+	-s[ize] <size>	- How big (in pixels) thumbnail images\n\
+			  should be (default is 128 pixels).\n\
 \n\
 The program will generate thumbnails for every page of <djvu_file_in>
 and will store results into <djvu_file_out>.\n\n", progname);
