@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.77 2001-07-11 20:44:02 bcr Exp $
+// $Id: GURL.cpp,v 1.78 2001-07-12 18:21:32 lchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -177,6 +177,7 @@ GURL::convert_slashes(void)
      if(*ptr == backslash)
        *ptr=slash;
    }
+   url=xurl;
 #endif
 }
 
