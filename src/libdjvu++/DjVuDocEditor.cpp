@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.6 1999-11-22 21:10:52 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.7 1999-11-22 21:15:53 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -495,8 +495,17 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
       // it assigned to shared files
    GMap<GString, GString> name2id;
 
+   GString errors;
    for(GPosition pos=file_names;pos;++pos)
-      insert_file(file_names[pos], true, file_pos, name2id);
+   {
+      TRY {
+	 insert_file(file_names[pos], true, file_pos, name2id);
+      } CATCH(exc) {
+	 if (errors.length()) errors+="\n";
+	 errors+=exc.get_cause();
+      } ENDCATCH;
+   }
+   if (errors.length()) THROW(errors);
 }
    
 void
