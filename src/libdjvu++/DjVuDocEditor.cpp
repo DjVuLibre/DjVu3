@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.3 1999-11-11 20:12:44 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.4 1999-11-19 17:31:28 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -75,13 +75,15 @@ DjVuDocEditor::init(const char * fname)
    
    orig_doc_type=tmp_doc->get_doc_type();
    orig_doc_pages=tmp_doc->get_pages_num();
-   if (orig_doc_type==OLD_BUNDLED || orig_doc_type==OLD_INDEXED)
+   if (orig_doc_type==OLD_BUNDLED ||
+       orig_doc_type==OLD_INDEXED ||
+       orig_doc_type==SINGLE_PAGE)
    {
 	 // Suxx. I need to convert it NOW.
 	 // We will unlink this file in the destructor
       tmp_doc_name=tmpnam(0);
       StdioByteStream str(tmp_doc_name, "wb");
-      tmp_doc->write(str);
+      tmp_doc->write(str, true);	// Force DJVM format
       str.flush();
       doc_pool=new DataPool(tmp_doc_name);
    }
@@ -494,6 +496,7 @@ DjVuDocEditor::save_as(const char * where, bool bundled)
 	 // and proceed.
       bool can_be_saved_bundled=orig_doc_type==BUNDLED ||
 				orig_doc_type==OLD_BUNDLED ||
+				orig_doc_type==SINGLE_PAGE ||
 				orig_doc_type==OLD_INDEXED && orig_doc_pages==1;
       bool can_be_saved_indirect=orig_doc_type==INDIRECT;
       if ((bundled ^ can_be_saved_bundled)!=0)

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.h,v 1.2 1999-11-06 16:16:37 eaf Exp $
+//C- $Id: DjVuDocEditor.h,v 1.3 1999-11-19 17:31:28 eaf Exp $
  
 #ifndef _DJVUDOCEDITOR_H
 #define _DJVUDOCEDITOR_H
@@ -27,7 +27,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocEditor.h,v 1.2 1999-11-06 16:16:37 eaf Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.3 1999-11-19 17:31:28 eaf Exp $#
 */
 
 //@{
@@ -149,14 +149,14 @@ inline bool
 DjVuDocEditor::can_be_saved(void) const
 {
    return !(orig_doc_type==UNKNOWN_TYPE ||
-	    orig_doc_type==OLD_INDEXED && orig_doc_pages!=1);
+	    orig_doc_type==OLD_INDEXED);
 }
 
 inline int
 DjVuDocEditor::get_save_doc_type(void) const
 {
-   if (orig_doc_type==OLD_INDEXED && orig_doc_pages==1)
-      if (get_pages_num()==1) return OLD_INDEXED;
+   if (orig_doc_type==SINGLE_PAGE)
+      if (get_pages_num()==1) return SINGLE_PAGE;
       else return BUNDLED;
    else if (orig_doc_type==INDIRECT) return INDIRECT;
    else if (orig_doc_type==OLD_BUNDLED || orig_doc_type==BUNDLED) return BUNDLED;
