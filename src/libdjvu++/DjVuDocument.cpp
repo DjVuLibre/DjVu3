@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.94 2000-01-07 00:28:07 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.95 2000-01-10 20:49:35 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -41,17 +41,24 @@ DjVuDocument::DjVuDocument(void)
     has_file_names(false),
     recover_errors(ABORT),
     verbose_eof(false),
-    init_called(false),
+    init_started(false),
     cache(0) 
 {
 }
 
 void
-DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
-                   DjVuFileCache * xcache)
+DjVuDocument::init(const GURL & url, GP<DjVuPort> port, DjVuFileCache * cache)
 {
-   if (init_called)
-      THROW("DjVuDocument is already initialized");
+   start_init(url, port, cache);
+   wait_for_complete_init();
+}
+
+void
+DjVuDocument::start_init(const GURL & url, GP<DjVuPort> xport,
+			 DjVuFileCache * xcache)
+{
+   if (init_started)
+      THROW("DjVuDocument cannot be initialized twice.");
    if (!get_count())
       THROW("DjVuDocument is not secured by a GP<DjVuDocument>");
    DEBUG_MSG("DjVuDocument::init(): initializing class...\n");
@@ -79,7 +86,7 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
    }
 
       // Now we say it is ready
-   init_called=true;
+   init_started=true;
 
    init_thread_flags=STARTED;
    init_life_saver=this;
@@ -120,9 +127,9 @@ DjVuDocument::~DjVuDocument(void)
 }
 
 void
-DjVuDocument::stop(void)
+DjVuDocument::stop_init(void)
 {
-   DEBUG_MSG("DjVuDocument::stop(): making sure that the init thread dies.\n");
+   DEBUG_MSG("DjVuDocument::stop_init(): making sure that the init thread dies.\n");
    DEBUG_MAKE_INDENT(3);
 
    GMonitorLock lock(&init_thread_flags);
@@ -147,7 +154,7 @@ DjVuDocument::stop(void)
 void
 DjVuDocument::check() const
 {
-  if (!init_called)
+  if (!init_started)
     THROW("DjVuDocument is not initialized");
 }
 

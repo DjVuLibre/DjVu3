@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.50 1999-12-07 22:19:23 eaf Exp $
+//C- $Id: DjVuDocument.h,v 1.51 2000-01-10 20:49:35 eaf Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.50 1999-12-07 22:19:23 eaf Exp $#
+    @version #$Id: DjVuDocument.h,v 1.51 2000-01-10 20:49:35 eaf Exp $#
 */
 
 //@{
@@ -92,26 +92,25 @@
 	     one would have to implement his own \Ref{DjVuPort}, which
 	     would handle requests for data arising when the document
 	     is being decoded.
-       \item The fact that the program is threadless simplifies things a lot.
-	     First of all, in the \Ref{init}() function the document
-	     finishes analysis of data before the function returns. Thus
-	     the information about the document type, the number of pages,
-	     their names, etc. becomes immediately available. In a threaded
-	     program the \Ref{init}() would start a separate thread, which
-	     will read data trying to analyze it. This has been done
-	     because data analysis actually requires some data. In the case
-	     of the DjVu plugin this data is not immediately available.
-	     Thus, to prevent the main thread from blocking, we perform
-	     initialization in a separate thread. To check if the class
-	     is completely initialized, use \Ref{is_init_complete}(). To wait
-	     for this to happen use \Ref{wait_for_complete_init}(). Once again,
-	     all these things are not required for single-threaded program.
+       \item In a threaded program instead of calling the \Ref{init}()
+             function one can call \Ref{start_init}() and \Ref{stop_init}()
+	     to initiate and interrupt initialization carried out in
+	     another thread. This possibility of initializing the document
+	     in another thread has been added specially for the plugin
+	     because the initialization itself requires data, which is
+	     not immediately available in the plugin. Thus, to prevent the
+	     main thread from blocking, we perform initialization in a
+	     separate thread. To check if the class is completely initialized,
+	     use \Ref{is_init_complete}(). To wait for this to happen use
+	     \Ref{wait_for_complete_init}(). Once again, all these things are
+	     not required for single-threaded program.
 
-	     Secondly, since the program is single-threaded, the image is
+	     Another difference between single-threaded and multi-threaded
+	     environments is that in a single-threaded program, the image is
 	     fully decoded before it's returned. In a multithreaded
 	     application decoding starts in a separate thread, and the pointer
-	     to the \Ref{DjVuImage} being decoded is returned
-	     immediately. This has been done to enable progressive redisplay
+	     to the \Ref{DjVuImage} being decoded is returned immediately.
+	     This has been done to enable progressive redisplay
 	     in the DjVu plugin. Use communication mechanism provided by
 	     \Ref{DjVuPort} and \Ref{DjVuPortcaster} to learn about progress
 	     of decoding.  Or try #dimg->wait_for_complete_decode()# to wait
@@ -125,21 +124,20 @@
     one stage after another:
     \begin{enumerate}
        \item First of all, immediately after the object is created \Ref{init}()
-             function must be called. {\bf Nothing} will work until this
-	     is done.
-       \item If the program is single-threaded, initialization started by
-	     \Ref{init}() completes before the function returns. Otherwise\
-	     \Ref{init}() starts a new thread, which continues initialization
-	     in parallel with the main one. This has been done to allow the
-	     DjVu plugin to use as much of #DjVuDocument# functionality as
-	     possible and to do it as soon as possible (not waiting for extra
-	     data).
-       \item The first thing the initializing thread learns about the document
+             or \Ref{start_init}() functions must be called. {\bf Nothing}
+	     will work until this is done. \Ref{init}() function will not
+	     return until the initialization is complete. You need to make
+	     sure, that enough data is available. {\bf Do not call \Ref{init}()
+	     in the plugin}. \Ref{start_init}() will start initialization
+	     in another thread. Use \Ref{stop_init}() to interrupt it.
+	     Use \Ref{is_init_complete}() to check the initialization progress.
+	     Use \Ref{wait_for_complete_init}() to wait for init to finish.
+       \item The first thing the initializing code learns about the document
 	     is its type (#BUNDLED#, #INDIRECT#, #OLD_BUNDLED# or #OLD_INDEXED#).
 	     As soon as it happens, document flags are changed and
 	     #notify_doc_flags_changed()# request is sent through the
 	     communication mechanism provided by \Ref{DjVuPortcaster}.
-       \item After the document type becomes known, the initializing thread
+       \item After the document type becomes known, the initializing code
              proceeds with learning the document structure. Gradually the
 	     flags are updated with values:
 	     \begin{itemize}
@@ -149,7 +147,7 @@
 		\item #DOC_NDIR_KNOWN#: Contents of the document navigation
 		      directory became known. This is meaningful for old-style
 		      documents (#OLD_BUNDLED# and #OLD_INDEXED#) only
-		\item #DOC_INIT_COMPLETE#: The initializating thread finished.
+		\item #DOC_INIT_COMPLETE#: The initializating code finished.
 	     \end{itemize}
     \end{enumerate} */
     
@@ -165,7 +163,8 @@ public:
 	     \item #DOC_NDIR_KNOWN#: Contents of the document navigation
 		   directory became known. This is meaningful for old-style
 		   documents (#OLD_BUNDLED# and #OLD_INDEXED#) only
-	     \item #DOC_INIT_COMPLETE#: The initializating thread finished.
+	     \item #DOC_INIT_COMPLETE#: The initialization has completed successfully.
+	     \item #DOC_INIT_FAILED#: The initialization failed.
 	  \end{itemize} */
    enum DOC_FLAGS { DOC_TYPE_KNOWN=1, DOC_DIR_KNOWN=2,
 		    DOC_NDIR_KNOWN=4, DOC_INIT_COMPLETE=8,
@@ -192,8 +191,8 @@ public:
 		   SINGLE_PAGE, UNKNOWN_TYPE };
    enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
 
-      /** Default constructor. Please call function \Ref{init}() before
-	  you start working with the #DjVuDocument#. */
+      /** Default constructor. Please call functions \Ref{init}() or
+	  \Ref{start_init}() before you start working with the #DjVuDocument#. */
    DjVuDocument(void);
    virtual ~DjVuDocument(void);
 
@@ -205,7 +204,7 @@ public:
 	  access it itself).
 
 	  {\bf Initializing thread}
-	  In a single-threaded application, the #init()# function performs
+	  In a single-threaded application, the #start_init()# function performs
 	  the complete initialization of the #DjVuDocument# before it returns.
 	  In a multi-threaded application, though, it initializes some internal
 	  variables, requests data for the document and starts a new
@@ -218,7 +217,7 @@ public:
 	  plugin would run out of data and block.
 
 	  {\bf Stages of initialization}
-	  Immediately after the #init()# function terminates, the
+	  Immediately after the #start_init()# function terminates, the
 	  #DjVuDocument# object is ready for use. Its functionality will
 	  not be complete (until the initializing thread finishes), but
 	  the object is still very useful. Such functions as \Ref{get_page}()
@@ -231,7 +230,8 @@ public:
 	  \Ref{get_doc_flags}() function or listen to the
 	  #notify_doc_flags_changed()# notifications distributed with the help
 	  of \Ref{DjVuPortcaster}. To wait for the initialization to
-	  complete use \Ref{wait_for_complete_init}().
+	  complete use \Ref{wait_for_complete_init}(). To stop initialization
+	  call \Ref{stop_init}().
 
 	  {\bf Querying data}
 	  The query for data is done using the communication mechanism
@@ -271,8 +271,26 @@ public:
 		 because #DjVuDocument# can access such files itself.
 	  @param cache It's used to cache decoded \Ref{DjVuFile}s and
 	         is actually useful in the plugin only.  */
-   void         init(const GURL & url, GP<DjVuPort> port=0, 
-                     DjVuFileCache * cache=0);
+   void		start_init(const GURL & url, GP<DjVuPort> port=0,
+			   DjVuFileCache * cache=0);
+
+      /** Call this function when you don't need the #DjVuDocument# any more.
+	  In a multithreaded environment it will stop initialization
+	  thread, if it is currently running. {\bf You will not be able
+	  to start the initialization again. Thus, after calling this
+          function the document should not be used any more}. */
+   void		stop_init(void);
+
+      /** Initializes the document.
+
+	  Contrary to \Ref{start_init}(), which just starts the initialization
+	  thread in a multithreaded environment, this function does not
+	  return until the initilization completes (either successfully or
+	  not). Basically, it calls \Ref{start_init}() and then
+	  \Ref{wait_for_complete_init}().
+	  */
+   void		init(const GURL & url, GP<DjVuPort> port=0,
+		     DjVuFileCache * cache=0);
 
       /** Returns #TRUE# if the initialization thread finished successfully.
 	  As soon as it happens, the document becomes completely initialized
@@ -287,9 +305,6 @@ public:
 	  {\bf Note:} In a single threaded application the initialization
 	  completes before the \Ref{init}() function returns. */
    bool		is_init_complete(void) const;
-
-      /// Call this function when you don't need the #DjVuDocument# any more.
-   void		stop(void);
 
       /** If the document has already learnt its type, the function will
 	  returns it: #DjVuDocument::OLD_BUNDLED# or
@@ -518,14 +533,14 @@ public:
       //@}
 
       /** Waits until the document becomes completely initialized. As
-	  described in \Ref{init}(), for multithreaded applications the
+	  described in \Ref{start_init}(), for multithreaded applications the
 	  initialization is carried out in parallel with the main thread.
 	  This function blocks the calling thread until the initializing
 	  thread reads enough data, receives information about the document
 	  format and exits.  This function returns #true# if the
 	  initialization is successful. You can use \Ref{get_flags}() or
 	  \Ref{is_init_complete}() to check more precisely the degree of
-	  initialization. */
+	  initialization. Use \Ref{stop_init}() to interrupt initialization. */
    bool    	   wait_for_complete_init(void);
    
       /// Returns cache being used.
@@ -653,7 +668,7 @@ private:
 
       ThumbReq(int page_num, const GP<DataPool> & data_pool);
    };
-   bool                 init_called;
+   bool                 init_started;
    GSafeFlags		flags;
    GSafeFlags		init_thread_flags;
    DjVuFileCache	* cache;
