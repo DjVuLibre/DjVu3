@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.h,v 1.20 1999-09-22 19:34:19 eaf Exp $
+//C- $Id: DataPool.h,v 1.21 1999-09-24 18:43:43 eaf Exp $
  
 #ifndef _DATAPOOL_H
 #define _DATAPOOL_H
@@ -44,7 +44,7 @@
 
     @memo Thread safe data storage
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DataPool.h,v 1.20 1999-09-22 19:34:19 eaf Exp $#
+    @version #$Id: DataPool.h,v 1.21 1999-09-24 18:43:43 eaf Exp $#
 */
 
 //@{
@@ -581,7 +581,9 @@ DataPool::get_size(void) const
 inline void
 DataPool::clear_stream(void)
 {
+   if (stream_lock) stream_lock->lock();
    stream=0;
+   if (stream_lock) stream_lock->unlock();
 }
 
 inline
