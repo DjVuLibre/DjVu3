@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.h,v 1.12 2000-10-12 01:39:00 bcr Exp $
+//C- $Id: GMapAreas.h,v 1.13 2000-10-12 19:01:51 bcr Exp $
 
 #ifndef _GMAPAREAS_H
 #define _GMAPAREAS_H
@@ -47,7 +47,7 @@ typedef unsigned int u_int32;
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.12 2000-10-12 01:39:00 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.13 2000-10-12 19:01:51 bcr Exp $# */
 //@{
 
 
@@ -97,6 +97,8 @@ public:
    static const char SHADOW_EOUT_BORDER_TAG [];
    static const char BORDER_AVIS_TAG [];
    static const char HILITE_TAG [];
+   static const char URL_TAG [];
+   static const char TARGET_SELF [];
 
    enum BorderType { NO_BORDER=0, XOR_BORDER=1, SOLID_BORDER=2,
 		     SHADOW_IN_BORDER=3, SHADOW_OUT_BORDER=4,

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GMapAreas.cpp,v 1.11 2000-10-12 02:23:04 bcr Exp $
+//C- $Id: GMapAreas.cpp,v 1.12 2000-10-12 19:01:51 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -38,8 +38,8 @@ const char GMapArea::SHADOW_EIN_BORDER_TAG[] = 	"shadow_ein";
 const char GMapArea::SHADOW_EOUT_BORDER_TAG[] = "shadow_eout";
 const char GMapArea::BORDER_AVIS_TAG[] = 	"border_avis";
 const char GMapArea::HILITE_TAG[] = 		"hilite";
-static const char TARGET_SELF[]="_self";
-static const char URL_TAG[]="url";
+const char GMapArea::URL_TAG[] = 		"url";
+const char GMapArea::TARGET_SELF[] = 		"_self";
 static const char zero_width[] = "GMapAreas.zero_width";
 static const char zero_height[] = "GMapAreas.zero_height";
 static const char width_1[] = "GMapAreas.width_1";
