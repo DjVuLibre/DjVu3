@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvm.cpp,v 1.9 2000-01-14 19:17:41 eaf Exp $
+//C- $Id: djvm.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $
 
 /** @name djvm
 
@@ -77,7 +77,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: djvm.cpp,v 1.9 2000-01-14 19:17:41 eaf Exp $# */
+    #$Id: djvm.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $# */
 //@{
 //@}
 
@@ -215,6 +215,8 @@ list(int argc, char ** argv)
 	       putchar(' ');
 	 } else if (file->is_include())
 	    printf("%s", "INCLUDE  ");
+	 } else if (file->is_shared_anno())
+	    printf("%s", "SHARED_ANNO  ");
 	 else if (file->is_thumbnails())
 	    printf("%s", "THUMBNAIL");
 	 else printf("%s", "UNKNOWN  ");

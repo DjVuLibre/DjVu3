@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cpaldjvu.cpp,v 1.6 2000-03-02 00:05:07 leonb Exp $
+//C- $Id: cpaldjvu.cpp,v 1.7 2000-04-22 00:09:12 bcr Exp $
 
 
 /** @name cpaldjvu
@@ -47,7 +47,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.6 2000-03-02 00:05:07 leonb Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.7 2000-04-22 00:09:12 bcr Exp $# */
 //@{
 //@}
 
@@ -804,7 +804,7 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
   // -- main composite chunk
-  iff.put_chunk("FORM:DJVU");
+  iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
   iff.put_chunk("INFO");
   DjVuInfo info;

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.116 2000-03-27 19:55:32 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.117 2000-04-22 00:09:12 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1139,7 +1139,9 @@ void
 DjVuDocument::notify_file_flags_changed(const DjVuFile * source,
 					long set_mask, long clr_mask)
 {
-   check();
+      // Don't check here if the document is initialized or not.
+      // This function may be called when it's not.
+      // check();
    if (set_mask & DjVuFile::DECODE_OK)
    {
       set_file_aliases(source);

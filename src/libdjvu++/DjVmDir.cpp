@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.18 2000-02-06 18:26:45 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.19 2000-04-22 00:09:12 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -169,6 +169,15 @@ DjVmDir::decode(ByteStream & str)
 		   file->is_page() << "\n");
       }
 
+	 // Check that there is only one file with SHARED_ANNO flag on
+      int shared_anno_cnt=0;
+      for(pos=files_list;pos;++pos)
+	 if (files_list[pos]->is_shared_anno())
+	    shared_anno_cnt++;
+      if (shared_anno_cnt>1)
+	 THROW("DjVu document is corrupt. There may be only one file\n"
+	       "with shared annotations in a multipage document.");
+
 	 // Now generate page=>file array for direct access
       int pages=0;
       for(pos=files_list;pos;++pos)
@@ -239,6 +248,15 @@ DjVmDir::encode(ByteStream & str) const
 
    if (files_list.size())
    {
+	 // Check that there is only one file with shared annotations
+      int shared_anno_cnt=0;
+      for(pos=files_list;pos;++pos)
+	 if (files_list[pos]->is_shared_anno())
+	    shared_anno_cnt++;
+      if (shared_anno_cnt>1)
+	 THROW("Cannot save a multipage document containing\n"
+	       "more than one file with shared annotations.");
+      
       if (bundled)
       {
 	    // We need to store offsets uncompressed. That's because when
@@ -374,6 +392,24 @@ DjVmDir::get_page_pos(int page_num) const
    else return -1;
 }
 
+GP<DjVmDir::File>
+DjVmDir::get_shared_anno_file(void) const
+{
+   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+
+   GP<File> file;
+   for(GPosition pos=files_list;pos;++pos)
+   {
+      GP<File> frec=files_list[pos];
+      if (frec->is_shared_anno())
+      {
+	 file=frec;
+	 break;
+      }
+   }
+   return file;
+}
+
 void
 DjVmDir::insert_file(File * file, int pos_num)
 {
@@ -399,6 +435,15 @@ DjVmDir::insert_file(File * file, int pos_num)
          THROW("File with TITLE '" + file->title + "' already exists in the DJVM directory.");
        title2file[file->title]=file;
      }
+
+      // Make sure that there is no more than one file with shared annotations
+   if (file->is_shared_anno())
+   {
+      for(GPosition pos=files_list;pos;++pos)
+	 if (files_list[pos]->is_shared_anno())
+	    THROW("Current DjVu multipage format does not support\n"
+		  "more than one file with shared annotations.");
+   }
    
       // Add the file to the list
    int cnt;

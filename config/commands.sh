@@ -76,7 +76,17 @@ then
     mkdirp="${mkdir} -p"
   fi
 
-  makeshlib="${CONFIG_DIR}/make_shlib.sh"
+  system=`uname | tr A-Z a-z`
+
+  case "$system" in 
+    irix* )
+      makeshlib="${CONFIG_DIR}/make_shlib.sh.irix"
+      ;;
+    * ) 
+      makeshlib="${CONFIG_DIR}/make_shlib.sh"
+      ;;
+  esac
+
   docxxclean="${CONFIG_DIR}/doc++clean.pl"
 
   RULES_DIR=`cd ${CONFIG_DIR}/../rules/ 1>>/dev/null 2>>/dev/null;"${pwdcmd}"`

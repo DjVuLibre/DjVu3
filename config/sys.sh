@@ -45,6 +45,7 @@ if [ -z "$SYS_SET" ] ; then
   elif [ "$SYS" = "IRIX64" ] ; then
     WHOLEARCHIVE="-Wl,-all"
     NOWHOLEARCHIVE="-Wl,-notall"
+    strip=""
   fi
   SYS_SET=true
   echo "$SYS"

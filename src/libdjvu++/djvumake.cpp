@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.17 2000-03-01 23:47:41 leonb Exp $
+//C- $Id: djvumake.cpp,v 1.18 2000-04-22 00:09:12 bcr Exp $
 
 /** @name djvumake
 
@@ -76,7 +76,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.17 2000-03-01 23:47:41 leonb Exp $#
+    #$Id: djvumake.cpp,v 1.18 2000-04-22 00:09:12 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -157,7 +157,6 @@ analyze_mmr_chunk(char *filename)
       char magic[4];
       memset(magic,0,sizeof(magic));
       bs.readall(magic,sizeof(magic));
-      bs.seek(0);
       if (!strncmp(magic,"AT&T",4))
         bs.readall(magic,sizeof(magic));
       if (strncmp(magic,"FORM",4))
@@ -169,6 +168,7 @@ analyze_mmr_chunk(char *filename)
       else
         {
           // Search Smmr chunk
+          bs.seek(0);
           GString chkid;
           IFFByteStream iff(bs);
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
@@ -205,7 +205,6 @@ analyze_jb2_chunk(char *filename)
       char magic[4];
       memset(magic,0,sizeof(magic));
       bs.readall(magic,sizeof(magic));
-      bs.seek(0);
       if (!strncmp(magic,"AT&T",4))
         bs.readall(magic,sizeof(magic));
       if (strncmp(magic,"FORM",4))
@@ -217,6 +216,7 @@ analyze_jb2_chunk(char *filename)
       else
         {
           // Search Sjbz chunk
+          bs.seek(0);
           GString chkid;
           IFFByteStream iff(bs);
           if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")

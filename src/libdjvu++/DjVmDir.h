@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.20 2000-02-27 23:19:49 eaf Exp $
+//C- $Id: DjVmDir.h,v 1.21 2000-04-22 00:09:12 bcr Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -62,7 +62,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.20 2000-02-27 23:19:49 eaf Exp $# */
+    #$Id: DjVmDir.h,v 1.21 2000-04-22 00:09:12 bcr Exp $# */
 //@{
 
 
@@ -121,8 +121,12 @@ public:
 	     this document.
 	     \item[THUMBNAILS] This file contains thumbnails for the document
 	     pages.
+	     \item[SHARED_ANNO] This file contains annotations shared by
+	     all the pages. It's supposed to be included into every page
+	     for the annotations to take effect. There may be only one
+	     file with shared annotations in a document.
 	     \end{description} */
-      enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2 };
+      enum FILE_TYPE { INCLUDE=0, PAGE=1, THUMBNAILS=2, SHARED_ANNO=3 };
 	 /** File name.  The optional file name must be unique and is assigned
 	     either by encoder or by user when the document is composed.  In the
 	     case of an {\em indirect} document, this is the relative URL of the
@@ -162,6 +166,8 @@ public:
 	 { return (flags & TYPE_MASK)==THUMBNAILS; }
 	 /** Returns the page number of this file. This function returns
 	     #-1# if this file does not represent a page of the document. */
+      bool is_shared_anno(void) const
+	 { return (flags & TYPE_MASK)==SHARED_ANNO; }
       int get_page_num(void) const 
 	 { return page_num; } 
 	 /** Default constructor. */
@@ -205,6 +211,10 @@ public:
    int get_files_num(void) const;
       /** Returns the number of file records representing pages. */
    int get_pages_num(void) const;
+      /** Returns back pointer to the file with #SHARED_ANNO# flag.
+	  Note that there may be only one file with shared annotations
+	  in any multipage DjVu document. */
+   GP<File> get_shared_anno_file(void) const;
       /** Changes the title of the file with ID #id#. */
    void set_file_title(const char * id, const char * title);
       /** Changes the name of the file with ID #id#. */

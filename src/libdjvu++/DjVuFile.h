@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.56 2000-03-23 20:32:18 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.57 2000-04-22 00:09:12 bcr Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.56 2000-03-23 20:32:18 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.57 2000-04-22 00:09:12 bcr Exp $#
 */
 
 //@{
@@ -398,9 +398,33 @@ public:
 	  decoding, which may have been started with the \Ref{start_decode}()
 	  function. Otherwise #ZERO# will be returned as well.
 
+	  If #max_level_ptr# pointer is not zero, the function will use
+	  it to store the maximum level number from which annotations
+	  have been obtained. #ZERO# level corresponds to the top-level
+	  page file.
+
 	  {\bf Summary:} This function will return complete annotations only
 	  when the \Ref{is_all_data_present}() returns #TRUE#. */
-   GP<MemoryByteStream>	get_merged_anno(void);
+   GP<MemoryByteStream>	get_merged_anno(int * max_level_ptr=0);
+
+      /** Goes down the hierarchy of #DjVuFile#s and merges their annotations.
+
+	  @param max_level_ptr If this pointer is not ZERO, the function
+	         will use it to store the maximum level at which annotations
+		 were found. Top-level page files have ZERO #level#.
+	  @param ignore_list The function will not process included #DjVuFile#s
+	         with URLs matching those mentioned in this #ignore_list#. */
+   GP<MemoryByteStream>	get_merged_anno(const GList<GURL> & ignore_list,
+					int * max_level_ptr);
+
+      /** Clears this file of all annotations. */
+   void		remove_anno(void);
+
+      /** Returns #TRUE# if the file contains annotation chunks.
+	  Known annotation chunks at the time of writing this help are:
+	  {\bf ANTa}, {\bf ANTz}, {\bf TXTa}, {\bf TXTz}, and
+	  {\bf FORM:ANNO}. */
+   bool		contains_anno(void);
    
       /** @name Encoding routines */
       //@{
@@ -437,6 +461,9 @@ public:
 
       // Internal. Used by DjVuImage
    void                 merge_anno(MemoryByteStream &out);
+
+      // Internal. Used by DjVuDocEditor
+   void			rebuild_data_pool(void);
 
       // Functions inherited from DjVuPort
    virtual bool		inherits(const char * class_name) const;
@@ -495,6 +522,8 @@ private:
    static void	progress_cb(int pos, void *);
    static void	get_merged_anno(const GP<DjVuFile> & file,
 				ByteStream & str_out,
+				const GList<GURL> & ignore_list,
+				int level, int & max_level,
 				GMap<GURL, void *> & map);
 
    void          check() const;

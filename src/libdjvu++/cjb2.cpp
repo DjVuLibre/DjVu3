@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: cjb2.cpp,v 1.9 2000-02-24 20:23:07 leonb Exp $
+//C- $Id: cjb2.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $
 
 
 /** @name cjb2
@@ -48,7 +48,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    #$Id: cjb2.cpp,v 1.9 2000-02-24 20:23:07 leonb Exp $# */
+    #$Id: cjb2.cpp,v 1.10 2000-04-22 00:09:12 bcr Exp $# */
 //@{
 //@}
 
@@ -824,7 +824,7 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
   StdioByteStream obs(fileout, "wb");
   IFFByteStream iff(obs);
   // -- main composite chunk
-  iff.put_chunk("FORM:DJVU");
+  iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
   DjVuInfo info;
   info.height = rimg.height;
