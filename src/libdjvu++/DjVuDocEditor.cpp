@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocEditor.cpp,v 1.8 1999-11-22 21:35:32 eaf Exp $
+//C- $Id: DjVuDocEditor.cpp,v 1.9 1999-11-23 15:40:40 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -460,7 +460,10 @@ DjVuDocEditor::insert_file(const char * file_name, bool is_page,
       str_out.seek(0);
       GP<DataPool> new_file_pool=new DataPool(str_out);
       {
-	 
+	    // It's important, that we replace the pool here anyway.
+	    // By doing this we load the file into memory. And this is
+	    // exactly what we want insert_group() wants us to do because
+	    // it creates temporary files.
 	 GURL file_url=id_to_url(id);
 	 GCriticalSectionLock lock(&files_lock);
 	 files_map[file_url]->pool=new_file_pool;
@@ -501,8 +504,45 @@ DjVuDocEditor::insert_group(const GList<GString> & file_names, int page_num)
    GString errors;
    for(GPosition pos=file_names;pos;++pos)
    {
+      GString fname=file_names[pos];
       TRY {
-	 insert_file(file_names[pos], true, file_pos, name2id);
+	    // Check if it's a multipage document...
+	 StdioByteStream str(fname, "rb");
+	 IFFByteStream iff(str);
+	 GString chkid;
+	 iff.get_chunk(chkid);
+	 if (chkid=="FORM:DJVM")
+	 {
+	       // Hey, it really IS a multipage document.
+	       // Open it, expand to a tmp directory and add pages
+	       // one after another
+	    GP<DjVuDocument> doc=new DjVuDocument();
+	    doc->init(GOS::filename_to_url(fname));
+	    doc->wait_for_complete_init();
+	    GString dirname=tmpnam(0);
+	    if (GOS::mkdir(dirname)<0)
+	       THROW("Failed to create directory '"+dirname+"'");
+	    TRY {
+	       doc->expand(dirname, GOS::basename(fname));
+	       int pages_num=doc->get_pages_num();
+	       for(int page_num=0;page_num<pages_num;page_num++)
+	       {
+		  GString name=doc->page_to_url(page_num).name();
+		  name=GOS::expand_name(name, dirname);
+		  insert_file(name, true, file_pos, name2id);
+	       }
+	       GOS::cleardir(dirname);
+	       GOS::deletefile(dirname);
+	       dirname.empty();
+	    } CATCH(exc) {
+	       if (dirname.length())
+	       {
+		  GOS::cleardir(dirname);
+		  GOS::deletefile(dirname);
+	       }
+	       RETHROW;
+	    } ENDCATCH;
+	 } else insert_file(fname, true, file_pos, name2id);
       } CATCH(exc) {
 	 if (errors.length()) errors+="\n\n";
 	 errors+=exc.get_cause();
@@ -517,15 +557,10 @@ DjVuDocEditor::insert_page(const char * file_name, int page_num)
    DEBUG_MSG("DjVuDocEditor::insert_page(): fname='" << file_name << "'\n");
    DEBUG_MAKE_INDENT(3);
 
-      // First translate the page_num to file_pos.
-   GP<DjVmDir> dir=get_djvm_dir();
-   int file_pos;
-   if (page_num<0 || page_num>=dir->get_pages_num()) file_pos=-1;
-   else file_pos=dir->get_page_pos(page_num);
+   GList<GString> list;
+   list.append(file_name);
 
-      // Now just call insert_file() to complete the job
-   GMap<GString, GString> name2id;
-   insert_file(file_name, true, file_pos, name2id);
+   insert_group(list, page_num);
 }
 
 void
