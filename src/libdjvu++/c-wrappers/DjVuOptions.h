@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuOptions.h,v 1.1 2000-02-03 17:09:23 bcr Exp $
+ *C- $Id: DjVuOptions.h,v 1.2 2000-02-03 19:01:33 bcr Exp $
  */
 
 #ifndef _DJVU_OPTIONS_H_
@@ -32,7 +32,7 @@ extern const char djvu_hflip_string[];
 extern const char djvu_invert_string[];
 extern const char djvu_help_string[];
 #define djvu_config_option {djvu_config_string+2,1,0,'f'}
-#define djvu_verbose_option {djvu_verbose_string+2,0,0,'v'}
+#define djvu_verbose_option {djvu_verbose_string+2,2,0,'v'}
 #define djvu_filelist_option {djvu_filelist_string+2,1,0,'T'}
 #define djvu_force_option {djvu_force_string+2,0,0,'F'}
 #define djvu_dpi_option {djvu_dpi_string+2,1,0,'d'}
@@ -44,8 +44,8 @@ extern const char djvu_help_string[];
 #define djvu_page_size_option {djvu_page_size_string+2,1,0,0xff}
 #define djvu_render_size_option {djvu_render_size_string+2,1,0,0xfe}
 #define djvu_rotate_option {djvu_rotate_string+2,1,0,'r'}
-#define djvu_vflip_option {djvu_vflip_string+2,0,0,'V'}
-#define djvu_hflip_option {djvu_hflip_string+2,0,0,'H'}
+#define djvu_vflip_option {djvu_vflip_string+2,2,0,'V'}
+#define djvu_hflip_option {djvu_hflip_string+2,2,0,'H'}
 #define djvu_invert_option {djvu_invert_string+2,0,0,'x'}
 #define djvu_help_option {djvu_help_string+2,0,0,'h'}
 
@@ -54,7 +54,7 @@ extern const char djvu_help_string[];
 extern const char djvu_page_range_string[];
 extern const char djvu_trace_string[];
 #define djvu_page_range_option {djvu_page_range_string+2,1,0,'p'}
-#define djvu_trace_option {djvu_trace_string+2,0,0,'V'}
+#define djvu_trace_option {djvu_trace_string+2,0,0,'Z'}
 
 /** These are defined in DjVuTransform.cpp as part of libdjvudecode.a */
 
@@ -64,7 +64,7 @@ extern const char djvu_resize_string[];
 extern const char djvu_upsample_string[];
 extern const char djvu_subsample_string[];
 extern const char djvu_segment_string[];
-#define djvu_togray_option {djvu_togray_string+2,0,0,'G'}
+#define djvu_togray_option {djvu_togray_string+2,2,0,'G'}
 #define djvu_tobitonal_option {djvu_tobitonal_string+2,2,0,'B'}
 #define djvu_resize_option {djvu_resize_string+2,1,0,'R'}
 #define djvu_upsample_option {djvu_upsample_string+2,1,0,'u'}
@@ -85,9 +85,9 @@ extern const char djvu_tolerance_percent_string[];
 #define djvu_conservative_option {djvu_conservative_string+2,0,0,'C'}
 #define djvu_lossless_option {djvu_lossless_string+2,0,0,'l'}
 #define djvu_aggressive_option {djvu_aggressive_string+2,0,0,'a'}
-#define djvu_halftone_off_option {djvu_halftone_off_string+2,0,0,'t'}
+#define djvu_halftone_off_option {djvu_halftone_off_string+2,2,0,'t'}
 #define djvu_pages_per_dict_option {djvu_pages_per_dict_string+2,1,0,'D'}
-#define djvu_pseudo_option {djvu_pseudo_string+2,0,0,'g'}
+#define djvu_pseudo_option {djvu_pseudo_string+2,2,0,'g'}
 #define djvu_tolerance_percent_option {djvu_tolerance_percent_string+2,1,0,0xfd}
 #define djvu_tolerance4_size_option {djvu_tolerance4_size_string+2,1,0,0xfc}
 
@@ -114,7 +114,7 @@ extern const char djvu_jpeg_string[];
 #define djvu_crcbnone_option {djvu_crcbnone_string+2,0,0,0xfb}
 #define djvu_crcbdelay_option {djvu_crcbdelay_string+2,1,0,0xfa}
 #define djvu_gamma_option {djvu_gamma_string+2,1,0,0xf9}
-#define djvu_jpeg_option {djvu_jpeg_string+2,0,0,'j'}
+#define djvu_jpeg_option {djvu_jpeg_string+2,2,0,'j'}
 
 /** These are defined in DjVuForegroundParse.cpp as part of libdjvudocument.a */
 
@@ -137,11 +137,11 @@ extern const char djvu_blurring_size_string[];
 extern const char djvu_fg_subsampling_string[];
 extern const char djvu_bg_subsampling_string[];
 extern const char djvu_resolution_multiplier_string[];
-extern const char djvu_high_variation_string[];
-extern const char djvu_masksub_refine_string[];
-extern const char djvu_masksub_sub_chrom_string[];
+extern const char djvu_high_variation_foreground_string[];
+extern const char djvu_refine_string[];
+extern const char djvu_sub_chrom_string[];
 
-#define djvu_masksub_sub_chrom_option {djvu_masksub_sub_chrom_string+2,0,0,0xf8}
+#define djvu_sub_chrom_option {djvu_sub_chrom_string+2,0,0,0xf8}
 #define djvu_threshold_level_option {djvu_threshold_level_string+2,1,0,0xf5}
 #define djvu_shape_filter_level_option {djvu_shape_filter_level_string+2,1,0,0xf4}
 #define djvu_pix_filter_level_option {djvu_pix_filter_level_string+2,1,0,0xf3}
@@ -153,8 +153,8 @@ extern const char djvu_masksub_sub_chrom_string[];
 #define djvu_fg_subsampling_option {djvu_fg_subsampling_string+2,1,0,0xec}
 #define djvu_bg_subsampling_option {djvu_bg_subsampling_string+2,1,0,0xeb}
 #define djvu_resolution_multiplier_option {djvu_resolution_multiplier_string+2,1,0,0xea}
-#define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,0,0,0xe9}
-#define djvu_masksub_refine_option {djvu_masksub_refine_string+2, 0, 0, 0xe8}
+#define djvu_high_variation_foreground_option {djvu_high_variation_foreground_string+2,2,0,0xe9}
+#define djvu_refine_option {djvu_refine_string+2, 2, 0, 0xe8}
 
 #endif
 
