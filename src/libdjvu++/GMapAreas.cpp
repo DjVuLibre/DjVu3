@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.cpp,v 1.24 2001-04-12 17:05:32 fcrary Exp $
+// $Id: GMapAreas.cpp,v 1.25 2001-06-13 22:57:38 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -833,6 +833,7 @@ GMapOval::map(GRectMapper &mapper)
     clear_bounds();
     initialize();
 }
+
 void 
 GMapOval::unmap(GRectMapper &mapper)
 {
@@ -850,3 +851,66 @@ GMapOval::unmap(GRectMapper &mapper)
     clear_bounds();
     initialize();
 }
+
+GMapArea::GMapArea(void) : target("_self"), border_type(NO_BORDER),
+   border_always_visible(false), border_color(0xff), border_width(1),
+   hilite_color(0xffffffff), bounds_initialized(0) {}
+
+GMapRect::GMapRect(void) : xmin(0), ymin(0), xmax(0), ymax(0) {}
+
+GMapRect::GMapRect(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
+   xmax(rect.xmax), ymax(rect.ymax) {}
+
+GMapRect &
+GMapRect::operator=(const GRect & rect)
+{
+   xmin=rect.xmin;
+   xmax=rect.xmax;
+   ymin=rect.ymin;
+   ymax=rect.ymax;
+   return *this;
+}
+
+void
+GMapRect::gma_move(int dx, int dy)
+{
+   xmin+=dx;
+   xmax+=dx;
+   ymin+=dy;
+   ymax+=dy;
+}
+
+bool
+GMapRect::gma_is_point_inside(const int x, const int y)
+{
+   return (x>=xmin)&&(x<xmax)&&(y>=ymin)&&(y<ymax);
+}
+
+GP<GMapArea>
+GMapRect::get_copy(void) const { return new GMapRect(*this); }
+
+GMapPoly::GMapPoly(void) : points(0), sides(0) {}
+
+void
+GMapPoly::move_vertex(int i, int x, int y)
+{
+   xx[i]=x; yy[i]=y;
+   clear_bounds();
+}
+
+GP<GMapArea>
+GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
+
+GMapOval::GMapOval(void) : xmin(0), ymin(0), xmax(0), ymax(0) {}
+
+void
+GMapOval::gma_move(int dx, int dy)
+{
+   xmin+=dx; xmax+=dx; ymin+=dy; ymax+=dy;
+   xf1+=dx; yf1+=dy; xf2+=dx; yf2+=dy;
+}
+
+GP<GMapArea>
+GMapOval::get_copy(void) const { return new GMapOval(*this); }
+
+

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GMapAreas.h,v 1.26 2001-04-12 00:25:00 bcr Exp $
+// $Id: GMapAreas.h,v 1.27 2001-06-13 22:57:38 bcr Exp $
 // $Name:  $
 
 #ifndef _GMAPAREAS_H
@@ -64,7 +64,7 @@
     @memo Definition of base map area classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GMapAreas.h,v 1.26 2001-04-12 00:25:00 bcr Exp $# */
+    #$Id: GMapAreas.h,v 1.27 2001-06-13 22:57:38 bcr Exp $# */
 //@{
 
 
@@ -211,6 +211,8 @@ public:
 	  for saving into #ANTa# chunk (see \Ref{DjVuAnno}) */
    GUTF8String	print(void);
 
+//   GUTF8String get_area(void) const;
+
       /// Virtual function returning the shape type.
    virtual MapAreaType const get_shape_type( void ) const { return UNKNOWN; };
       /// Virtual function returning the shape name.
@@ -237,22 +239,13 @@ protected:
    virtual char const * const	gma_check_object(void) const=0;
    virtual GUTF8String	gma_print(void)=0;
    
-   void		clear_bounds(void);
+   void		clear_bounds(void) { bounds_initialized=0; }
 private:
    int		xmin, xmax, ymin, ymax;
    bool		bounds_initialized;
 
    void		initialize_bounds(void);
 };
-
-inline
-GMapArea::GMapArea(void) : target("_self"), border_type(NO_BORDER),
-   border_always_visible(false), border_color(0xff), border_width(1),
-   hilite_color(0xffffffff), bounds_initialized(0) {}
-
-inline void
-GMapArea::clear_bounds(void) { bounds_initialized=0; }
-
 
 // ---------- GMAPRECT ---------
 
@@ -274,15 +267,15 @@ public:
    virtual ~GMapRect();
 
       /// Returns the width of the rectangle
-   int		get_width(void) const;
+   int		get_width(void) const { return xmax-xmin; }
       /// Returns the height of the rectangle
-   int		get_height(void) const;
-
-      /// Returns \Ref{GRect} describing the map area's rectangle
-   operator GRect(void);
+   int		get_height(void) const { return ymax-ymin; }
 
       /// Changes the #GMapRect#'s geometry
    GMapRect & operator=(const GRect & rect);
+
+      /// Returns \Ref{GRect} describing the map area's rectangle
+   operator GRect(void);
    
       /// Returns MapRect
    virtual MapAreaType const get_shape_type( void ) const { return RECT; };
@@ -307,72 +300,6 @@ protected:
    virtual char const * const gma_check_object(void) const;
    virtual GUTF8String	gma_print(void);
 };
-
-inline
-GMapRect::GMapRect(void) : xmin(0), ymin(0), xmax(0), ymax(0) {}
-
-inline
-GMapRect::GMapRect(const GRect & rect) : xmin(rect.xmin), ymin(rect.ymin),
-   xmax(rect.xmax), ymax(rect.ymax) {}
-
-inline
-GMapRect::operator GRect(void)
-{
-   return GRect(xmin, ymin, xmax-xmin, ymax-ymin);
-}
-
-inline GMapRect &
-GMapRect::operator=(const GRect & rect)
-{
-   xmin=rect.xmin;
-   xmax=rect.xmax;
-   ymin=rect.ymin;
-   ymax=rect.ymax;
-   return *this;
-}
-
-inline int
-GMapRect::get_width(void) const { return xmax-xmin; }
-
-inline int
-GMapRect::get_height(void) const { return ymax-ymin; }
-
-inline int
-GMapRect::gma_get_xmin(void) const { return xmin; }
-
-inline int
-GMapRect::gma_get_ymin(void) const { return ymin; }
-
-inline int
-GMapRect::gma_get_xmax(void) const { return xmax; }
-
-inline int
-GMapRect::gma_get_ymax(void) const { return ymax; }
-
-inline char const * const
-GMapRect::gma_check_object(void)  const{ return ""; }
-
-inline void
-GMapRect::gma_move(int dx, int dy)
-{
-   xmin+=dx;
-   xmax+=dx;
-   ymin+=dy;
-   ymax+=dy;
-}
-
-inline bool
-GMapRect::gma_is_point_inside(const int x, const int y)
-{
-   return (x>=xmin)&&(x<xmax)&&(y>=ymin)&&(y<ymax);
-}
-
-inline char const * const 
-GMapRect::get_shape_name(void) const { return RECT_TAG; }
-
-inline GP<GMapArea>
-GMapRect::get_copy(void) const { return new GMapRect(*this); }
-
 
 // ---------- GMAPPOLY ---------
 
@@ -463,36 +390,6 @@ private:
 				      int x21, int y21, int x22, int y22);
 };
 
-inline
-GMapPoly::GMapPoly(void) : points(0), sides(0) {}
-
-inline int
-GMapPoly::get_points_num(void) const { return points; }
-
-inline int
-GMapPoly::get_sides_num(void) const { return sides; }
-
-inline int
-GMapPoly::get_x(int i) const { return xx[i]; }
-
-inline int
-GMapPoly::get_y(int i) const { return yy[i]; }
-
-inline void
-GMapPoly::move_vertex(int i, int x, int y)
-{
-   xx[i]=x; yy[i]=y;
-   clear_bounds();
-}
-
-inline char const * const
-GMapPoly::get_shape_name(void) const { return POLY_TAG; }
-
-inline GP<GMapArea>
-GMapPoly::get_copy(void) const { return new GMapPoly(*this); }
-
-
-
 // ---------- GMAPOVAL ---------
 
 /** Implements elliptical map areas. The only supported types of border
@@ -554,7 +451,43 @@ private:
 };
 
 inline
-GMapOval::GMapOval(void) : xmin(0), ymin(0), xmax(0), ymax(0) {}
+GMapRect::operator GRect(void)
+{
+  return GRect(xmin, ymin, xmax-xmin, ymax-ymin);
+}
+
+inline int
+GMapRect::gma_get_xmin(void) const { return xmin; }
+
+inline int
+GMapRect::gma_get_ymin(void) const { return ymin; }
+
+inline int
+GMapRect::gma_get_xmax(void) const { return xmax; }
+
+inline int
+GMapRect::gma_get_ymax(void) const { return ymax; }
+
+inline char const * const
+GMapRect::gma_check_object(void)  const{ return ""; }
+
+inline char const * const 
+GMapRect::get_shape_name(void) const { return RECT_TAG; }
+
+inline int
+GMapPoly::get_points_num(void) const { return points; }
+
+inline int
+GMapPoly::get_sides_num(void) const { return sides; }
+
+inline int
+GMapPoly::get_x(int i) const { return xx[i]; }
+
+inline int
+GMapPoly::get_y(int i) const { return yy[i]; }
+
+inline char const * const
+GMapPoly::get_shape_name(void) const { return POLY_TAG; }
 
 inline int
 GMapOval::get_a(void) const { return a; }
@@ -580,18 +513,8 @@ GMapOval::gma_get_xmax(void) const { return xmax; }
 inline int
 GMapOval::gma_get_ymax(void) const { return ymax; }
 
-inline void
-GMapOval::gma_move(int dx, int dy)
-{
-   xmin+=dx; xmax+=dx; ymin+=dy; ymax+=dy;
-   xf1+=dx; yf1+=dy; xf2+=dx; yf2+=dy;
-}
-
 inline char const * const
 GMapOval::get_shape_name(void) const { return OVAL_TAG; }
-
-inline GP<GMapArea>
-GMapOval::get_copy(void) const { return new GMapOval(*this); }
 
 //@}
 
