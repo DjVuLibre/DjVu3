@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: package.sh,v 1.15 2001-01-04 22:04:54 bcr Exp $
+# $Id: package.sh,v 1.16 2001-02-02 23:04:21 bcr Exp $
 # $Name:  $
 
 # EXIT ON ERROR
@@ -105,6 +105,7 @@ fi
 
 thisdir=`pwd`
 
+
 i="./TOPDIR/SRCDIR/src/include/DjVuVersion.h"
 version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"`
 if [ -z "$version" ] 
@@ -116,7 +117,13 @@ then
   echo "Version not found in TOPDIR/SRCDIR/src/include/DjVuVersion.h" 1>&2
   exit 1
 fi
-version=`echo $version|tr ' ' '-'`
+version=`echo $version|sed -e 's, ,-,g'`
+v=`echo "$version|sed -n -e 's,^\([0-9]\).*,\1,p'`
+if [ -z "$v" ]
+then
+  version="alpha"
+fi
+
 srcfilelist="$srcdir/archive.list"
 filelist="$packagedir/archive.list"
 if [ ! -r "$srcfilelist" ]

@@ -31,7 +31,7 @@
 #C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 #C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #
-# $Id: functions.sh,v 1.54 2001-01-09 17:29:22 bcr Exp $
+# $Id: functions.sh,v 1.55 2001-02-02 23:04:21 bcr Exp $
 # $Name:  $
 
 #
@@ -1098,14 +1098,22 @@ then
 else
   i="${CONFIG_DIR}/../src/include/DjVuVersion.h"
 fi
-version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"|tr '\n' '-'`
+version=`sed -n -e 's,.* DJVU_CVS_NAME[^0-9]*\([1-9][-_0-9A-Za-z]*\).*,\1,p' < "$i"`
 if [ -z "$version" ] 
 then 
   version=`sed -n -e 's,.* DJVU_VERSION  *"\(.*\)".*$,\1,p' -e 's,.*DJVU_CVS_REV.*Revision: \([0-9][.0-9]*\) .*,\1,p' < "$i"|tr '\n' '-'|sed 's,-$,,g'`
 fi
-set -x
-version=`echo $version|tr ' ' '-'`
+if [ -z "$version" ] 
+then
+  echo "Version not found in TOPDIR/SRCDIR/src/include/DjVuVersion.h" 1>&2
+  exit 1
+fi
+version=`echo $version|sed -e 's, ,-,g'`
+v=`echo "$version|sed -n -e 's,^\([0-9]\).*,\1,p'`
+if [ -z "$v" ]
+then
+  version="alpha"
+fi
 echo Building version $version
-set +x
 CONFIG_VARS=`echo version $CONFIG_VARS`
 
