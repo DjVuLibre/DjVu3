@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: XMLParser.cpp,v 1.18 2001-07-16 15:46:04 bcr Exp $
+// $Id: XMLParser.cpp,v 1.19 2001-07-17 00:32:22 fcrary Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -947,7 +947,7 @@ lt_XMLParser::Impl::ChangeTextOCR(
   if(value.length() && value.downcase() != "false")
   {
     const GP<ByteStream> bs=OCRcallback(value,DjVuImage::create(dfile));
-    if(bs)
+    if( bs && bs->size() )
     {
       const GP<lt_XMLTags> tags(lt_XMLTags::create(bs));
       ChangeText(width,height,*dfile,*tags);
