@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.25 2000-01-04 20:01:47 bcr Exp $
+//C- $Id: DjVuGlobal.h,v 1.26 2000-01-05 20:02:24 bcr Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -40,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.25 2000-01-04 20:01:47 bcr Exp $#
+    #$Id: DjVuGlobal.h,v 1.26 2000-01-05 20:02:24 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -61,29 +61,13 @@
 #ifdef NEED_DJVU_MEMORY
 #include <new.h>
 
-// We also define these typedefs in the API header file.
-//
-#ifndef HAS_DJVU_CALLBACKS
-#define HAS_DJVU_CALLBACKS
-extern "C"
-{
-  typedef void djvu_free_callback (void *);
-  typedef void *djvu_realloc_callback (void *, size_t);
-  typedef void *djvu_malloc_callback (size_t);
-  typedef void *djvu_calloc_callback (size_t,size_t);
-  int djvu_set_memory_callbacks(
-           djvu_free_callback *,
-           djvu_realloc_callback *,
-           djvu_malloc_callback *,
-           djvu_calloc_callback *);
+#include "c-wrappers/DjVu.h"
 
-};
-#endif
-
-// Normally, this is the only functions we should need.
+// These define the two callbacks needed for C++
 typedef void djvu_delete_callback(void *);
 typedef void *djvu_new_callback(size_t);
-// Normally, these are the only functions we should need.
+
+// These functions allow users to set the callbacks.
 int djvu_memoryObject_callback ( djvu_delete_callback*, djvu_new_callback*);
 int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 
@@ -97,6 +81,7 @@ int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 #define STATIC_INLINE inline
 #endif /* __GNUC__ */
 #endif /* STATIC_INLINE */
+
 // This clause is used when overriding operator new
 // because the standard has slightly changed.
 #if defined( __GNUC__ ) && ( __GNUC__*1000 + __GNUC_MINOR__ >= 2091 )
@@ -114,20 +99,6 @@ int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 #ifndef delete_throw_spec
 #define delete_throw_spec
 #endif  /* delete_throw_spec */
-
-// Replacement functions.
-DLLEXPORT void * _djvu_new(size_t);
-DLLEXPORT void * _djvu_newArray(size_t);
-DLLEXPORT void _djvu_delete(void *);
-DLLEXPORT void _djvu_deleteArray(void *);
-
-// We also need classic memory functions, for routines that need realloc.
-//
-DLLEXPORT void *_djvu_malloc(size_t);
-DLLEXPORT void *_djvu_calloc(size_t, size_t);
-DLLEXPORT void *_djvu_realloc(void*, size_t);
-DLLEXPORT void _djvu_free(void*);
-
 
 #ifdef UNIX
 extern djvu_new_callback *_djvu_new_ptr;
@@ -220,13 +191,10 @@ operator delete [] (void *addr) delete_throw_spec
     multithreaded programs.  */
 //@{
 
-extern "C"
-{
-  typedef void
-  djvu_progress_callback (const char *task,unsigned long,unsigned long);
-  DLLEXPORT djvu_progress_callback *
-  djvu_set_progress_callback(djvu_progress_callback *);
-};
+#ifndef HAS_DJVU_PROGRESS_CALLBACKS
+#define HAS_DJVU_PROGRESS_CALLBACKS
+
+#include "c-wrappers/DjVu.h"
 
 #ifdef NEED_DJVU_PROGRESS
 

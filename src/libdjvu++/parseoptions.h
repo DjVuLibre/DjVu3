@@ -6,12 +6,25 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.16 2000-01-05 19:59:21 praveen Exp $
+//C- $Id: parseoptions.h,v 1.17 2000-01-05 20:05:43 bcr Exp $
 
 #endif /* __cplusplus */
 
 #ifndef __DJVUPARSEOPTIONS_H__
 #define __DJVUPARSEOPTIONS_H__
+
+#ifdef __cplusplus
+// First we include some C wrappers for our class.
+// The purpose of the DjVuParseOptions class, is to give a standard
+// way for all DjVu programs and API type functions to access values
+// from the command line and from configuration files.
+//
+// The operations of ChangeProfile(), and the copy constructor are only
+// thread safe if you define a THREADMETHOD.
+//
+#endif /* __cplusplus */
+
+#include "c-wrappers/DjVu.h"
 
 #ifdef __cplusplus
 #ifdef __GNUC__
@@ -54,8 +67,8 @@
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: praveen $#
-   @version #$Id: parseoptions.h,v 1.16 2000-01-05 19:59:21 praveen Exp $#
+   @author: #$Author: bcr $#
+   @version #$Id: parseoptions.h,v 1.17 2000-01-05 20:05:43 bcr Exp $#
  */
 
 //@{
@@ -213,114 +226,6 @@
    Be very careful of missing quotes...
    @memo Examples using the \Ref{DjVuParseOptions} class
  */
-
-// First we include some C wrappers for our class.
-// The purpose of the DjVuParseOptions class, is to give a standard
-// way for all DjVu programs and API type functions to access values
-// from the command line and from configuration files.
-//
-// The operations of ChangeProfile(), and the copy constructor are only
-// thread safe if you define a THREADMETHOD.
-//
-
-extern "C" {
-#endif /* __cplusplus */
-
-/** The #djvu_option# structure is very simmular to the standard unix
-    long_options structure for getopt_long(3), and the usage is almost
-    identical.
-    @memo The djvu_option structure wraps the DjVuParseOptions class 
-  */
-
-  struct djvu_option {
-    /** This is the option long name without the leading double dash */
-    const char *name;
-    /** has_arg is one if the option has a value, and 2 if the value
-        is optional.  Otherwise has_arg should be 0. */
-    int has_arg;
-    /** Currently this value is unused. */
-    int *flag;
-    /** This is a character representing the short option value.  Use '-'
-        if there is no short option. */
-    int val;
-  };
-
-/** @name DjVuParseOptions C Wrappers
-    The \Ref{DjVuParseOptions} class is wrapped by the following
-    the following set of wrapper functions.
-    @memo Wrapper functions for \Ref{DjVuParseOptions} */
-#ifdef DOCXX_CODE
-//@{
-#endif /* DOCXX_CODE */
-
-/** The #djvu_parse# structure is used for exporting and \Ref{DjVuParseOptions}
-    methods from C++ into C.
- */
-  struct djvu_parse
-  {
-    /** This is a pointer to a \Ref{DjVuParseOptions} object */
-    void *Private;
-  };
-
-  /** This is a wrapper for the C++ DjVuParseOptions profile constructor  */
-  struct djvu_parse
-  djvu_parse_init(const char []);
-
-  /** This is a wrapper for the C++ DjVuParseOptions config file constructor  */
-  struct djvu_parse
-  djvu_parse_config(const char [],const char []);
-
-  /** This is a wrapper for the C++ DjVuParseOptions copy constructor  */
-  struct djvu_parse
-  djvu_parse_copy(const struct djvu_parse);
-
-  /** This is a wrapper for the DjVuParseOptions::ChangeProfile function. */
-  void
-  djvu_parse_change_profile(struct djvu_parse,const char []);
-
-    /** This is a wrapper for the DjVuParseOptions destructor */
-  void
-  djvu_parse_free(struct djvu_parse);
-
-    /** This is a wrapper for the DjVuParseOptions::GetValue function */
-  const char *
-  djvu_parse_value(struct djvu_parse,const char []);
-
-    /** This is a wrapper for the DjVuParseOptions::GetInteger function */
-  int
-  djvu_parse_integer(struct djvu_parse,const char [],const int);
-
-    /** This is a wrapper for the DjVuParseOptions::GetInteger function */
-  int
-  djvu_parse_number(struct djvu_parse,const char [],const int);
-
-    /** This is a wrapper for the DjVuParseOptions::ParseArguments function */
-  int
-  djvu_parse_arguments
-  (struct djvu_parse,int,const char * const *,const struct djvu_option []);
-
-    /** This is a wrapper for the DjVuParseOptions::HasError function */
-  int
-  djvu_parse_haserror(struct djvu_parse);
-
-    /** This is a wrapper for the DjVuParseOptions::GetError function */
-  const char *
-  djvu_parse_error(struct djvu_parse);
-
-    /** This is a wrapper for the DjVuParseOptions::perror function */
-  void
-  djvu_parse_perror(struct djvu_parse);
-
-    /** This is a wrapper for the DjVuParseOptions::ConfigFilename function */
-  const char *
-  djvu_parse_configfile(struct djvu_parse,const char[],int);
-
-#ifdef DOCXX_CODE
-//@}
-#endif /* DOCXX_CODE */
-#ifdef __cplusplus
-};
-
 
 class DjVuTokenList;
 
