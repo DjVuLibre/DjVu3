@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.76 2001-05-01 17:12:15 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.77 2001-05-01 23:19:16 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1875,7 +1875,7 @@ DjVuDocEditor::save_as(const GURL &where, bool bundled)
 
        iff.put_chunk("FORM:DJVM", 1);
        iff.put_chunk("DIRM");
-       djvm_dir->encode(gstr);
+       djvm_dir->encode(giff->get_bytestream());
        iff.close_chunk();
        iff.close_chunk();
        iff.flush();
