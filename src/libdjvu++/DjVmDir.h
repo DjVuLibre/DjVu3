@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.6 1999-09-01 23:47:54 leonb Exp $
+//C- $Id: DjVmDir.h,v 1.7 1999-09-23 19:05:24 eaf Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.6 1999-09-01 23:47:54 leonb Exp $# */
+    #$Id: DjVmDir.h,v 1.7 1999-09-23 19:05:24 eaf Exp $# */
 //@{
 
 
@@ -167,8 +167,8 @@ inline bool
 DjVmDir::is_indirect(void) const
 {
   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
-  GP<File> file=files_list[files_list];
-  return file && file->offset==0;
+  return files_list.size() && files_list[files_list] &&
+     files_list[files_list]->offset==0;
 }
 
 inline bool

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.4 1999-08-30 19:28:31 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.5 1999-09-23 19:05:24 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -68,105 +68,108 @@ DjVmDir::decode(ByteStream & str)
    int files=str.read16();
    DEBUG_MSG("number of files=" << files << "\n");
 
-   DEBUG_MSG("reading offsets and sizes\n");
-   for(int file=0;file<files;file++)
+   if (files)
    {
-      GP<File> file=new File();
-      files_list.append(file);
-      if (bundled)
+      DEBUG_MSG("reading offsets and sizes\n");
+      for(int file=0;file<files;file++)
       {
-	 file->offset=str.read32();
-	 file->size=str.read24();
-	 if (file->offset==0 || file->size==0)
-	    THROW("Directory error: no indirect entries allowed in bundled document.");
-      } else file->offset=file->size=0;
-   }
-
-   BSByteStream bs_str(str);
-   DEBUG_MSG("reading and decompressing flags...\n");
-   for(pos=files_list;pos;++pos)
-      files_list[pos]->flags=bs_str.read8();
-   
-   DEBUG_MSG("reading and decompressing names...\n");
-   TArray<char> strings;
-   char buffer[1024];
-   int length;
-   while((length=bs_str.read(buffer, 1024)))
-   {
-      int strings_size=strings.size();
-      strings.resize(strings_size+length-1);
-      memcpy((char*) strings+strings_size, buffer, length);
-   }
-   DEBUG_MSG("size of decompressed names block=" << strings.size() << "\n");
-   
-      // Copy names into the files
-   const char * ptr=strings;
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-
-      file->id=ptr; ptr+=file->id.length()+1;
-      if (file->flags & File::HAS_NAME)
-      {
-	 file->name=ptr; ptr+=file->name.length()+1;
-      } else file->name=file->id;
-      if (file->flags & File::HAS_TITLE)
-      {
-	 file->title=ptr; ptr+=file->title.length()+1;
-      } else file->title=file->id;
-      
-      DEBUG_MSG(file->name << ", " << file->id << ", " << file->title << ", " <<
-		file->offset << ", " << file->size << ", " <<
-		file->is_page() << "\n");
-   }
-
-      // Now generate page=>file array for direct access
-   int pages=0;
-   for(pos=files_list;pos;++pos)
-      pages+=files_list[pos]->is_page() ? 1 : 0;
-   DEBUG_MSG("got " << pages << " pages\n");
-   page2file.resize(pages-1);
-   int page_num=0;
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (file->is_page())
-      {
-	 page2file[page_num]=file;
-	 file->page_num=page_num++;
+	 GP<File> file=new File();
+	 files_list.append(file);
+	 if (bundled)
+	 {
+	    file->offset=str.read32();
+	    file->size=str.read24();
+	    if (file->offset==0 || file->size==0)
+	       THROW("Directory error: no indirect entries allowed in bundled document.");
+	 } else file->offset=file->size=0;
       }
-   }
 
-      // Generate name2file map
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (name2file.contains(file->name))
-	 THROW("Error in 'DIRM' chunk: two records for the same NAME '"
-	       + file->name + "'");
-      name2file[file->name]=file;
-   }
-
-      // Generate id2file map
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (id2file.contains(file->id))
-	 THROW("Error in 'DIRM' chunk: two records for the same ID '"
-	       + file->id + "'");
-      id2file[file->id]=file;
-   }
-
-      // Generate title2file map
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (file->title.length())
+      BSByteStream bs_str(str);
+      DEBUG_MSG("reading and decompressing flags...\n");
+      for(pos=files_list;pos;++pos)
+	 files_list[pos]->flags=bs_str.read8();
+   
+      DEBUG_MSG("reading and decompressing names...\n");
+      TArray<char> strings;
+      char buffer[1024];
+      int length;
+      while((length=bs_str.read(buffer, 1024)))
       {
-	 if (title2file.contains(file->title))
-	    THROW("Error in 'DIRM' chunk: two records for the same TITLE '"
-		  + file->title + "'");
-	 title2file[file->title]=file;
+	 int strings_size=strings.size();
+	 strings.resize(strings_size+length-1);
+	 memcpy((char*) strings+strings_size, buffer, length);
+      }
+      DEBUG_MSG("size of decompressed names block=" << strings.size() << "\n");
+   
+	 // Copy names into the files
+      const char * ptr=strings;
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+
+	 file->id=ptr; ptr+=file->id.length()+1;
+	 if (file->flags & File::HAS_NAME)
+	 {
+	    file->name=ptr; ptr+=file->name.length()+1;
+	 } else file->name=file->id;
+	 if (file->flags & File::HAS_TITLE)
+	 {
+	    file->title=ptr; ptr+=file->title.length()+1;
+	 } else file->title=file->id;
+      
+	 DEBUG_MSG(file->name << ", " << file->id << ", " << file->title << ", " <<
+		   file->offset << ", " << file->size << ", " <<
+		   file->is_page() << "\n");
+      }
+
+	 // Now generate page=>file array for direct access
+      int pages=0;
+      for(pos=files_list;pos;++pos)
+	 pages+=files_list[pos]->is_page() ? 1 : 0;
+      DEBUG_MSG("got " << pages << " pages\n");
+      page2file.resize(pages-1);
+      int page_num=0;
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 if (file->is_page())
+	 {
+	    page2file[page_num]=file;
+	    file->page_num=page_num++;
+	 }
+      }
+
+	 // Generate name2file map
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 if (name2file.contains(file->name))
+	    THROW("Error in 'DIRM' chunk: two records for the same NAME '"
+		  + file->name + "'");
+	 name2file[file->name]=file;
+      }
+
+	 // Generate id2file map
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 if (id2file.contains(file->id))
+	    THROW("Error in 'DIRM' chunk: two records for the same ID '"
+		  + file->id + "'");
+	 id2file[file->id]=file;
+      }
+
+	 // Generate title2file map
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 if (file->title.length())
+	 {
+	    if (title2file.contains(file->title))
+	       THROW("Error in 'DIRM' chunk: two records for the same TITLE '"
+		     + file->title + "'");
+	    title2file[file->title]=file;
+	 }
       }
    }
 }
@@ -180,48 +183,51 @@ DjVmDir::encode(ByteStream & str) const
    GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    GPosition pos;
 
-   bool bundled=files_list[files_list]->offset!=0;
+   bool bundled=files_list.size() ? (files_list[files_list]->offset!=0) : true;
    DEBUG_MSG("encoding version number=" << version << ", bundled=" << bundled << "\n");
    str.write8(version | ((int) bundled<< 7));
    
    DEBUG_MSG("storing the number of records=" << files_list.size() << "\n");
    str.write16(files_list.size());
 
-   if (bundled)
+   if (files_list.size())
    {
-      DEBUG_MSG("storing offsets and sizes for every record\n");
+      if (bundled)
+      {
+	 DEBUG_MSG("storing offsets and sizes for every record\n");
+	 for(pos=files_list;pos;++pos)
+	 {
+	    GP<File> file=files_list[pos];
+	    if (bundled ^ (file->offset!=0))
+	       THROW("The directory contains both indirect and bundled records.");
+      
+	    str.write32(file->offset);
+	    str.write24(file->size);
+	 }
+      }
+
+      BSByteStream bs_str(str, 50);
+      DEBUG_MSG("storing and compressing flags for every record\n");
       for(pos=files_list;pos;++pos)
       {
 	 GP<File> file=files_list[pos];
-	 if (bundled ^ (file->offset!=0))
-	    THROW("The directory contains both indirect and bundled records.");
-      
-	 str.write32(file->offset);
-	 str.write24(file->size);
+	 if (file->name!=file->id) file->flags|=File::HAS_NAME;
+	 else file->flags&=~File::HAS_NAME;
+	 if (file->title!=file->id) file->flags|=File::HAS_TITLE;
+	 else file->flags&=~File::HAS_TITLE;
+	 bs_str.write8(file->flags);
       }
-   }
 
-   BSByteStream bs_str(str, 50);
-   DEBUG_MSG("storing and compressing flags for every record\n");
-   for(pos=files_list;pos;++pos)
-   {
-      GP<File> file=files_list[pos];
-      if (file->name!=file->id) file->flags|=File::HAS_NAME;
-      else file->flags&=~File::HAS_NAME;
-      if (file->title!=file->id) file->flags|=File::HAS_TITLE;
-      else file->flags&=~File::HAS_TITLE;
-      bs_str.write8(file->flags);
-   }
-
-   DEBUG_MSG("storing and compressing names...\n");
-   for(pos=files_list;pos;++pos)
-   {
-     GP<File> file=files_list[pos];
-     bs_str.writall((const void*)(const char*)file->id, file->id.length()+1);
-     if (file->flags & File::HAS_NAME)
-       bs_str.writall((const void*)(const char*)file->name, file->name.length()+1);
-     if (file->flags & File::HAS_TITLE)
-       bs_str.writall((const void*)(const char*)file->title, file->title.length()+1);
+      DEBUG_MSG("storing and compressing names...\n");
+      for(pos=files_list;pos;++pos)
+      {
+	 GP<File> file=files_list[pos];
+	 bs_str.writall((const void*)(const char*)file->id, file->id.length()+1);
+	 if (file->flags & File::HAS_NAME)
+	    bs_str.writall((const void*)(const char*)file->name, file->name.length()+1);
+	 if (file->flags & File::HAS_TITLE)
+	    bs_str.writall((const void*)(const char*)file->title, file->title.length()+1);
+      }
    }
    
    DEBUG_MSG("done\n");

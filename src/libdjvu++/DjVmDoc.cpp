@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.7 1999-09-23 13:26:06 leonb Exp $
+//C- $Id: DjVmDoc.cpp,v 1.8 1999-09-23 19:05:47 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -161,6 +161,8 @@ DjVmDoc::write(ByteStream & str)
       iff.copy(*str_in);
    }
 
+   iff.close_chunk();
+
    DEBUG_MSG("done storing DjVm file.\n");
 }
 
@@ -186,10 +188,10 @@ DjVmDoc::read(const GP<DataPool> & pool)
 
    data.empty();
 
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   if (files_list[files_list]->offset==0)
+   if (dir->is_indirect())
       THROW("Can't read indirect DjVm documents from DataPools or ByteStreams.");
-      
+
+   GPList<DjVmDir::File> files_list=dir->get_files_list();
    for(GPosition pos=files_list;pos;++pos)
    {
       DjVmDir::File * f=files_list[pos];
@@ -235,15 +237,15 @@ DjVmDoc::read(const char * name)
    dir->decode(iff);
    iff.close_chunk();
 
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   if (files_list[files_list]->offset!=0) read(pool);
+   if (dir->is_bundled()) read(pool);
    else
    {
       GString full_name=GOS::expand_name(name);
       GString dir_name=GOS::basename(full_name);
 
       data.empty();
-      
+
+      GPList<DjVmDir::File> files_list=dir->get_files_list();
       for(GPosition pos=files_list;pos;++pos)
       {
 	 DjVmDir::File * f=files_list[pos];
