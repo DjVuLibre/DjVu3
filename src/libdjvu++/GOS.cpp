@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.cpp,v 1.16 1999-11-22 22:57:52 eaf Exp $
+//C- $Id: GOS.cpp,v 1.17 1999-11-23 15:39:18 eaf Exp $
 
-// "$Id: GOS.cpp,v 1.16 1999-11-22 22:57:52 eaf Exp $"
+// "$Id: GOS.cpp,v 1.17 1999-11-23 15:39:18 eaf Exp $"
 
 #ifdef __GNUC__
 #pragma implementation
@@ -565,7 +565,46 @@ GOS::mkdir(const char * dirname)
    return -1;
 }
 
+#if defined(sun) || defined(__osf__) || defined(hpux)
+#include <dirent.h>
+#else
+#include <sys/dir.h>
+#endif
 
+int
+GOS::cleardir(const char * dirname)
+{
+   if (!dirname || !dirname[0]) return -1;
+
+#ifdef UNIX
+   DIR * dir=opendir(dirname);
+   if (dir)
+   {
+#if defined(sun) || defined(__osf__) || defined(hpux)
+      dirent * de;
+#else
+      direct * de;
+#endif
+      while((de=readdir(dir)))
+	 if (strcmp(de->d_name, ".") &&
+	     strcmp(de->d_name, ".."))
+	 {
+	    GString name=GOS::expand_name(de->d_name, dirname);
+	    int rc=0;
+	    if (GOS::is_dir(name)) rc=cleardir(name);
+	    if (rc<0) return rc;
+	    rc=GOS::deletefile(name);
+	    if (rc<0) return rc;
+	 }
+      closedir(dir);
+      return 0;
+   }
+#else
+   THROW("Please provide correct implementation of GOS::cleardir() for this platform");
+#endif
+
+   return -1;
+}
 
 // -----------------------------------------
 // Functions for measuring time

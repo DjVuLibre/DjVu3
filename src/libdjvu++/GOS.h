@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GOS.h,v 1.8 1999-11-22 22:57:52 eaf Exp $
+//C- $Id: GOS.h,v 1.9 1999-11-23 15:39:18 eaf Exp $
 
 #ifndef _GOS_H_
 #define _GOS_H_
@@ -31,7 +31,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- Initial implementation
     @version
-    #$Id: GOS.h,v 1.8 1999-11-22 22:57:52 eaf Exp $#
+    #$Id: GOS.h,v 1.9 1999-11-23 15:39:18 eaf Exp $#
 */
 //@{
 
@@ -81,6 +81,9 @@ class GOS
   static int deletefile(const char * filename);
   /** Creates the specified directory. */
   static int mkdir(const char * dirname);
+  /** Recursively erases contents of directory #dirname#. The directory
+      itself will not be removed. */
+  static int cleardir(const char * dirname);
   
   // -----------------------------------------
   // Functions for measuring time
