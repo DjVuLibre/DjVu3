@@ -372,9 +372,10 @@ check_debug_option()
 
 
 # Usage: check_thread_option THREADFLAG
-# Side effects:   $A_DEFS <-- updated for multithread compilation
-#                 $A_OPT  <-- updated for multithread compilation
-
+# Side effects: changes C/A_DEFS, C/A_LIBS, C/A_CXXFLAGS, C/A_CCFLAGS
+# Also introduces CXXTHREADS, CCTHREADS, DEFSTHREADS and LIBSTHREADS
+# because w/o them I (eaf) can't configure djview and nsdejavu.so in on
+# configuration script
 
 check_thread_option()
 {
@@ -388,10 +389,12 @@ check_thread_option()
     no* )
        C_DEFS=APPEND
        A_DEFS="-DTHREADMODEL=NOTHREADS $A_DEFS" 
+       DEFSTHREADS="-DTHREADMODEL=NOTHREADS"
        ;;       
     jri* )
        C_DEFS=APPEND
        A_DEFS="-DTHREADMODEL=JRITHREADS $A_DEFS" 
+       DEFSTHREADS="-DTHREADMODEL=JRITHREADS"
        ;;       
     co* )
        if [ ! -z "$CXX" ]
@@ -407,6 +410,7 @@ check_thread_option()
          fi
          C_CXXFLAGS=APPEND
          A_CXXFLAGS="${CXXCOTHREAD} $A_CXXFLAGS" 
+	 CXXTHREADS="${CXXCOTHREAD}"
        fi
        if [ ! -z "$CC" ]
        then
@@ -421,6 +425,7 @@ check_thread_option()
          fi
          C_CCFLAGS=APPEND
          A_CCFLAGS="${CCCOTHREAD} $A_CCFLAGS" 
+	 CCTHREADS="${CCCOTHREAD}"
        fi
        if [ ! -z "$CXXCOTHREAD_UNSAFE$CCCOTHREAD_UNSAFE" ] 
        then
@@ -437,6 +442,7 @@ check_thread_option()
          fi
          C_CCFLAGS=APPEND
          A_CCFLAGS="$CCPTHREAD $A_CCFLAGS"
+	 CCTHREADS="$CCPTHREAD"
        fi
        if [ ! -z "$CXX" ]
        then
@@ -446,11 +452,13 @@ check_thread_option()
          fi
          C_CXXFLAGS=APPEND
          A_CXXFLAGS="$CXXPTHREAD $A_CXXFLAGS"
+	 CXXTHREADS="$CXXPTHREAD"
        fi
        if [ ! -z "${CCPTHREAD_LIB}${CXXPTHREAD_LIB}" ]
        then 
          C_LIBS=APPEND
          A_LIBS="${CXXPTHREAD_LIB} ${A_LIBS}"
+	 LIBSTHREADS="${CXXPTHREAD_LIB}"
        fi
        ;;
     *)
@@ -458,6 +466,7 @@ check_thread_option()
        exit 1
        ;;
   esac
+  CONFIG_VARS="$CONFIG_VARS CCTHREADS CXXTHREADS DEFSTHREADS LIBTHREADS"
 }
 
 
