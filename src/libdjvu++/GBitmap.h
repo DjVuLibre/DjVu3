@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.h,v 1.8 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GBitmap.h,v 1.9 1999-05-19 18:24:11 leonb Exp $
 
 #ifndef _GBITMAP_H_
 #define _GBITMAP_H_
@@ -44,7 +44,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: GBitmap.h,v 1.8 1999-03-17 19:24:57 leonb Exp $#
+    #$Id: GBitmap.h,v 1.9 1999-05-19 18:24:11 leonb Exp $#
 
  */
 //@{
@@ -282,11 +282,21 @@ public:
   unsigned char *take_data(size_t &offset);
   /** Initializes this GBitmap by borrowing a memory segment.  The GBitmap
       then directly addresses the memory buffer #data# provided by the user.
-      This buffer must be large enough to hold #w*h# bytes.  The GBitmap
-      object does not ``own'' the buffer: you must explicitly de-allocate the
-      buffer using #operator delete []#.  This de-allocation should take place
-      after the destruction or the re-initialization of the GBitmap object.  */
+      This buffer must be large enough to hold #w*h# bytes representing each
+      one pixel.  The GBitmap object does not ``own'' the buffer: you must
+      explicitly de-allocate the buffer using #operator delete []#.  This
+      de-allocation should take place after the destruction or the
+      re-initialization of the GBitmap object.  */
   void borrow_data(unsigned char *data, int w, int h);
+  /** Initializes this GBitmap by setting the size to #h# rows and #w#
+      columns, and directly addressing the memory buffer #rledata# provided by
+      the user.  This buffer contains #rledatalen# bytes representing the
+      bitmap in run length encoded form.  The GBitmap object then ``owns'' the
+      buffer (unlike #borrow_data# sigh!) and will deallocate this buffer with
+      #operator delete[]#.  The encoding of buffer #rledata# is similar to the
+      data segment of the RLE file format (without the header) documented in
+      \Ref{PNM and RLE file formats}.  */
+  void borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h);
   //@}
 
 

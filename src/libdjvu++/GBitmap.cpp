@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GBitmap.cpp,v 1.5 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GBitmap.cpp,v 1.6 1999-05-19 18:24:11 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -23,7 +23,7 @@
 #include "GString.h"
 
 
-// File "$Id: GBitmap.cpp,v 1.5 1999-03-17 19:24:57 leonb Exp $"
+// File "$Id: GBitmap.cpp,v 1.6 1999-05-19 18:24:11 leonb Exp $"
 // - Author: Leon Bottou, 05/1997
 
 // ----- constructor and destructor
@@ -83,6 +83,10 @@ GBitmap::GBitmap(const GBitmap &ref, const GRect &rect, int border)
 {
   init(ref, rect, border);
 }
+
+
+
+
 
 
 // ----- initialization
@@ -214,7 +218,6 @@ GBitmap::init(ByteStream &ref, int aborder)
   THROW("Unknown PBM, PGM or RLE file format");
 }
 
-
 void
 GBitmap::borrow_data(unsigned char *data, int w, int h)
 {
@@ -229,6 +232,22 @@ GBitmap::borrow_data(unsigned char *data, int w, int h)
   bytes_per_row = w;
   bytes = data;
   rlelength = 0;
+}
+
+void
+GBitmap::borrow_rle(unsigned char *rledata, unsigned int rledatalen, int w, int h)
+{
+  delete [] bytes_data;
+  delete [] rle;
+  bytes = bytes_data = rle = 0;
+  grays = 2;
+  nrows = h;
+  ncolumns = w;
+  border = 0;
+  bytes_data = 0;
+  bytes_per_row = w;
+  rle = rledata;
+  rlelength = rledatalen;
 }
 
 
