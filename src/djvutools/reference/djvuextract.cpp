@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvuextract.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: djvuextract.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name djvuextract
@@ -65,7 +65,7 @@
     @memo
     Extract components from DjVu files.
     @version
-    #$Id: djvuextract.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $#
+    #$Id: djvuextract.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> - Initial implementation\\
     Andrei Erofeev <eaf@geocities.com> - Multipage support */
@@ -249,9 +249,9 @@ main(int argc, char **argv)
             }
           else
             {
-              StdioByteStream obs(argv[i]+5,"wb");
+              GP<ByteStream> obs=ByteStream::create(argv[i]+5,"wb");
               mbs.seek(0);
-              obs.copy(mbs);
+              obs->copy(mbs);
               fprintf(stderr, "  %s --> \"%s\" (%d bytes)\n", 
                       argv[i], argv[i]+5, mbs.size());
             }

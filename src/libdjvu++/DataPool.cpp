@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.63 2001-02-08 23:30:05 bcr Exp $
+// $Id: DataPool.cpp,v 1.64 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -786,7 +786,8 @@ DataPool::connect(const char * fname_in, int start_in, int length_in)
       DEBUG_MAKE_INDENT(3);
       char buffer[1024];
       int length;
-      StdioByteStream str("-", "rb");
+      GP<ByteStream> gstr=ByteStream::create("-", "rb");
+      ByteStream &str=*gstr;
       while((length=str.read(buffer, 1024)))
 	 add_data(buffer, length);
       set_eof();

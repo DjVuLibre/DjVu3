@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvutxt.cpp,v 1.9 2001-01-19 02:31:21 bcr Exp $
+// $Id: djvutxt.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 // DJVUTXT -- DjVu TXT extractor
@@ -69,7 +69,7 @@
     @author
     Andrei Erofeev <eaf@geocities.com> -- initial implementation
     @version
-    #$Id: djvutxt.cpp,v 1.9 2001-01-19 02:31:21 bcr Exp $# */
+    #$Id: djvutxt.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -217,7 +217,8 @@ main(int argc, char ** argv)
 
       GP<DjVuDocument> doc=new DjVuDocument();
       doc->init(GOS::filename_to_url(name_in));
-      StdioByteStream str_out(name_out, "w");
+      GP<ByteStream> gstr_out=ByteStream::create(name_out, "w");
+      ByteStream &str_out=*gstr_out;
       if (page_num<0)
 	 for(page_num=0;page_num<doc->get_pages_num();page_num++)
 	    doPage(doc, page_num, str_out);

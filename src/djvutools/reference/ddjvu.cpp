@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ddjvu.cpp,v 1.8 2001-01-04 22:04:54 bcr Exp $
+// $Id: ddjvu.cpp,v 1.9 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name ddjvu
@@ -111,7 +111,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ddjvu.cpp,v 1.8 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.9 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -243,16 +243,16 @@ convert(const char *from, const char *to, int page_num)
   // Save image
   if (pm) 
     {
-      StdioByteStream out (to,"wb");
-      pm->save_ppm(out);
+      GP<ByteStream> out=ByteStream::create(to,"wb");
+      pm->save_ppm(*out);
     }
   else if (bm) 
     {
-      StdioByteStream out (to,"wb");
+      GP<ByteStream> out=ByteStream::create(to,"wb");
       if (bm->get_grays() == 2)
-        bm->save_pbm(out);
+        bm->save_pbm(*out);
       else 
-        bm->save_pgm(out);
+        bm->save_pgm(*out);
     }
   else 
     {

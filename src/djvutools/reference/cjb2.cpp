@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cjb2.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: cjb2.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -70,7 +70,7 @@
     Paul Howard <pgh@research.att.com>\\
     Pascal Vincent <vincentp@iro.umontreal.ca>
     @version
-    $Id: cjb2.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $ */
+    $Id: cjb2.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $ */
 //@{
 //@}
 
@@ -803,8 +803,8 @@ struct cjb2opts {
 void 
 cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
 {
-  StdioByteStream ibs(filein, "rb");
-  GBitmap input(ibs);
+  GP<ByteStream> ibs=ByteStream::create(filein, "rb");
+  GBitmap input(*ibs);
 
   // Read input image
   CCImage rimg(input.columns(), input.rows(), opts.dpi);  // construct CCImage
@@ -843,8 +843,8 @@ cjb2(const char *filein, const char *fileout, const cjb2opts &opts)
     }
   
   // Code
-  StdioByteStream obs(fileout, "wb");
-  IFFByteStream iff(obs);
+  GP<ByteStream> obs=ByteStream::create(fileout, "wb");
+  IFFByteStream iff(*obs);
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk

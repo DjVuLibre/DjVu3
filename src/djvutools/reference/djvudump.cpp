@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: djvudump.cpp,v 1.10 2001-01-04 22:04:54 bcr Exp $
+// $Id: djvudump.cpp,v 1.11 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name djvuinfo
@@ -78,7 +78,7 @@ xxx
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvudump.cpp,v 1.10 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: djvudump.cpp,v 1.11 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -96,12 +96,12 @@ void
 display(const char *s)
 {
    DjVuDumpHelper helper;
-   StdioByteStream ibs(s, "rb");
+   GP<ByteStream> ibs=ByteStream::create(s, "rb");
    GP<ByteStream> str_out;
-   str_out=helper.dump(ibs);
-   StdioByteStream obs("-", "w");
+   str_out=helper.dump(*ibs);
+   GP<ByteStream> obs=ByteStream::create("-", "w");
    str_out->seek(0);
-   obs.copy(*str_out);
+   obs->copy(*str_out);
 }
 
 void

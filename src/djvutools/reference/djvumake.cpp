@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvumake.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: djvumake.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name djvumake
@@ -102,7 +102,7 @@
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $#
+    #$Id: djvumake.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> \\
     Patrick Haffner <haffner@research.att.com>
@@ -184,7 +184,8 @@ analyze_mmr_chunk(char *filename)
 {
   if (!mmrstencil || !mmrstencil->size())
     {
-      StdioByteStream bs(filename,"rb");
+      GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+      ByteStream &bs=*gbs;
       mmrstencil = new MemoryByteStream();
       // Check if file is an IFF file
       char magic[4];
@@ -232,7 +233,8 @@ analyze_jb2_chunk(char *filename)
 {
   if (!jb2stencil || !jb2stencil->size())
     {
-      StdioByteStream bs(filename,"rb");
+      GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+      ByteStream &bs=*gbs;
       jb2stencil = new MemoryByteStream();
       // Check if file is an IFF file
       char magic[4];
@@ -387,8 +389,8 @@ void
 create_raw_chunk(IFFByteStream &iff, char *chkid, char *filename)
 {
   iff.put_chunk(chkid);
-  StdioByteStream ibs(filename,"rb");
-  iff.copy(ibs);
+  GP<ByteStream> ibs=ByteStream::create(filename,"rb");
+  iff.copy(*ibs);
   iff.close_chunk();
 }
 
@@ -413,7 +415,8 @@ struct SecondaryHeader {
 void 
 create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
 {
-  StdioByteStream bs(filename,"rb");
+  GP<ByteStream> gbs=ByteStream::create(filename,"rb");
+  ByteStream &bs=*gbs;
   IFFByteStream bsi(bs);
   GString chkid;
   bsi.get_chunk(chkid);
@@ -467,7 +470,8 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
       if (!s)
         s = filespec + strlen(filespec);
       GString filename(filespec, s-filespec);
-      ByteStream *pbs = new StdioByteStream(filename,"rb");
+      static GP<ByteStream> pbs;
+      pbs=ByteStream::create(filename,"rb");
       bg44iff = new IFFByteStream(*pbs);
       GString chkid;
       bg44iff->get_chunk(chkid);
@@ -549,7 +553,8 @@ create_masksub_chunks(IFFByteStream &iff, char *filespec)
   // Check and load pixmap file
   if (!stencil)
     G_THROW("The use of a raw ppm image requires a stencil");
-  StdioByteStream ibs(filespec, "rb");
+  GP<ByteStream> gibs=ByteStream::create(filespec, "rb");
+  ByteStream &ibs=*gibs;
   GPixmap raw_pm(ibs);
   if ((int) stencil->get_width() != (int) raw_pm.columns())
     G_THROW("Stencil and raw image have different widths!");
@@ -600,7 +605,8 @@ main(int argc, char **argv)
         usage();
       // Open djvu file
       remove(argv[1]);
-      StdioByteStream obs(argv[1],"wb");
+      GP<ByteStream> gobs=ByteStream::create(argv[1],"wb");
+      ByteStream &obs=*gobs;
       IFFByteStream iff(obs);
       // Create header
       iff.put_chunk("FORM:DJVU", 1);

@@ -16,13 +16,6 @@
 #include "RunImage.h"
 #endif
 
-#ifdef WIN32
-#define BINARY "b"
-#else
-#define BINARY
-#endif
-
-
 int 
 usage()
 {
@@ -47,9 +40,10 @@ main(int argc, char **argv)
           if (argc != 4)
             usage();
           // Read image and compute runs
-          StdioByteStream input(argv[2],"r"BINARY);
+          GP<ByteStream> input=ByteStream::create(argv[2],"rb");
+          GBitmap bm(*input);
+          input=0;
           RunImage rimg;
-          GBitmap bm(input);
           rimg.add_bitmap_runs(bm);
           bm.GBitmap::~GBitmap();
           // Perform CC analysis
@@ -62,8 +56,8 @@ main(int argc, char **argv)
           // Apply JB2 Image filters
           GP<JB2Image> jimgf = JB2Filter(jimg);
           // Code JB2 Image
-          StdioByteStream output(argv[3],"w"BINARY);
-          jimgf->encode(output);
+          GP<ByteStream> output=ByteStream::create(argv[3],"wb");
+          jimgf->encode(*output);
         }
       else
 #endif
@@ -72,25 +66,26 @@ main(int argc, char **argv)
           //
           if (argc>3)
             usage();
-          StdioByteStream input (argv[1],"r"BINARY);
+          GP<ByteStream> input=ByteStream::create(argv[1],"rb");
           GP<JB2Image> image = new JB2Image;
-          image->decode(input);
+          image->decode(*input);
+          input=0;
           GP<GBitmap> bm = image->get_bitmap(1);
           if (argc>2)
             {
               int len = strlen(argv[2]);
               if (! strcmp(argv[2]+len-4, ".pbm")) {
-                StdioByteStream output(argv[2],"w"BINARY);
-                bm->save_pbm(output);
+                GP<ByteStream> output=ByteStream::create(argv[2],"wb");
+                bm->save_pbm(*output);
               } else if (! strcmp(argv[2]+len-4, ".rle")) {
-                StdioByteStream output(argv[2],"w"BINARY);
-                bm->save_rle(output);
+                GP<ByteStream> output=ByteStream::create((argv[2],"wb");
+                bm->save_rle(*output);
               } else if (! strcmp(argv[2]+len-2, ".r")) {
-                StdioByteStream output(argv[2],"w"BINARY);
-                bm->save_rle(output);
+                GP<ByteStream> output=ByteStream::Create(argv[2],"wb");
+                bm->save_rle(*output);
               } else if (! strcmp(argv[2]+len-2, ".q")) {
-                StdioByteStream output(argv[2],"w"BINARY);
-                image->encode(output);
+                GP<ByteStream> output=ByteStream::Create(argv[2],"wb");
+                image->encode(*output);
               } else {
                 G_THROW("TestJB2.bad_suffix");
               }

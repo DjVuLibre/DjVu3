@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: csepdjvu.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $
+// $Id: csepdjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -108,7 +108,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: csepdjvu.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: csepdjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -1302,8 +1302,8 @@ main(int argc, const char **argv)
           else 
             {
               // Process separation file
-              StdioByteStream fbs(arg,"rb");
-              BufferByteStream ibs(fbs);
+              GP<ByteStream> fbs=ByteStream::create(arg,"rb");
+              BufferByteStream ibs(*fbs);
               do {
                 char pagename[16];
                 sprintf(pagename, "p%04d.djvu", ++pageno);
@@ -1331,14 +1331,14 @@ main(int argc, const char **argv)
         {
           // Save as a single page 
           outputpage.seek(0);
-          StdioByteStream obs(outputfile,"wb");
-          obs.copy(outputpage);
+          GP<ByteStream> obs=ByteStream::create(outputfile,"wb");
+          obs->copy(outputpage);
         }
       else if (pageno > 1)
         {
           // Save as a bundled file
-          StdioByteStream obs(outputfile,"wb");
-          doc.write(obs);
+          GP<ByteStream> obs=ByteStream::create(outputfile,"wb");
+          doc.write(*obs);
         }
       else 
         usage();

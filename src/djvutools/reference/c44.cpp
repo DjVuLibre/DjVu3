@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: c44.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: c44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -184,7 +184,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: c44.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: c44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -609,8 +609,8 @@ getmask(int w, int h)
   static GP<GBitmap> msk8;
   if (!! mskfile)
     {
-      StdioByteStream mbs(mskfile,"rb");
-      msk8 = new GBitmap(mbs);
+      GP<ByteStream> mbs=ByteStream::create(mskfile,"rb");
+      msk8 = new GBitmap(*mbs);
       if (msk8->columns() != (unsigned int)w || 
           msk8->rows()    != (unsigned int)h  )
         G_THROW("c44: mask and image have different size");
@@ -658,7 +658,8 @@ main(int argc, char **argv)
       // Parse arguments
       parse(argc, argv);
       // Check input file
-      StdioByteStream ibs(pnmfile,"rb");
+      GP<ByteStream> gibs=ByteStream::create(pnmfile,"rb");
+      ByteStream &ibs=*gibs;
       char prefix[16];
       if (ibs.readall((void*)prefix, sizeof(prefix)) != sizeof(prefix))
         G_THROW("c44: cannot read pnm file header");
@@ -722,8 +723,8 @@ main(int argc, char **argv)
       if (iwp)
         {
           remove(iw4file);
-          StdioByteStream obs(iw4file,"wb");
-          IFFByteStream iff(obs);
+          GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
+          IFFByteStream iff(*obs);
           if (flag_crcbdelay >= 0)
             iwp->parm_crcbdelay(flag_crcbdelay);
           if (flag_dbfrac > 0)
@@ -739,8 +740,8 @@ main(int argc, char **argv)
       else if (iwb)
         {
           remove(iw4file);
-          StdioByteStream obs(iw4file,"wb");
-          IFFByteStream iff(obs);
+          GP<ByteStream> obs=ByteStream::create(iw4file,"wb");
+          IFFByteStream iff(*obs);
           if (flag_dbfrac > 0)
             iwb->parm_dbfrac((float)flag_dbfrac);
           int nchunk = resolve_quality(w*h);

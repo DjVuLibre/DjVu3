@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: d44.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $
+// $Id: d44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name d44
@@ -84,7 +84,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: d44.cpp,v 1.7 2001-01-04 22:04:54 bcr Exp $# 
+    #$Id: d44.cpp,v 1.8 2001-02-09 01:06:42 bcr Exp $# 
 */
 //@{
 //@}
@@ -184,7 +184,8 @@ mymain(int argc, char **argv)
       // Parse arguments
       parse(argc, argv);
       // Check input file
-      StdioByteStream ibs(iw4file,"rb");
+      GP<ByteStream> gibs=ByteStream::create(iw4file,"rb");
+      ByteStream &ibs=*gibs;
       GString chkid;
       // Determine file type
       { 
@@ -221,8 +222,8 @@ mymain(int argc, char **argv)
           MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
           DeleteFile(tszPnmFile) ;
 #endif
-          StdioByteStream obs(pnmfile,"wb");
-          pbm->save_pgm(obs);
+          GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
+          pbm->save_pgm(*obs);
         }
       else if (chkid == "FORM:PM44")
         {
@@ -249,8 +250,8 @@ mymain(int argc, char **argv)
           MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,pnmfile,strlen(pnmfile)+1,tszPnmFile,sizeof(tszPnmFile)) ;
           DeleteFile(tszPnmFile) ;
 #endif
-          StdioByteStream obs(pnmfile,"wb");
-          ppm->save_ppm(obs);
+          GP<ByteStream> obs=ByteStream::create(pnmfile,"wb");
+          ppm->save_ppm(*obs);
         }
       else
         {

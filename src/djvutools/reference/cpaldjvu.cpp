@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: cpaldjvu.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $
+// $Id: cpaldjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -69,7 +69,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: cpaldjvu.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: cpaldjvu.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -823,8 +823,8 @@ cpaldjvu(const GPixmap &input, const char *fileout, const cpaldjvuopts &opts)
 #endif
 
   // Assemble DJVU file
-  StdioByteStream obs(fileout, "wb");
-  IFFByteStream iff(obs);
+  GP<ByteStream> obs=ByteStream::create(fileout, "wb");
+  IFFByteStream iff(*obs);
   // -- main composite chunk
   iff.put_chunk("FORM:DJVU", 1);
   // -- ``INFO'' chunk
@@ -929,8 +929,8 @@ main(int argc, const char **argv)
       if (!inputppmfile || !outputdjvufile)
         usage();
       // Load and run
-      StdioByteStream ibs(inputppmfile,"rb");
-      GPixmap input(ibs);
+      GP<ByteStream> ibs=ByteStream::create(inputppmfile,"rb");
+      GPixmap input(*ibs);
       cpaldjvu(input, outputdjvufile, opts);
     }
   G_CATCH(ex)

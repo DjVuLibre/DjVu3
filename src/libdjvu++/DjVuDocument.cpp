@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.138 2001-01-18 22:13:36 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.139 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -1690,8 +1690,8 @@ DjVuDocument::save_as(const char where[], const bool bundled)
    }else if (bundled)
    {
       DataPool::load_file(full_name);
-      StdioByteStream str(full_name, "wb");
-      write(str);
+      GP<ByteStream> str=ByteStream::create(full_name, "wb");
+      write(*str);
    } else 
    {
      expand(GOS::dirname(full_name), GOS::basename(full_name));

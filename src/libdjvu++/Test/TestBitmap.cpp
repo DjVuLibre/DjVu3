@@ -155,7 +155,8 @@ main(void)
     d2.blit(&c,16,8,1);
     d2.blit(&c,16,8,2);
     d2.blit(&c,0,0,3);
-    StdioByteStream cout(stdout,"w");
+    GP<ByteStream> gcout=ByteStream::create(stdout,"w"); 
+    ByteStream &cout=*gcout;
     d1.save_pgm(cout,0);
     d2.save_pgm(cout,0);
   }

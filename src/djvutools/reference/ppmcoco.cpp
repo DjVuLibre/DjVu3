@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ppmcoco.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $
+// $Id: ppmcoco.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 /** @name ppmcoco
@@ -104,7 +104,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: ppmcoco.cpp,v 1.6 2001-01-04 22:04:54 bcr Exp $# */
+    #$Id: ppmcoco.cpp,v 1.7 2001-02-09 01:06:42 bcr Exp $# */
 //@{
 //@}
 
@@ -188,11 +188,11 @@ main (int argc, char **argv)
         fprintf(stderr,"warning: strong correction reduces image quality\n");
       // perform
       GPixmap pm;
-      StdioByteStream ibs(infile,"rb"); 
-      pm.init(ibs); 
+      GP<ByteStream> ibs=ByteStream::create(infile,"rb"); 
+      pm.init(*ibs); 
       pm.color_correct(gamma_correction);
-      StdioByteStream obs(outfile,"wb"); 
-      pm.save_ppm(obs); 
+      GP<ByteStream> obs=ByteStream::create(outfile,"wb"); 
+      pm.save_ppm(*obs); 
     }
   G_CATCH(ex)
     {

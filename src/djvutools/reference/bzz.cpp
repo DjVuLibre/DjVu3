@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: bzz.cpp,v 1.9 2001-01-04 22:04:54 bcr Exp $
+// $Id: bzz.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $
 // $Name:  $
 
 
@@ -58,7 +58,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation
     @version
-    $Id: bzz.cpp,v 1.9 2001-01-04 22:04:54 bcr Exp $ */
+    $Id: bzz.cpp,v 1.10 2001-02-09 01:06:42 bcr Exp $ */
 //@{
 //@}
 
@@ -130,17 +130,17 @@ main(int argc, char **argv)
       if (argc >= 4)
         usage();
       // Action
-      StdioByteStream in(infile,"rb");
-      StdioByteStream out(outfile,"wb");
+      GP<ByteStream> in=ByteStream::create(infile,"rb");
+      GP<ByteStream> out=ByteStream::create(outfile,"wb");
       if (blocksize)
         {
-          BSByteStream bsb(out, blocksize);
-          bsb.copy(in);
+          BSByteStream bsb(*out, blocksize);
+          bsb.copy(*in);
         }
       else 
         {
-          BSByteStream bsb(in);
-          out.copy(bsb);
+          BSByteStream bsb(*in);
+          out->copy(bsb);
         }
     }
   G_CATCH(ex)
