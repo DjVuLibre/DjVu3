@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.17 1999-09-15 19:29:28 eaf Exp $
+//C- $Id: DataPool.cpp,v 1.18 1999-09-16 15:45:05 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -538,13 +538,9 @@ DataPool::set_eof(void)
 	 GCriticalSectionLock lock(&data_lock);
 	 length=data->size();
       }
-      
-	 // Wake up everybody to let them rescan flags
-      {
-	 GCriticalSectionLock lock(&readers_lock);
-	 for(GPosition pos=readers_list;pos;++pos)
-	    readers_list[pos]->event.set();
-      }
+
+	 // Wake up all readers to let them rescan the flags
+      wake_up_all_readers();
    
 	 // Activate all trigger callbacks with negative threshold
       check_triggers();
