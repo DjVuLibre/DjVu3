@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.1.2.1 1999-04-12 16:48:22 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.1.2.2 1999-04-28 19:49:04 eaf Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -27,7 +27,7 @@
 /** @name DjVuInterface.h
     @memo DjVu document interface.
     @author Andrei Erofeev
-    @version #$Id: DjVuPort.h,v 1.1.2.1 1999-04-12 16:48:22 eaf Exp $#
+    @version #$Id: DjVuPort.h,v 1.1.2.2 1999-04-28 19:49:04 eaf Exp $#
 */
 
 //@{
@@ -69,6 +69,24 @@ public:
    virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
    virtual bool		notify_error(const DjVuPort * source, const char * msg);
    virtual bool		notify_status(const DjVuPort * source, const char * msg);
+};
+
+class DjVuMemoryPort : public DjVuPort
+{
+public:
+   virtual bool		inherits(const char * class_name) const;
+   
+   virtual GP<DataRange>request_data(const DjVuPort * source, const GURL & url);
+   void		add_data(const GURL & url, const GP<DataPool> & pool);
+private:
+   class Pair : public GPEnabled
+   {
+   public:
+      GURL		url;
+      GP<DataPool>	pool;
+   };
+   GCriticalSection	lock;
+   GPList<Pair>		list;
 };
 
 class DjVuPortcaster : public DjVuPort
@@ -154,6 +172,14 @@ DjVuSimplePort::inherits(const char * class_name) const
 {
    return
       !strcmp("DjVuSimplePort", class_name) ||
+      DjVuPort::inherits(class_name);
+}
+
+inline bool
+DjVuMemoryPort::inherits(const char * class_name) const
+{
+   return
+      !strcmp("DjVuMemoryPort", class_name) ||
       DjVuPort::inherits(class_name);
 }
 

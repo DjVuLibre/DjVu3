@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.1.2.2 1999-04-20 18:44:02 eaf Exp $
+//C- $Id: DjVuPort.cpp,v 1.1.2.3 1999-04-28 19:49:04 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -460,4 +460,40 @@ DjVuSimplePort::notify_status(const DjVuPort * source, const char * msg)
 {
    fprintf(stderr, "%s\n", msg);
    return 1;
+}
+
+//****************************************************************************
+//*************************** DjVuMemoryPort *********************************
+//****************************************************************************
+
+GP<DataRange>
+DjVuMemoryPort::request_data(const DjVuPort * source, const GURL & url)
+{
+   TRY {
+      GCriticalSectionLock lk(&lock);
+      for(GPosition pos=list;pos;++pos)
+	 if (list[pos]->url==url)
+	    return new DataRange(list[pos]->pool);
+   } CATCH(exc) {
+   } ENDCATCH;
+   return 0;
+}
+
+void
+DjVuMemoryPort::add_data(const GURL & url, const GP<DataPool> & pool)
+{
+   GP<Pair> pair;
+   GCriticalSectionLock lk(&lock);
+   for(GPosition pos=list;pos;++pos)
+      if (list[pos]->url==url)
+      {
+	 pair=list[pos];
+	 break;
+      }
+   if (!pair)
+   {
+      pair=new Pair();
+      list.append(pair);
+   }
+   pair->pool=pool;
 }
