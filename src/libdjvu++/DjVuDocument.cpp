@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.43 1999-09-17 19:02:28 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.44 1999-09-17 20:21:26 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -66,18 +66,18 @@ DjVuDocument::~DjVuDocument(void)
       // Before we proceed with destroy we must stop the initializing
       // thread (involves stopping the init_data_pool, the file
       // used to decode NDIR chunks (if any) and all unnamed files)
-   if (init_data_pool) init_data_pool->stop();
+   if (init_data_pool) init_data_pool->stop(false);	// any operation
    GMonitorLock lock(&init_thread_flags);
    while((init_thread_flags & STARTED) &&
 	 !(init_thread_flags & FINISHED))
    {
-      if (ndir_file) ndir_file->stop();
+      if (ndir_file) ndir_file->stop(true);	// non-block ops only
       ndir_file=0;
 
       {
 	 GCriticalSectionLock lock(&ufiles_lock);
 	 for(GPosition pos=ufiles_list;pos;++pos)
-	    ufiles_list[pos]->file->stop();
+	    ufiles_list[pos]->file->stop(true);	// non-block ops only
 	 ufiles_list.empty();
       }
 
@@ -98,11 +98,12 @@ DjVuDocument::static_init_thread(void * cl_data)
    DjVuDocument * th=(DjVuDocument *) cl_data;
    TRY {
       th->init_thread();
+	 // Do not do ANYTHING below this line
    } CATCH(exc) {
       th->flags=th->flags | DjVuDocument::DOC_INIT_FAILED;
-      TRY {
-	 get_portcaster()->notify_error(th, exc.get_cause());
-      } CATCH(exc) {} ENDCATCH;
+      TRY { get_portcaster()->notify_error(th, exc.get_cause()); } CATCH(exc) {} ENDCATCH;
+      th->init_thread_flags=th->init_thread_flags | FINISHED;
+	 // Do not do ANYTHING below this line
    } ENDCATCH;
       // Do not do ANYTHING below this line
 }
