@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.7 1999-06-30 20:48:09 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.8 1999-07-13 15:29:38 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -518,16 +518,6 @@ DjVuAnno::decode(ByteStream & str)
    GCriticalSectionLock lock(&class_lock);
 
    raw=read_raw(str);
-   GLParser parser(raw);
-   decode(parser);
-}
-
-void
-DjVuAnno::decode(const char * str)
-{
-   GCriticalSectionLock lock(&class_lock);
-
-   raw=str;
    GLParser parser(raw);
    decode(parser);
 }
