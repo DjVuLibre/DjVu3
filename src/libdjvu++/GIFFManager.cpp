@@ -1,0 +1,508 @@
+//C-  -*- C++ -*-
+//C-
+//C-  Copyright (c) 1988 AT&T	
+//C-  All Rights Reserved 
+//C-
+//C-  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
+//C-  The copyright notice above does not evidence any
+//C-  actual or intended publication of such source code.
+//C-
+//C-  $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+
+/*****************************************************************************
+ *
+ *   $Revision: 1.1 $
+ *   $Date: 1999-01-22 00:40:19 $
+ *   @(#) $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+ *
+ *****************************************************************************/
+
+// $Id: GIFFManager.cpp,v 1.1 1999-01-22 00:40:19 leonb Exp $
+// - Author: Andrei Erofeev, 7/1998
+
+#ifdef __GNUC__
+#pragma implementation
+#endif
+
+#include "GIFFManager.h"
+#include "GException.h"
+
+#if defined(DEBUG) || defined(RUNTIME_DEBUG)
+#include "debug.h"
+#else
+#define DEBUG_MAKE_INDENT(x)
+#define DEBUG_MSG(x)
+#endif
+
+void
+GIFFChunk::setName(const char * name)
+{
+   DEBUG_MSG("GIFFChunk::setName(): name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   const char * colon;
+   if ((colon=strchr(name, ':')))
+   {
+      type=GString(name, colon-name);
+      name=colon+1;
+      if (strchr(name, ':'))
+	 THROW("Chunk name may contain only one colon.");
+   };
+
+   DEBUG_MSG("auto-setting type to '" << type << "'\n");
+
+   if (strpbrk(name, ".[]"))
+      THROW("Chunk name may not contain dots, and brackets.");
+   
+   strncpy(GIFFChunk::name, name, 4); GIFFChunk::name[4]=0;
+   for(int i=strlen(GIFFChunk::name);i<4;i++) GIFFChunk::name[i]=' ';
+}
+
+bool
+GIFFChunk::checkName(const char * name)
+{
+   GString type;
+   
+   const char * colon;
+   if ((colon=strchr(name, ':')))
+   {
+      type=GString(name, colon-name);
+      name=colon+1;
+   };
+   
+   GString sname=GString(name, 4);
+   for(int i=sname.length();i<4;i++) sname.setat(i, ' ');
+
+   DEBUG_MSG("GIFFChunk::checkName(): type='" << type << "' name='" << sname << "'\n");
+   return (type==GIFFChunk::type || !type.length() && GIFFChunk::type=="FORM")
+       && sname==GIFFChunk::name;
+}
+
+void
+GIFFChunk::save(IFFByteStream & istr, bool use_trick)
+{
+   DEBUG_MSG("GIFFChunk::save(): saving chunk '" << getFullName() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (isContainer())
+   {
+      if (chunks.size())
+      {
+	 istr.put_chunk(getFullName(), use_trick);
+	 for(GPosition pos=chunks;pos;++pos)
+	    if (chunks[pos]->getType()=="PROP")
+	       chunks[pos]->save(istr);
+	 for(GPosition pos=chunks;pos;++pos)
+	    if (chunks[pos]->getType()!="PROP")
+	       chunks[pos]->save(istr);
+	 istr.close_chunk();
+      } else
+      {
+	 DEBUG_MSG("but it's empty => don't save empty container.\n");
+      };
+   } else
+   {
+      istr.put_chunk(getName(), use_trick);
+      istr.write((char *) data, data.size());
+      istr.close_chunk();
+   };
+}
+
+void
+GIFFChunk::addChunk(const GP<GIFFChunk> & chunk, int position)
+{
+   DEBUG_MSG("GIFFChunk::addChunk(): Adding chunk to '" << getName() <<
+	     "' @ position=" << position << "\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (!type.length())
+   {
+      DEBUG_MSG("Converting the parent to FORM\n");
+      type="FORM";
+   };
+
+   if (chunk->getType()=="PROP")
+   {
+      DEBUG_MSG("Converting the parent to LIST\n");
+      type="LIST";
+   };
+
+   GPosition pos;
+   if (position>=0 && chunks.nth(position, pos))
+      chunks.insert_before(pos, chunk);
+   else chunks.append(chunk);
+}
+
+void
+GIFFChunk::decodeName(const char * name, GString * short_name_ptr,
+		      int * number_ptr)
+{
+   DEBUG_MSG("GIFFChunk::decodeName(): Checking brackets in name '" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (strchr(name, '.')) THROW("Chunk name may not contain dots.");
+
+   int number=0;
+   const char * obracket;
+   if ((obracket=strchr(name, '[')))
+   {
+      const char * cbracket;
+      if (!(cbracket=strchr(obracket+1, ']')))
+	 THROW("Unmatched openining bracket in chunk name encountered.");
+      number=atoi(GString(obracket+1, cbracket-obracket-1));
+      if (cbracket[1]) THROW("Chunk name contains garbage after ']'.");
+   };
+
+   GString short_name=GString(name, obracket-name);
+   int colon=short_name.search(':');
+   if (colon>=0) short_name=(const char *) short_name+(colon+1);
+   for(int i=short_name.length();i<4;i++) short_name.setat(i, ' ');
+   
+   DEBUG_MSG("short_name='" << short_name << "'\n");
+   DEBUG_MSG("number=" << number << "\n");
+   
+   if (number_ptr) *number_ptr=number;
+   if (short_name_ptr) *short_name_ptr=short_name;
+}
+
+void
+GIFFChunk::delChunk(const char * name)
+   // The name may contain brackets to specify the chunk number
+{
+   DEBUG_MSG("GIFFChunk::delChunk(): Deleting chunk '" << name <<
+	     "' from '" << getName() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GString short_name;
+   int number;
+   decodeName(name, &short_name, &number);
+
+   int num=0;
+   for(GPosition pos=chunks;pos;++pos)
+      if (chunks[pos]->getName()==short_name && num++==number)
+      {
+	 chunks.del(pos);
+	 return;
+      };
+   
+   char * buffer=new char[256];
+   sprintf(buffer, "There is no subchunk '%s' #%d in chunk '%s'.",
+	   (const char *) short_name, number, (const char *) getName());
+   THROW(buffer);
+}
+
+GP<GIFFChunk>
+GIFFChunk::getChunk(const char * name, int * pos_ptr)
+   // The name may contain brackets to specify the chunk number
+{
+   DEBUG_MSG("GIFFChunk::getChunk(): Returning chunk '" << name <<
+	     "' from '" << getName() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   GString short_name;
+   int number;
+   decodeName(name, &short_name, &number);
+
+   int num=0;
+   int pos_num;
+   GPosition pos;
+   for(pos=chunks, pos_num=0;pos;++pos, pos_num++)
+      if (chunks[pos]->getName()==short_name && num++==number)
+      {
+	 if (pos_ptr) *pos_ptr=pos_num;
+	 return chunks[pos];
+      };
+
+   return 0;
+}
+
+int
+GIFFChunk::getChunksNumber(const char * name)
+{
+   DEBUG_MSG("GIFFChunk::getChunksNumber(): Returning number of chunks '" << name <<
+	     "' in '" << getName() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   if (strpbrk(name, "[]")) THROW("Chunk name may not contain brackets.");
+   
+   GString short_name;
+   int number;
+   decodeName(name, &short_name, &number);
+   
+   int num=0;
+   for(GPosition pos=chunks;pos;++pos)
+      num+=(chunks[pos]->getName()==short_name);
+   return num;
+}
+
+//************************************************************************
+
+void
+GIFFManager::addChunk(const char * parent_name, const GP<GIFFChunk> & chunk,
+		      int pos)
+      // parent_name is the fully qualified name of the PARENT
+      //             IT MAY BE EMPTY
+      // All the required chunks will be created
+      // pos=-1 means to append the chunk
+{
+   DEBUG_MSG("GIFFManager::addChunk(): Adding chunk to name='" << parent_name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (!top_level->getName().length())
+   {
+      if (!parent_name || !strlen(parent_name) || parent_name[0]!='.')
+	 THROW("Top level chunk name is not known yet.");
+      if (!parent_name[1])
+      {
+	    // 'chunk' is actually the new top-level chunk
+	 DEBUG_MSG("since parent_name=='.', making the chunk top-level\n");
+	 if (!chunk->isContainer()) THROW("Only a container may be top level chunk.");
+	 top_level=chunk;
+	 return;
+      };
+      DEBUG_MSG("Setting the name of the top-level chunk\n");
+      const char * next_dot=strchr(parent_name+1, '.');
+      if (!next_dot) top_level->setName(parent_name+1);
+      else top_level->setName(GString(parent_name+1, next_dot-parent_name-1));
+   };
+
+   DEBUG_MSG("top level chunk name='" << top_level->getName() << "'\n");
+   
+   if (parent_name && strlen(parent_name) && parent_name[0]=='.')
+   {
+      const char * next_dot=strchr(parent_name+1, '.');
+      if (!next_dot) next_dot=parent_name+strlen(parent_name);
+      GString top_name=GString(parent_name+1, next_dot-parent_name-1);
+      if (!top_level->checkName(top_name))
+	 THROW("The top level chunk of the file does not have the name '"+
+	       top_name+"'.");
+      parent_name=next_dot;
+   };
+
+   GP<GIFFChunk> cur_sec=top_level;
+   const char * start, * end=parent_name-1;
+   do
+   {
+      for(start=++end;*end;end++)
+	 if (*end=='.') break;
+      if (end>start)
+      {
+	 char name[128];
+	 char short_name[128];
+	 strncpy(name, start, end-start);
+	 name[end-start]=0;
+	 strcpy(short_name, name);
+
+	 int number=0;
+	 char * obracket=strchr(short_name, '[');
+	 if (obracket)
+	 {
+	    char * cbracket=strchr(obracket+1, ']');
+	    if (!cbracket) THROW("Unbalanced bracket in chunk name.");
+	    number=atoi(GString(obracket+1, cbracket-obracket-1));
+	    *obracket=0;
+	 };
+
+	 for(int i=cur_sec->getChunksNumber(short_name);i<number+1;i++)
+	    cur_sec->addChunk(new GIFFChunk(short_name));
+	 cur_sec=cur_sec->getChunk(name);
+	 if (!cur_sec) THROW("Internal error: chunk '"+GString(name)+"' is not known.");
+      };
+   } while(*end);
+   
+   cur_sec->addChunk(chunk, pos);
+}
+
+void
+GIFFManager::addChunk(const char * name, const char * buffer, int length)
+      // name is fully qualified name of the chunk TO BE INSERTED.
+      //      it may contain brackets at the end to set the position
+      // All the required chunks will be created
+{
+   DEBUG_MSG("GIFFManager::addChunk(): adding plain chunk with name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   const char * short_name=strrchr(name, '.');
+   if (!short_name) short_name=name;
+   else short_name++;
+
+   int pos=-1;
+   const char * obracket=strchr(short_name, '[');
+   if (obracket)
+   {
+      const char * cbracket=strchr(obracket+1, ']');
+      if (!cbracket) THROW("Unbalanced bracket in chunk name.");
+      pos=atoi(GString(obracket+1, cbracket-obracket-1));
+      if (cbracket[1]) THROW("Chunk name contains garbage after ']'.");
+   };
+   GString chunk_name=GString(short_name, obracket-short_name);
+   DEBUG_MSG("Creating new chunk with name " << chunk_name << "\n");
+   GP<GIFFChunk> chunk;
+   chunk=new GIFFChunk(chunk_name, buffer, length);
+   addChunk(GString(name, short_name-name), chunk, pos);
+}
+
+void
+GIFFManager::delChunk(const char * name)
+      // "name" should be fully qualified, that is contain dots.
+      // It may also end with [] to set the chunk order number
+{
+   DEBUG_MSG("GIFFManager::delChunk(): Deleting chunk '" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (!name || !strlen(name))
+      THROW("Attempt to delete a chunk with empty name.");
+
+   if (name[0]=='.')
+   {
+      char * next_dot=strchr(name+1, '.');
+      if (!next_dot)
+      {
+	 if (top_level->checkName(name+1))
+	 {
+	    DEBUG_MSG("Removing top level chunk..\n");
+	    top_level=new GIFFChunk();
+	    return;
+	 } else
+	    THROW("The name of the top level chunk is not '"+GString(name+1)+"'.");
+      };
+      GString top_name=GString(name+1, next_dot-name-1);
+      if (!top_level->checkName(top_name))
+	 THROW("The name of the top level chunk is not '"+top_name+"'.");
+      name=next_dot+1;
+   };
+   
+   GP<GIFFChunk> cur_sec=top_level;
+   const char * start, * end=name-1;
+   do
+   {
+      for(start=++end;*end;end++)
+	 if (*end=='.') break;
+      if (end>start && *end=='.')
+	 cur_sec=cur_sec->getChunk(GString(start, end-start));
+      if (!cur_sec) THROW("Can't find chunk with name '"+GString(name)+"'.");
+   } while(*end);
+   
+   if (!strlen(start))
+   {
+      char * buffer=new char[128];
+      sprintf(buffer, "Malformed chunk name '%s': ends with a dot.", name);
+      THROW(buffer);
+   };
+   
+   cur_sec->delChunk(start);
+}
+
+GP<GIFFChunk>
+GIFFManager::getChunk(const char * name, int * pos_num)
+      // "name" should be fully qualified, that is contain dots.
+      // It may also end with [] to set the chunk order number
+{
+   DEBUG_MSG("GIFFManager::getChunk(): Returning chunk '" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   if (!name || !strlen(name))
+      THROW("Attempt to get a chunk with empty name.");
+
+   if (name[0]=='.')
+   {
+      char * next_dot=strchr(name+1, '.');
+      if (!next_dot)
+      {
+	 if (top_level->checkName(name+1))
+	 {
+	    DEBUG_MSG("Returning top level chunk..\n");
+	    return top_level;
+	 } else
+	    THROW("The name of the top level chunk is not '"+GString(name+1)+"'.");
+      };
+      GString top_name=GString(name+1, next_dot-name-1);
+      if (!top_level->checkName(top_name))
+	 THROW("The name of the top level chunk is not '"+top_name+"'.");
+      name=next_dot+1;
+   };
+   
+   GP<GIFFChunk> cur_sec=top_level;
+   const char * start, * end=(const char *) name-1;
+   do
+   {
+      for(start=++end;*end;end++)
+	 if (*end=='.') break;
+      if (end>start) cur_sec=cur_sec->getChunk(GString(start, end-start), pos_num);
+      if (!cur_sec) return 0;
+   } while(*end);
+   
+   return cur_sec;
+}
+
+int
+GIFFManager::getChunksNumber(const char * name)
+   // Returns the number of chunks with given fully qualified name
+{
+   DEBUG_MSG("GIFFManager::getChunksNumber(): name='" << name << "'\n");
+   DEBUG_MAKE_INDENT(3);
+
+   const char * last_dot=strrchr(name, '.');
+   if (!last_dot) return top_level->getChunksNumber(name);
+   else
+   {
+      GP<GIFFChunk> chunk=getChunk(GString(name, last_dot-name));
+      if (chunk) return chunk->getChunksNumber(last_dot+1);
+      else return 0;
+   };
+}
+
+void
+GIFFManager::loadChunk(IFFByteStream & istr, GP<GIFFChunk> chunk)
+{
+   DEBUG_MSG("GIFFManager::loadChunk(): loading contents of chunk '" <<
+	     chunk->getName() << "'\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   int chunk_size;
+   GString chunk_id;
+   while ((chunk_size=istr.get_chunk(chunk_id)))
+   {
+      if (istr.check_id(chunk_id))
+      {
+	 GP<GIFFChunk> ch=new GIFFChunk(chunk_id);
+	 loadChunk(istr, ch);
+	 chunk->addChunk(ch);
+      } else
+      {
+	 GArray<char> data(chunk_size-1);
+	 int bytes_read=0;
+	 while(bytes_read<chunk_size)
+	    bytes_read+=istr.read(data+bytes_read, chunk_size-bytes_read);
+	 GP<GIFFChunk> ch=new GIFFChunk(chunk_id, data, chunk_size);
+	 chunk->addChunk(ch);
+      };
+      istr.close_chunk();
+   };
+}
+
+void
+GIFFManager::loadFile(ByteStream & str)
+{
+   DEBUG_MSG("GIFFManager::loadFile(): Loading IFF file.\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   IFFByteStream istr(&str);
+   GString chunk_id;
+   if (istr.get_chunk(chunk_id))
+   {
+      if (strncmp(chunk_id, "FORM:", 5))
+	 THROW("Can't find top level FORM chunk in the IFF file being loaded.");
+      setName(chunk_id);
+      loadChunk(istr, top_level);
+      istr.close_chunk();
+   };
+}
+
+void
+GIFFManager::saveFile(ByteStream & str)
+{
+   IFFByteStream istr(&str);
+   
+   top_level->save(istr, 1);
+}

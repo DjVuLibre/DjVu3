@@ -1,0 +1,12 @@
+forw["douze"] :=-1
+forw.size() :=4
+forw.size() :=3
+forw.contains("one",pf) :=1
+forw[pf] :=1
+forw["one"] :=1
+forw.contains("thre",pf) :=0
+forw["three"] :=3
+( two:2 three:3 one:1 )
+( two:2 three:3 one:1 )
+( 1:one 2:two 3:three )
+( three:3 one:1 )

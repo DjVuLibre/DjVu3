@@ -1,0 +1,9 @@
+0 enter
+0 leave
+0 sleeping 3s
+0 sleeping 6s
+0 waking up
+1 enter
+1 leave
+1 waiting (no timeout)
+1 waiting (timeout 3s)

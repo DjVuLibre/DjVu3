@@ -1,0 +1,101 @@
+// -*- C++ -*-
+/** @name DjVu Reference Library.
+ */              
+//@{        
+        
+
+//----------------------------------------
+/** @name Open Source Release.
+    What we release in source code and why.
+ */
+//@{
+
+/** @name AT&T License.
+ */
+
+/** @name Source Code Release.
+ */
+
+/** @name How To Participate.
+ */
+
+//@}
+
+
+
+//----------------------------------------
+/** @name DjVu Overview.
+ */
+//@{
+
+/** @name Layered Images.
+ */
+
+/** @name DJVU files.
+ */
+
+/** @name DJVM files.
+ */
+
+//@}
+
+
+
+//----------------------------------------
+/** @name Getting Started.
+ */
+//@{
+
+/** @name Compiling the Library.
+ */
+
+/** @name Decoding DjVu content.
+ */
+
+/** @name Creating DjVu content.
+ */
+
+
+//@}
+
+
+
+//----------------------------------------
+/** @name Library Reference.
+ */             
+
+//@{
+//@Include: debug.h
+//@Include: DjVuGlobal.h
+//@Include: GException.h
+//@Include: GSmartPointer.h
+//@Include: GString.h
+//@Include: GContainer.h
+//@Include: GRect.h
+//@Include: GThreads.h
+//@Include: GOS.h
+//@Include: ByteStream.h
+//@Include: IFFByteStream.h
+//@Include: ZPCodec.h
+//@Include: BSByteStream.h
+//@Include: GBitmap.h
+//@Include: GPixmap.h
+//@Include: GScaler.h
+//@Include: IWCodec.h
+//@Include: JB2Codec.h
+//@}
+
+
+/** @name Utility Programs.
+ */             
+
+//@{
+//@Include: bzz.cpp
+//@Include: showiff.cpp
+//@Include: ppmcoco.cpp
+//@Include: c44.cpp
+//@Include: d44.cpp
+//@}
+
+
+//@}
