@@ -1,4 +1,5 @@
 //C-  -*- C++ -*-
+<<<<<<< DjVuGlobal.cpp
 //C- DjVu® Reference Library (v. 3.0)
 //C- 
 //C- Copyright © 1999-2000 LizardTech, Inc. All Rights Reserved.
@@ -25,7 +26,7 @@
 //C- ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF 
 //C- MERCHANTIBILITY OF FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuGlobal.cpp,v 1.27 2000-11-02 01:08:34 bcr Exp $
+// $Id: DjVuGlobal.cpp,v 1.28 2000-11-03 01:35:37 bcr Exp $
 // $Name:  $
 
 
