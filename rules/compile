@@ -1,0 +1,21 @@
+.SUFFIXES: .c
+.c.o:
+%%%BEGIN_REQUIRE(@%CC%@)
+	@rm -f "$*.o"
+	@echo "$(CC) -I. $(CCFLAGS) -c $*.c";for i in `echo ".:$(VPATH)"|sed 's,:, ,g'`; do k="-I$$i -ISRCDIR/$$i $$k";if [ -z "$$j" ] ; then if [ -r "$$i/$*.c" ] ; then j="$$i"; elif [ -r "SRCDIR/$$i/$*.c" ] ; then j="SRCDIR/$$i"; fi ; fi ; done ; if [ -z "$$j" ] ; then j="." ; fi ; $(CC) $$k $(CCFLAGS) -c "$$j/$*.c"
+%%%END_REQUIRE(@%CC%@)
+%%%BEGIN_REQUIRE!(@%CC%@)
+	@echo 1>&2 "Configuration error.  No C compiler available."
+	exit 1
+%%%END_REQUIRE!(@%CC%@)
+
+.SUFFIXES: .cpp
+.cpp.o:
+%%%BEGIN_REQUIRE(@%CXX%@)
+	@echo "$(CXX) -I. $(CXXFLAGS) -c $*.cpp";for i in `echo ".:$(VPATH)"|sed 's,:, ,g'`; do k="-I$$i -ISRCDIR/$$i $$k";if [ -z "$$j" ] ; then if [ -r "$$i/$*.cpp" ] ; then j="$$i"; elif [ -r "SRCDIR/$$i/$*.cpp" ] ; then j="SRCDIR/$$i"; fi ; fi ; done ; if [ -z "$$j" ] ; then j="." ; fi ; $(CXX) $$k $(CXXFLAGS) -c "$$j/$*.cpp"
+%%%END_REQUIRE(@%CXX%@)
+%%%BEGIN_REQUIRE!(@%CXX%@)
+	@echo 1>&2 "Configuration error.  No C++ compiler available."
+	exit 1
+%%%END_REQUIRE!(@%CXX%@)
+
