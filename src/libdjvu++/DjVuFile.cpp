@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.47 1999-09-14 22:32:38 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.48 1999-09-15 17:54:42 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -370,7 +370,7 @@ DjVuFile::decode_func(void)
       }
    } CATCH(exc) {
       TRY {
-	 if (strcmp(exc.get_cause(), "STOP") == 0)
+	 if (!strcmp(exc.get_cause(), "STOP"))
 	 {
 	    flags.enter();
 	    flags=flags & ~DECODING | DECODE_STOPPED;
@@ -385,7 +385,7 @@ DjVuFile::decode_func(void)
 	    pcaster->notify_status(this, GString(url)+" FAILED");
 	    pcaster->notify_error(this, exc.get_cause());
 	    pcaster->notify_file_flags_changed(this, DECODE_FAILED, DECODING);
-	 };
+	 }
       } CATCH(exc) {
 	 DEBUG_MSG("******* Oops. Almost missed an exception\n");
       } ENDCATCH;
@@ -1003,7 +1003,13 @@ void
 DjVuFile::static_trigger_cb(void * cl_data)
 {
    DjVuFile * th=(DjVuFile *) cl_data;
-   th->trigger_cb();
+   TRY {
+      th->trigger_cb();
+   } CATCH(exc) {
+      TRY {
+	 get_portcaster()->notify_error(th, exc.get_cause());
+      } CATCH(exc) {} ENDCATCH;
+   } ENDCATCH;
 }
 
 void
