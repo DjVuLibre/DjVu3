@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.4 1999-05-25 22:29:18 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.5 1999-06-09 21:24:20 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -402,37 +402,29 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
 	       GLObject::GLObjectType type=object->get_type();
 	       if (type==GLObject::NUMBER) strcat(buffer, "number.");
 	       else if (type==GLObject::STRING) strcat(buffer, "string.");
-	    };
+	    }
 	    THROW(buffer);
-	 };
+	 }
 	 
 	 // OK. Get the object contents
 	 GPList<GLObject> new_list;
-	 int eof_caught=0;
 	 TRY
-	 {
-	    parse(object->get_symbol(), new_list, start);
-	 } CATCH(exc)
-	 {
-	    if (!strcmp(exc.get_cause(), "EOF")) eof_caught=1;
-	    else RETHROW;
-	 } ENDCATCH;
-	 if (eof_caught)
-	 {
-	    char * buffer=new char[128];
-	    sprintf(buffer, "Unexpectedly got EOF when parsing contents of object '%s'.",
-		    (const char *) object->get_symbol());
-	    THROW(buffer);
-	 };
-	 
+           {
+             parse(object->get_symbol(), new_list, start);
+           } 
+         CATCH(exc)
+           {
+             if (strcmp(exc.get_cause(), "EOF"))
+               RETHROW;
+           } 
+         ENDCATCH;
 	 list.append(new GLObject(object->get_symbol(), new_list));
 	 continue;
-      };
-      
-      if (token.type==GLToken::CLOSE_PAR) return;
-
+      }
+      if (token.type==GLToken::CLOSE_PAR) 
+        return;
       list.append(token.object);
-   };
+   }
 }
 
 void

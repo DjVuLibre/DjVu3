@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.7 1999-06-03 16:46:45 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.8 1999-06-09 21:24:20 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -315,7 +315,7 @@ DjVuFile::decode_func(void)
       };
    } CATCH(exc) {
       delete decode_stream; decode_stream=0;
-      if (strstr(exc.get_cause(), "STOP"))
+      if (strcmp(exc.get_cause(), "STOP") == 0)
       {
 	 status_mon.enter();
 	 status=status & ~DECODING | DECODE_STOPPED;
@@ -421,7 +421,8 @@ DjVuFile::decode(ByteStream & str)
    GString chkid;
    
    IFFByteStream iff(str);
-   if (!iff.get_chunk(chkid)) THROW("EOF");
+   if (!iff.get_chunk(chkid)) 
+     THROW("EOF");
 
    bool djvi=(chkid=="FORM:DJVI");
 
@@ -469,7 +470,8 @@ DjVuFile::decode(ByteStream & str)
 		     int chksize;
 		     GString chkid;
 		     IFFByteStream iff(*str);
-		     if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+		     if (!iff.get_chunk(chkid)) 
+                       THROW("EOF");
 
 		     while((chksize=iff.get_chunk(chkid)))
 		     {
@@ -609,8 +611,8 @@ DjVuFile::decode(ByteStream & str)
 		     int chksize;
 		     GString chkid;
 		     IFFByteStream iff(*str);
-		     if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+		     if (!iff.get_chunk(chkid)) 
+                       THROW("EOF");
 		     while((chksize=iff.get_chunk(chkid)))
 		     {
 			get_portcaster()->notify_chunk_done(file, chkid);
@@ -764,29 +766,31 @@ DjVuFile::stop_decode(bool sync)
 void
 DjVuFile::process_incl_chunks(void)
 {
-   ByteStream * str=0;
-
-   TRY {
+  ByteStream * str=0;
+  TRY 
+    {
       str=data_range->get_stream();
-      
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
-      while((chksize=iff.get_chunk(chkid)))
-      {
-	 if (chkid=="INCL" || chkid=="INCF")
-	    process_incl_chunk(iff, chkid=="INCL");
-	 iff.close_chunk();
-      }
-   } CATCH(exc) {
+      if (iff.get_chunk(chkid))
+        {
+          while((chksize=iff.get_chunk(chkid)))
+            {
+              if (chkid=="INCL" || chkid=="INCF")
+                process_incl_chunk(iff, chkid=="INCL");
+              iff.close_chunk();
+            }
+        }
+    } 
+  CATCH(exc) 
+    {
       delete str; str=0;
       RETHROW;
-   } ENDCATCH;
-   
-   delete str; str=0;
-   status|=INCL_FILES_CREATED;
+    } 
+  ENDCATCH;
+  delete str; str=0;
+  status|=INCL_FILES_CREATED;
 }
 
 GP<DjVuNavDir>
@@ -840,7 +844,8 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
 	 int chksize;
 	 GString chkid;
 	 IFFByteStream iff(*str);
-	 if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+	 if (!iff.get_chunk(chkid)) 
+           THROW("EOF");
 
 	 while((chksize=iff.get_chunk(chkid)))
 	 {
@@ -983,7 +988,8 @@ DjVuFile::unlink_file(const char * name)
       int chksize;
       GString chkid;
       IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+      if (!iff_in.get_chunk(chkid)) 
+        THROW("EOF");
 
       iff_out.put_chunk(chkid);
 
@@ -1093,7 +1099,8 @@ DjVuFile::include_file(const GP<DjVuFile> & file, int chunk_pos, bool incl)
       int chksize;
       GString chkid;
       IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+      if (!iff_in.get_chunk(chkid)) 
+        THROW("EOF");
 
       iff_out.put_chunk(chkid);
 
@@ -1166,8 +1173,8 @@ DjVuFile::get_chunks_number(void)
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+      if (!iff.get_chunk(chkid)) 
+        THROW("EOF");
       while((chksize=iff.get_chunk(chkid)))
       {
 	 chunks++;
@@ -1191,8 +1198,8 @@ DjVuFile::get_chunk_name(int chunk_num)
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+      if (!iff.get_chunk(chkid)) 
+        THROW("EOF");
       int chunk=0;
       while((chksize=iff.get_chunk(chkid)))
       {
@@ -1222,8 +1229,8 @@ DjVuFile::contains_chunk(const char * chunk_name)
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+      if (!iff.get_chunk(chkid)) 
+        THROW("EOF");
       while((chksize=iff.get_chunk(chkid)))
       {
 	 if (chkid==chunk_name) { contains=1; break; }
@@ -1257,8 +1264,8 @@ DjVuFile::delete_chunks(const char * chunk_name)
       int chksize;
       GString chkid;
       IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+      if (!iff_in.get_chunk(chkid)) 
+        THROW("EOF");
       iff_out.put_chunk(chkid);
 
       while((chksize=iff_in.get_chunk(chkid)))
@@ -1316,8 +1323,8 @@ DjVuFile::insert_chunk(int pos, const char * chunk_name,
       int chksize;
       GString chkid;
       IFFByteStream iff_in(*str_in);
-      if (!iff_in.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
-
+      if (!iff_in.get_chunk(chkid)) 
+        THROW("EOF");
       iff_out.put_chunk(chkid);
 
       bool done=0;
@@ -1386,7 +1393,8 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
       int chksize;
       GString chkid;
       IFFByteStream iff(*str);
-      if (!iff.get_chunk(chkid)) THROW("File does not appear to be in IFF format.");
+      if (!iff.get_chunk(chkid)) 
+        THROW("EOF");
 
       if (top_level) ostr.put_chunk(chkid);
       

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuInfo.cpp,v 1.2 1999-05-25 19:42:28 eaf Exp $
+//C- $Id: DjVuInfo.cpp,v 1.3 1999-06-09 21:24:20 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -46,6 +46,8 @@ DjVuInfo::decode(ByteStream &bs)
   // Read data
   unsigned char buffer[10];
   int  size = bs.readall((void*)buffer, sizeof(buffer));
+  if (size == 0)
+    THROW("EOF");
   if (size < 5)
     THROW("DjVu Decoder: Corrupted file (truncated INFO chunk)");
   // Analyze data with backward compatibility in mind!

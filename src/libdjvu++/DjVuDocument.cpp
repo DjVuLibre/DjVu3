@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.12 1999-06-09 19:35:03 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.13 1999-06-09 21:24:20 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -99,98 +99,102 @@ DjVuDocument::detect_doc_type(const GURL & doc_url)
 
    if (cache && cache->get_item(doc_url))
    {
-	 // Shortcut: since the url is in the cache, it's a file's URL,
-	 // which means, that we've got DJVU document
-      DEBUG_MSG("URL is in the cache => DJVU doc.\n");
-      djvm=0;
-      return;
+     // Shortcut: since the url is in the cache, it's a file's URL,
+     // which means, that we've got DJVU document
+     DEBUG_MSG("URL is in the cache => DJVU doc.\n");
+     djvm=0;
+     return;
    }
    
    DjVuPortcaster * pcaster=get_portcaster();
    GP<DataRange> data_range=pcaster->request_data(this, doc_url);
-   if (!data_range) THROW("Failed to get data for URL '"+doc_url+"'");
-
+   if (!data_range) 
+     THROW("Failed to get data for URL '"+doc_url+"'");
+   
    ByteStream * stream=0;
+   TRY 
+     {
+       stream=data_range->get_stream();
+       IFFByteStream iff(*stream);
+       GString chkid;
+       int size = iff.get_chunk(chkid);
+       if (size == 0)
+         THROW("EOF");
+       if (size<0 || size>10*1024*1024)
+         THROW("The main stream is not IFF stream.");
 
-   TRY {
-      stream=data_range->get_stream();
-      IFFByteStream iff(*stream);
-      GString chkid;
-      int size;
-      if ((size=iff.get_chunk(chkid)))
-      {
-	 if (size<0 || size>10*1024*1024)
-	    THROW("The main stream is not IFF stream.");
-	 if (chkid=="FORM:DJVM")
+       if (chkid=="FORM:DJVM")
 	 {
-	    DEBUG_MSG("Got DJVM document here\n");
-	    DEBUG_MAKE_INDENT(3);
-
-	    djvm=1;
-	    djvm_pool=data_range->get_pool();
-	    djvm_doc_url=doc_url;
-
-	       // Get the DJVM directory and offset to the 1st DJVU page
-	    int first_page_offset=0;
-	    while(1)
-	    {
+           DEBUG_MSG("Got DJVM document here\n");
+           DEBUG_MAKE_INDENT(3);
+           djvm=1;
+           djvm_pool=data_range->get_pool();
+           djvm_doc_url=doc_url;
+           // Get the DJVM directory and offset to the 1st DJVU page
+           int first_page_offset=0;
+           while(1)
+             {
 	       int offset;
 	       size=iff.get_chunk(chkid, &offset);
 	       if (chkid=="DIR0")
-	       {
-		  DEBUG_MSG("Got DIR0 chunk\n");
-		  djvm_dir.decode(iff);
-		  if (first_page_offset) break;
-	       };
+                 {
+                   DEBUG_MSG("Got DIR0 chunk\n");
+                   djvm_dir.decode(iff);
+                   if (first_page_offset) 
+                     break;
+                 }
 	       if (!first_page_offset &&
 		   (chkid=="FORM:DJVU" ||
 		    chkid=="FORM:PM44" ||
 		    chkid=="FORM:BM44"))
-	       {
-		  DEBUG_MSG("Got 1st page offset=" << offset << "\n");
-		  first_page_offset=offset;
-		  if (djvm_dir.get_files_num()) break;
-	       };
+                 {
+                   DEBUG_MSG("Got 1st page offset=" << offset << "\n");
+                   first_page_offset=offset;
+                   if (djvm_dir.get_files_num()) break;
+                 }
 	       iff.close_chunk();
-	    };
-	 
-	    if (!djvm_dir.get_files_num())
-	       THROW("Didn't manage to find DIR0 chunk in given DJVM stream.");
-	    if (!first_page_offset)
-	       THROW("This document does not contain any DJVU pages.");
-
-	       // Now get the name for the first DJVU page using the directory
-	    for(int i=0;i<djvm_dir.get_files_num();i++)
-	    {
+             }
+           if (!djvm_dir.get_files_num())
+             THROW("Didn't manage to find DIR0 chunk in given DJVM stream.");
+           if (!first_page_offset)
+             THROW("This document does not contain any DJVU pages.");
+           // Now get the name for the first DJVU page using the directory
+           for(int i=0;i<djvm_dir.get_files_num();i++)
+             {
 	       DjVmDir0::FileRec & file=*djvm_dir.get_file(i);
 	       if (file.offset==first_page_offset)
-	       {
-		  djvm_first_page_name=file.name;
-		  break;
-	       };
-	    };
-	    if (!djvm_first_page_name.length())
-	       THROW("Failed to guess the name of the first DJVU page in this document.");
-	 } else
+                 {
+                   djvm_first_page_name=file.name;
+                   break;
+                 }
+             }
+           if (!djvm_first_page_name.length())
+             THROW("Failed to guess the name of the first DJVU page in this document.");
+	 } 
+       else
 	 {
-	       // DJVU format
-	    DEBUG_MSG("Got DJVU document here.\n");
-	    djvm=0;
-	 };
-      } else THROW("Corrupt document file: not in IFF format.");
-   } CATCH(exc) {
-      delete stream; stream=0;
-      if (!strstr(exc.get_cause(), "EOF")) RETHROW;
-   } ENDCATCH;
-   
-   delete stream; stream=0;
+           // DJVU format
+           DEBUG_MSG("Got DJVU document here.\n");
+           djvm=0;
+	 }
+     }
+   CATCH(exc) 
+     {
+       delete stream; 
+       stream=0;
+       if (strcmp(exc.get_cause(), "EOF") != 0) 
+         RETHROW;
+     } 
+   ENDCATCH;
+   delete stream; 
+   stream=0;
 }
 
 GString
 DjVuDocument::djvm_url2name(const GURL & url) const
 {
-   if (!is_djvm()) THROW("Internal error: the document format is not DJVM.");
-   
+   if (!is_djvm()) 
+     THROW("Internal error: the document format is not DJVM.");
    GString name;
    if (!strncmp(url, djvm_doc_url, strlen(djvm_doc_url)))
    {
