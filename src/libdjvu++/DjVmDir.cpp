@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.15 2000-01-25 00:46:31 leonb Exp $
+//C- $Id: DjVmDir.cpp,v 1.16 2000-02-04 15:41:34 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -61,21 +61,6 @@ DjVmDir::File::File(const char *name, const char *id,
   flags=page ? PAGE : INCLUDE;
 }
    
-/* Directory file format
-
-   char8		(version number | (bundled or not) << 7)
-   char16		number of records
-   for every record (only if bundled)
-      char32		offset
-      char24		size
-   bzz compressed block:
-      for every record
-         char8 flags
-      for every record
-         ASCIIZ id
-         ASCIIZ name, if it's different from id (see flags)
-         ASCIIZ title, if it's different from id (see flags)
-*/
 
 const int DjVmDir::version=1;
 
