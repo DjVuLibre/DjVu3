@@ -8,7 +8,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.21.4.3 1999-04-12 16:44:58 eaf Exp $
+# C- $Id: Makefile.in,v 1.21.4.4 1999-04-26 19:30:52 eaf Exp $
 
 SHELL=/bin/sh
 prefix=@prefix@
@@ -44,7 +44,7 @@ LIBOBJS= GString.o GException.o GContainer.o GRect.o GSmartPointer.o \
 	 DjVuImage.o GOS.o DjVuGlobal.o Arrays.o DataPool.o debug.o\
 	 GPContainer.o GURL.o DjVuNavDir.o GCache.o DjVuPort.o\
 	 DjVuAnno.o DjVuInfo.o DjVmDir0.o DjVuFile.o DjVuDocument.o\
-	 GIFFManager.o DjVmFile.o ATTLicense.o
+	 GIFFManager.o DjVmFile.o GHLObjects.o ATTLicense.o
 
 # Make all
 
@@ -60,6 +60,7 @@ $(LIB): $(LIBOBJS)
 
 # Rules for building support programs
 
+DJVMOBJS = djvm.o
 C44OBJS = c44.o
 D44OBJS = d44.o
 DJVUINFOOBJS = djvuinfo.o
@@ -70,6 +71,9 @@ PPMCOCOOBJS = ppmcoco.o
 ANNOTATEOBJS = annotate.o
 BZZOBJS = bzz.o BSByteStream.o ZPCodec.o ByteStream.o GException.o DjVuGlobal.o
 LIBDJVUOBJS = libdjvu.o 
+
+djvm: $(DJVMOBJS) $(LIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LDLIBS)
 
 c44: $(C44OBJS) $(LIB)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(C44OBJS) $(LIB) $(LDLIBS)
