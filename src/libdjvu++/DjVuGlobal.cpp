@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.cpp,v 1.10 1999-09-23 03:13:37 leonb Exp $
+//C- $Id: DjVuGlobal.cpp,v 1.11 1999-09-23 12:45:46 leonb Exp $
 
 
 
@@ -90,12 +90,14 @@ DjVuProgressTask::~DjVuProgressTask()
 {
   if (callback)
     {
-      if (parent==0)
-        lastsigdate -= INTERVAL;
-      run (nsteps+1);
       if (head != this)
         THROW("DjVuProgress is not compatible with multithreading");
       head = parent;
+      unsigned long curdate = GOS::ticks();
+      if (parent)
+        parent->run(nsteps+1);
+      else if (callback)
+        (*callback)(curdate-startdate, curdate-startdate);
     }
 }
 
@@ -125,7 +127,7 @@ DjVuProgressTask::signal(unsigned long curdate, unsigned long estdate)
         {
           parent->signal(curdate, enddate);
         }
-      else if (callback)
+      else if (callback && curdate<enddate)
         {
           (*callback)(curdate-startdate, enddate-startdate);
           lastsigdate = curdate;
