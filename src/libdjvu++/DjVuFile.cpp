@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.cpp,v 1.155 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVuFile.cpp,v 1.156 2001-04-05 19:57:57 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -465,7 +465,7 @@ DjVuFile::decode_func(void)
     }
   } G_CATCH(exc) {
     G_TRY {
-      if (!strcmp(exc.get_cause(), "STOP"))
+      if (exc.get_cause() == GString("STOP"))
       {
         flags.enter();
         flags=flags & ~DECODING | DECODE_STOPPED;
@@ -605,7 +605,7 @@ DjVuFile::report_error
 (const GException &ex,bool throw_errors)
 {
   data_pool->clear_stream();
-  if((!verbose_eof)||strcmp(ex.get_cause(),"EOF"))
+  if((!verbose_eof)|| (ex.get_cause() != GString("EOF")))
   {
     if(throw_errors)
     {
@@ -1187,7 +1187,7 @@ DjVuFile::decode(GP<ByteStream> gbs)
   }
   G_CATCH(ex)
   {
-    if(!strcmp(ex.get_cause(),"EOF"))
+    if(ex.get_cause() == GString("EOF"))
     {
       if (chunks_number < 0)
         chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
@@ -1420,15 +1420,15 @@ DjVuFile::decode_ndir(GMap<GURL, void *> & map)
     }
     G_CATCH(ex)
     {
-      if(!strcmp(ex.get_cause(),"EOF"))
-      {
-        if (chunks_number < 0)
-          chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
-        report_error(ex,(recover_errors<=SKIP_PAGES));
-      }else
-      {
-        report_error(ex,true);
-      }
+       if(ex.get_cause() == GString("EOF"))
+       {
+          if (chunks_number < 0)
+             chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;
+          report_error(ex,(recover_errors<=SKIP_PAGES));
+       }else
+       {
+          report_error(ex,true);
+       }
     }
     G_ENDCATCH;
     
@@ -2020,7 +2020,7 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
     }
     G_CATCH(ex)
     {
-      if(!strcmp(ex.get_cause(),"EOF"))
+      if(ex.get_cause() == GString("EOF"))
       {
         if (chunks_number < 0)
           chunks_number=(recover_errors>SKIP_CHUNKS)?chunks:last_chunk;

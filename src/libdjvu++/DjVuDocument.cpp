@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.cpp,v 1.153 2001-04-05 16:06:26 bcr Exp $
+// $Id: DjVuDocument.cpp,v 1.154 2001-04-05 19:57:56 chrisp Exp $
 // $Name:  $
 
 
@@ -252,9 +252,9 @@ DjVuDocument::static_init_thread(void * cl_data)
     th->flags|=DjVuDocument::DOC_INIT_FAILED;
     G_TRY {
       th->check_unnamed_files();
-      if (!strcmp(exc.get_cause(), "EOF") && th->verbose_eof)
+      if ((GString("EOF") == exc.get_cause()) && th->verbose_eof)
         get_portcaster()->notify_error(th, "DjVuDocument.init_eof");
-      else if (!strcmp(exc.get_cause(), "STOP"))
+      else if (GString("STOP") == exc.get_cause())
         get_portcaster()->notify_status(th, "DjVuDocument.stopped");
       else
         get_portcaster()->notify_error(th, exc.get_cause());

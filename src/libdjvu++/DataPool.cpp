@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DataPool.cpp,v 1.70 2001-03-30 23:31:28 bcr Exp $
+// $Id: DataPool.cpp,v 1.71 2001-04-05 19:57:56 chrisp Exp $
 // $Name:  $
 
 
@@ -1028,7 +1028,8 @@ DataPool::get_data(void * buffer, int offset, int sz, int level)
 	    retval=pool->get_data(buffer, start+offset, sz, level+1);
 	 } G_CATCH(exc) {
             pool->clear_stream();
-	    if (strcmp(exc.get_cause(), "DataPool.reenter") || level)
+//            if (strcmp(exc.get_cause(), "DataPool.reenter") || level)
+            if ((exc.get_cause() == GString("DataPool.reenter") ) || level)
 	      G_RETHROW;
 	 } G_ENDCATCH;
          pool->clear_stream();

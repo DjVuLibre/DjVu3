@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVmDir.cpp,v 1.35 2001-03-06 19:55:42 bcr Exp $
+// $Id: DjVmDir.cpp,v 1.36 2001-04-05 19:57:56 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -544,7 +544,8 @@ DjVmDir::delete_file(const char * id)
    for(GPosition pos=files_list;pos;++pos)
    {
       GP<File> & f=files_list[pos];
-      if (!strcmp(f->id, id))
+//      if (!strcmp(f->id, id))
+      if (GString(id) == f->id)
       {
 	 name2file.del(f->name);
 	 id2file.del(f->id);

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: parseoptions.cpp,v 1.71 2001-04-05 16:06:27 bcr Exp $
+// $Id: parseoptions.cpp,v 1.72 2001-04-05 19:57:57 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -595,7 +595,7 @@ DjVuParseOptions::ParseArguments(
     if(s && (j=strlen(s)) && (v=VarTokens->GetToken(opts[i].name))>=0)
     {
 #ifdef SUPPRESS_VERBOSE
-      if( strcmp( "verbose", s ) != 0 )
+      if( GSTring("verbose") == s  )
 #endif
       Arguments->Add(v,args.optarg?args.optarg:"TRUE");
     }
@@ -1679,7 +1679,8 @@ DjVuParseOptions::GetOpt::getopt_long()
     }
     for(longindex=0,opts=long_opts;opts->name;++opts,++longindex)
     {
-      if(!strcmp(opts->name,argv[optind]+nextchar))
+//      if(!strcmp(opts->name,argv[optind]+nextchar))
+       if (opts->name == GString(argv[optind]+nextchar))
       {
         if((opts->has_arg)&&(opts->has_arg != 2))
         {
@@ -1791,7 +1792,8 @@ DjVuTokenList::GetToken( const char name[] ) const
   while(MinGuess<MaxGuess)
   {
     const int guess=MinGuess+((MaxGuess-MinGuess)/2);
-    const int i=strcmp(name,Entry[guess].Name);
+//    const int i=strcmp(name,Entry[guess].Name);
+    const int i=(name == GString(Entry[guess].Name));
     if(i<0)
     {
       MaxGuess=guess;

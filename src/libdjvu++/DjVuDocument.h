@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocument.h,v 1.80 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVuDocument.h,v 1.81 2001-04-05 19:57:57 chrisp Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCUMENT_H
@@ -58,7 +58,7 @@ class ByteStream;
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.80 2001-03-30 23:31:28 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.81 2001-04-05 19:57:57 chrisp Exp $#
 */
 
 //@{
@@ -927,8 +927,10 @@ inline bool
 DjVuDocument::inherits(const char * class_name) const
 {
    return
-      !strcmp("DjVuDocument", class_name) ||
+      (GString("DjVuDocument") == class_name) ||
       DjVuPort::inherits(class_name);
+//      !strcmp("DjVuDocument", class_name) ||
+//      DjVuPort::inherits(class_name);
 }
 
 inline float

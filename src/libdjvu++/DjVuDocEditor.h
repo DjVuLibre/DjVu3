@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.h,v 1.36 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVuDocEditor.h,v 1.37 2001-04-05 19:57:56 chrisp Exp $
 // $Name:  $
 
 #ifndef _DJVUDOCEDITOR_H
@@ -51,7 +51,7 @@
 
     @memo DjVu document editor class.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuDocEditor.h,v 1.36 2001-03-30 23:31:28 bcr Exp $#
+    @version #$Id: DjVuDocEditor.h,v 1.37 2001-04-05 19:57:56 chrisp Exp $#
 */
 
 //@{
@@ -397,8 +397,10 @@ inline bool
 DjVuDocEditor::inherits(const char * class_name) const
 {
    return
-      !strcmp("DjVuDocEditor", class_name) ||
+      (GString("DjVuDocEditor") == class_name) ||
       DjVuDocument::inherits(class_name);
+//      !strcmp("DjVuDocEditor", class_name) ||
+//      DjVuDocument::inherits(class_name);
 }
 
 inline int

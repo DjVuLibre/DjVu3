@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.63 2001-04-04 22:12:11 bcr Exp $
+// $Id: DjVuImage.cpp,v 1.64 2001-04-05 19:57:57 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -396,18 +396,18 @@ void
 DjVuImage::notify_chunk_done(const DjVuPort *, const char * name)
 {
    if (!relayout_sent &&
-       (!strncmp(name, "INFO", 4) ||
-	!strncmp(name, "PMxx", 2) ||
-	!strncmp(name, "BMxx", 2)  ) )
+       ( GString("INFO").ncmp(name, 4) ||
+	GString("PMxx").ncmp(name, 2) ||
+	GString("BMxx").ncmp(name, 2)  ) )
    {
       DjVuPort::get_portcaster()->notify_relayout(this);
       relayout_sent=true;
    } 
-   else if (!strncmp(name, "Sxxx", 1) ||
-            !strncmp(name, "BGxx", 2) ||
-            !strncmp(name, "FGxx", 2) ||
-            !strncmp(name, "BMxx", 2) ||
-            !strncmp(name, "PMxx", 2)  )
+   else if (GString("Sxxx").ncmp(name, 1) ||
+            GString("BGxx").ncmp(name, 2) ||
+            GString("FGxx").ncmp(name, 2) ||
+            GString("BMxx").ncmp(name, 2) ||
+            GString("PMxx").ncmp(name, 2)  )
      DjVuPort::get_portcaster()->notify_redisplay(this);
 }
 

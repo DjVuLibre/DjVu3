@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuAnno.cpp,v 1.71 2001-04-05 16:06:26 bcr Exp $
+// $Id: DjVuAnno.cpp,v 1.72 2001-04-05 19:57:56 chrisp Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -441,7 +441,8 @@ GLParser::parse(const char * cur_name, GPList<GLObject> & list,
       } 
       G_CATCH(exc)
       {
-        if (strcmp(exc.get_cause(), "EOF"))
+//        if (strcmp(exc.get_cause(), "EOF"))
+         if (GString("EOF") == exc.get_cause())
           G_RETHROW;
       } 
       G_ENDCATCH;
@@ -465,7 +466,8 @@ GLParser::parse(const char * str)
       parse("toplevel", list, str);
    } G_CATCH(exc)
    {
-      if (strcmp(exc.get_cause(), "EOF"))
+//      if (strcmp(exc.get_cause(), "EOF"))
+      if (GString("EOF") == exc.get_cause())
         G_RETHROW;
    } G_ENDCATCH;
 }

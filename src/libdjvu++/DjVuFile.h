@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuFile.h,v 1.76 2001-03-08 19:08:03 bcr Exp $
+// $Id: DjVuFile.h,v 1.77 2001-04-05 19:57:57 chrisp Exp $
 // $Name:  $
 
 #ifndef _DJVUFILE_H
@@ -71,7 +71,7 @@ class DjVuNavDir;
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.76 2001-03-08 19:08:03 bcr Exp $#
+    @version #$Id: DjVuFile.h,v 1.77 2001-04-05 19:57:57 chrisp Exp $#
 */
 
 //@{
@@ -726,8 +726,10 @@ inline bool
 DjVuFile::inherits(const char * class_name) const
 {
    return
-      !strcmp("DjVuFile", class_name) ||
+      (GString("DjVuFile") == class_name) ||
       DjVuPort::inherits(class_name);
+//      !strcmp("DjVuFile", class_name) ||
+//      DjVuPort::inherits(class_name);
 }
 
 inline void
