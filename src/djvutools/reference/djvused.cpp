@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-// $Id: djvused.cpp,v 1.5 2001-09-21 21:51:15 leonb Exp $
+// $Id: djvused.cpp,v 1.6 2001-09-24 20:02:45 leonb Exp $
 // $Name:  $
 
 #include <stdio.h>
@@ -324,6 +324,34 @@ get_data_from_file(const char *cmd, ParsingByteStream &pbs, ByteStream &out)
 }
 
 void
+print_c_string(const char *data, int length, ByteStream &out)
+{
+  out.write("\"",1);
+  while (*data && length>0) 
+    {
+      int span = 0;
+      while (span<length && data[span]>=0x20 && 
+             data[span]<0x7f && data[span]!='"' && data[span]!='\\' )
+        span++;
+      if (span > 0) 
+        {
+          out.write(data, span);
+          data += span;
+          length -= span;
+        }
+      else
+        {
+          char buffer[5];
+          sprintf(buffer,"\\%03o", (int)*(unsigned char*)data);
+          out.write(buffer,4);
+          data += 1;
+          length -= 1;
+        }
+    }
+  out.write("\"",1);
+}
+
+void
 command_ls(ParsingByteStream &)
 {
   int pagenum = 0;
@@ -509,65 +537,14 @@ print_ant(IFFByteStream &iff, ByteStream &out)
 }
 
 void
-print_meta(IFFByteStream &iff, ByteStream &out)
-{
-  GUTF8String chkid;  
-  GP<DjVuANT> ant=DjVuANT::create();
-  while (iff.get_chunk(chkid))
-    {
-      if (chkid == "ANTa") 
-        {
-          ant->decode(*iff.get_bytestream());
-          for (GPosition pos=ant->metadata; pos; ++pos)
-            { 
-              GUTF8String tmp;
-              tmp=ant->metadata.key(pos);
-              out.writestring(tmp); 
-              out.write8('\t');
-              tmp=ant->metadata[pos];
-              out.writestring(tmp);
-              out.write8('\n');
-            }
-          
-        }
-      else if (chkid == "ANTz") 
-        {
-          GP<ByteStream> bsiff=BSByteStream::create(iff.get_bytestream());
-          ant->decode(*bsiff);
-          for (GPosition pos=ant->metadata; pos; ++pos)
-            {
-              GUTF8String tmp;
-              tmp=ant->metadata.key(pos);
-              out.writestring(tmp); 
-              out.write8('\t');
-              tmp=ant->metadata[pos];
-              out.writestring(tmp);
-              out.write8('\n');
-            }
-        }
-      iff.close_chunk();
-      }
-}
-
-void 
-command_print_meta(ParsingByteStream &)
-{
-  if (!file)
-    verror("you must first select a page");
-  GP<ByteStream> out=ByteStream::create("w");
-  GP<ByteStream> bs(file->get_anno());
-  GP<IFFByteStream> iff=IFFByteStream::create(bs); 
-  print_meta(*iff,*out);
-}
-
-void
 command_print_ant(ParsingByteStream &)
 {
   if (!file)
     verror("you must first select a page");
   GP<ByteStream> out=ByteStream::create("w");
-  GP<ByteStream> bs(file->get_anno());
-  GP<IFFByteStream> iff=IFFByteStream::create(bs);
+  GP<ByteStream> anno = file->get_anno();
+  if (! (anno && anno->size())) return;
+  GP<IFFByteStream> iff=IFFByteStream::create(anno);
   print_ant(*iff, *out);
 }
 
@@ -578,6 +555,7 @@ command_print_merged_ant(ParsingByteStream &)
     verror("you must first select a page");
   GP<ByteStream> out=ByteStream::create("w");
   GP<ByteStream> anno = file->get_merged_anno();
+  if (! (anno && anno->size())) return;
   GP<IFFByteStream> iff=IFFByteStream::create(anno);
   print_ant(*iff, *out);
 }
@@ -603,7 +581,6 @@ modify_ant(const GP<DjVuFile> &f,
   f->set_modified(true);
   modified = true;
 }
-
 
 void
 file_remove_ant(const GP<DjVuFile> &f, const char *id)
@@ -635,46 +612,80 @@ command_remove_ant(ParsingByteStream &)
 }
 
 void
-print_c_string(const char *data, int length, ByteStream &out)
+command_set_ant(ParsingByteStream &pbs)
 {
-  out.write("\"",1);
-  while (*data && length>0) 
-    {
-      int span = 0;
-      while (span<length && data[span]>=0x20 && 
-             data[span]<0x7f && data[span]!='"' && data[span]!='\\' )
-        span++;
-      if (span > 0) 
-        {
-          out.write(data, span);
-          data += span;
-          length -= span;
-        }
-      else
-        {
-          char buffer[5];
-          sprintf(buffer,"\\%03o", *data);
-          out.write(buffer,4);
-          data += 1;
-          length -= 1;
-        }
-    }
-  out.write("\"",1);
+  if (! file)
+    verror("must select a page first");
+  const GP<ByteStream> ant=ByteStream::create();
+  { 
+    GP<ByteStream> bsant=BSByteStream::create(ant,100);
+    get_data_from_file("set-ant", pbs, *bsant);
+  }
+  modify_ant(file, "ANTz", ant);
+  vprint("set-ant: modified \"%s\"", (const char*)(GNativeString)fileid);
 }
 
 void
-remove_meta(GP<ByteStream> in, GP<ByteStream> out)
+print_meta(IFFByteStream &iff, ByteStream &out)
+{
+  GUTF8String chkid;  
+  while (iff.get_chunk(chkid))
+    {
+      bool ok = false;
+      GP<DjVuANT> ant=DjVuANT::create();
+      if (chkid == "ANTz") {
+          GP<ByteStream> bsiff=BSByteStream::create(iff.get_bytestream());
+          ant->decode(*bsiff);
+          ok = true;
+      } else if (chkid == "ANTa") {
+        ant->decode(*iff.get_bytestream());
+        ok = true;
+      }
+      if (ok)
+        {
+          for (GPosition pos=ant->metadata; pos; ++pos)
+            { 
+              GUTF8String tmp;
+              tmp=ant->metadata.key(pos);
+              out.writestring(tmp); 
+              out.write8('\t');
+              tmp=ant->metadata[pos];
+              print_c_string((const char*)tmp, tmp.length(), out);
+              out.write8('\n');
+            }
+        }
+      iff.close_chunk();
+    }
+}
+
+void 
+command_print_meta(ParsingByteStream &)
+{
+  if (!file)
+    verror("you must first select a page");
+  GP<ByteStream> out=ByteStream::create("w");
+  GP<ByteStream> anno = file->get_anno();
+  if (! (anno && anno->size())) return;
+  GP<IFFByteStream> iff=IFFByteStream::create(anno); 
+  print_meta(*iff,*out);
+}
+
+static bool
+filter_meta_out(GP<ByteStream> in, GP<ByteStream> out)
 {
   int c;
   int plevel = 0;
   bool copy = true;
-  
+  bool unchanged = true;
   GP<ParsingByteStream> inp = ParsingByteStream::create(in);
-  c = inp->get();
-  while (c != EOF)
+  while ((c = inp->get()) != EOF)
+    if (c!=' ' && c!='\t' && c!='\r' && c!='\n')
+      break;
+  inp->unget(c);
+  while ((c = inp->get()) != EOF)
     {
       if (plevel == 0)
-        if (c != ' ' && c!= '\t')
+        if (c !=' ' && c!='\t' && c!='\r' && c!='\n')
           copy = true;
       if (c == '#')
         {
@@ -688,7 +699,8 @@ remove_meta(GP<ByteStream> in, GP<ByteStream> out)
         {
           inp->unget(c);
           GUTF8String token = inp->get_token();
-          print_c_string(token, token.length(), *out);
+          if (copy)
+            print_c_string(token, token.length(), *out);
         }
       else if (c == '(')
         {
@@ -696,7 +708,7 @@ remove_meta(GP<ByteStream> in, GP<ByteStream> out)
             {
               GUTF8String token = inp->get_token();
               if (token == "metadata")
-                copy = false;
+                copy = unchanged = false;
               if (copy) {
                 out->write8('(');
                 out->write((const char*)token, token.length());
@@ -716,11 +728,57 @@ remove_meta(GP<ByteStream> in, GP<ByteStream> out)
       else if (copy)
         out->write8(c);
     }
+  return !unchanged;
+}
+
+static bool
+modify_meta(const GP<DjVuFile> &f,
+            GMap<GUTF8String,GUTF8String> *newmeta)
+{
+  bool changed = false;
+  GP<ByteStream> newant = ByteStream::create();
+  if (newmeta && !newmeta->isempty())
+    {
+      newant->writestring(GUTF8String("(metadata ("));
+      for (GPosition pos=newmeta->firstpos(); pos; ++pos)
+        {
+          GUTF8String key = newmeta->key(pos); 
+          GUTF8String val = (*newmeta)[pos];
+          newant->write("\n\t(",2);
+          newant->writestring(key);
+          newant->write(" ",1);
+          print_c_string((const char*)val, val.length(), *newant);
+          newant->write(")",1);
+        }
+      newant->write(" )\n",3);
+      changed = true;
+    }
+  GP<ByteStream> anno = f->get_anno();
+  if (anno && anno->size()) 
+    {
+      GP<IFFByteStream> iff=IFFByteStream::create(anno);
+      GP<ByteStream> oldant = ByteStream::create();
+      print_ant(*iff,*oldant);
+      oldant->seek(0);
+      if (filter_meta_out(oldant, newant))
+        changed = true;
+    }
+  const GP<ByteStream> newantz=ByteStream::create();
+  if (changed)
+    {
+      newant->seek(0);
+      { GP<ByteStream> bzz = BSByteStream::create(newantz,100); bzz->copy(*newant); }
+      newantz->seek(0);
+      modify_ant(f, "ANTz", newantz);
+    }
+  return changed;
 }
 
 void
 file_remove_meta(const GP<DjVuFile> &f, const char *id)
 {
+  if (modify_meta(f, 0))
+    vprint("remove_meta: modified \"%s\"", id);
 }
 
 void 
@@ -758,21 +816,6 @@ command_set_meta(ParsingByteStream &pbs)
   get_data_from_file("set-meta", pbs, *metastream);
   metastream->seek(0);
   set_meta(*iff, metastream);
-  vprint("set-meta: file modified");
-}
-
-
-void
-command_set_ant(ParsingByteStream &pbs)
-{
-  if (! file)
-    verror("must select a page first");
-  const GP<ByteStream> ant=ByteStream::create();
-  { 
-    GP<ByteStream> bsant=BSByteStream::create(ant,100);
-    get_data_from_file("set-ant", pbs, *bsant);
-  }
-  modify_ant(file, "ANTz", ant);
   vprint("set-ant: modified \"%s\"", (const char*)(GNativeString)fileid);
 }
 
