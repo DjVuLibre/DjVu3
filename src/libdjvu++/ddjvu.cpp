@@ -9,17 +9,17 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvu2pnm.cpp,v 1.1 2000-03-01 05:40:22 bcr Exp $
+//C- $Id: ddjvu.cpp,v 1.1 2000-03-01 23:47:41 leonb Exp $
 
 
-/** @name djvutopnm
+/** @name ddjvu
 
     {\bf Synopsis}
     \begin{verbatim}
-        djvutopnm [options] djvufilename [pnmfilename]
+        ddjvu [options] djvufilename [pnmfilename]
     \end{verbatim}
 
-    {\bf Description} --- File #"djvutopnm.cpp"# illustrates how to decode and
+    {\bf Description} --- File #"ddjvu.cpp"# illustrates how to decode and
     render a DjVu file using class #DjVuImage#.  This program decodes all
     variants of DjVu files, including the wavelet files produced by \Ref{c44},
     and produces PNM files (see \Ref{PNM and RLE file formats}).
@@ -70,13 +70,13 @@
     {\bf Other Options} --- The following two options are less commonly used:
     \begin{description}
     \item[-segment WxH+X+Y] Selects an image segment to render. Conceptually,
-       #djvutopnm# renders the full page using the specified resolution, and
+       #ddjvu# renders the full page using the specified resolution, and
        then extracts a subimage of width #W# and height #H#, starting at
        position (#X#,#Y#) relative to the bottom left corner of the page.
        Both operations of course happen simultaneously.  Rendering a small
        subimage is much faster than rendering the complete image.  Note that
        the output PNM file will always have size #WxH#.
-    \item[-v] Causes #djvutopnm# to print abundant information about the
+    \item[-v] Causes #ddjvu# to print abundant information about the
        structure of the DjVu file, the compression ratios, the memory usage,
        and the decoding and rendering times.
     \item[-page N] This can be used to decode a specific page of a multipage
@@ -90,7 +90,7 @@
     Yann Le Cun <yann@research.att.com>\\
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: djvu2pnm.cpp,v 1.1 2000-03-01 05:40:22 bcr Exp $# */
+    #$Id: ddjvu.cpp,v 1.1 2000-03-01 23:47:41 leonb Exp $# */
 //@{
 //@}
 
@@ -233,9 +233,9 @@ void
 usage()
 {
   fprintf(stderr,
-          "DJVUTOPNM -- DjVu decompression utility\n"
+          "DDJVU -- DjVu decompression utility\n"
           "  Copyright (c) AT&T 1999.  All rights reserved\n"
-          "Usage: djvutopnm [options] [<djvufile> [<pnmfile>]]\n\n"
+          "Usage: ddjvu [options] [<djvufile> [<pnmfile>]]\n\n"
           "Options:\n"
           "  -v                  Prints various informational messages.\n"
           "  -scale N            Selects display scale (default: 100%%).\n"
@@ -387,7 +387,7 @@ main(int argc, char **argv)
     }
   CATCH(ex)
     {
-      ex.perror("Exception while executing DJVUTOPNM");
+      ex.perror("Exception while executing DDJVU");
       exit(1);
     }
   ENDCATCH;

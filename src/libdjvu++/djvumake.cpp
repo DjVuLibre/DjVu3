@@ -9,131 +9,78 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: djvumake.cpp,v 1.16 2000-02-28 23:23:51 haffner Exp $
+//C- $Id: djvumake.cpp,v 1.17 2000-03-01 23:47:41 leonb Exp $
 
 /** @name djvumake
 
     {\bf Synopsis}
     \begin{verbatim}
-       % djvumake <djvufile> [Sjbz=<maskfile>] [FG44=<fgfile>] [BG44=<bgfile>]
+       % djvumake <djvufile> [...<arguments>...]
     \end{verbatim}
-    This commands also supports #"Smmr"# chunks for G4/MMR encoded masks,
-    #"FGjp"# and #"BGjp"# for JPEG encoded color layers, and finally #"FG2k"#
-    and #"BG2k"# for JPEG-2000 encoded color layers.
 
     {\bf Description}
 
-    This program assembles the DjVu file #djvufile# using the JB2 data
-    contained in file #maskfile# and the IW44 data contained in files #bgfile#
-    and #fgfile#.  This is useful for creating a DjVu image file from its 
-    individual components.
+    This command assembles a single-page DjVu file by copying or creating
+    chunks according to the provided <arguments>. Supported syntaxes for
+    <arguments> are as follows:
+    \begin{tabular}{ll}
+    {#INFO=<w>,<h>,<dpi>#} &
+      Creates the initial ``INFO'' chunk.  Arguments #w#, #h# and #dpi#
+      describe the width, height and resolution of the image.  All arguments
+      may be omitted.  The default resolution is 300 dpi.  The default width
+      and height will be retrieved from the first mask chunk specified in the
+      command line options.\\
+      {#Sjbz=<jb2file>#} &
+      Creates a JB2 mask chunk.  File #jb2file# may
+      contain raw JB2 data or be a DjVu file containing JB2 data, such as the
+      files produced by \Ref{cjb2}.\\
+      {#Smmr=<mmrfile>] #} &
+      Creates a mask chunk containing MMR/G4 data.  File #mmrfile#
+      may contain raw MMR data or be a DjVu file containing MMR data.\\
+      {#BG44=<iw44file>:<n>#} &
+      Creates one or more IW44 background chunks.  File #iw44file# must be an
+      IW44 file such as the files created by \Ref{c44}.  The optional argument
+      #n# indicates the number of chunks to copy from the IW44 file.\\
+      {#BGjp=<jpegfile>#} &
+      Creates a JPEG background chunk.\\
+      {#BG2k=<jpegfile>#} &
+      Creates a JPEG-2000 background chunk.\\
+      {#FG44=<iw44file>#} &
+      Creates one IW44 foreround chunks.  File #iw44file# must be an
+      IW44 file such as the files created by \Ref{c44}.  Only the first
+      chunk will be copied.\\
+      {#FGbz=<bzzfile>#} &
+      Creates a chunk containing colors for each JB2 encoded object.
+      Such chunks are created using class \Ref{DjVuPalette}.
+      See program \Ref{cpaldjvu} for an example.\\
+      {#FGjp=<jpegfile>#} &
+      Creates a JPEG foreground chunk.\\
+      {#FG2k=<jpegfile>#} &
+      Creates a JPEG-2000 foreground chunk.\\
+      {#PPM=<ppmfile>#} &
+      Create IW44 foreground and background chunks
+      by masking and subsampling PPM file #ppmfile#.
+      This is used by program \Ref{cdjvu}.
+    \end{tabular}
 
-    {\bf Recipe for creating a Photo DjVu File}
-
-    You can simply use program \Ref{c44} and specify either option #-dpi# or
-    #-gamma#.  Since these options are not supported by IW44 files, program
-    \Ref{c44} will produce a Photo DjVu File instead of an IW44 file.
-    Program #djvumake# however may be useful to convert an IW44 file into
-    a Photo DjVu File. Assuming that you have an IW44 file with a 640x480 image,
-    you can also generate Photo DjVu File using the following command:
+    Let us assume now that you have a PPM image #"myimage.ppm"# and a PBM
+    bitonal image #"mymask.pbm"# whose black pixels indicate which pixels
+    belong to the foreground.  Such a bitonal file may be obtained by
+    thresholding, although more sophisticated techniques can give better
+    results.  You can then generate a Compound DjVu File by typing:
     \begin{verbatim}
-       % djvumake my.djvu INFO=640,480  BG44=my.iw4
-    \end{verbatim}
-    
-
-    {\bf Recipe for creating a Bilevel DjVu File}
-
-    You can simply use program \Ref{cjb2} which generates Bilevel DjVu Image
-    files.  Program #djvumake# however can be useful to extract the mask from
-    a Compound DjVu File (using #djvuextract#) and create a Bilevel DjVu Image
-    (using #djvumake#).
-    \begin{verbatim}
-       % djvuextract mycompound.djvu Sjbz=myjb2.q
-       % djvumake mybilevel.djvu Sjbz=myjb2.q
-    \end{verbatim}
-
-    
-    {\bf Recipe for creating a Compound DjVu File}
-
-    Let us assume that you use a program like Gimp \URL{http://www.gimp.org}
-    or Photoshop.  You have created your image using two layers.  The
-    background layer contains all pictures and background details.  The
-    foreground layer contains the text and the drawings. Transparency is
-    controlled by a layer mask attached to the foreground layer.  The layer
-    mask contains the shape of the text and drawings in black and white.  The
-    actual foreground layer contains large patches of color which are only
-    displayed where the layer mask is black.  You can see a Gimp example in
-    file #"@Samples/layers.xcf.gz"#.
-
-    This layered model is very close to the Compound DjVu Image model.  In the
-    DjVu model however, the three images (the background layer, the foreground
-    layer mask, and the actual foreground layer) can have different
-    resolutions.
-    \begin{itemize}
-    \item
-    The size of the foreground layer mask is always equal to the size of the
-    DjVu image.  You must create a JB2 file containing the foreground mask as
-    explained in the {\em Recipe for Creating a Bilevel DjVu File}. Each zero
-    pixel in the mask means that the corresponding pixel in the raw image
-    belongs to the background. Each non zero pixel means that the
-    corresponding pixel in the raw image belongs to the foreground. Let us
-    call this file #"myjb2.q"#.
-    \item
-    The size of the background image is computed by rounding up the ratio
-    between the size of the mask and an integer background sub-sampling ratio
-    in range 1 to 12.  Choosing a sub-sampling ratio of 3 is usually a good
-    starting point.  You must then subsample the background layer image and save
-    it into a PPM file named #"mybg.ppm"#.  
-    \item
-    The size of the foreground color image is computed by rounding up the
-    ratio between the size of the mask and an integer background sub-sampling
-    ratio in range 1 to 12.  Choosing a sub-sampling ratio of 12 is usually
-    adequate.  You must then subsample the background layer image and save
-    it into a PPM file named #"myfg.ppm"#.  
-    \end{itemize}
-    
-    When you subsample these images, you should consider some refinements.
-    The color of each pixel of the subsampled image is an average of the
-    colors of a couple of pixels in the original image.  When you compute this
-    average, you eliminate the original pixels which are not visible, such as
-    pixels of the background layer which are masked by the foreground, or
-    pixels of the foreground color layer which are not visible because of the
-    mask transparency.
-    
-    It sometimes happens that you cannot compute the color of a pixel in the
-    subsampled image because none of the pixels in the corresponding image are
-    visible.  That means that we do not really care about the color of the
-    subsampled pixel because it is not visible at all.  It is not desirable of
-    course to encode the color value of such pixels.  This is possible using
-    the {\em masking} feature of the wavelet encoder.  You must first save two
-    PBM images named #"mybg.pbm"# and #"myfg.pbm"#.  These images have the
-    same size as the corresponding PPM images.  A black pixel in these images
-    mean that we should not code the color of the corresponding pixel in the
-    PPM image.
-
-    We must then encode both images using the \Ref{c44} wavelet encoder.
-    The following commands to the trick:
-    \begin{verbatim}
-      % c44 -slice 74+10+9+4 -mask mybg.msk mybg.ppm mybg.iw4 
-      % c44 -slice 100 -crcbfull -mask myfg.msk myfg.ppm myfg.iw4
-    \end{verbatim}
-    Note that we use different options. The background wavelet file
-    #"mybg.iw4"# contains four refinement chunks specified by option #-slice#.
-    The foreground wavelet file #"myfg.iw4"# contains a single chunk (option
-    #-slice#) and allocated more bits for encoding the colors (option
-    #-crcbfull#). 
-
-    The last step consists of assembling the DjVu file using #djvumake#.
-    \begin{verbatim}
-       djvumake my.djvu Sjbz=myjb2.q FG44=myfg.iw4 BG44=mybg.iw4
+       % cjb2 mymask.pbm mymask.djvu
+       % djvumake mycompound.djvu Sjbz=mymask.djvu PPM=myimage.ppm
     \end{verbatim}
 
     @memo
     Assemble DjVu files.
     @version
-    #$Id: djvumake.cpp,v 1.16 2000-02-28 23:23:51 haffner Exp $#
+    #$Id: djvumake.cpp,v 1.17 2000-03-01 23:47:41 leonb Exp $#
     @author
-    L\'eon Bottou <leonb@research.att.com> */
+    L\'eon Bottou <leonb@research.att.com> \\
+    Patrick Haffner <haffner@research.att.com>
+*/
 //@{
 //@}
 
@@ -146,32 +93,6 @@
 
 #include "GPixmap.h"
 #include "GBitmap.h"
-  static void 
-  processForeground(const GPixmap* image, const JB2Image *mask,
-                    GPixmap& subsampled_image, GBitmap& subsampled_mask);
-  
-  static void 
-  processBackground(const GPixmap* image, const JB2Image *mask,
-                    GPixmap& subsampled_image, GBitmap& subsampled_mask, int bg_sub);
-
-
-  static void 
-  maskedSubsample(const GPixmap *p_img,
-                  const GBitmap *p_mask,
-                  GPixmap& subsampled_image,
-                  GBitmap& subsampled_mask,
-                  int gridwidth, 
-                  int inverted_mask = 0, 
-                  int incr_flag = 0, 
-                  int minpixels = 1 );
-  
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 int flag_contains_fg      = 0;
 int flag_contains_bg      = 0;
@@ -180,11 +101,14 @@ int flag_contains_bg44    = 0;
 IFFByteStream *bg44iff    = 0;
 GP<MemoryByteStream> jb2stencil = 0;
 GP<MemoryByteStream> mmrstencil = 0;
-GP<JB2Image> stencil=0;
+GP<JB2Image> stencil      = 0;
 
 int w = -1;
 int h = -1;
+int dpi = 300;
 
+
+// -- Display brief usage information
 
 void 
 usage()
@@ -195,85 +119,171 @@ usage()
          "\n"
          "The arguments describe the successive chunks of the DJVU file.\n"
          "Possible arguments are:\n"
-         "   INFO=w,h                    --  Create the initial information chunk\n"
-         "   Sjbz=jb2file                --  Create a JB2 stencil chunk\n"
-         "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
+         "\n"
+         "   INFO=w[,[h[,[dpi]]]]        --  Create the initial information chunk\n"
+         "   Sjbz=jb2file                --  Create a JB2 mask chunk\n"
+         "   Smmr=mmrfile                --  Create a MMR mask chunk\n"
          "   BG44=[iw4file][:nchunks]    --  Create one or more IW44 background chunks\n"
-         "   ppm=ppmfile[:bg-subsample]  --  Using  jb2file, extracts the foreground and the background from raw ppmfile"
+         "   BGjp=jpegfile               --  Create a JPEG background chunk\n"
+         "   BG2k=jpeg2000file           --  Create a JPEG-2000 background chunk\n"
+         "   FG44=iw4file                --  Create an IW44 foreground chunk\n"
+         "   FGjp=jpegfile               --  Create a JPEG foreground chunk\n"
+         "   FG2k=jpeg2000file           --  Create a JPEG-2000 foreground chunk\n"
+         "   FGbz=bzzfile                --  Create a BZZ foreground chunk\n"
+         "\n"
+         "   PPM=ppmfile                 --  Create IW44 foreground and background chunks\n"
+         "                                   by masking and subsampling a PPM file.\n"
          "\n"
          "You may omit the specification of the information chunk. An information\n"
-         "chunk will be created using the image size of the first stencil chunk\n"
-         "This program tries to issue a warning when you are building an\n"
+         "chunk will be created using the image size of the first mask chunk\n"
+         "This program is sometimes able  to issue a warning when you are building an\n"
          "incorrect djvu file.\n"
          "\n");
   exit(1);
 }
 
 
+
+// -- Obtain image size from mmr chunk
+
 void
 analyze_mmr_chunk(char *filename)
 {
-  if (!mmrstencil)
+  if (!mmrstencil || !mmrstencil->size())
     {
       StdioByteStream bs(filename,"rb");
       mmrstencil = new MemoryByteStream();
-      mmrstencil->copy(bs);
+      // Check if file is an IFF file
+      char magic[4];
+      memset(magic,0,sizeof(magic));
+      bs.readall(magic,sizeof(magic));
+      bs.seek(0);
+      if (!strncmp(magic,"AT&T",4))
+        bs.readall(magic,sizeof(magic));
+      if (strncmp(magic,"FORM",4))
+        {
+          // Must be a raw file
+          bs.seek(0);
+          mmrstencil->copy(bs);
+        }
+      else
+        {
+          // Search Smmr chunk
+          GString chkid;
+          IFFByteStream iff(bs);
+          if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
+            THROW("Expecting a DjVu file!");
+          for(; iff.get_chunk(chkid); iff.close_chunk())
+            if (chkid=="Smmr") { mmrstencil->copy(bs); break; }
+        }
+      // Check result
       mmrstencil->seek(0);
-      int jw, jh, invert, strip;
-      MMRDecoder::decode_header(*mmrstencil, jw, jh, invert,strip);
+      if (!mmrstencil->size())
+        THROW("Could not find MMR data");
+      // Decode
+      stencil = MMRDecoder::decode(*mmrstencil);
+      int jw = stencil->get_width();
+      int jh = stencil->get_height();
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
+        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", filename);
     }
 }
+
+
+// -- Obtain image size from jb2 chunk
 
 void 
 analyze_jb2_chunk(char *filename)
 {
-  if (!jb2stencil)
+  if (!jb2stencil || !jb2stencil->size())
     {
       StdioByteStream bs(filename,"rb");
-      stencil=new(JB2Image);
       jb2stencil = new MemoryByteStream();
-      jb2stencil->copy(bs);
+      // Check if file is an IFF file
+      char magic[4];
+      memset(magic,0,sizeof(magic));
+      bs.readall(magic,sizeof(magic));
+      bs.seek(0);
+      if (!strncmp(magic,"AT&T",4))
+        bs.readall(magic,sizeof(magic));
+      if (strncmp(magic,"FORM",4))
+        {
+          // Must be a raw file
+          bs.seek(0);
+          jb2stencil->copy(bs);
+        }
+      else
+        {
+          // Search Sjbz chunk
+          GString chkid;
+          IFFByteStream iff(bs);
+          if (iff.get_chunk(chkid)==0 || chkid!="FORM:DJVU")
+            THROW("Expecting a DjVu file!");
+          for(; iff.get_chunk(chkid); iff.close_chunk())
+            if (chkid=="Sjbz") { jb2stencil->copy(bs); break; }
+        }
+      // Check result
       jb2stencil->seek(0);
+      if (!jb2stencil->size())
+        THROW("Could not find JB2 data");
+      // Decode
+      stencil=new(JB2Image);
       stencil->decode(*jb2stencil);
       int jw = stencil->get_width();
       int jh = stencil->get_height();
       if (w < 0) w = jw;
       if (h < 0) h = jh;
       if (jw!=w || jh!=h)
-        fprintf(stderr,"djvumake: stencil size (%s) does not match info size\n", filename);
+        fprintf(stderr,"djvumake: mask size (%s) does not match info size\n", filename);
     }
 }
 
 
-
+// -- Create info chunk from specification or mask
 
 void
 create_info_chunk(IFFByteStream &iff, int argc, char **argv)
 {
-  if (argc>2 && !strncmp(argv[2],"INFO=",5))
+  // Process info specification
+  for (int i=2; i<argc; i++)
+    if (! strncmp(argv[i],"INFO=",5))
+      {
+        int   narg = 0;
+        char *ptr = argv[i]+5;
+        while (*ptr)
+          {
+            if (*ptr != ',')
+              {
+                int x = strtol(ptr, &ptr, 10);
+                switch(narg)
+                  {
+                  case 0: 
+                    w = x; break;
+                  case 1: 
+                    h = x; break;
+                  case 2: 
+                    dpi = x; break;
+                  default:  
+                    THROW("djvumake: incorrect 'INFO' chunk specification\n");
+                  }
+              }
+            narg++;
+            if (*ptr && *ptr++!=',')
+              THROW("djvumake: comma expected in 'INFO' chunk specification\n");
+          }
+          break;
+      }
+  if (w>0 && (w<=0 || w>=32768))
+    THROW("djvumake: incorrect width in 'INFO' chunk specification\n");
+  if (h>0 && (h<=0 || h>=32768))
+    THROW("djvumake: incorrect height in 'INFO' chunk specification\n");
+  if (dpi>0 && (dpi<72 || dpi>144000))
+    THROW("djvumake: incorrect dpi in 'INFO' chunk specification\n");
+  // Search first mask chunks if size is still unknown
+  if (h<0 || w<0)
     {
-      // process info specification
-      char *ptr = argv[2]+5;
-      // size
-      w = strtol(ptr, &ptr, 10);
-      if (w<=0 || w>=16384)
-        THROW("djvumake: incorrect width in 'INFO' chunk specification\n");
-      if (*ptr++ != ',')
-        THROW("djvumake: comma expected in 'INFO' chunk specification (before height)\n");
-      h = strtol(ptr, &ptr, 10);      
-      if (h<=0 || h>=16384)
-        THROW("djvumake: incorrect height in 'INFO' chunk specification\n");
-      // rest
-      if (*ptr)
-        THROW("djvumake: syntax error in 'INFO' chunk specification\n");
-    }
-  else
-    {
-      // search stencil chunk
       for (int i=2; i<argc; i++)
         if (!strncmp(argv[i],"Sjbz=",5))
           {
@@ -286,28 +296,22 @@ create_info_chunk(IFFByteStream &iff, int argc, char **argv)
             break;
           }
     }
-  // warn
+  
+  // Check that we have everything
   if (w<0 || h<0)
-    fprintf(stderr,"djvumake: cannot determine image size\n");
+    THROW("djvumake: cannot determine image size\n");
   // write info chunk
   DjVuInfo info;
   info.width = w;
   info.height = h;
+  info.dpi = dpi;
   iff.put_chunk("INFO");
   info.encode(iff);
   iff.close_chunk();
 }
 
 
-void 
-create_raw_chunk(IFFByteStream &iff, char *chkid, char *filename)
-{
-  iff.put_chunk(chkid);
-  StdioByteStream ibs(filename,"rb");
-  iff.copy(ibs);
-  iff.close_chunk();
-}
-
+// -- Create MMR mask chunk
 
 void 
 create_mmr_chunk(IFFByteStream &iff, char *chkid, char *filename)
@@ -318,6 +322,9 @@ create_mmr_chunk(IFFByteStream &iff, char *chkid, char *filename)
   iff.copy(*mmrstencil);
   iff.close_chunk();
 }
+
+
+// -- Create JB2 mask chunk
 
 void 
 create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
@@ -330,6 +337,19 @@ create_jb2_chunk(IFFByteStream &iff, char *chkid, char *filename)
 }
 
 
+// -- Create chunk by copying file contents
+
+void 
+create_raw_chunk(IFFByteStream &iff, char *chkid, char *filename)
+{
+  iff.put_chunk(chkid);
+  StdioByteStream ibs(filename,"rb");
+  iff.copy(ibs);
+  iff.close_chunk();
+}
+
+
+// -- Internal headers for IW44
 
 struct PrimaryHeader {
   unsigned char serial;
@@ -344,6 +364,7 @@ struct SecondaryHeader {
 } secondary;
 
 
+// -- Create and check FG44 chunk
 
 void 
 create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
@@ -387,6 +408,8 @@ create_fg44_chunk(IFFByteStream &iff, char *ckid, char *filename)
 
 
 
+// -- Create and check BG44 chunk
+
 void 
 create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
 {
@@ -429,7 +452,7 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     {
       if (chkid!="PM44" && chkid!="BM44")
         {
-          fprintf(stderr,"djvumake: BG44 file contains unrecognized chunks (ignored)\n");
+          fprintf(stderr,"djvumake: BG44 file contains unrecognized chunks (fixed)\n");
           nchunks += 1;
           bg44iff->close_chunk();
           continue;
@@ -464,32 +487,31 @@ create_bg44_chunk(IFFByteStream &iff, char *ckid, char *filespec)
     fprintf(stderr,"djvumake: no more chunks in BG44 file\n");
 }
 
-void masksub(IFFByteStream &iff, char *filespec)
-{
-  char *s = strchr(filespec, ':');
-  if (s == filespec)
-    THROW("djvumake: no filename specified in first ppm specification");
-  if (!s)
-    s = filespec + strlen(filespec);
-  GString filename(filespec, s-filespec);
-  int bg_sub=3;
-  if (*s == ':')
-    bg_sub = atol(s+1);
 
+
+// -- Forward declarations
+
+void processForeground(const GPixmap* image, const JB2Image *mask,
+                       GPixmap& subsampled_image, GBitmap& subsampled_mask);
+void processBackground(const GPixmap* image, const JB2Image *mask,
+                       GPixmap& subsampled_image, GBitmap& subsampled_mask);
+
+
+// -- Create both foreground and background by masking and subsampling
+
+void 
+create_masksub_chunks(IFFByteStream &iff, char *filespec)
+{
+  // Check and load pixmap file
   if (!stencil)
     THROW("The use of a raw ppm image requires a stencil");
-  StdioByteStream ibs(filename, "rb");
-  GPixmap raw_pm;
-  raw_pm.init(ibs);
-  
-  if (bg_sub<1)
-    THROW("background subsampling must be >=1");
-
+  StdioByteStream ibs(filespec, "rb");
+  GPixmap raw_pm(ibs);
   if ((int) stencil->get_width() != (int) raw_pm.columns())
     THROW("Stencil and raw image have different widths!");
   if ((int) stencil->get_height() != (int) raw_pm.rows())
     THROW("Stencil and raw image have different heights!");
-  // foreground
+  // Encode foreground
   {
     GPixmap fg_img;
     GBitmap fg_mask;
@@ -501,49 +523,28 @@ void masksub(IFFByteStream &iff, char *filespec)
     fg_pm->encode_chunk(iff, parms[0]);
     iff.close_chunk();
   }
-  
-  // backgound
+  // Encode backgound 
   {
     GPixmap bg_img;
     GBitmap bg_mask;
-    processBackground(&raw_pm, stencil, bg_img, bg_mask, bg_sub);
+    processBackground(&raw_pm, stencil, bg_img, bg_mask);
     GP<IWPixmap> bg_pm = new IWPixmap(&bg_img, &bg_mask, IWPixmap::CRCBnormal);
-    IWEncoderParms parms[8];
-    // could make  quality=75accessible
-    int nchunks=4; int quality=75; 
-    //  int base=72+ (int) (log(bg_subsampling/3.0)/log(3.0)*10);
-    //
-    // The following is the precalculated values of the above formula for 
-    // the meaningfull ranges of bg_subsampling.
-    static const int base_offset[]={72,61,68,72,74,76,78,79,80,82};
-
-    int base= base_offset[bg_sub];
-    int linear_quality;
-    if (quality >= 75)
-      linear_quality = (quality - 75) * 2 + 50;
-    else
-      linear_quality = (quality * 2) / 3;
-    
-    int n=0;
-    switch (nchunks) {
-    case 4:
-      parms[0].bytes = 10000;
-      parms[n++].slices = base + linear_quality / 25;
-    case 3:
-      parms[n++].slices = base + linear_quality / 4;
-    case 2:
-      parms[n++].slices = base + linear_quality / 3;
-    case 1:
-      parms[n++].slices = base + linear_quality / 2;
-    }
-    for (int i=0; i<nchunks; i++)
-      {
-        iff.put_chunk("BG44");
-        bg_pm->encode_chunk(iff, parms[i]);
-        iff.close_chunk();
-      }
+    IWEncoderParms parms[4];
+    parms[0].bytes = 10000;
+    parms[0].slices = 74;
+    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[0]); iff.close_chunk();
+    parms[1].slices = 84;
+    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[1]); iff.close_chunk();
+    parms[2].slices = 90;
+    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[2]); iff.close_chunk();
+    parms[3].slices = 97;
+    iff.put_chunk("BG44"); bg_pm->encode_chunk(iff, parms[3]); iff.close_chunk();
   }
 }
+
+
+
+// -- Main
 
 int
 main(int argc, char **argv)
@@ -611,15 +612,11 @@ main(int argc, char **argv)
               create_raw_chunk(iff, argv[i], argv[i]+5);
               flag_contains_fg = 1;
             }
-          else if (! strncmp(argv[i],"ppm=",4))
+          else if (! strncmp(argv[i],"PPM=",4))
             {
-              
-              if (flag_contains_bg)
-                fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
-              if (flag_contains_bg)
-                fprintf(stderr,"djvumake: Duplicate BGxx chunk\n");
-              masksub(iff, argv[i]+4 );
-
+              if (flag_contains_bg || flag_contains_fg)
+                fprintf(stderr,"djvumake: Duplicate 'FGxx' or 'BGxx' chunk\n");
+              create_masksub_chunks(iff, argv[i]+4 );
               flag_contains_bg = 1;
               flag_contains_fg = 1;
             }
@@ -660,8 +657,13 @@ main(int argc, char **argv)
   return 0;
 }
 
-// Returns a dilated version (1 pixel, 8-neighborhood) of the original GBitmap
-// (width and height of resulting GBitmap are logically 2 pixels more)
+
+////////////////////////////////////////
+// MASKING AND SUBSAMPLING
+////////////////////////////////////////
+
+
+// -- Returns a dilated version of a bitmap
 
 static GP<GBitmap> 
 dilate8(const GBitmap *p_bm)
@@ -692,37 +694,7 @@ dilate8(const GBitmap *p_bm)
 }
 
 
-// Returns an eroded version (1-pixel, 8 neighborhood) of the original GBitmap
-// (width and height of resulting GBitmap are logically 2 pixels less)
-
-static GP<GBitmap> 
-erode8(const GBitmap *p_bm)
-{
-  const GBitmap& bm = *p_bm;
-  int newnrows = bm.rows()-2;
-  int newncolumns = bm.columns()-2;
-  if(newnrows<=0 || newncolumns<=0) // then return an empty GBitmap 
-    return new GBitmap;
-    
-  GP<GBitmap> p_newbm = new GBitmap(newnrows,newncolumns); 
-  GBitmap& newbm = *p_newbm;
-  for(int y=0; y<newnrows; y++)
-    {
-      for(int x=0; x<newncolumns; x++)
-        {
-          // Check if there's a white pixel in the 8-neighborhood
-          if(   !( bm[y  ][x] && bm[y  ][x+1] && bm[y  ][x+2]
-                && bm[y+1][x] && bm[y+1][x+1] && bm[y+1][x+2]
-                && bm[y+2][x] && bm[y+2][x+1] && bm[y+2][x+2]))
-            newbm[y][x] = 0; // then set current to white
-          else
-            newbm[y][x] = 1; // else set current to black
-        }
-    }
-  return p_newbm;
-}
-
-// Returns a new JB2Image that is a copy of the original with every blit dilated (8 neighborhod)
+// -- Returns a dilated version of a jb2image
 
 GP<JB2Image> 
 dilate8(const JB2Image *im)
@@ -753,7 +725,38 @@ dilate8(const JB2Image *im)
   return newim;
 }
 
-// Returns a new JB2Image that is a copy of the original with every blit eroded (8-neighborhood)
+
+// -- Returns an eroded version of a bitmap
+
+static GP<GBitmap> 
+erode8(const GBitmap *p_bm)
+{
+  const GBitmap& bm = *p_bm;
+  int newnrows = bm.rows()-2;
+  int newncolumns = bm.columns()-2;
+  if(newnrows<=0 || newncolumns<=0) // then return an empty GBitmap 
+    return new GBitmap;
+  GP<GBitmap> p_newbm = new GBitmap(newnrows,newncolumns); 
+  GBitmap& newbm = *p_newbm;
+  for(int y=0; y<newnrows; y++)
+    {
+      for(int x=0; x<newncolumns; x++)
+        {
+          // Check if there's a white pixel in the 8-neighborhood
+          if(   !( bm[y  ][x] && bm[y  ][x+1] && bm[y  ][x+2]
+                && bm[y+1][x] && bm[y+1][x+1] && bm[y+1][x+2]
+                && bm[y+2][x] && bm[y+2][x+1] && bm[y+2][x+2]))
+            newbm[y][x] = 0; // then set current to white
+          else
+            newbm[y][x] = 1; // else set current to black
+        }
+    }
+  return p_newbm;
+}
+
+
+// -- Returns an eroded version of a jb2image
+
 GP<JB2Image> 
 erode8(const JB2Image *im)
 {
@@ -784,46 +787,30 @@ erode8(const JB2Image *im)
 }
 
 
-
-
-
-// ************************************
-// * public static methods of MaskSub *
-// ************************************
-
-// maskedSubsample method:
-// Subsamples only the pixels of <image> that are not masked (<mask>).
-// This call resizes and fills the resulting <subsampled_image> and <subsampled_mask>.
-// Their dimension is the dimension of the original <image> divided by <gridwidth>
-// and rounded to the superior integer.
-// For each square grid (gridwidth times gridwidth) of the subsampling mesh
-// that contains at least <minpixels> non-masked pixels, their value is averaged 
-// to give the value of the corresponding <subsampled_image> pixel, and the
-// <subsampled_mask> is cleared at this position.
-// If <inverted_mask> is true, then pixels are considered to be masked when mask==0
-//
-// The <incr_flag> can be set to specify incremental mode.
-// This mode is used when calling maskedSubsample a second time 
-// with a different mask. This will only set the pixels that have not previously been 
-// set (i.e. for which the subsampled_mask hasn't been cleared). In this mode, the 
-// subsampled_image and subsampled_mask are expected to already have the correct size.
-// (See explanation in MaskSub::processBackground code to know how and why this is used)
+// Subsamples only the pixels of <image> that are not masked (<mask>).  This
+// call resizes and fills the resulting <subsampled_image> and
+// <subsampled_mask>.  Their dimension is the dimension of the original
+// <image> divided by <gridwidth> and rounded to the superior integer.  For
+// each square grid (gridwidth times gridwidth) of the subsampling mesh that
+// contains at least <minpixels> non-masked pixels, their value is averaged to
+// give the value of the corresponding <subsampled_image> pixel, and the
+// <subsampled_mask> is cleared at this position.  If <inverted_mask> is true,
+// then pixels are considered to be masked when mask==0
  
 
 static void
 maskedSubsample(const GPixmap* img,
-                         const GBitmap *p_mask,
-                         GPixmap& subsampled_image,
-                         GBitmap& subsampled_mask,
-                         int gridwidth, int inverted_mask, 
-                         int incr_flag, int minpixels
-                         )
+                const GBitmap *p_mask,
+                GPixmap& subsampled_image,
+                GBitmap& subsampled_mask,
+                int gridwidth, int inverted_mask, 
+                int minpixels=1
+                )
 {
   const GPixmap& image= *img;
   const GBitmap& mask = *p_mask;
   int imageheight = image.rows();
   int imagewidth = image.columns();
-  
   // compute the size of the resulting subsampled image
   int subheight = imageheight/gridwidth;
   if(imageheight%gridwidth)
@@ -831,118 +818,89 @@ maskedSubsample(const GPixmap* img,
   int subwidth = imagewidth/gridwidth;
   if(imagewidth%gridwidth)
     subwidth++;
-
-  if(!incr_flag) // set the sizes unless in incremental mode
-    {
-      subsampled_image.init(subheight, subwidth);
-      subsampled_mask.init(subheight, subwidth);
-    }
-
+  // set the sizes unless in incremental mode
+  subsampled_image.init(subheight, subwidth);
+  subsampled_mask.init(subheight, subwidth);
+  // go subsampling
   int row, col;  // row and col in the subsampled image
   int posx, posxend, posy, posyend; // corresponding square in the original image
-
   for(row=0, posy=0; row<subheight; row++, posy+=gridwidth)
     {
       GPixel* subsampled_image_row = subsampled_image[row]; // row row of subsampled image
       unsigned char* subsampled_mask_row = subsampled_mask[row]; // row row of subsampled mask
-
       posyend = posy+gridwidth;
       if(posyend>imageheight)
         posyend = imageheight;
-
       for(col=0, posx=0; col<subwidth; col++, posx+=gridwidth) 
         {
-          // Do not overwrite if in incremental mode
-          if(!(incr_flag && subsampled_mask_row[col]==0)) 
+          posxend = posx+gridwidth;
+          if(posxend>imagewidth)
+            posxend = imagewidth;
+          int count = 0;
+          int r = 0;
+          int g = 0;
+          int b = 0;
+          for(int y=posy; y<posyend; y++)
             {
-              posxend = posx+gridwidth;
-              if(posxend>imagewidth)
-                posxend = imagewidth;
-
-              int count = 0;
-              int r = 0;
-              int g = 0;
-              int b = 0;
-              for(int y=posy; y<posyend; y++)
+              const unsigned char* mask_y = mask[y]; // Row y of the mask
+              for(int x=posx; x<posxend; x++)
                 {
-                  const unsigned char* mask_y = mask[y]; // Row y of the mask
-                  for(int x=posx; x<posxend; x++)
+                  unsigned char masked = (inverted_mask ? !mask_y[x] :mask_y[x]);
+                  if(!masked)
                     {
-                      unsigned char masked = (inverted_mask ? !mask_y[x] :mask_y[x]);
-                      if(!masked)
-                        {
-                          GPixel p = image[y][x];
-                          r += p.r;
-                          g += p.g;
-                          b += p.b;
-                          count ++;
-                        }
+                      GPixel p = image[y][x];
+                      r += p.r;
+                      g += p.g;
+                      b += p.b;
+                      count ++;
                     }
                 }
-
-              /* minpixels pixels are enough to give the color */
-              /* so set it, and do not mask this point */
-              if(count >= minpixels)   
-                {
-                  GPixel p;
-                  p.r = r/count;
-                  p.g = g/count;
-                  p.b = b/count;
-                  subsampled_image_row[col] = p;
-                  subsampled_mask_row[col] = 0;
-                } 
-              else /* make it bright red and masked */ 
-                {
-                  subsampled_image_row[col] = GPixel::RED;
-                  subsampled_mask_row[col] = 1;
-                }
+            }
+          /* minpixels pixels are enough to give the color */
+          /* so set it, and do not mask this point */
+          if(count >= minpixels)   
+            {
+              GPixel p;
+              p.r = r/count;
+              p.g = g/count;
+              p.b = b/count;
+              subsampled_image_row[col] = p;
+              subsampled_mask_row[col] = 0;
+            } 
+          else /* make it bright red and masked */ 
+            {
+              subsampled_image_row[col] = GPixel::RED;
+              subsampled_mask_row[col] = 1;
             }
         }
     }
 }
 
 
+// -- Computes foreground image and mask
 
-
-
-static void processForeground(const GPixmap* image, const JB2Image *mask,
-                                GPixmap& subsampled_image, GBitmap& subsampled_mask)
+void 
+processForeground(const GPixmap* image, const JB2Image *mask,
+                  GPixmap& subsampled_image, GBitmap& subsampled_mask)
 {
   GP<JB2Image> eroded_mask = erode8(mask);
   maskedSubsample(image, eroded_mask->get_bitmap(), 
-                  subsampled_image, subsampled_mask, 12, TRUE);
-#ifdef DEBUG_SAVE
-  StdioByteStream mask_pbm("mask.pbm","wb");
-  mask->get_GBitmap()->save_pbm(mask_pbm);
-  StdioByteStream sub_fg_ppm("sub_fg.ppm","wb");
-  subsampled_image.save_ppm(sub_fg_ppm);
-  StdioByteStream sub_fg_mask_pbm("sub_fg_mask.pbm","wb");
-  subsampled_mask.save_pbm(sub_fg_mask_pbm);
-#endif
+                  subsampled_image, subsampled_mask, 
+                  6, 1);   // foreground subsample is 6 (300dpi->50dpi)
 }
 
-static void processBackground(const GPixmap* image, const JB2Image *mask,
-                           GPixmap& subsampled_image, GBitmap& subsampled_mask,
-                              int bg_sub)
+
+// -- Computes background image and mask
+
+void 
+processBackground(const GPixmap* image, const JB2Image *mask,
+                  GPixmap& subsampled_image, GBitmap& subsampled_mask)
 {
   GP<JB2Image> dilated_mask1 = dilate8(mask);
   GP<JB2Image> dilated_mask2 = dilate8(dilated_mask1);
-  maskedSubsample(image, dilated_mask2->get_bitmap(), subsampled_image, 
-                  subsampled_mask, bg_sub, FALSE);
-#ifdef TEMPORARY_DISABLED
-  // Now we call maskedSubsample in incremental mode to solve the following problem: 
-  // The problem may occur with N=2: if dilation removes all the pixels in a 3x3 box, 
-  // nothing is left to sample the background color
-  // One deletion will remove less backgound pixels.
-  maskedSubsample(image, dilated_mask1->get_GBitmap(), subsampled_image, 
-                  subsampled_mask, 3, FALSE, TRUE);
-#endif
-#ifdef DEBUG_SAVE
-  StdioByteStream sub_bg_ppm("sub_bg.ppm","wb");
-  subsampled_image.save_ppm(sub_bg_ppm);
-  StdioByteStream sub_bg_mask_pbm("sub_bg_mask.pbm","wb");
-  subsampled_mask.save_pbm(sub_bg_mask_pbm);
-#endif
+  maskedSubsample(image, dilated_mask2->get_bitmap(),
+                  subsampled_image, subsampled_mask, 
+                  3, 0);   // background subsample is 3 (300dpi->100dpi)
 }
 
 

@@ -306,7 +306,7 @@
     to decode the contents of a DjVu file.  The complete documentation is
     found in section \Ref{DjVuDocument.h}, \Ref{DjVuImage.h} and
     \Ref{DjVuFile}.  You may also consult the source code of programs
-    \Ref{djvutopnm} and \Ref{djvm}.
+    \Ref{ddjvu} and \Ref{djvm}.
 
     The DjVu Reference Library uses a two stage decoding model. 
     \begin{itemize}
@@ -839,7 +839,7 @@
 //@Include: d44.cpp
 //@Include: cjb2.cpp
 //@Include: cpaldjvu.cpp
-//@Include: djvutopnm.cpp
+//@Include: ddjvu.cpp
 //@Include: djvumake.cpp
 //@Include: djvuextract.cpp
 //@Include: djvmcvt.cpp

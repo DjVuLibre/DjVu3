@@ -1,28 +1,24 @@
-#!/bin/sh
-#
-# Copyright (c) 2000 AT&T
-# All Rights Reserved
-# written 01/00 by Patrick Haffner
+#!/bin/sh 
+# Copyright (c) 2000 AT&T -- All Rights Reserved
+# Written 01/00 by Patrick Haffner
 
 # Setup root name of temporary files
-temp=${TMPDIR:-/tmp}/cdj$$
-# Ensure temporary files are deleted 
-trap 'rm -f "$temp"*; exit 1' 2 3
+temp=${TMPDIR:-/tmp}/cdjvu$$
 
+# Ensure temporary files are deleted 
+trap 'rm -f "$temp"*; exit 1' 0 2 3
 
 # Display command while executing
-run()
-{
-        echo 1>&2 $1
-        eval $1
-}
+run() {
+ echo 1>&2 $1 
+ eval $1 
+} 
 
-# compute the binary mask from the color image
+# Compute the binary mask from the color image
 run "ppmtopgm $1 | pgmtopbm -threshold > $temp.pbm"
 
 # JB2 compression
-run "cjb2 -loose -clean $temp.pbm $temp.djvu"
-run "djvuextract  $temp.djvu Sjbz=$temp.jb2"
+run "cjb2 -loose -clean $temp.pbm $temp-m.djvu"
 
-# masksub and djvumake
-run "djvumake $2 Sjbz=$temp.jb2 ppm=$1"
+# Subsample, mask, and assemble
+run "djvumake $2 Sjbz=$temp-m.djvu PPM=$1"

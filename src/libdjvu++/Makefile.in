@@ -7,7 +7,7 @@
 # C- AT&T, you have an infringing copy of this software and cannot use it
 # C- without violating AT&T's intellectual property rights.
 # C-
-# C- $Id: Makefile.in,v 1.87 2000-03-01 05:40:22 bcr Exp $
+# C- $Id: Makefile.in,v 1.88 2000-03-01 23:47:41 leonb Exp $
 
 %%%include <paths>
 
@@ -34,10 +34,10 @@ CXXFLAGS=@%CXXFLAGS%@ $(CXXOPT) $(CXXWARN) $(CXXPIC) $(DEFS) $(INCS)
 
 LIB= $(LIBDJVUXX)
 
-PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/djvu2pnm\
+PROG= $(BINPATH)/djvudump $(BINPATH)/c44 $(BINPATH)/d44 $(BINPATH)/ddjvu\
 	$(BINPATH)/djvumake $(BINPATH)/djvuextract $(BINPATH)/ppmcoco\
 	$(BINPATH)/bzz $(BINPATH)/djthumb $(BINPATH)/djvmcvt $(BINPATH)/djvm\
-	$(BINPATH)/cjb2 $(BINPATH)/cpaldjvu
+	$(BINPATH)/cjb2 $(BINPATH)/cpaldjvu $(BINPATH)/cdjvu
 
 # Makefile for libdjvu++.a
 
@@ -76,7 +76,7 @@ DJVMCVTOBJS = djvmcvt.o
 C44OBJS = c44.o
 D44OBJS = d44.o
 DJVUDUMPOBJS = djvudump.o
-DJVU2PNMOBJS = djvu2pnm.o
+DDJVUOBJS = ddjvu.o
 MAKEDEJAVUOBJS = djvumake.o
 BREAKDEJAVUOBJS = djvuextract.o
 PPMCOCOOBJS = ppmcoco.o
@@ -84,15 +84,16 @@ BZZOBJS = bzz.o
 DJTHUMBOBJS = djthumb.o
 CJB2OBJS = cjb2.o
 CPALDJVUOBJS = cpaldjvu.o
+CDJVUSCRIPT = SRCDIR/cdjvu
 
 
 $(BINPATH)/djvmcvt: $(DJVMCVTOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMCVTOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMCVTOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djvm: $(DJVMOBJS) $(LIB) @%LIBJPEG%@
+$(BINPATH)/djvm: $(DJVMOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVMOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) @%LIBJPEG%@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVMOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/c44: $(C44OBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(C44OBJS) $(LIB) ; fi
@@ -106,9 +107,9 @@ $(BINPATH)/djvudump: $(DJVUDUMPOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVUDUMPOBJS) $(LIB)  ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVUDUMPOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djvu2pnm: $(DJVU2PNMOBJS) $(LIB)
-	if [ -n "$(RPO)" ] ; then $(RPO) $(DJVU2PNMOBJS) $(LIB) ; fi
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJVU2PNMOBJS) $(LIB) $(LIBS)
+$(BINPATH)/ddjvu: $(DDJVUOBJS) $(LIB)
+	if [ -n "$(RPO)" ] ; then $(RPO) $(DDJVUOBJS) $(LIB) ; fi
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DDJVUOBJS) $(LIB) $(LIBS)
 
 $(BINPATH)/djvumake: $(MAKEDEJAVUOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(MAKEDEJAVUOBJS) $(LIB) ; fi
@@ -134,10 +135,13 @@ $(BINPATH)/bzz: $(BZZOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(BZZOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(BZZOBJS) $(LIB) $(LIBS)
 
-$(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB) $(LIBS)
+$(BINPATH)/djthumb: $(DJTHUMBOBJS) $(LIB)
 	if [ -n "$(RPO)" ] ; then $(RPO) $(DJTHUMBOBJS) $(LIB) ; fi
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@  $(DJTHUMBOBJS) $(LIB) $(LIBS)
 
+$(BINPATH)/cdjvu: $(CDJVUSCRIPT)
+	cp $(CDJVUSCRIPT) $@
+	chmod 755 $@
 
 # Documentation
 
