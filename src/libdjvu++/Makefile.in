@@ -155,8 +155,10 @@ PHONY: html tex clean realclean distclean install depend
 	$(CXX) $(CXXFLAGS) -c $(SRCDIR)/$*.cpp
 
 
-
 ### DEPENDENCIES
+ATTLicense.o: ATTLicense.cpp ATTLicense.h GString.h DjVuGlobal.h \
+ GException.h GSmartPointer.h ByteStream.h GContainer.h BSByteStream.h \
+ ZPCodec.h
 BSByteStream.o: BSByteStream.cpp BSByteStream.h DjVuGlobal.h \
  GException.h ByteStream.h GContainer.h GSmartPointer.h ZPCodec.h
 ByteStream.o: ByteStream.cpp ByteStream.h DjVuGlobal.h GException.h \
