@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GException.cpp,v 1.9 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GException.cpp,v 1.9.4.1 1999-05-13 19:37:00 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -21,11 +21,9 @@
 #include <string.h>
 #include <new.h>
 #include "GException.h"
-#ifdef DEBUGLVL
 #include "debug.h"
-#endif
 
-// File "$Id: GException.cpp,v 1.9 1999-03-17 19:24:57 leonb Exp $"
+// File "$Id: GException.cpp,v 1.9.4.1 1999-05-13 19:37:00 eaf Exp $"
 // - Author: Leon Bottou, 05/1997
 
 GException::GException() 
