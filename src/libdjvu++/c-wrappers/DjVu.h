@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVu.h,v 1.11 2000-03-10 14:57:35 haffner Exp $
+ *C- $Id: DjVu.h,v 1.12 2000-07-04 00:51:49 mrosen Exp $
  */
 
 #ifndef _DJVU_GLOBAL_API_H
@@ -20,13 +20,16 @@
     compression progress, and manually parsing command line arguments.
     Most user programs should not need these functions.
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers 
 */
 /*@{*/
 
 /*
  * $Log: DjVu.h,v $
- * Revision 1.11  2000-03-10 14:57:35  haffner
+ * Revision 1.12  2000-07-04 00:51:49  mrosen
+ * updated documentation
+ *
+ * Revision 1.11  2000/03/10 14:57:35  haffner
  * Typos + cannot use "default" as a variable name!
  *
  * Revision 1.10  2000/03/08 22:59:46  bcr

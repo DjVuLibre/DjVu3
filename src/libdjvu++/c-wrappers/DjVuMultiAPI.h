@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuMultiAPI.h,v 1.22 2000-05-02 22:34:56 bcr Exp $
+ *C- $Id: DjVuMultiAPI.h,v 1.23 2000-07-04 00:51:50 mrosen Exp $
  */
 
 
@@ -21,12 +21,15 @@
     This API does not contain any functions for encoding, rendering, or
     decoding.
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers 
 */
 
 /* 
  * $Log: DjVuMultiAPI.h,v $
- * Revision 1.22  2000-05-02 22:34:56  bcr
+ * Revision 1.23  2000-07-04 00:51:50  mrosen
+ * updated documentation
+ *
+ * Revision 1.22  2000/05/02 22:34:56  bcr
  * Added basic support for thumbnails.
  *
  * Revision 1.21  2000/03/08 22:59:46  bcr

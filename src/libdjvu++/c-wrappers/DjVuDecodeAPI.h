@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDecodeAPI.h,v 1.27 2000-06-01 22:37:04 bcr Exp $
+ *C- $Id: DjVuDecodeAPI.h,v 1.28 2000-07-04 00:51:50 mrosen Exp $
  */
 
 #ifndef _DJVUDECODE_H_
@@ -20,14 +20,17 @@
     The structures defined here are also used for some of the encoding
     functions.
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers 
 */
 
 /*@{*/
 
 /*
  * $Log: DjVuDecodeAPI.h,v $
- * Revision 1.27  2000-06-01 22:37:04  bcr
+ * Revision 1.28  2000-07-04 00:51:50  mrosen
+ * updated documentation
+ *
+ * Revision 1.27  2000/06/01 22:37:04  bcr
  * Added support for the --white-normalize and --black-normalize in documenttodjvu
  *
  * Revision 1.26  2000/03/09 22:27:59  bcr

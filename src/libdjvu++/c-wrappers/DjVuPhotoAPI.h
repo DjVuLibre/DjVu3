@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuPhotoAPI.h,v 1.17 2000-03-09 22:27:59 bcr Exp $
+ *C- $Id: DjVuPhotoAPI.h,v 1.18 2000-07-04 00:51:50 mrosen Exp $
  */
 
 #ifndef _DJVUPHOTO_H_
@@ -21,14 +21,17 @@
    photos.  Most of the structures defined here are also used for the
    background layer when document encoding.
    @author
-   Bill C Riemers <bcr@att.com>
+   Bill C Riemers 
 */
 
 /*@{*/
 
 /*
  * $Log: DjVuPhotoAPI.h,v $
- * Revision 1.17  2000-03-09 22:27:59  bcr
+ * Revision 1.18  2000-07-04 00:51:50  mrosen
+ * updated documentation
+ *
+ * Revision 1.17  2000/03/09 22:27:59  bcr
  * Updated the documentation, again.
  *
  * Revision 1.16  2000/03/08 22:59:46  bcr

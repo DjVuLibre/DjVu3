@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuBitonalAPI.h,v 1.13 2000-03-09 22:27:59 bcr Exp $
+ *C- $Id: DjVuBitonalAPI.h,v 1.14 2000-07-04 00:51:50 mrosen Exp $
  */
 
 #ifndef _DJVUBITONAL_H_
@@ -18,14 +18,17 @@
     @memo #DjVuBitonalAPI.h# defines the functions used to convert multiple
     bitonal images to DjVu multipage documents.
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers 
 */
 
 /*@{*/
 
 /* 
  * $Log: DjVuBitonalAPI.h,v $
- * Revision 1.13  2000-03-09 22:27:59  bcr
+ * Revision 1.14  2000-07-04 00:51:50  mrosen
+ * updated documentation
+ *
+ * Revision 1.13  2000/03/09 22:27:59  bcr
  * Updated the documentation, again.
  *
  * Revision 1.12  2000/03/08 22:59:46  bcr

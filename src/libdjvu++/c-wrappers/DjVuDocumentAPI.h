@@ -7,7 +7,7 @@
  *C- AT&T, you have an infringing copy of this software and cannot use it
  *C- without violating AT&T's intellectual property rights.
  *C-
- *C- $Id: DjVuDocumentAPI.h,v 1.29 2000-03-26 16:16:41 haffner Exp $
+ *C- $Id: DjVuDocumentAPI.h,v 1.30 2000-07-04 00:51:50 mrosen Exp $
  */
 
 #ifndef _DJVUDOCUMENT_H_
@@ -22,12 +22,15 @@
     Document files consist of both a foreground layer with text and a
     background layer with images.
     @author
-    Bill C Riemers <bcr@att.com>
+    Bill C Riemers 
 */
 
 /*
  * $Log: DjVuDocumentAPI.h,v $
- * Revision 1.29  2000-03-26 16:16:41  haffner
+ * Revision 1.30  2000-07-04 00:51:50  mrosen
+ * updated documentation
+ *
+ * Revision 1.29  2000/03/26 16:16:41  haffner
  * Added options
  *
  * Revision 1.28  2000/03/09 22:27:59  bcr
