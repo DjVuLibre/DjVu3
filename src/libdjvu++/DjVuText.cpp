@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuText.cpp,v 1.7 2000-12-18 17:14:11 bcr Exp $
+// $Id: DjVuText.cpp,v 1.8 2000-12-20 21:46:07 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -406,6 +406,83 @@ DjVuTXT::find_zones(int string_start, int string_length) const
       }
     }
     if (zone_list.size()) break;
+  }
+  return zone_list;
+}
+
+
+GList<DjVuTXT::Zone *>
+DjVuTXT::find_text_in_rect(GRect target_rect, GString &text) const
+      // For the string starting at string_start of length string_length
+      // the function will generate a list of smallest zones of the
+      // same type and will return it
+{
+  GList<Zone *> zone_list;
+
+  int text_start = 0;
+  int text_end = 0;
+
+  
+  int zone_type=CHARACTER;
+  while(zone_type>=PAGE)
+  {
+    int start=0;
+    int end=textUTF8.length();
+
+
+	enum { notfound, finding, found } found_status;
+	found_status = notfound;
+    
+    while(found_status!=found)
+    {
+      if (start==end) 
+		break;
+      
+      Zone * zone=get_smallest_zone(zone_type, start, end);
+      if (zone && zone_type==zone->ztype )
+      {
+		  if(target_rect.contains(zone->rect))
+		  {
+			zone_list.append(zone);
+			if( found_status == notfound )
+				text_start = start;
+
+			text_end = end;
+			
+			found_status = finding;
+		  }
+		  else 
+		  if( found_status == finding && ((target_rect.ymin > zone->rect.ymax) || (target_rect.ymax < zone->rect.ymin)))
+		  {
+
+			  text_end = end;
+			  found_status = found;
+		  }
+		  else if( found_status == finding )
+		  {
+			  zone_list.append(zone);
+			  text_end = end;
+		  }
+
+
+		  start=end;
+		  end=textUTF8.length();
+      } else
+      {
+        //zone_type--;
+        //zone_list.empty();
+        break;
+      }
+    }
+    if (zone_list.size()) 
+	{
+		text = textUTF8.substr(text_start, text_end-text_start+1);
+		break;
+	}
+	else
+		zone_type--;
+
+
   }
   return zone_list;
 }

@@ -31,7 +31,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C- 
 // 
-// $Id: DjVuText.h,v 1.5 2000-12-18 17:14:11 bcr Exp $
+// $Id: DjVuText.h,v 1.6 2000-12-20 21:46:07 praveen Exp $
 // $Name:  $
 
 #ifndef _DJVUTEXT_H
@@ -56,7 +56,7 @@
     @memo Implements support for DjVuImage hidden text.
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVuText.h,v 1.5 2000-12-18 17:14:11 bcr Exp $# */
+    #$Id: DjVuText.h,v 1.6 2000-12-20 21:46:07 praveen Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -179,6 +179,9 @@ public:
   GList<Zone *> search_string(const char * string, int & start_pos,
 			      bool search_fwd, bool match_case,
 			      bool whole_word=false) const;
+
+  GList<Zone *> find_text_in_rect(GRect target_rect, GString &text) const;
+
   /** Returns the number of bytes needed by this data structure. It's
       used by caching routines to estimate the size of a \Ref{DjVuImage}. */
   unsigned int get_memory_usage() const;
