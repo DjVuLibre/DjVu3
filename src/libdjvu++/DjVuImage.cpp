@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuImage.cpp,v 1.54 2001-03-27 20:15:30 praveen Exp $
+// $Id: DjVuImage.cpp,v 1.55 2001-03-27 22:04:19 praveen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -1059,7 +1059,13 @@ do_bitmap(const DjVuImage &dimg, BImager get,
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
     if (rw*red>w-red && rw*red<w+red && rh*red>h-red && rh*red<h+red)
-      return (dimg.*get)(zrect, red, align);
+    {
+        GP<GBitmap> bm=(dimg.*get)(zrect, red, align);
+        if(bm)
+            bm->rotate((4-dimg.get_rotate())%4);
+        else
+            return NULL;
+    }
   // Find best reduction
   for (red=15; red>1; red--)
     if ( (rw*red < w && rh*red < h) ||
@@ -1136,7 +1142,13 @@ do_pixmap(const DjVuImage &dimg, PImager get,
   zrect.translate(-all.xmin, -all.ymin);
   for (red=1; red<=15; red++)
     if (rw*red>w-red && rw*red<w+red && rh*red>h-red && rh*red<h+red)
-      return (dimg.*get)(zrect, red, gamma);
+    {
+        GP<GPixmap> pm = (dimg.*get)(zrect, red, gamma);
+        if( pm ) 
+            pm->rotate((4-dimg.get_rotate())%4);
+        else
+            return NULL;
+    }
   // These reductions usually go faster (improve!)
   static int fastred[] = { 12,6,4,3,2,1 };
   // Find best reduction
