@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DataPool.cpp,v 1.36 1999-12-03 22:05:16 bcr Exp $
+//C- $Id: DataPool.cpp,v 1.37 1999-12-13 20:07:05 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -710,6 +710,15 @@ DataPool::add_data(const void * buffer, int offset, int size)
 
       // And call triggers
    check_triggers();
+
+      // Do not undo the following two lines. The reason why we need them
+      // here is the connected DataPools, which use 'length' (more exactly
+      // has_data()) to see if they have all data required. So, right after
+      // all data has been added to the master DataPool, but before EOF
+      // is set, the master and slave DataPools disagree regarding if
+      // all data is there or not. These two lines solve the problem
+   GCriticalSectionLock lock(&data_lock);
+   if (length>=0 && data->size()>=length) set_eof();
 }
 
 bool
