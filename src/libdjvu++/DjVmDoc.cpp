@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.15 1999-10-25 16:49:41 eaf Exp $
+//C- $Id: DjVmDoc.cpp,v 1.16 1999-10-29 15:21:35 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -100,7 +100,15 @@ DjVmDoc::write(ByteStream & str)
 
    GPList<DjVmDir::File> files_list=dir->get_files_list();
    for(pos=files_list;pos;++pos)
-      files_list[pos]->offset=0xffffffff;
+   {
+      GP<DjVmDir::File> file=files_list[pos];
+      file->offset=0xffffffff;
+      GPosition data_pos;
+      if (!data.contains(file->id, data_pos))
+	 THROW("Strange: there is no data for file '"+file->id+"'\n");
+      file->size=data[data_pos]->get_length();
+      if (!file->size) THROW("Strange: File size is zero.");
+   }
    
    MemoryByteStream tmp_str;
    IFFByteStream tmp_iff(tmp_str);
@@ -116,14 +124,8 @@ DjVmDoc::write(ByteStream & str)
       if ((offset & 1)!=0) offset++;
       
       GP<DjVmDir::File> & file=files_list[pos];
-      GPosition data_pos;
-      if (!data.contains(file->id, data_pos))
-	 THROW("Strange: there is no data for file '"+file->id+"'\n");
       file->offset=offset;
-      file->size=data[data_pos]->get_length();
-      if (!file->size)
-        THROW("Strange: File size is zero.");
-      offset+=file->size;
+      offset+=file->size;	// file->size has been set in the first pass
    }
 
    DEBUG_MSG("pass 2: store the file contents.\n");
