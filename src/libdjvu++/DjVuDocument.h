@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.42 1999-11-19 16:30:16 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.43 1999-11-19 23:44:17 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@research.att.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.42 1999-11-19 16:30:16 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.43 1999-11-19 23:44:17 bcr Exp $#
 */
 
 //@{
@@ -192,8 +192,6 @@ public:
 		   SINGLE_PAGE, UNKNOWN_TYPE };
    enum THREAD_FLAGS { STARTED=1, FINISHED=2 };
 
-   GMap<GURL,GString> *filelist;
-
       /** Default constructor. Please call function \Ref{init}() before
 	  you start working with the #DjVuDocument#. */
    DjVuDocument(void);
@@ -272,11 +270,9 @@ public:
 		 tool, which should work with files on the hard disk only
 		 because #DjVuDocument# can access such files itself.
 	  @param cache It's used to cache decoded \Ref{DjVuFile}s and
-	         is actually useful in the plugin only. 
-	  @param filelist This is only usefull in single threaded mode for
-		 finding all files opened in the pool. */
+	         is actually useful in the plugin only.  */
    void         init(const GURL & url, GP<DjVuPort> port=0, 
-                     DjVuFileCache * cache=0,GMap<GURL,GString> *filelist=0);
+                     DjVuFileCache * cache=0);
 
       /** Returns #TRUE# if the initialization thread finished successfully.
 	  As soon as it happens, the document becomes completely initialized
@@ -611,7 +607,10 @@ public:
    virtual GPBase	id_to_file(const DjVuPort * source, const char * id);
    virtual GP<DataPool>	request_data(const DjVuPort * source, const GURL & url);
    virtual void		notify_file_flags_changed(const DjVuFile * source,
-						  long set_mask, long clr_mask);
+ 			long set_mask, long clr_mask);
+
+   GList<GString>	get_files_list(void);
+
 protected:
    GURL			init_url;
    GP<DataPool>		init_data_pool;

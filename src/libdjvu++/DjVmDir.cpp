@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.10 1999-10-25 16:49:41 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.11 1999-11-19 23:44:17 bcr Exp $
 
 
 #ifdef __GNUC__
@@ -336,7 +336,10 @@ DjVmDir::title_to_file(const char * title) const
 GPList<DjVmDir::File>
 DjVmDir::get_files_list(void) const
 {
-   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
+//   There is no reason to lock when we aren't doing anything but
+//   returning a value....
+//
+//   GCriticalSectionLock lock((GCriticalSection *) &class_lock);
    return files_list;
 }
 

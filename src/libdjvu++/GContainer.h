@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.26 1999-10-07 23:33:33 leonb Exp $
+//C- $Id: GContainer.h,v 1.27 1999-11-19 23:44:18 bcr Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -69,7 +69,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.26 1999-10-07 23:33:33 leonb Exp $# */
+    #$Id: GContainer.h,v 1.27 1999-11-19 23:44:18 bcr Exp $# */
 //@{
 
 
@@ -582,13 +582,13 @@ public:
     \begin{verbatim}
     void print_list(GList<GString> a)
     {
-      for (GPosition i = a; ; i; ++i) 
+      for (GPosition i = a ; i; ++i) 
         printf("%s\n", (const char*) a[i] );
     }
 
     void print_list_backwards(GList<GString> a)
     {
-      for (GPosition i = a.lastpos(); ; i; --i) 
+      for (GPosition i = a.lastpos() ; i; --i) 
         printf("%s\n", (const char*) a[i] );
     }
     \end{verbatim}

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.h,v 1.21 1999-11-18 23:23:27 eaf Exp $
+//C- $Id: DjVuPort.h,v 1.22 1999-11-19 23:44:18 bcr Exp $
  
 #ifndef _DJVUPORT_H
 #define _DJVUPORT_H
@@ -71,7 +71,7 @@
     @memo DjVu decoder communication mechanism.
     @author Andrei Erofeev <eaf@research.att.com>\\
             L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuPort.h,v 1.21 1999-11-18 23:23:27 eaf Exp $# */
+    @version #$Id: DjVuPort.h,v 1.22 1999-11-19 23:44:18 bcr Exp $# */
 //@{
 
 class DjVuPort;
@@ -201,12 +201,6 @@ public:
 	  is done and how long the decoding will continue.  Argument #done# is
 	  a number from 0 to 1 reflecting the progress. */
    virtual void		notify_decode_progress(const DjVuPort * source, float done);
-      /** This is a hack to allow us to keep track of all files accessed
-          by this class. */
-   void set_filelist(GMap<GURL,GString> *thisfilelist);
-      /** This is a hack to allow us to keep track of all files accessed
-          by this class. */
-   static GMap<GURL,GString> *filelist;
       //@}
 };
 

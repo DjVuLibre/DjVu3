@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.68 1999-11-19 18:27:18 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.69 1999-11-19 23:44:17 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -37,16 +37,15 @@ get_int_prefix(void * ptr)
 }
 
 DjVuDocument::DjVuDocument(void)
-  : doc_type(UNKNOWN_TYPE), init_called(false), cache(0), filelist(0)
+  : doc_type(UNKNOWN_TYPE), init_called(false), cache(0)
 {
 }
 
 
 void
 DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
-                   DjVuFileCache * xcache,GMap<GURL,GString> *thisfilelist)
+                   DjVuFileCache * xcache)
 {
-   filelist=thisfilelist;
    if (init_called)
       THROW("DjVuDocument is already initialized");
    if (!get_count())
@@ -60,7 +59,6 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
    init_url=url;
    DjVuPortcaster * pcaster=get_portcaster();
    if (!xport) xport=simple_port=new DjVuSimplePort();
-   simple_port->set_filelist(filelist);
    pcaster->add_route(this, xport);
    pcaster->add_route(this, this);
 
@@ -78,8 +76,6 @@ DjVuDocument::init(const GURL & url, GP<DjVuPort> xport,
 
 DjVuDocument::~DjVuDocument(void)
 {
-      // Stop listing files.
-   simple_port->set_filelist(0);
       // No more messages, please. We're being destroyed.
    get_portcaster()->del_port(this);
 
@@ -1040,6 +1036,14 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 
+//   if (filelist && url.is_local_file_url())
+//   {
+//     GString fname=GOS::url_to_filename(url);
+//     if (GOS::basename(fname)=="-") fname="-";
+//     (*filelist)[url]=fname;
+//   }
+
+
    if (url==init_url) return init_data_pool;
 
    check();	// Don't put it before 'init_data_pool'
@@ -1222,6 +1226,42 @@ add_file_to_djvm(const GP<DjVuFile> & file, bool page,
    }
 }
 
+static void
+local_get_files_list(DjVuFile * f, GMap<GURL, void *> & map)
+{
+   GURL url=f->get_url();
+   if (!map.contains(url))
+   {
+      map[url]=0;
+      f->process_incl_chunks();
+      GPList<DjVuFile> files_list=f->get_included_files();
+      for(GPosition pos=files_list;pos;++pos)
+         local_get_files_list(files_list[pos], map);
+   }
+}
+
+GList<GString>
+DjVuDocument::get_files_list(void) 
+{
+  check();
+  int pages_num=get_pages_num();
+  GMap<GURL, void *> map;
+  int i;
+  for(i=0;i<pages_num;i++)
+     local_get_files_list(get_djvu_file(i), map);
+  GList<GString> list;
+  GPosition j;
+  for(j=map;j;++j)
+  {
+    if (map.key(j).is_local_file_url())
+    {
+      list.append(GOS::url_to_filename(map.key(j)));
+    }
+  }
+  return list;
+}
+
+
 GP<DjVmDoc>
 DjVuDocument::get_djvm_doc(const bool SkipErrors)
       // This function may block for data
@@ -1264,22 +1304,22 @@ DjVuDocument::get_djvm_doc(const bool SkipErrors)
         for(int page_num=0;page_num<ndir->get_pages_num();page_num++)
         {
            TRY {
-             if(filelist)
-             {	// Only add pages to the filelist when successfull.
-               GMap<GURL,GString> tmplist;
-               simple_port->set_filelist(&tmplist);
+//             if(filelist)
+//             {	// Only add pages to the filelist when successfull.
+//               GMap<GURL,GString> tmplist;
+//               simple_port->set_filelist(&tmplist);
+//  	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
+//	       add_file_to_djvm(file, true, *doc, map_add);
+//               simple_port->set_filelist(filelist);
+//               for (GPosition i = tmplist; i; ++i)
+//               {
+//                 (*filelist)[tmplist.key(i)]=tmplist[i];
+//               }
+//             }else
+//             {
   	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
 	       add_file_to_djvm(file, true, *doc, map_add);
-               simple_port->set_filelist(filelist);
-               for (GPosition i = tmplist; i; ++i)
-               {
-                 (*filelist)[tmplist.key(i)]=tmplist[i];
-               }
-             }else
-             {
-  	       GP<DjVuFile> file=url_to_file(ndir->page_to_url(page_num));
-	       add_file_to_djvm(file, true, *doc, map_add);
-             }
+//             }
            }
            CATCH(ex)
            {
@@ -1338,3 +1378,4 @@ DjVuDocument::save_as
       write(str);
    } else expand(GOS::dirname(full_name), GOS::basename(full_name),SkipErrors);
 }
+
