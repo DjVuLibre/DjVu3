@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.40 1999-09-27 14:03:39 leonb Exp $
+//C- $Id: DjVuFile.h,v 1.41 1999-09-27 21:59:11 eaf Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.40 1999-09-27 14:03:39 leonb Exp $#
+    @version #$Id: DjVuFile.h,v 1.41 1999-09-27 21:59:11 eaf Exp $#
 */
 
 //@{
@@ -402,7 +402,7 @@ public:
       //@}
 
       // Internal. Used by DjVuDocument
-   GP<DataPool>		get_data_pool(void) const { return data_pool; };
+   GP<DataPool>		get_init_data_pool(void) const { return data_pool; };
 
       // Internal. Used by DjVuDocument. May block for data.
    void			move(const GURL & dir_url);
