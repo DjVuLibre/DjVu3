@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.56 1999-09-19 19:24:36 eaf Exp $
+//C- $Id: DjVuFile.cpp,v 1.57 1999-09-19 19:34:27 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -140,7 +140,7 @@ DjVuFile::init(const GURL & xurl, GP<DjVuPort> port)
       // Set it here because trigger will call other DjVuFile's functions
    initialized=true;
    
-   if (!(data_pool=pcaster->request_data(this, url)))
+   if (!(data_pool=new DataPool(pcaster->request_data(this, url))))
       THROW("Failed get data for URL '"+url+"'");
    data_pool->add_trigger(-1, static_trigger_cb, this);
 }
