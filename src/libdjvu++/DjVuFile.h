@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.h,v 1.32 1999-09-16 21:50:11 eaf Exp $
+//C- $Id: DjVuFile.h,v 1.33 1999-09-17 14:37:44 leonb Exp $
  
 #ifndef _DJVUFILE_H
 #define _DJVUFILE_H
@@ -46,7 +46,7 @@
 
     @memo Classes representing DjVu files.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuFile.h,v 1.32 1999-09-16 21:50:11 eaf Exp $#
+    @version #$Id: DjVuFile.h,v 1.33 1999-09-17 14:37:44 leonb Exp $#
 */
 
 //@{
@@ -156,13 +156,15 @@ public:
    GP<DjVuInfo>		info;
       /// Pointer to DjVu annotation.
    GP<DjVuAnno>		anno;
-      /// Pointer to the background component of DjVu image.
+      /// Pointer to the background component of DjVu image (IW44 encoded).
    GP<IWPixmap>		bg44;
-      /// Pointer to the mask of foreground component of DjVu image.
+      /// Pointer to the background component of DjVu image (Raw).
+   GP<GPixmap>		bgpm;
+      /// Pointer to the mask of foreground component of DjVu image (JB2 encoded).
    GP<JB2Image>		fgjb;
-      /// Pointer to the optional shape dictionary for the mask.
+      /// Pointer to the optional shape dictionary for the mask (JB2 encoced).
    GP<JB2Dict>		fgjd;
-      /// Pointer to the colors of foreground component of DjVu image.
+      /// Pointer to the colors of foreground component of DjVu image (Raw).
    GP<GPixmap>		fgpm;
       /// Pointer to the textual information
    GP<DjVuText>         txtz;
