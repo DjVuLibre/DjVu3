@@ -27,7 +27,7 @@ fi
 
 for arg 
 do
-   case "$arg" in 
+   case $arg in 
         --prefix=* )     
            prefix=`echo $arg | sed 's/[-A-Za-z_]*=//'` 
            ;; 
@@ -45,14 +45,15 @@ do
            DEFS="$DEFS $flag"
            ;;
         *)
-           echo 1>&2 "$conf: Unrecognized argument '$arg'"
-           cat 1>&2 <<\EOF
+           test $arg = --help || echo 1>&2 "$conf: Unrecognized option '$arg'"
+           cat 1>&2 <<EOF
+Usage: $conf <options>
 Recognized options:
   --prefix=PREFIXDIR                    set install directory.
   --with-debug                          compile with debug enabled.
-  --without-threads                     do not use threads.
-  --with-threads=(no|co|posix|dce|jri)  choose thread implementation.
   --with-cxxflag=FLAG                   gives flag FLAG to C++ compiler.
+  --without-threads                     do not use threads.
+  --with-threads=(cothreads|posix|dce)  choose a thread implementation.
 EOF
            exit 1 ;;
    esac
@@ -121,7 +122,7 @@ then
     co* )
        DEFS="$DEFS -DTHREADMODEL=COTHREADS" 
        ;;       
-    posix | dce )
+    posix* | dce* )
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
        echo -n "Check option -pthread ..."
        if ( ( $CXX -pthread /tmp/$$.c -o /tmp/$$ >/tmp/$$.log 2>&1 ) \
@@ -182,7 +183,6 @@ sed < $SRCDIR/Makefile.in > Makefile \
   -e 's!@ldlibs@!'"$LDLIBS"'!g' \
   -e 's!@ranlib@!'"$RANLIB"'!g' \
   -e 's!@ar@!'"$AR"'!g'
-
 
 case "$TOPDIR" in
   .*) # relative source directory
