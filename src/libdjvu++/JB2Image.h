@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.8 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: JB2Image.h,v 1.8.4.1 1999-03-30 21:28:24 eaf Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -99,7 +99,7 @@
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.8 1999-03-17 19:24:58 leonb Exp $#
+    #$Id: JB2Image.h,v 1.8.4.1 1999-03-30 21:28:24 eaf Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -113,7 +113,7 @@
 
 #include "DjVuGlobal.h"
 #include "GString.h"
-#include "GContainer.h"
+#include "Arrays.h"
 #include "GSmartPointer.h"
 #include "ZPCodec.h"
 #include "GRect.h"
@@ -290,8 +290,8 @@ private:
   // Implementation
   int width;
   int height;
-  GArray<JB2Shape> shapes;
-  GArray<JB2Blit> blits;
+  DArray<JB2Shape> shapes;
+  DArray<JB2Blit> blits;
 };
 
 

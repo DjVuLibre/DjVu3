@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.7 1999-03-17 19:24:58 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.7.4.1 1999-03-30 21:28:24 eaf Exp $
 
 
 #ifdef __GNUC__
@@ -82,8 +82,8 @@ private:
   void code_eventual_lossless_refinement();
   void code_record_type(int &rectype);
   void code_match_index(int &index);
-  GArray<int> shape2lib;
-  GArray<int> lib2shape;
+  TArray<int> shape2lib;
+  TArray<int> lib2shape;
   // Code pairs
   NumContext abs_loc_x;
   NumContext abs_loc_y;
@@ -124,7 +124,7 @@ private:
   void encode_libonly_shape(JB2Image *jim, int shapeno);
 #ifdef STRICT_PGH
   struct LibRect { short top,left,right,bottom; };
-  GArray<LibRect> libinfo;
+  DArray<LibRect> libinfo;
   void compute_pgh_size(int libno, GBitmap *cbm);
 #endif
 };

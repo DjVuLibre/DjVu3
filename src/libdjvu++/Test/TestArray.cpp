@@ -9,15 +9,13 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: TestArray.cpp,v 1.6 1999-03-17 19:25:00 leonb Exp $
+//C- $Id: TestArray.cpp,v 1.6.4.1 1999-03-30 21:28:24 eaf Exp $
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "GContainer.h"
+#include "Arrays.h"
 #include "GString.h"
-
-
 
 
 #define PRS(expr)  printf("%s :=\"%s\"\n", #expr, (const char*)(expr))
@@ -37,21 +35,18 @@ void operator delete(void *x) {
 }
 #endif
 
-
 void
-PCONT(GContainer<int> &ga)
+PARR(DArray<int> &ga)
 {
-  int *np;
-  GPosition pos(ga);
-  while ((np = ga.next(pos)))
-    printf("%d ", *np);
+  for(int i=ga.lbound();i<=ga.hbound();i++)
+    printf("%d ", ga[i]);
   printf("\n");
 }
 
 void
 test_integer()
 {
-  GArray<int> ga;
+  DArray<int> ga;
 
   ga.resize(0,12);
   ga[0] = 1;
@@ -59,21 +54,21 @@ test_integer()
   ga.resize(12);
   PRI(ga.lbound());
   PRI(ga.hbound()); 
-  PCONT(ga);
+  PARR(ga);
   ga.touch(-10);
   PRI(ga.lbound());
   PRI(ga.hbound());
-  PCONT(ga);
+  PARR(ga);
 
   ga.del(1);
   PRI(ga.lbound());
   PRI(ga.hbound());
-  PCONT(ga);
+  PARR(ga);
 
   ga.ins(-4, 23, 5);
   PRI(ga.lbound());
   PRI(ga.hbound());
-  PCONT(ga);
+  PARR(ga);
 
 
 }
@@ -84,7 +79,7 @@ test_integer()
 void
 test_string()
 {
-  GArray<GString> ga(0,9);
+  DArray<GString> ga(0,9);
   // Test of allocation
   ga[0] = "zero";
   ga[2] = "two";
@@ -112,37 +107,18 @@ test_string()
   ga[4] = "four";
   ga[1] = "one";
   // Test of iterator
-  const GString *gsp;
-  GPosition pos(ga);
-  PRS(ga[pos]);
-  while ((gsp = ga.next(pos)))
-    PRS(*gsp);
+  int i;
+  for(i=ga.lbound();i<=ga.hbound();i++) PRS(ga[i]);
   // Test of iterator
   ga.del(1);
   ga.ins(1,"hello",2);
-  ga.first(pos);
-  PRS(ga[pos]);
-  while ((gsp = ga.next(pos)))
-    PRS(*gsp);
+  for(i=ga.lbound();i<=ga.hbound();i++) PRS(ga[i]);
   // Test of copy
-  GArray<GString> gb (ga);
+  DArray<GString> gb (ga);
   PRI(gb.size());
   PRI(gb.lbound());
   PRI(gb.hbound());
-  gb.first(pos);
-  while ((gsp = gb.next(pos)))
-    PRS(*gsp);
-
-  // Test of copy
-  GContainer<GString>& gc = ga;
-  GArray<GString> gd (gc);
-  PRI(gd.size());
-  PRI(gd.lbound());
-  PRI(gd.hbound());
-  gd.first(pos);
-  GString *gsc;
-  while ((gsc = gd.next(pos)))
-    PRS(*gsc);
+  for(i=gb.lbound();i<=gb.hbound();i++) PRS(gb[i]);
 
 }
 
@@ -153,7 +129,12 @@ test_string()
 int
 main()
 {
-  test_string();
-  test_integer();
-  return 0;
+   TRY {
+      test_string();
+      test_integer();
+   } CATCH(exc) {
+      exc.perror();
+      return 1;
+   } ENDCATCH;
+   return 0;
 }

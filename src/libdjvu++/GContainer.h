@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.9 1999-03-17 19:24:57 leonb Exp $
+//C- $Id: GContainer.h,v 1.9.4.1 1999-03-30 21:28:24 eaf Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -36,6 +36,12 @@
     \Ref{GThreads.h}.  Class \Ref{GPosition} is a universal iterator for all
     container objects.
 
+    {\bf Note} --- Classes \Ref{GArray} and \Ref{GSArray} have been made
+    obsolete by classes \Ref{DArray} and \Ref{TArray} and are
+    no longer supported and documented. The substitutes provide
+    the same interface, which should make it relatively painless to start
+    using them instead of the obsolete ones.
+    
     {\bf Historical comments} --- I chose to implement my own containers because
     the STL classes were not universally available and the compilers were
     rarely able to deal with such a template galore.  The following template
@@ -48,7 +54,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@research.att.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.9 1999-03-17 19:24:57 leonb Exp $# */
+    #$Id: GContainer.h,v 1.9.4.1 1999-03-30 21:28:24 eaf Exp $# */
 //@{
 
 class GContainerBase;
@@ -174,48 +180,19 @@ public:
 };
 
 
-/** Dynamic array.  
-    Template class #GArray<TYPE># implements an array of
-    elements of type #TYPE#.  Each element is identified by an integer
-    subscript.  The valid subscripts range is defined by dynamically
-    adjustable lower- and upper-bounds.  Besides accessing and setting
-    elements, member functions are provided to insert or delete elements at
-    specified positions.
-    
-    This template class must be able to access
-    \begin{itemize}
-    \item a null constructor #TYPE::TYPE()#, 
-    \item a copy constructor #TYPE::TYPE(const TYPE &)#,
-    \item and a copy operator #TYPE & operator=(const TYPE &)#.
-    \end{itemize} */
+/** Dynamic array.
+
+    Is now obsolete. Please use \Ref{TArray}, \Ref{DArray}
+    instead. */
 
 template <class TYPE>
 class GArray : public GContainer<TYPE> {
 public:
   // -- CONSTRUCTORS
-  /** Constructs an empty array. The valid subscript range is initially
-      empty. Member function #touch# and #resize# provide convenient ways
-      to enlarge the subscript range. */
   GArray();
-  /** Constructs an array with subscripts in range 0 to #hibound#. 
-      The subscript range can be subsequently modified with member functions
-      #touch# and #resize#.
-      @param hibound upper bound of the initial subscript range. */
   GArray(int hibound);
-  /** Constructs an array with subscripts in range #lobound# to #hibound#.  
-      The subscript range can be subsequently modified with member functions
-      #touch# and #resize#.
-      @param lobound lower bound of the initial subscript range.
-      @param hibound upper bound of the initial subscript range. */
   GArray(int lobound, int hibound);
-  /** Constructs an array by copying the elements of container #gc#.
-      The valid subscript will range from zero to the number of 
-      elements in container #gc# minus one.      
-      @param gc container from which elements will be copied. */
   GArray(const GContainer<TYPE> &gc);
-  /** Copy constructor. The resulting array will have the same
-      valid subscript range as array #gc#. All elements in #gc#
-      will be copied into the constructed array. */
   GArray(const GArray<TYPE> &gc);
   // -- DESTRUCTOR
   virtual ~GArray();
@@ -228,106 +205,23 @@ public:
   virtual const TYPE *get(const GPosition &pos) const;
   virtual TYPE* get(const GPosition &pos);
   // -- ACCESS
-  /** Returns the lower bound of the valid subscript range. */
   int lbound() const;
-  /** Returns the upper bound of the valid subscript range. */
   int hbound() const;
-  /** Returns a reference to the array element for subscript #n#.  This
-      reference can be used for both reading (as "#a[n]#") and writing (as
-      "#a[n]=v#") an array element.  This operation will not extend the valid
-      subscript range: an exception \Ref{GException} is thrown if argument #n#
-      is not in the valid subscript range. */
   TYPE& operator[](int n);
-  /** Returns a constant reference to the array element for subscript #n#.
-      This reference can only be used for reading (as "#a[n]#") an array
-      element.  This operation will not extend the valid subscript range: an
-      exception \Ref{GException} is thrown if argument #n# is not in the valid
-      subscript range.  This variant of #operator[]# is necessary when dealing
-      with a #const GArray<TYPE>#. */
   const TYPE& operator[](int n) const;
-  /** Returns a reference to the array element for position #n#.  This
-      reference can be used for both reading and writing an array element.  An
-      exception \Ref{GException} is thrown if argument #n# is not a valid
-      #GPosition# for this container. */
   TYPE& operator[](GPosition pos);
-  /** Returns a constant reference to the array element for position #n#.
-      This reference can only be used for reading an array element.  An
-      exception \Ref{GException} is thrown if argument #n# is not a valid
-      #GPosition# for this container. This variant of #operator[]# is
-      necessary when dealing with a #const GArray<TYPE>#. */
   const TYPE& operator[](GPosition pos) const;
   // -- CONVERSION
-  /** Returns a pointer for reading or writing the array elements.  This
-      pointer can be used to access the array elements with the same
-      subscripts and the usual bracket syntax.  This pointer remains valid as
-      long as the valid subscript range is unchanged. If you change the
-      subscript range, you must stop using the pointers returned by prior
-      invocation of this conversion operator. */
   operator TYPE* ();
-  /** Returns a pointer for reading (but not modifying) the array elements.
-      This pointer can be used to access the array elements with the same
-      subscripts and the usual bracket syntax.  This pointer remains valid as
-      long as the valid subscript range is unchanged. If you change the
-      subscript range, you must stop using the pointers returned by prior
-      invocation of this conversion operator. */
   operator const TYPE* () const;
   // -- ALTERATION
-  /** Erases the array contents. All elements in the array are destroyed.  
-      The valid subscript range is set to the empty range. */
   void empty();
-  /** Extends the subscript range so that is contains #n#.
-      This function does nothing if #n# is already int the valid subscript range.
-      If the valid range was empty, both the lower bound and the upper bound
-      are set to #n#.  Otherwise the valid subscript range is extended
-      to encompass #n#. This function is very handy when called before setting
-      an array element:
-      \begin{verbatim}
-        int lineno=1;
-        GArray<GString> a;
-        while (! end_of_file()) { 
-          a.touch[lineno]; 
-          a[lineno++] = read_a_line(); 
-        }
-      \end{verbatim} 
-  */
   void touch(int n);
-  /** Resets the valid subscript range to #0#---#hibound#. 
-      This function may destroy some array elements and may construct
-      new array elements with the null constructor. Setting #hibound# to
-      #-1# resets the valid subscript range to the empty range.
-      @param hibound upper bound of the new subscript range. */      
   void resize(int hibound);
-  /** Resets the valid subscript range to #lobound#---#hibound#. 
-      This function may destroy some array elements and may construct
-      new array elements with the null constructor. Setting #lobound# to #0# and
-      #hibound# to #-1# resets the valid subscript range to the empty range.
-      @param lobound lower bound of the new subscript range.
-      @param hibound upper bound of the new subscript range. */
   void resize(int lobound, int hibound);
-  /** Shifts the valid subscript range. Argument #disp# is added to both 
-      bounds of the valid subscript range. Array elements previously
-      located at subscript #x# will now be located at subscript #x+disp#. */
   void shift(int disp);
-  /** Deletes array elements. The array elements corresponding to
-      subscripts #n#...#n+howmany-1# are destroyed. All array elements
-      previously located at subscripts greater or equal to #n+howmany#
-      are moved to subscripts starting with #n#. The new subscript upper
-      bound is reduced in order to account for this shift. 
-      @param n subscript of the first element to delete.
-      @param howmany number of elements to delete. */
   void del(int n, unsigned int howmany=1);
-  /** Insert new elements into an array. This function inserts
-      #howmany# elements at position #n# into the array. The initial value #val#
-      is copied into the new elements. All array elements previously located at subscripts
-      #n# and higher are moved to subscripts #n+howmany# and higher. The upper bound of the 
-      valid subscript range is increased in order to account for this shift.
-      @param n subscript of the first inserted element.
-      @param val initial value of the new elements.
-      @param howmany number of elements to insert. */
   void ins(int n, const TYPE &val, unsigned int howmany=1);
-  /** Copy operator. All elements in array #*this# are destroyed.
-      The valid subscript range is set to the valid subscript range of
-      array #ga#. All elements of #ga# are copied into array #*this#. */
   GArray<TYPE>& operator= (const GArray &ga);
 protected:
   // Implementation
@@ -340,59 +234,25 @@ protected:
 
 
 
-/** Sortable array.  
-    Template class #GSArray<TYPE># implements sorting routines for the array
-    elements. These sorting routines are implemented in a subclass in order
-    to reduce the template instantiation overhead for class #GArray#.  Besides
-    the #TYPE# constructors and operators required by class #GArray#, this
-    template class must be able to access a less-or-equal comparison operator:
-    #TYPE::operator<=(const TYPE&)#.  */
+/** Sortable array.
+
+    It's now obsolete. Please use \Ref{TArray}, \Ref{DArray}
+    instead. */
 
 template<class TYPE>
 class GSArray : public GArray<TYPE>
 {
 public:
   // -- CONSTRUCTORS
-  /** Constructs an empty array. The valid subscript range is initially
-      empty. Member function #touch# and #resize# provide convenient ways
-      to enlarge the subscript range. */
   GSArray() {};
-  /** Constructs an array with subscripts in range 0 to #hibound#. 
-      The subscript range can be subsequently modified with member functions
-      #touch# and #resize#.
-      @param hibound upper bound of the initial subscript range. */
   GSArray(int hibound) : GArray<TYPE>(hibound) {};
-  /** Constructs an array with subscripts in range #lobound# to #hibound#.  
-      The subscript range can be subsequently modified with member functions
-      #touch# and #resize#.
-      @param lobound lower bound of the initial subscript range.
-      @param hibound upper bound of the initial subscript range. */
   GSArray(int lobound, int hibound) : GArray<TYPE>(lobound, hibound) {};
-  /** Constructs an array by copying the elements of container #gc#.
-      The valid subscript will range from zero to the number of 
-      elements in container #gc# minus one.      
-      @param gc container from which elements will be copied. */
   GSArray(const GContainer<TYPE> &gc) : GArray<TYPE>(gc) {};
-  /** Copy constructor. The resulting array will have the same
-      valid subscript range as array #gc#. All elements in #gc#
-      will be copied into the constructed array. */
   GSArray(const GArray<TYPE> &gc) : GArray<TYPE>(gc) {};
   // -- SORT
-  /** Sort array elements.  Sort all array elements in ascending order.  Array
-      elements are compared using the less-or-equal comparison operator for
-      type #TYPE#. */
   void sort();
-  /** Sort array elements in subscript range #lo# to #hi#.  Sort all array
-      elements whose subscripts are in range #lo#..#hi# in ascending order.
-      The other elements of the array are left untouched.  An exception is
-      thrown if arguments #lo# and #hi# are not in the valid subscript range.
-      Array elements are compared using the less-or-equal comparison operator
-      for type #TYPE#.  
-      @param lo low bound for the subscripts of the elements to sort.  
-      @param hi high bound for the subscripts of the elements to sort. */
   void sort(int lo, int hi);
 };
-
 
 /** Doubly linked list.
     Template class #GList<TYPE># implements a doubly linked list of elements
@@ -1172,8 +1032,6 @@ GSArray<TYPE>::sort(int lo, int hi)
   sort(lo, h);
   sort(l, hi);
 }
-
-
 
 // --------- GLIST IMPLEMENTATION
 
