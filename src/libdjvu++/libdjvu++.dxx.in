@@ -328,31 +328,38 @@
           both the memory and the computational requirements.
     \end{itemize}
 
-    An example of decoding multipage DjVu document is shown below. First you
-    create \Ref{DjVuDocument}. Then you start decoding of desired page by
-    calling \Ref{DjVuDocument::get_page}(). Page numbers start from #0#.  If
-    threads have been enabled at compilation time, the decoding will start in
-    another thread. Otherwise you'll get a fully decoded image after this
-    function returns. If threads are enabled though, you'll need to wait for
-    the decoding to finish. This can be done the best with
-    \Ref{DjVuImage::wait_for_decoder}.
+    An example of decoding a multipage DjVu document is shown below.
+    First you create \Ref{DjVuDocument} and call
+    \Ref{DjVuDocument::init} with a proper file URL.  This function
+    starts a thread which decodes the document structure (i.e. the
+    number of pages, the page names, etc.).  You can use function
+    \Ref{DjVuDocument::wait_for_complete_init} to wait for the
+    termination of this thread and check its result.  Then you can use
+    function \Ref{DjVuDocument::get_page} to obtain a \Ref{DjVuImage}
+    for a given page number.  This function starts a thread which
+    decodes the image data. Again you can call function
+    \Ref{DjVuImage::wait_for_complete_decode} to wait for the
+    termination of this thread and check its result.
+
     \begin{verbatim}
       GP<DjVuDocument> doc = new DjVuDocument;
+      // Decode the document structure
       doc->init(GOS::filename_to_url("file.djvu"));
+      if (! doc->wait_for_complete_init())
+        THROW("A decoding error has occured");      
+      // Decode a page
       GP<DjVuImage> dimg = doc->get_page(2);
-      if (! dimg->wait_for_decoder() )
+      if (! dimg->wait_for_complete_decode() )
         THROW("A decoding error has occured");
+
     \end{verbatim}
 
-    This is the easiest way to load a DjVu document when it's stored on hard
-    drive. \Ref{DjVuDocument} accesses all the files itself and prints all
-    status and error messages directly to #stderr#. In a more complex
-    environment you may want to have more control on where the data is coming
-    from and where status and error messages are directed. Then you'll need to
-    derive one of your classes from \Ref{DjVuPort} and take part in requests
-    and notifications exchange supported by \Ref{DjVuPort} and
-    \Ref{DjVuPortcaster}.
-    
+    Note: When the reference library is compiled without threads, both functions
+    \Ref{DjVuDocument::init} and \Ref{DjVuDocument::get_page} perform their
+    task before returning.  The functions \Ref{DjVuDocument::wait_for_complete_init}
+    and \Ref{DjVuImage::wait_for_complete_decode} do not wait, but are still
+    useful for testing that the operation was successful.
+
     The sample rendering code below may be called whenever you need to
     redisplay part of a window showing DjVu image.  Class \Ref{GRect} is used
     to represent two rectangles of interest. Rectangle #full# represents the
@@ -376,27 +383,42 @@
        if (bm) { my_display_in_grays(bm); return ; }
     \end{verbatim}
      
-    Progressive display can be implemented using multi-threading. The browser
-    starts decoding as soon as it starts receiving data. The decoding
-    carried out by \Ref{DjVuFile} is always started in another thread when
-    threads have been enabled at the compilation time. Data streams, errors
-    and status notifications can be handles with the help of our communication
-    scheme supported by \Ref{DjVuPort} and \Ref{DjVuPortcaster}. The
-    main thread can call the rendering functions at any time while the
-    decoding is in progress.  These function render the image as early as
-    possible, using only the already decoded data.
+    This is the easiest way to decode and render a DjVu document
+    stored in the filesystem. \Ref{DjVuDocument} accesses all the
+    required and prints all potential error messages directly to
+    #stderr#.
+
+    In a more complex environment you may want to have more control on
+    where the data is coming from and where status and error messages
+    are directed.  By definining a subclass of \Ref{DjVuPort}, you can
+    receive notifications from the decoding threads.  These
+    notifications allow you to provide data from various sources, to
+    know about various error conditions, and to know when enough data
+    has been decoded to display a preliminary version of the image.
+    
+    Progressive display, for instance, can be implemented by letting
+    the decoding threads run in the background.  These threads wait
+    for data and process it as soon as possible.  The main thread
+    handles the user interface and can call the rendering functions at
+    any time while the decoding is in progress.  These function will
+    render the best possible image given the amount of data currently
+    received (or simply return 0 if no rendering is possible yet).
+    The \Ref{DjVuPort} notification mechanism allows you to determine
+    when enough data has been received to justify redisplaying an
+    updated version of the image.
 
     Section \Ref{GThreads.h} discusses the multi-threading capabilities of the
     DjVu Reference Library.  These features must be enabled at compile-time
     using the adequate option of the configuration script.  
 
-    {\bf Note:} In previous versions of the library, decoding was achieved by
-    calling function \Ref{DjVuImage::decode} in class \Ref{DjVuImage}.  This
-    method has been made obsolete by the introduction of multipage DjVu
-    documents and #INCL# chunks.  The decoder has to handle more than one
-    stream of incoming data and should be able to keep track of relationships
-    between different files in the same document.  All this activity is now
-    orchestrated by class \Ref{DjVuDocument}.  */
+    {\bf Note:} In previous versions of the library, decoding was
+    achieved by calling function \Ref{DjVuImage::decode} in class
+    \Ref{DjVuImage}.  This method has been made obsolete by the
+    introduction of multipage DjVu documents and #INCL# chunks.  The
+    decoder has to handle more than one stream of incoming data and
+    should be able to keep track of relationships between different
+    files in the same document.  All this activity is now orchestrated
+    by class \Ref{DjVuDocument}.  */
 
 //@}
 
@@ -424,17 +446,16 @@
     incorrectly recognize any IFF file as a Microsoft AIFF sound file.  The
     presence of these four octets prevents this incorrect identification.
 
-    The DjVu specification mandates that the decoder should silently skip
-    chunks whose identifier is not recognized.  This mechanism provides a
-    backward compatible way to extend the initial format by allocating new
-    chunk identifiers.
+    The DjVu specification mandates that the decoder should silently
+    skip chunks whose identifier is not recognized.  This mechanism
+    provides a backward compatible way to extend the initial format by
+    allocating new chunk identifiers. 
 
-    Now DjVu files may include other files by means of #INCL# and #INCF# chunks.
-    After recognizing such chunks, the decoder should open the specified file
-    and start decoding it possibly in another thread (if threads have been
-    enabled at compilation time). The difference between #INCL# and #INCF#
-    is that if a missing file is included via #INCF# chunk, the decoding will
-    fail. Otherwise only an error message will be issued. */
+    Starting with version 20, DjVu files may include other files by
+    means of #INCL# chunks.  After recognizing such chunks, the
+    decoder should open the specified file and start decoding it
+    possibly in another thread (if threads have been enabled at
+    compilation time). */
 //@{
 
 /** @name DjVu Image Files
@@ -548,25 +569,23 @@
     analogue of #ANTa# called #ANTz# later.
     */
 
-/** @name Multipage DjVu documents
-
-    {\bf Included Files} --- Multiple DjVu files may share information such as
-    background layer or character shapes.  There are many benefits associated
-    with storing such shared information in separate files.  A well designed
-    browser may keep pre-decoded copies of these files in a cache.  This
-    procedure would reduce the size of the data transferred over the Internet
-    and also increase the display speed.  The currently implemented scheme
-    involves {\em inclusion chunks} (chunk identifiers #"INCL"# and #"INCF"#)
-    containing the name of a file to include.  The included file should be a
-    #"FORM:DJVI"# chunk potentially containing any information otherwise
-    allowed in a DjVu file (except for the #"INFO"# chunk of course).
-    
-    {\bf Document Navigation} --- [COMPLETE HERE] Once the DjVu browser knows the
-    document structure, it can use smart caching, pre-fetching and
-    pre-decoding strategies.
+/** @name Multipage DjVu documents.
 
     {\bf Bundled and Indirect Multi-page Documents} --- [COMPLETE HERE]
 
+    {\bf Included Files} --- Multiple DjVu files may share information
+    such as background layer or character shapes.  There are many
+    benefits associated with storing such shared information in
+    separate files.  A well designed browser may keep pre-decoded
+    copies of these files in a cache.  This procedure would reduce the
+    size of the data transferred over the Internet and also increase
+    the display speed.  The currently implemented scheme involves {\em
+    inclusion chunks} (chunk identifiers #"INCL"#) containing the
+    identifier of a file to include.  The included file should be a
+    #"FORM:DJVI"# chunk potentially containing any information
+    otherwise allowed in a DjVu file (except for the #"INFO"# chunk of
+    course).
+    
     {\bf Obsolete Formats} --- The decoder supports two other multipage
     formats which are now obsolete.  These formats are technologically
     inferior and should no longer be used. */

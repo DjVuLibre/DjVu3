@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.17 1999-09-13 21:27:41 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.18 1999-09-20 12:55:50 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -57,6 +57,7 @@ private:
   static const int BIGPOSITIVE;
   static const int BIGNEGATIVE;
   static const int CELLCHUNK;
+  static const int CELLEXTRA;
   int cur_ncell;
   int max_ncell;
   BitContext *bitcells;
@@ -64,6 +65,7 @@ private:
   NumContext *rightcell;
   void CodeBit(int &bit, BitContext &ctx);
   void CodeNum(int &num, int lo, int hi, NumContext &ctx);
+  void reset_numcoder();
   // Info
   char refinementp;
   char gotstartrecordp;
@@ -334,7 +336,7 @@ JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 #define MATCHED_REFINE_IMAGE_ONLY       (6)
 #define MATCHED_COPY                    (7)
 #define NON_MARK_DATA                   (8)
-#define REQUIRED_DICT                   (9)
+#define REQUIRED_DICT_OR_RESET          (9)
 #define PRESERVED_COMMENT               (10)
 #define END_OF_DATA                     (11)
 
@@ -345,6 +347,7 @@ JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
 const int _JB2Codec::BIGPOSITIVE = 262142;
 const int _JB2Codec::BIGNEGATIVE = -262143;
 const int _JB2Codec::CELLCHUNK = 20000;
+const int _JB2Codec::CELLEXTRA =   500;
 
 
 // CONSTRUCTOR
@@ -382,7 +385,7 @@ _JB2Codec::_JB2Codec(ByteStream &bs, int encoding)
   memset(bitdist, 0, sizeof(bitdist));
   memset(cbitdist, 0, sizeof(cbitdist));
   // Initialize numcoder
-  max_ncell = CELLCHUNK;
+  max_ncell = CELLCHUNK+CELLEXTRA;
   bitcells  = new BitContext[max_ncell];
   leftcell  = new NumContext[max_ncell];
   rightcell = new NumContext[max_ncell];
@@ -398,6 +401,33 @@ _JB2Codec::~_JB2Codec()
   delete [] rightcell;
   delete [] leftcell;
 }
+
+
+void 
+_JB2Codec::reset_numcoder()
+{
+  dist_comment_byte = 0;
+  dist_comment_length = 0;
+  dist_record_type = 0;
+  dist_match_index = 0;
+  abs_loc_x = 0;
+  abs_loc_y = 0;
+  abs_size_x = 0;
+  abs_size_y = 0;
+  image_size_dist = 0;
+  inherited_shape_count_dist = 0;
+  rel_loc_x_current = 0;
+  rel_loc_x_last = 0;
+  rel_loc_y_current = 0;
+  rel_loc_y_last = 0;
+  rel_size_x = 0;
+  rel_size_y = 0;
+  memset(bitcells, 0, sizeof(BitContext)*max_ncell);
+  memset(leftcell, 0, sizeof(NumContext)*max_ncell);
+  memset(rightcell, 0, sizeof(NumContext)*max_ncell);
+  cur_ncell = 1;
+}
+
 
 void 
 _JB2Codec::set_dict_callback(JB2DecoderCallback *cb, void *arg)
@@ -1172,11 +1202,14 @@ _JB2Codec::code_record(int &rectype, JB2Dict *jim, JB2Shape *jshp)
         code_comment(jim->comment);
         break;
       }
-    case REQUIRED_DICT:
+    case REQUIRED_DICT_OR_RESET:
       {
-        if (gotstartrecordp)
-          THROW("Corrupted file: Misplaced REQUIRED_DICT record");
-        code_inherited_shape_count(jim);
+        if (! gotstartrecordp)
+	  // Indicates need for a shape dictionary
+	  code_inherited_shape_count(jim);
+	else
+	  // Reset all numerical contexts to zero
+	  reset_numcoder();
         break;
       }
     case END_OF_DATA:
@@ -1223,7 +1256,7 @@ _JB2Codec::code(JB2Dict *jim)
       int nshape = jim->get_shape_count();
       init_library(jim);
       // Code headers.
-      int rectype = REQUIRED_DICT;
+      int rectype = REQUIRED_DICT_OR_RESET;
       if (jim->get_inherited_shape_count() > 0)
         code_record(rectype, jim, NULL);
       rectype = START_OF_DATA;
@@ -1243,6 +1276,12 @@ _JB2Codec::code(JB2Dict *jim)
             rectype = MATCHED_REFINE_LIBRARY_ONLY;
           code_record(rectype, jim, jshp);
           add_library(shapeno, jshp);
+	  // Check numcoder status
+	  if (cur_ncell > CELLCHUNK) 
+	    {
+	      rectype = REQUIRED_DICT_OR_RESET;
+	      code_record(rectype, 0, 0);	      
+	    }
         }
       // Code end of data record
       rectype = END_OF_DATA;
@@ -1397,17 +1436,14 @@ _JB2Codec::code_record(int &rectype, JB2Image *jim, JB2Shape *jshp, JB2Blit *jbl
         code_comment(jim->comment);
         break;
       }
-    case REQUIRED_DICT:
+    case REQUIRED_DICT_OR_RESET:
       {
-        // An error is normally signaled when a REQUIRED_DICT record occurs
-        // after START_OF_DATA, However the REQUIRED_DICT record uses the same
-        // record number as the obsolete LOSSLESS_REFINEMENT record. Therefore
-        // we do not signal an error if the refinement flag is set and we will
-        // simply handle the record as an END_OF_DATA.
-        if (gotstartrecordp && !refinementp)
-          THROW("Corrupted file: Misplaced REQUIRED_DICT record");
         if (! gotstartrecordp)
-          code_inherited_shape_count(jim);
+	  // Indicates need for a shape dictionary
+	  code_inherited_shape_count(jim);
+	else
+	  // Reset all numerical contexts to zero
+	  reset_numcoder();
         break;
       }
     case END_OF_DATA:
@@ -1509,7 +1545,7 @@ _JB2Codec::code(JB2Image *jim)
             }
         }
       // Code headers.
-      int rectype = REQUIRED_DICT;
+      int rectype = REQUIRED_DICT_OR_RESET;
       if (jim->get_inherited_shape_count() > 0)
         code_record(rectype, jim, NULL, NULL);
       rectype = START_OF_DATA;
@@ -1573,6 +1609,12 @@ _JB2Codec::code(JB2Image *jim)
               if (libraryp) 
                 add_library(shapeno, jshp);
             }
+	  // Check numcoder status
+	  if (cur_ncell > CELLCHUNK) 
+	    {
+	      rectype = REQUIRED_DICT_OR_RESET;
+	      code_record(rectype, 0, 0, 0);
+	    }
         }
       // Code end of data record
       rectype = END_OF_DATA;
@@ -1593,9 +1635,6 @@ _JB2Codec::code(JB2Image *jim)
         {
           code_record(rectype, jim, &tmpshape, &tmpblit);        
           if (rectype==END_OF_DATA)
-            break;
-          // Handle obsolete LOSSLESS_REFINEMENT record as END_OF_DATA records.
-          if (gotstartrecordp && rectype==REQUIRED_DICT)
             break;
         } 
       if (!gotstartrecordp)
@@ -1628,6 +1667,12 @@ _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
       code_record(rectype, jim, jshp, NULL);      
       // Add shape to library
       add_library(shapeno, jshp);
+      // Check numcoder status
+      if (cur_ncell > CELLCHUNK) 
+	{
+	  rectype = REQUIRED_DICT_OR_RESET;
+	  code_record(rectype, 0, 0, 0);
+	}
     }
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.h,v 1.15 1999-08-08 23:27:05 leonb Exp $
+//C- $Id: JB2Image.h,v 1.16 1999-09-20 12:55:50 leonb Exp $
 
 #ifndef _JB2IMAGE_H
 #define _JB2IMAGE_H
@@ -89,25 +89,25 @@
     smoothing the shapes in order to reduce the noise and maximize the
     similarities between shapes.
     
-    {\bf ToDo} --- Some improvements have been planned for a long time: (a)
-    Shapes eventually will contain information about the baseline: this could
-    improve the handling of the character descenders and also will provide a
-    more understandable way to superpose matching shapes.  (b) JB2 files
-    eventually will be able to reference external shape dictionaries: common
-    characters will be shared between document pages.  (c) There will be a way
-    to specify a color for each shape: this is good for encoding
-    electronically produced documents.
-    
+    {\bf JB2 extensions} --- Two extensions of the JB2
+    encoding format have been introduced with DjVu files version 21. The first
+    extension addresses the shared shape dictionaries. The second extension
+    bounds the number of probability contexts used for coding numbers.
+    Both extensions maintain backward compatibility with JB2 as 
+    described in the ICFDD proposal. A more complete discussion
+    can be found in section \Ref{JB2 extensions for version 21.}.
+
     {\bf References} 
     \begin{itemize}
     \item Paul G. Howard : {\em Text image compression using soft 
           pattern matching}, Computer Journal, volume 40:2/3, 1997.
     \item JBIG1 : \URL{http://www.jpeg.org/public/jbighomepage.htm}.
     \item JBIG2 draft : \URL{http://www.jpeg.org/public/jbigpt2.htm}.
+    \item ICFDD Draft Proposed American National Standard, 1999-08-26.
     \end{itemize}
 
     @version
-    #$Id: JB2Image.h,v 1.15 1999-08-08 23:27:05 leonb Exp $#
+    #$Id: JB2Image.h,v 1.16 1999-09-20 12:55:50 leonb Exp $#
     @memo
     Coding bilevel images with JB2.
     @author
@@ -366,13 +366,8 @@ private:
 };
 
 
-//@}
-
 
 // JB2DICT INLINE FUNCTIONS
-
-
-
 
 inline int
 JB2Dict::get_shape_count() const
@@ -448,4 +443,93 @@ JB2Image::get_blit(int blitno) const
 }
 
 
+
+// ---------- THE END
 #endif
+
+
+
+/** @name JB2 extensions for version 21.
+
+    Two extensions of the JB2 encoding format have been introduced
+    with DjVu files version 21.  Both extensions maintain significant
+    backward compatibility with previous version of the JB2 format.
+    These extensions are described below by reference to the ICFDD
+    proposal dated August 1999.  Both extension make use of the unused
+    record type value #9# (cf. ICFDD page 24) which has been renamed
+    #REQUIRED_DICT_OR_RESET#.
+
+    {\bf Shared Shape Dictionaries} --- This extension provides
+    support for sharing symbol definitions between the pages of a
+    document.  To achieve this objective, the JB2 image data chunk
+    must be able to address symbols defined elsewhere by a JB2
+    dictionary data chunk shared by all the pages of a document.
+
+    The arithmetically encoded JB2 image data logically consist of a
+    sequence of records. The decoder processes these records in
+    sequence and maintains a library of symbols which can be addressed
+    by the following records.  The first record usually is a ``Start
+    Of Image'' record describing the size of the image.
+
+    Starting with version 21, a #REQUIRED_DICT_OR_RESET# (9) record
+    type can appear {\em before} the #START_OF_DATA# (0) record.  The
+    record type field is followed by a single number arithmetically
+    encoded (cf. ICFDD page 26) using a sixteenth context (cf. ICFDD
+    page 25).  This record appears when the JB2 data chunk requires
+    symbols encoded in a separate JB2 dictionary data chunk.  The
+    number (the {\bf dictionary size}) indicates how many symbols
+    should have been defined by the JB2 dictionary data chunk.  The
+    decoder should simply load these symbols in the symbol library and
+    proceed as usual.  New symbols potentially defined by the
+    subsequent JB2 image data records will therefore be numbered with
+    integers greater or equal than the dictionary size.
+
+    The JB2 dictionary data format is a pure subset of the JB2 image
+    data format.  The #START_OF_DATA# (0) record always specifies an
+    image width of zero and an image height of zero.  The only allowed
+    record types are those defining library symbols only
+    (#NEW_SYMBOL_LIBRARY_ONLY# (2) and #MATCHED_REFINE_LIBRARY_ONLY#
+    (5) cf. ICFDD page 24) followed by a final #END_OF_DATA# (11)
+    record.
+
+    The JB2 dictionary data is usually located in an {\bf Djbz} chunk.
+    Each page {\bf FORM:DJVU} may directly contain a {\bf Djbz} chunk,
+    or may indirectly point to such a chunk using an {\bf INCL} chunk
+    (cf. \Ref{Multipage DjVu documents.}).
+    
+
+    {\bf Numcoder Reset} --- This extension addresses a problem for
+    hardware implementations.  The encoding of numbers (cf. ICFDD page
+    26) potentially uses an unbounded number of binary coding
+    contexts. These contexts are normally allocated when they are used
+    for the first time (cf. ICFDD informative note, page 27).
+
+    Starting with version 21, a #REQUIRED_DICT_OR_RESET# (9) record
+    type can appear {\em after} the #START_OF_DATA# (0) record.  The
+    decoder should proceed with the next record after {\em clearing
+    all binary contexts used for coding numbers}.  This operation
+    implies that all binary contexts previously allocated for coding
+    numbers can be deallocated.
+  
+    Starting with version 21, the JB2 encoder should insert a
+    #REQUIRED_DICT_OR_RESET# record type whenever the number of these
+    allocated binary contexts exceeds #20000#.  Only very large
+    documents ever reach such a large number of allocated binary
+    contexts (e.g large maps).  Hardware implementation however can
+    benefit greatly from a hard bound on the total number of binary
+    coding contexts.  Old JB2 decoders will treat this record type as
+    an #END_OF_DATA# record and cleanly stop decoding (cf. ICFDD page
+    30, Image refinement data).
+
+
+    {\bf References} ---
+    \begin{itemize}
+    \item ICFDD Draft Proposed American National Standard, 1999-08-26.
+    \item DjVu Specification, \URL{http://www.djvu.com/djvu/sci/djvuspec}.
+    \end{itemize}
+
+    @memo Extensions to the JB2 format introduced in version 21.  */
+
+//@}
+
+
