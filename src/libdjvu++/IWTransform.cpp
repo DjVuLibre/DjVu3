@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.13 1999-09-28 19:56:18 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.14 1999-11-03 00:51:50 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -524,16 +524,17 @@ filter_fh(short *p, int w, int h, int rowsize, int scale)
           q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
           q += s+s;
         }
-      while (q-s3 < e)
-        {
-          // Special case  w <= x < w+3
-          b0=b1; 
-          b1=b2; 
-          b2=b3;
-          b3=0;
-          q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
-          q += s+s;
-        }
+      if (q-s3 >= p)
+        while (q-s3 < e)
+          {
+            // Special case  w <= x < w+3
+            b0=b1; 
+            b1=b2; 
+            b2=b3;
+            b3=0;
+            q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+16) >> 5);
+            q += s+s;
+          }
       y += scale;
       p += rowsize;
     }
@@ -621,15 +622,16 @@ filter_bh(short *p, int w, int h, int rowsize, int scale)
           q[-s3] = q[-s3] + ((((b1+b2)<<3)+(b1+b2)-b0-b3+8) >> 4);
           q += s+s;
         }
-      while (q-s3 < e)
-        {
-          // Special case  w <= x < w+3
-          b0=b1; 
-          b1=b2; 
-          b2=b3;
-          q[-s3] = q[-s3] + ((b1+b2+1)>>1);
-          q += s+s;
-        }
+      if (q-s3 >= p)
+        while (q-s3 < e)
+          {
+            // Special case  w <= x < w+3
+            b0=b1; 
+            b1=b2; 
+            b2=b3;
+            q[-s3] = q[-s3] + ((b1+b2+1)>>1);
+            q += s+s;
+          }
       y += scale;
       p += rowsize;
     }
@@ -651,6 +653,7 @@ filter_bh(short *p, int w, int h, int rowsize, int scale)
 void
 IWTransform::forward(short *p, int w, int h, int rowsize, int begin, int end)
 { 
+
   // PREPARATION
   filter_begin(w,h);
   // LOOP ON SCALES
