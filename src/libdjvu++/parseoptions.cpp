@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.18 1999-12-15 21:57:53 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.19 2000-01-05 19:57:51 praveen Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -20,9 +20,14 @@
 #ifdef THREADMODEL
 #include "GThreads.h"
 #endif THREADMODEL
-#include <string.h>
+#ifndef WIN32
 #include <unistd.h>
 #include <pwd.h>
+#else 
+#include <windows.h>
+#include <winreg.h>
+#endif
+#include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -129,7 +134,9 @@ djvu_parse_error(struct djvu_parse opts)
 void
 djvu_parse_perror(struct djvu_parse opts)
 {
-  return ((DjVuParseOptions *)(opts.Private))->perror();
+  ((DjVuParseOptions *)(opts.Private))->perror();
+  return;
+  
 }
 
   /* This is a wrapper for the DjVUParseOptions::ConfigFilename funciton */
@@ -170,7 +177,11 @@ DjVuParseOptions::DjVuParseOptions
     name[i]=tolower(progname[i]);
   }
   name[i]=0;
+#ifndef  WIN32
   if(namelen > 4 && !strcasecmp(name+namelen-4,".exe"))
+#else
+  if(namelen > 4 && !strcmp(name+namelen-4,".exe"))
+#endif
   {
     name[namelen-4]=0;
   }
@@ -659,15 +670,20 @@ DjVuParseOptions::ReadConfig
     }
   }else
   {
+#ifndef WIN32
     const char *xname=strrchr(prog,'/');
+#else
+	const char *xname=strrchr(prog,'\\');
+#endif
     xname=xname?(xname+1):prog;
+
     retval=ProfileTokens->SetToken(xname);
 	// First check and see if we have already read in this profile.
     if(Configuration->Grow(retval+1))
     {
       FILE *f=0;
       if(((ConfigFilename(xname,0)&&(f=fopen(filename,"r"))))
-        ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
+         ||((ConfigFilename(xname,1)&&(f=fopen(filename,"r")))))
       {
         ReadFile(line,f,retval);
         fclose(f);
@@ -1101,10 +1117,60 @@ DjVuParseOptions::ProfileList::Add
   }
 }
 
+#ifdef WIN32
+LPSTR RegOpenReadConfig ( HKEY hParentKey) {
+
+  LPCSTR szSoftware = "Software";
+  LPCSTR szCompany =  "AT&T";
+  LPCSTR szProduct =  "DjVu";
+  LPCSTR szProfilePath = "Profile Path";
+
+  HKEY hSoftwareKey = NULL;
+  HKEY hCompanyKey = NULL;
+  HKEY hProductKey = NULL;
+  HKEY hProfilePathKey = NULL;
+
+  if (RegOpenKeyEx(hParentKey, szSoftware, 0,
+                    KEY_READ, &hSoftwareKey) == ERROR_SUCCESS )
+    if (RegOpenKeyEx(hSoftwareKey, szCompany, 0,
+                      KEY_READ, &hCompanyKey) == ERROR_SUCCESS )
+      if (RegOpenKeyEx(hCompanyKey, szProduct, 0,
+		                KEY_READ, &hProductKey) == ERROR_SUCCESS )
+        if (RegOpenKeyEx(hProductKey, szProfilePath, 0,
+		                  KEY_READ, &hProfilePathKey) == ERROR_SUCCESS )
+        {
+          // Success
+          LPSTR szPathValue = new char[100];
+		  LPCSTR lpszEntry = "";
+          DWORD dwCount = 100;
+		  DWORD dwType;
+          LONG lResult = RegQueryValueEx(hProfilePathKey, lpszEntry, NULL,
+		                   &dwType, (LPBYTE) szPathValue, &dwCount);
+		  RegCloseKey(hSoftwareKey);
+          RegCloseKey(hCompanyKey) ;
+          RegCloseKey(hProductKey);
+          RegCloseKey(hProfilePathKey);
+		  
+		  if ( (lResult == ERROR_SUCCESS) && (dwType == REG_SZ)) {
+			  return szPathValue ;
+		  }
+          return 0;
+        }
+
+  if (hSoftwareKey) RegCloseKey(hSoftwareKey);
+  if (hCompanyKey)  RegCloseKey(hCompanyKey); 
+  if (hProductKey)  RegCloseKey(hProductKey); 
+  if (hProfilePathKey)  RegCloseKey(hProfilePathKey); 
+  return 0;
+
+}
+#endif
+
 const char * const
 DjVuParseOptions::ConfigFilename
 (const char config[],int level)
 {
+#ifndef WIN32
   const char *retval=0;
   const char *this_config=config[0]?config:default_string;
 	if ( filename ) {
@@ -1167,6 +1233,43 @@ DjVuParseOptions::ConfigFilename
     strcat(filename,ConfigExt);
   }
   return retval;
+#else
+
+	char * root;
+	int rootlen;
+
+	const char *retval=0;
+	const char *this_config=config[0]?config:default_string;
+
+	if ( filename ) {
+  	delete [] filename;
+  	filename=0;
+	}
+
+    if (level == 0 ) 
+		root = (char *) RegOpenReadConfig (HKEY_CURRENT_USER);
+	else
+		root = (char *) RegOpenReadConfig (HKEY_LOCAL_MACHINE);
+	if (root[0]) {
+		rootlen = strlen(root);
+		retval=filename=new char [rootlen+strlen(this_config)+sizeof(ConfigExt)+1];
+		strcpy(filename,root);
+		strcat(filename, "\\");
+		strcat(filename,this_config);
+		strcat(filename,ConfigExt);
+		return retval;        
+	} else {
+        const char emsg[]="SDK not installed properly, please install it again.\n";
+        char *s=new char [sizeof(emsg)];
+        sprintf(s,emsg);
+        Errors->AddError(s);
+        delete [] s;
+		char tempfilename[] = "/windows/djvu";
+		filename = new char[sizeof(tempfilename)];
+		strcpy ( filename, tempfilename);
+		return (retval = filename);
+	}
+#endif
 }
 
 static int

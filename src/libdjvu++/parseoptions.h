@@ -6,7 +6,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.h,v 1.15 1999-12-17 02:21:35 bcr Exp $
+//C- $Id: parseoptions.h,v 1.16 2000-01-05 19:59:21 praveen Exp $
 
 #endif /* __cplusplus */
 
@@ -54,8 +54,8 @@
    \Ref{DjVuParseOptions Examples}.
 
    @memo Class used for parsing options and configuration files.
-   @author: #$Author: bcr $#
-   @version #$Id: parseoptions.h,v 1.15 1999-12-17 02:21:35 bcr Exp $#
+   @author: #$Author: praveen $#
+   @version #$Id: parseoptions.h,v 1.16 2000-01-05 19:59:21 praveen Exp $#
  */
 
 //@{
@@ -593,12 +593,12 @@ DjVuParseOptions::GetBest
 
 inline int
 DjVuParseOptions::GetInteger
-(const char xname[],const int errval=0) const
+(const char xname[],const int errval) const
 { return GetInteger(GetVarToken(xname),errval); }
 
 inline int
 DjVuParseOptions::GetNumber
-(const char xname[],const int errval=0) const
+(const char xname[],const int errval) const
 { return GetNumber(GetVarToken(xname),errval); }
 
 inline const char * const
