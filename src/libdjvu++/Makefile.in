@@ -156,8 +156,7 @@ release:
 	$(MAKE) tex
 	$(MAKE) html
 	$(MAKE) distclean
-	@(cd ..; gnu-tar cvf - --exclude=CVS $(NAM) ) | gzip -9 > ../$(NAM)-$(VER).tar.gz
-	#@attcapsule ATTLICENSE ../$(NAM)-$(VER).tar.gz
+	@attcapsule ATTLICENSE ../$(NAM)-$(VER).tar.gz
 	@echo Distribution is in ../$(NAM)-$(VER).tar.gz
 
 
