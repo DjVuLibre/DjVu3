@@ -65,12 +65,13 @@ done
 
 cxx=`unescape "$CXX"`
 cxxsymbolic=`unescape "$CXXSYMBOLIC"`
+cxxthreads=`unescape "$CXXTHREADS"`
 name=`unescape "$soname"`
 
 echo "" > "dummy$$.c"
 "$cxx" -c "dummy$$.c" -o "dummy$$.o" 
-echo "$cxx $cxxsymbolic -o $outputname dummy$$.o -Wl,-soname,$name $libs"
-"$cxx" $cxxsymbolic -o `basename "$outputname"` "dummy$$.o" "-Wl,-soname,$name" $libs
+echo "$cxx $cxxsymbolic $cxxthreads -o $outputname dummy$$.o -Wl,-soname,$name $libs"
+"$cxx" $cxxsymbolic $cxxthreads -o `basename "$outputname"` "dummy$$.o" "-Wl,-soname,$name" $libs
 rm -f "dummy$$.o" "dummy$$.c"
 `unescape "$mv"` `basename $outputname` "$outputname"
 

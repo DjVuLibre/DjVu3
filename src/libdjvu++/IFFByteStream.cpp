@@ -11,9 +11,9 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.cpp,v 1.11 2000-05-01 16:15:22 bcr Exp $
+//C- $Id: IFFByteStream.cpp,v 1.12 2000-06-06 18:04:14 bcr Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.11 2000-05-01 16:15:22 bcr Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.12 2000-06-06 18:04:14 bcr Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -28,7 +28,7 @@
 
 // Constructor
 IFFByteStream::IFFByteStream(ByteStream &xbs)
-  : ctx(0), bs(&xbs), dir(0)
+  : has_magic(false), ctx(0), bs(&xbs), dir(0)
 {
   offset = seekto = bs->tell();
 }
@@ -138,9 +138,10 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
   // Record raw offset
   int rawoffset = offset;
   
-  // Read chunk id (skipping sequences inserted here to defeat 
-  // Internet Explorer assumptions about IFF)
-  do {
+  // Read chunk id (skipping magic sequences inserted here to make
+  // DjVu files recognizable.)
+  while (1)
+  {
     if (ctx && offset == ctx->offEnd)
       return 0;
     if (ctx && offset+4 > ctx->offEnd)
@@ -151,8 +152,11 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
       return 0;
     if (bytes != 4)
       THROW("EOF");
-  } while (buffer[0]==0x41 && buffer[1]==0x54 && 
-           buffer[2]==0x26 && buffer[3]==0x54  );
+    if(buffer[0] != 0x41 || buffer[1] != 0x54 ||
+       buffer[2] != 0x26 || buffer[3] != 0x54 )
+      break;
+    has_magic=true;
+  }
   
   // Read chunk size
   if (ctx && offset+4 > ctx->offEnd)
@@ -224,7 +228,7 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
 // -- write new chunk header
 
 void  
-IFFByteStream::put_chunk(const char *chkid, int insert_att)
+IFFByteStream::put_chunk(const char *chkid, int insert_magic)
 {
   int bytes;
   char buffer[8];
@@ -248,13 +252,16 @@ IFFByteStream::put_chunk(const char *chkid, int insert_att)
   if (offset & 1)
     offset += bs->write((void*)&buffer[4], 1);
 
-  // Insert "AT&T" to fool MSIE
-  if (insert_att)
+  // Insert magic to make this file recognizable as DjVu
+  if (insert_magic)
   {
-    // Don't change the way you fool Internet Explorer! 
-    // I rely on these "AT&T" letters in some places
+    // Don't change the way you do the file magic!
+    // I rely on these bytes letters in some places
     // (like DjVmFile.cpp and djvm.cpp) -- eaf
-    strcpy(buffer,"AT&T");
+    buffer[0]=0x41;
+    buffer[1]=0x54;
+    buffer[2]=0x26;
+    buffer[3]=0x54;
     offset += bs->writall((void*)&buffer[0], 4);
   }
 

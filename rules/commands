@@ -13,6 +13,7 @@ CP=@%cp%@
 DIRNAME=@%dirname%@
 DOCXX=@%docxx%@
 DOCXXCLEAN=@%docxxclean%@
+ECHO=@%echo%@
 FIND=@%find%@
 GREP=@%grep%@
 LATEX=@%latex%@

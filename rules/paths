@@ -10,28 +10,28 @@ HTMLJB2PATH=TOPDIR/html/JB2
 HTMLMULTIPATH=TOPDIR/html/MultiPage
 HTMLMASKFINDPATH=TOPDIR/html/MaskFind
 
-LIBDJVUXX=$(LIBPATH)/libdjvu++.a
-LIBDJVUXX_LINK=-ldjvu++
+LIBDJVUXX=$(LIBPATH)/libdjvu.a
+LIBDJVUXX_LINK=-ldjvu
 LIBDJVUXX_INC=-I./TOPDIR/src/libdjvu++ -I./TOPDIR/SRCDIR/src/libdjvu++
 
-LIBDJVUMULTIXX=$(LIBPATH)/libdjvumulti++.a
-LIBDJVUMULTIXX_LINK=-ldjvumulti++
+LIBDJVUMULTIXX=$(LIBPATH)/libdjvumulti.a
+LIBDJVUMULTIXX_LINK=-ldjvumulti
 LIBDJVUMULTIXX_INC=-I./TOPDIR/src/libmulti++ -I./TOPDIR/SRCDIR/src/libmulti++
 
-LIBJB2XX=$(LIBPATH)/libjb2++.a
-LIBJB2XX_LINK=-ljb2++
+LIBJB2XX=$(LIBPATH)/libjb2.a
+LIBJB2XX_LINK=-ljb2
 LIBJB2XX_INC=-I./TOPDIR/src/libjb2++  -I./TOPDIR/SRCDIR/src/libjb2++
 
-LIBDJVUIOXX=$(LIBPATH)/libdjvuio++.a
-LIBDJVUIOXX_LINK=-ldjvuio++
+LIBDJVUIOXX=$(LIBPATH)/libdjvuio.a
+LIBDJVUIOXX_LINK=-ldjvuio
 LIBDJVUIOXX_INC=-I./TOPDIR/src/libio++ -I./TOPDIR/SRCDIR/src/libio++
 
 LIBDJVUIMAGE=$(LIBPATH)/libdjvuimage.a
 LIBDJVUIMAGE_LINK=-ldjvuimage
 LIBDJVUIMAGE_INC=-I./TOPDIR/src/libimage -I./TOPDIR/SRCDIR/src/libimage
 
-LIBDJVUDECODEXX=$(LIBPATH)/libdjvudecode++.a
-LIBDJVUDECODEXX_LINK=-ldjvudecode++
+LIBDJVUDECODEXX=$(LIBPATH)/libdjvudecode.a
+LIBDJVUDECODEXX_LINK=-ldjvudecode
 LIBDJVUDECODEXX_INC=-I./TOPDIR/src/libapi/libdjvudecode -I./TOPDIR/SRCDIR/src/libapi/libdjvudecode
 
 LIBDJVUBITONAL=$(LIBPATH)/libdjvubitonal.a
@@ -46,8 +46,8 @@ LIBDJVUDOCUMENT=$(LIBPATH)/libdjvudocument.a
 LIBDJVUDOCUMENT_LINK=-ldjvudocument
 LIBDJVUDOCUMENT_INC=-I./TOPDIR/src/libapi/libdjvudocument -I./TOPDIR/SRCDIR/src/libapi/libdjvudocument
 
-LIBMASKFINDXX=$(LIBPATH)/libmaskfind++.a
-LIBMASKFINDXX_LINK=-lmaskfind++
+LIBMASKFINDXX=$(LIBPATH)/libmaskfind.a
+LIBMASKFINDXX_LINK=-lmaskfind
 LIBMASKFINDXX_INC=-I./TOPDIR/src/libmaskfind++ -I./TOPDIR/SRCDIR/src/libmaskfind++
 
 %%%BEGIN_REQUIRE(@%LIBJPEG%@)

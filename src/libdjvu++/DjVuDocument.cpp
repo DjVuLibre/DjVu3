@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.120 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: DjVuDocument.cpp,v 1.121 2000-06-06 18:04:13 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -24,8 +24,21 @@
 
 const float	DjVuDocument::thumb_gamma=(float)2.20;
 
+GP<ByteStream> (* DjVuDocument::djvu_import_codec)(
+  const char *filename,GP<DataPool> &xdata_pool, bool &needs_compression)=0;
+
+void
+DjVuDocument::set_import_codec(
+  GP<ByteStream> (*codec)(const char filename[],GP<DataPool>&xdata_pool,
+    bool &needs_compression))
+{
+  djvu_import_codec=codec;
+}
+
 DjVuDocument::DjVuDocument(void)
   : doc_type(UNKNOWN_TYPE),
+    needs_compression_flag(false),
+    needs_rename_flag(false),
     has_file_names(false),
     recover_errors(ABORT),
     verbose_eof(false),
@@ -188,15 +201,28 @@ DjVuDocument::init_thread(void)
 
    DjVuPortcaster * pcaster=get_portcaster();
       
-   GP<ByteStream> stream=init_data_pool->get_stream();
+   GP<ByteStream> stream;
+   if(init_url && init_url.is_local_file_url() && djvu_import_codec)
+   {
+     stream=djvu_import_codec((const char *)(GOS::url_to_filename(init_url)),
+       init_data_pool,needs_compression_flag);
+     if(needs_compression_flag)
+       needs_rename_flag=true;
+   }else
+   {
+     stream=init_data_pool->get_stream();
+   }
    IFFByteStream iff(*stream);
    GString chkid;
    int size=iff.get_chunk(chkid);
-   if (size==0) THROW("EOF");
+   if (!size)
+     THROW("EOF");
    if (size < 0)
-      THROW("The requested file does not exist.");
+     THROW("The requested file does not exist.");
    if (size<8)
-      THROW("The requested input is not a DjVu File");
+   {
+     THROW("The requested input is not a DjVu File");
+   }
    if (chkid=="FORM:DJVM")
    {
       DEBUG_MSG("Got DJVM document here\n");
@@ -269,7 +295,7 @@ DjVuDocument::init_thread(void)
 	 if (!first_page_name.length())
 	    THROW("Failed to find any page in this document.");
 
-	 flags|=DOC_DIR_KNOWN;
+	 flags|=DOC_TYPE_KNOWN;
 	 pcaster->notify_doc_flags_changed(this, DOC_DIR_KNOWN, 0);
 	 check_unnamed_files();
       }

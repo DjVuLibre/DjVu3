@@ -11,7 +11,7 @@
 //C- LizardTech, you have an infringing copy of this software and cannot use it
 //C- without violating LizardTech's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.124 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.125 2000-06-06 18:04:13 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -32,6 +32,8 @@
 
 #define REPORT_EOF(x) \
   {TRY{THROW("EOF");}CATCH(ex){report_error(ex,(x));}ENDCATCH;}
+
+static GP<GPixmap> (*djvu_decode_codec)(ByteStream &bs)=0;
 
 class ProgressByteStream : public ByteStream
 {
@@ -850,6 +852,25 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 		  get_dpi(fg44.get_width(), fg44.get_height()));
     } 
 
+  // RAWC (background RAWC)
+  else if (chkid == "RAWC" && (djvu || djvi))
+    {
+      if (bg44 || bgpm)
+        THROW("DjVu Decoder: Corrupted data (Duplicate background layer)");
+      if(djvu_decode_codec)
+      {
+        set_modified(true);
+        set_needs_compression(true);
+        DjVuFile::bgpm = djvu_decode_codec(iff);
+        desc.format("RAW Color Import (%dx%d, %d dpi)",
+		  bgpm->columns(), bgpm->rows(),
+		  get_dpi(bgpm->columns(), bgpm->rows()));
+      }else
+      {
+        desc.format("RAW Color Import (Unimplemented)");
+      }
+    } 
+  
   // BGjp (background JPEG)
   else if (chkid == "BGjp" && (djvu || djvi))
     {
@@ -978,6 +999,12 @@ DjVuFile::decode_chunk(const char *id, ByteStream &iff, bool djvi, bool djvu, bo
 
   // Return description
   return desc;
+}
+
+void
+DjVuFile::set_decode_codec(GP<GPixmap> (*codec)(ByteStream &bs))
+{
+  djvu_decode_codec=codec;
 }
 
 void

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.h,v 1.60 2000-05-31 21:42:33 bcr Exp $
+//C- $Id: DjVuDocument.h,v 1.61 2000-06-06 18:04:13 bcr Exp $
  
 #ifndef _DJVUDOCUMENT_H
 #define _DJVUDOCUMENT_H
@@ -33,7 +33,7 @@
 
     @memo DjVu document class.
     @author Andrei Erofeev <eaf@geocities.com>, L\'eon Bottou <leonb@research.att.com>
-    @version #$Id: DjVuDocument.h,v 1.60 2000-05-31 21:42:33 bcr Exp $#
+    @version #$Id: DjVuDocument.h,v 1.61 2000-06-06 18:04:13 bcr Exp $#
 */
 
 //@{
@@ -320,6 +320,10 @@ public:
 	  See \Ref{is_init_complete}() and \Ref{wait_for_complete_init}()
 	  for more details. */
    bool		is_init_ok(void) const;
+      /** Returns #TRUE# if there are uncompressed pages in this document. */
+   bool		needs_compression(void) const;
+      /** Returns #TRUE# if this file must be renamed before saving. */
+   bool		needs_rename(void) const;
 
       /** Returns #TRUE# is the initialization thread failed.
 
@@ -661,12 +665,21 @@ public:
    virtual GList<GString>	get_file_names(void);
    virtual void 	set_recover_errors(ErrorRecoveryAction=ABORT);
    virtual void 	set_verbose_eof(bool=true);
+
+   static void set_import_codec(
+     GP<ByteStream> (*codec)(const char filename[], GP<DataPool>&, bool &));
+
 protected:
+   static GP<ByteStream> (*djvu_import_codec) (
+     const char *filename,GP<DataPool> &xdata_pool, bool &needs_compression);
    virtual GP<DjVuFile>	url_to_file(const GURL & url, bool dont_create=false);
    GURL			init_url;
    GP<DataPool>		init_data_pool;
    GP<DjVmDir>		djvm_dir;	// New-style DjVm directory
    int			doc_type;
+   bool needs_compression_flag;
+   bool needs_rename_flag;
+
    
 
    bool			has_file_names;
@@ -767,6 +780,18 @@ inline bool
 DjVuDocument::is_init_ok(void) const
 {
    return (flags & DOC_INIT_OK)!=0;
+}
+
+inline bool
+DjVuDocument::needs_compression(void) const
+{
+   return needs_compression_flag;
+}
+
+inline bool
+DjVuDocument::needs_rename(void) const
+{
+   return needs_rename_flag;
 }
 
 inline bool

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IFFByteStream.h,v 1.14 1999-11-22 03:35:17 bcr Exp $
+//C- $Id: IFFByteStream.h,v 1.15 2000-06-06 18:04:14 bcr Exp $
 
 
 #ifndef _IFFBYTESTREAM_H_
@@ -68,7 +68,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com>
     @version
-    #$Id: IFFByteStream.h,v 1.14 1999-11-22 03:35:17 bcr Exp $# */
+    #$Id: IFFByteStream.h,v 1.15 2000-06-06 18:04:14 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -153,10 +153,10 @@ public:
       data.  Argument #chkid# defines a extended chunk identifier for this
       chunk.  The chunk data can then be written using function #write#.  The
       chunk is terminated by a matching call to function #close_chunk#.  When
-      #insertatt# is non zero, function #put_chunk# inserts the four letters
-      #"AT&T"# before the chunk header, as discussed in
+      #insertmagic# is non zero, function #put_chunk# inserts the bytes:
+      0x41, 0x54, 0x26, 0x54 before the chunk header, as discussed in
       \Ref{IFFByteStream.h}. */
-  void put_chunk(const char *chkid, int insertatt=0);
+  void put_chunk(const char *chkid, int insertmagic=0);
   /** Leaves the current chunk.  This function leaves the chunk previously
       entered by a matching call to #get_chunk# and #put_chunk#.  The
       IFFByteStream is then ready to process the next chunk at the same
@@ -195,6 +195,9 @@ public:
       returns #-1# if this is an illegal or otherwise reserved identifier
       which should not be used.  */
   static int check_id(const char *id);
+  /** #has_magic# is true if the stream has the DjVu file magic.
+   */
+  bool has_magic;
 private:
   // private datatype
   struct IFFContext

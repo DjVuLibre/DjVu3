@@ -395,13 +395,9 @@ check_thread_option()
        exit 1
        ;;
     no* )
-       C_DEFS=APPEND
-       A_DEFS="-DTHREADMODEL=NOTHREADS $A_DEFS" 
        DEFSTHREADS="-DTHREADMODEL=NOTHREADS"
        ;;       
     jri* )
-       C_DEFS=APPEND
-       A_DEFS="-DTHREADMODEL=JRITHREADS $A_DEFS" 
        DEFSTHREADS="-DTHREADMODEL=JRITHREADS"
        ;;       
     co* )
@@ -416,8 +412,6 @@ check_thread_option()
            echo 1>&2 "You need GNU g++ or a derivative such as pgcc or egcs."
            exit 1
          fi
-         C_CXXFLAGS=APPEND
-         A_CXXFLAGS="${CXXCOTHREAD} $A_CXXFLAGS" 
 	 CXXTHREADS="${CXXCOTHREAD}"
        fi
        if [ ! -z "$CC" ]
@@ -431,8 +425,6 @@ check_thread_option()
            echo 1>&2 "You need GNU gcc or a derivative such as pgcc or egcs."
            exit 1
          fi
-         C_CCFLAGS=APPEND
-         A_CCFLAGS="${CCCOTHREAD} $A_CCFLAGS" 
 	 CCTHREADS="${CCCOTHREAD}"
        fi
        if [ ! -z "$CXXCOTHREAD_UNSAFE$CCCOTHREAD_UNSAFE" ] 
@@ -448,8 +440,6 @@ check_thread_option()
          then
            . "${CONFIG_DIR}/pthread.sh"
          fi
-         C_CCFLAGS=APPEND
-         A_CCFLAGS="$CCPTHREAD $A_CCFLAGS"
 	 CCTHREADS="$CCPTHREAD"
        fi
        if [ ! -z "$CXX" ]
@@ -458,14 +448,10 @@ check_thread_option()
          then
            . "${CONFIG_DIR}/pthread.sh"
          fi
-         C_CXXFLAGS=APPEND
-         A_CXXFLAGS="$CXXPTHREAD $A_CXXFLAGS"
 	 CXXTHREADS="$CXXPTHREAD"
        fi
        if [ ! -z "${CCPTHREAD_LIB}${CXXPTHREAD_LIB}" ]
        then 
-         C_LIBS=APPEND
-         A_LIBS="${CXXPTHREAD_LIB} ${A_LIBS}"
 	 LIBSTHREADS="${CXXPTHREAD_LIB}"
        fi
        ;;
