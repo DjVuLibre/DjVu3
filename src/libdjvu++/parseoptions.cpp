@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: parseoptions.cpp,v 1.30 2000-01-29 23:30:32 bcr Exp $
+//C- $Id: parseoptions.cpp,v 1.31 2000-01-30 00:07:47 bcr Exp $
 #ifdef __GNUC__
 #pragma implementation
 #endif
@@ -279,6 +279,7 @@ DjVuParseOptions::init(
   for(int i=0;i<i_max;i++)
   {
     s=tmp.ProfileTokens->Entry[i].Name;
+    int k=tmp.ProfileTokens->Entry[i].Token;
     int j=ProfileTokens->GetToken(s);
     if(j<0)
     {
@@ -286,10 +287,10 @@ DjVuParseOptions::init(
       (void)(Configuration->Grow(j+1));
       delete [] Configuration->profiles[j].values;
     }
-    Configuration->profiles[j].size=tmp.Configuration->profiles[i].size;
-    Configuration->profiles[j].values=tmp.Configuration->profiles[i].values;
-    tmp.Configuration->profiles[i].size=0;
-    tmp.Configuration->profiles[i].values=0;
+    Configuration->profiles[j].size=tmp.Configuration->profiles[k].size;
+    Configuration->profiles[j].values=tmp.Configuration->profiles[k].values;
+    tmp.Configuration->profiles[k].size=0;
+    tmp.Configuration->profiles[k].values=0;
   }
   delete [] name;
   delete [] filename;
