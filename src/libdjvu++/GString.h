@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.79 2001-06-05 03:19:58 bcr Exp $
+// $Id: GString.h,v 1.80 2001-06-05 15:07:40 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -64,7 +64,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.79 2001-06-05 03:19:58 bcr Exp $# */
+    #$Id: GString.h,v 1.80 2001-06-05 15:07:40 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -1304,7 +1304,7 @@ GBaseString::toInt(void) const
 
 /** Returns a long intenger.  Implments i18n strtol.  */
 inline long
-GBaseString::toLong(const int pos, int &endpos, const int base=10) const
+GBaseString::toLong(const int pos, int &endpos, const int base) const
 {
   long int retval=0; 
   if(ptr)
@@ -1319,21 +1319,21 @@ GBaseString::toLong(const int pos, int &endpos, const int base=10) const
 
 inline long
 GBaseString::toLong(
-  const GUTF8String& src, const int pos, int &endpos, const int base=10)
+  const GUTF8String& src, const int pos, int &endpos, const int base)
 {
   return src.toLong(pos,endpos,base);
 }
 
 inline long
 GBaseString::toLong(
-  const GNativeString& src, const int pos, int &endpos, const int base=10)
+  const GNativeString& src, const int pos, int &endpos, const int base)
 {
   return src.toLong(pos,endpos,base);
 }
 
 /** Returns a unsigned long integer.  Implements i18n strtoul. */
 inline unsigned long 
-GBaseString::toULong(const int pos, int &endpos, const int base=10) const
+GBaseString::toULong(const int pos, int &endpos, const int base) const
 {
   unsigned long retval=0; 
   if(ptr)
@@ -1348,14 +1348,14 @@ GBaseString::toULong(const int pos, int &endpos, const int base=10) const
 
 inline unsigned long
 GBaseString::toULong(
-  const GUTF8String& src, const int pos, int &endpos, const int base=10)
+  const GUTF8String& src, const int pos, int &endpos, const int base)
 {
   return src.toULong(pos,endpos,base);
 }
 
 inline unsigned long
 GBaseString::toULong(
-  const GNativeString& src, const int pos, int &endpos, const int base=10)
+  const GNativeString& src, const int pos, int &endpos, const int base)
 {
   return src.toULong(pos,endpos,base);
 }
