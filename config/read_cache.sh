@@ -1,7 +1,8 @@
 # This script reads the variables from the cache file.
 
 if [ -z "${CONFIG_DIR}" ] ; then
-  . `dirname $0`/functions.sh
+  echo "You must source functions.sh" 1>&2
+  exit 1
 fi
 if [ -z "${CONFIG_CACHE}" ] ; then
   . ${CONFIG_DIR}/dirs.sh

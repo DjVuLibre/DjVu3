@@ -8,12 +8,13 @@
 #
 
 if [ -z "$CONFIG_DIR" ] ; then
-  CONFIG_DIR=`dirname "$0"`
+  CONFIG_DIR=`dirname "$0"`/config
+  CONFIG_DIR=`cd "$CONFIG_DIR" 2>>/dev/null 1>>/dev/null;pwd`
   CONFIG_VARS=`echo CONFIG_DIR "${CONFIG_VARS}"`
 fi
 
 if [ -z "$SYS" ] ; then
-  "${CONFIG_DIR}"/sys.sh
+  . "${CONFIG_DIR}"/sys.sh
 fi
 
 ### ------------------------------------------------------------------------
@@ -167,55 +168,11 @@ EOF
 
 check_compiler()
 {
-    CC=${CC-gcc}
-    CXX=${CXX-g++}
+    . ${CONFIG_DIR}/cc.sh
+    . ${CONFIG_DIR}/cxx.sh
     OPT=${OPT}
     WARN=${WARN}
     LIBS=
-
-    # -----
-
-    echo 'int main(void) {return 0;}' | testfile $temp.c
-    echon "Testing C compiler ... "
-    if ( run $CC -c $temp.c -o $temp.o ) 
-    then
-        echo $CC.
-    elif ( run gcc -c $temp.c -o $temp.o ) 
-    then
-        CC=gcc
-        echo $CC.
-    elif ( run cc -c $temp.c -o $temp.o  ) 
-    then
-        CC=cc
-        echo $CC.
-    else
-        echo 1>&2 "$conf: Cannot find C compiler"
-        echo 1>&2 "-- Use environment variable CC to specify a C compiler."
-        echo 1>&2 "-- Use environment variable OPT and WARN to specify compiler options."
-        exit 1
-    fi
-
-    # -----
-
-    echo 'int main(void) {return 0;}' | testfile $temp.cpp
-    echon "Testing C++ compiler ... "
-    if ( run $CXX -c $temp.cpp -o $temp.o ) 
-    then
-        echo $CXX.
-    elif ( run g++ -c $temp.cpp -o $temp.o ) 
-    then
-        CXX=g++
-        echo $CXX.
-    elif ( run CC -c $temp.cpp -o $temp.o ) 
-    then
-        CXX=CC
-        echo $CXX.
-    else
-        echo 1>&2 "$conf: Cannot find C++ compiler"
-        echo 1>&2 "-- Use environment variable CXX to specify a C++ compiler."
-        echo 1>&2 "-- Use environment variable OPT and WARN to specify compiler options."
-        exit 1
-    fi
 
     # -----
 
@@ -223,12 +180,12 @@ check_compiler()
     cc_is_gcc=
     echon "Checking whether both compilers are gcc ... "
     echo 'int main(void) { return __GNUG__;}' | testfile $temp.cpp
-    if ( run $CXX -O -c $temp.cpp -o $temp  ) 
+    if ( cd `dirname $temp` 2>>/dev/null 1>>/dev/null;run $CXX $CXXFLAGS -O -c $temp.cpp ) 
     then
         cxx_is_gcc=yes
     fi
     echo 'int main(void) { return __GNUC__;}' | testfile $temp.c
-    if ( run $CC -c $temp.c -o $temp ) 
+    if ( cd `dirname $temp` 2>>/dev/null 1>>/dev/null;run $CC $CCFLAGS -c $temp.c ) 
     then
         cc_is_gcc=yes
     fi
@@ -245,27 +202,11 @@ check_compiler()
 
     # -----
 
-    if [ -n "$compiler_is_gcc" ]
-    then
-        echon "Testing pipe option ... "
-        echo 'int main(void) {return 0;}' | testfile $temp.cpp
-        if ( run $CXX -pipe -c $temp.cpp -o $temp ) 
-        then
-            echo yes.
-            CC="$CC -pipe"
-            CXX="$CXX -pipe"
-        else
-            echo no.
-        fi
-    fi
-
-    # -----
-
     if [ -z "$OPT" ]
     then
         echon "Testing optimization option ... "
         echo 'int main(void) {return 0;}' | testfile $temp.cpp
-        if ( run $CXX -O -c $temp.cpp -o $temp ) 
+        if ( run $CXX $CXXFLAGS -O -c $temp.cpp -o $temp ) 
         then
             OPT=-O
             echo $OPT
@@ -330,7 +271,7 @@ extern "C" void *(*__get_eh_context_ptr)(void);
 extern "C" void *__new_eh_context(void);
 void main() { __get_eh_context_ptr = &__new_eh_context; }
 EOF
-       if ( run $CXX $temp.cpp -o $temp ) 
+       if ( run $CXX $CXXFLAGS $temp.cpp -o $temp ) 
        then
           echo yes.
        else
@@ -344,7 +285,7 @@ EOF
        DEFS="$DEFS -DTHREADMODEL=POSIXTHREADS" 
        echo 'int main(void) {return 0;}' | testfile $temp.cpp
        echon "Check option -pthread ... "
-       if ( ( run $CXX -pthread $temp.cpp -o $temp ) \
+       if ( ( run $CXX $CXXFLAGS -pthread $temp.cpp -o $temp ) \
             && [ -z "`grep -i unrecognized $temp.out`" ] )
        then
          echo yes.
@@ -353,12 +294,12 @@ EOF
        else
          echo no.
          echon "Check option -threads ... "
-         if ( ( run $CXX -threads $temp.cpp -o $temp ) \
+         if ( ( run $CXX $CXXFLAGS -threads $temp.cpp -o $temp ) \
               && [ -z "`grep -i unrecognized $temp.out`" ] )
          then
            echo yes.
            CC="$CC -threads"
-           CXX="$CXX -threads"
+           CXX="$CXX $CXXFLAGS -threads"
          else
            echo no.
            LIBS="$LIBS -lpthread"
@@ -395,7 +336,7 @@ check_rpo_option()
      exit 1
   fi
   echo 'int main(void) {return 0;}' | testfile $temp.cpp
-  if ( ( run $CXX -frepo $temp.cpp -o $temp ) \
+  if ( ( run $CXX $CXXFLAGS -frepo $temp.cpp -o $temp ) \
          && [ -z "`grep -i unrecognized $temp.out`" ] )
   then
     echo yes.
@@ -441,7 +382,7 @@ int main(void) { return $func(); }
 EOF
   for lib
   do
-    if ( run $CXX $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
+    if ( run $CXX $CXXFLAGS $OPT $DEFS $WARN $temp.cpp $lib -o $temp ) 
     then
       echo $lib
       LIBS="$LIBS $lib"
@@ -465,6 +406,10 @@ EOF
 check_make_stlib()
 {
     echon Searching how to build a static library ...
+    testfile $temp.c <<EOF
+int main(void) { return 1; }
+EOF
+    $CC $CCFLAGS $OPT $DEFS $WARN -c $temp.c
     AR=${AR-ar}
     MAKE_STLIB=${MAKE_STLIB-$AR cq}
     if ( run $MAKE_STLIB $temp.a $temp.o ) 
@@ -543,8 +488,8 @@ generate_makefile()
     -e 's!@topsrcdir@!'"$xtopsrcdir"'!g' \
     -e 's!@topbuilddir@!'"$xtopbuilddir"'!g' \
     -e 's!@srcdir@!'"$xsrcdir"'!g' \
-    -e 's!@cc@!'"$CC"'!g' \
-    -e 's!@cxx@!'"$CXX"'!g' \
+    -e 's!@cc@!'"$CC $CCFLAGS"'!g' \
+    -e 's!@cxx@!'"$CXX $CXXFLAGS"'!g' \
     -e 's!@defs@!'"$DEFS"'!g' \
     -e 's!@opt@!'"$OPT"'!g' \
     -e 's!@warn@!'"$WARN"'!g' \
@@ -582,8 +527,8 @@ generate_main_makefile()
 SHELL=/bin/sh
 TOPSRCDIR= $topsrcdir
 TOPBUILDDIR= $topbuilddir
-CC= $CC
-CXX= $CXX
+CC= $CC $CCFLAGS
+CXX= $CXX $CXXFLAGS
 OPT= $OPT
 WARN= $WARN
 DEFS= $DEFS
