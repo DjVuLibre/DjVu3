@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.h,v 1.12 2000-02-22 17:15:32 leonb Exp $
+//C- $Id: DjVuPalette.h,v 1.13 2000-02-24 16:38:48 leonb Exp $
 
 
 
@@ -37,7 +37,7 @@
     @memo 
     DjVuPalette header file
     @version 
-    #$Id: DjVuPalette.h,v 1.12 2000-02-22 17:15:32 leonb Exp $#
+    #$Id: DjVuPalette.h,v 1.13 2000-02-24 16:38:48 leonb Exp $#
     @author: 
     L\'eon Bottou <leonb@research.att.com> */
 //@{
@@ -145,7 +145,7 @@ public:
 private:
   int color_to_index_slow(const unsigned char *bgr);
   // Histogram
-  struct PHist { int p[3]; int w; };
+  struct PHist { float p[3]; int w; };
   PHist *hcube;
   void allocate_hcube();
   static int hind[3][256];

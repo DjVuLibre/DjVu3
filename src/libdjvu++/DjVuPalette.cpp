@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPalette.cpp,v 1.7 2000-02-22 17:15:32 leonb Exp $
+//C- $Id: DjVuPalette.cpp,v 1.8 2000-02-24 16:38:48 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -42,6 +42,10 @@ umax(unsigned char a, unsigned char b)
 
 inline unsigned char 
 umin(unsigned char a, unsigned char b) 
+{ return (a>b) ? b : a; }
+
+inline float 
+fmin(float a, float b) 
 { return (a>b) ? b : a; }
 
 
@@ -184,11 +188,11 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
         pdata.touch(ncolors);
         PData &data = pdata[ncolors++];
         PHist &hist = hcube[i];
-        data.p[0] = hist.p[0]/hist.w;
-        data.p[1] = hist.p[1]/hist.w;
-        data.p[2] = hist.p[2]/hist.w;
+        data.p[0] = (unsigned char) fmin(255, hist.p[0]/hist.w);
+        data.p[1] = (unsigned char) fmin(255, hist.p[1]/hist.w);
+        data.p[2] = (unsigned char) fmin(255, hist.p[2]/hist.w);
         data.w = hist.w;
-        sum += hist.w;
+        sum += data.w;
       }
   // Create first box
   GList<PBox> boxes;
@@ -267,20 +271,20 @@ DjVuPalette::compute_palette(int maxcolors, int minboxsize)
     {
       PBox &box = boxes[p];
       // Compute box representative color
-      int bsum = 0;
-      int gsum = 0;
-      int rsum = 0;
+      float bsum = 0;
+      float gsum = 0;
+      float rsum = 0;
       for (int j=0; j<box.colors; j++)
         {
-          int w = box.data[j].w;
+          float w = box.data[j].w;
           bsum += box.data[j].p[0] * w;
           gsum += box.data[j].p[1] * w;
           rsum += box.data[j].p[2] * w;
         }
       PColor &color = palette[ncolors++];
-      color.p[0] = bsum/box.sum;
-      color.p[1] = gsum/box.sum;
-      color.p[2] = rsum/box.sum;
+      color.p[0] = (unsigned char) fmin(255, bsum/box.sum);
+      color.p[1] = (unsigned char) fmin(255, gsum/box.sum);
+      color.p[2] = (unsigned char) fmin(255, rsum/box.sum);
       color.p[3] = ( color.p[0]*BMUL + color.p[1]*GMUL + color.p[2]*RMUL) / SMUL;
     }
   // Save dominant color
