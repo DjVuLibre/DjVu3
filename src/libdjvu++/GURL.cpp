@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GURL.cpp,v 1.85 2001-07-24 17:52:04 bcr Exp $
+// $Id: GURL.cpp,v 1.86 2001-07-24 20:34:15 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -805,24 +805,21 @@ GURL::clear_hash_argument(void)
    GCriticalSectionLock lock(&class_lock);
    bool found=false;
    GUTF8String new_url;
-   const GUTF8String old_url(url);
-   for(const char * start=old_url;*start;start++)
+   for(const char * start=url;*start;start++)
    {
-      if (found)
+         // Break on first CGI arg.
+      if (*start=='?')
       {
-        if(*start == '?')
-        {
-          new_url+=start;
-          break;
-        }
-      }else if (*start=='?')
-      {
-        new_url=old_url;
-        break;
-      }else if (*start=='#')
-      {
-        new_url=url.substr(0,(size_t)start-(size_t)(const char *)old_url);
-        found=true;
+         new_url+=start;
+         break;
+      }
+
+      if (!found)
+      { 
+        if (*start=='#')
+          found=true;
+        else
+          new_url+=*start;
       }
    }
    url=new_url;
@@ -840,15 +837,12 @@ GURL::clear_cgi_arguments(void)
    cgi_value_arr.empty();
 
       // And clear everything past the '?' sign in the URL
-   const GUTF8String old_url(url);
-   for(const char * ptr=old_url;*ptr;ptr++)
-   {
+   for(const char * ptr=url;*ptr;ptr++)
       if (*ptr=='?')
       {
-        url=old_url.substr(0,(size_t)ptr-(size_t)(const char *)old_url);
-        break;
+         url.setat(ptr-url, 0);
+         break;
       }
-   }
 }
 
 void
