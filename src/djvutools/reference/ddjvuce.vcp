@@ -4,6 +4,7 @@
 
 # TARGTYPE "Win32 (WCE x86em) Application" 0x7f01
 # TARGTYPE "Win32 (WCE SH3) Application" 0x8101
+# TARGTYPE "Win32 (WCE MIPS) Application" 0x8201
 
 CFG=ddjvuce - Win32 (WCE SH3) Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
@@ -22,6 +23,7 @@ CFG=ddjvuce - Win32 (WCE SH3) Debug
 !MESSAGE "ddjvuce - Win32 (WCE SH3) Debug" (based on "Win32 (WCE SH3) Application")
 !MESSAGE "ddjvuce - Win32 (WCE x86em) Release" (based on "Win32 (WCE x86em) Application")
 !MESSAGE "ddjvuce - Win32 (WCE x86em) Debug" (based on "Win32 (WCE x86em) Application")
+!MESSAGE "ddjvuce - Win32 (WCE MIPS) Debug" (based on "Win32 (WCE MIPS) Application")
 !MESSAGE 
 
 # Begin Project
@@ -162,6 +164,42 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib $(CEx86Corelibc) /nologo /stack:0x10000,0x1000 /subsystem:windows /debug /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /windowsce:emulation /MACHINE:IX86
 # ADD LINK32 /nologo /stack:0x10000,0x1000 /subsystem:windows /debug /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /windowsce:emulation /MACHINE:IX86
 
+!ELSEIF  "$(CFG)" == "ddjvuce - Win32 (WCE MIPS) Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "MIPSDbg"
+# PROP BASE Intermediate_Dir "MIPSDbg"
+# PROP BASE CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP BASE Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "MIPSDbg"
+# PROP Intermediate_Dir "MIPSDbg"
+# PROP CPU_ID "{D6519020-710F-11D3-99F2-00105A0DF099}"
+# PROP Platform_ID "{8A9A2F80-6887-11D3-842E-005004848CBA}"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "DEBUG" /d "$(CePlatform)" /d "MIPS" /d "_MIPS_" /r
+# ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "DEBUG" /d "$(CePlatform)" /d "MIPS" /d "_MIPS_" /r
+CPP=clmips.exe
+# ADD BASE CPP /nologo /W3 /GX- /Zi /Od /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "USE_EXCEPTION_EMULATION" /YX /M$(CECrtMTDebug) /c
+# ADD CPP /nologo /W3 /GX- /Zi /Od /I "..\..\libdjvu++" /D "DEBUG" /D "WIN32" /D _WIN32_WCE=$(CEVersion) /D "$(CePlatform)" /D "MIPS" /D "_MIPS_" /D UNDER_CE=$(CEVersion) /D "UNICODE" /D "_UNICODE" /D "USE_EXCEPTION_EMULATION" /YX /M$(CECrtMTDebug) /c
+MTL=midl.exe
+# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH3
+# SUBTRACT BASE LINK32 /incremental:no
+# ADD LINK32 /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
+# SUBTRACT LINK32 /pdb:none
+
 !ENDIF 
 
 # Begin Target
@@ -170,6 +208,7 @@ LINK32=link.exe
 # Name "ddjvuce - Win32 (WCE SH3) Debug"
 # Name "ddjvuce - Win32 (WCE x86em) Release"
 # Name "ddjvuce - Win32 (WCE x86em) Debug"
+# Name "ddjvuce - Win32 (WCE MIPS) Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -301,6 +340,47 @@ NODEP_CPP_DDJVU=\
 	
 
 !ELSEIF  "$(CFG)" == "ddjvuce - Win32 (WCE x86em) Debug"
+
+DEP_CPP_DDJVU=\
+	"..\..\libdjvu++\Arrays.h"\
+	"..\..\libdjvu++\ByteStream.h"\
+	"..\..\libdjvu++\DataPool.h"\
+	"..\..\libdjvu++\debug.h"\
+	"..\..\libdjvu++\DjVmDir.h"\
+	"..\..\libdjvu++\DjVmDir0.h"\
+	"..\..\libdjvu++\DjVmDoc.h"\
+	"..\..\libdjvu++\DjVuAnno.h"\
+	"..\..\libdjvu++\DjVuDocument.h"\
+	"..\..\libdjvu++\DjVuFile.h"\
+	"..\..\libdjvu++\DjVuFileCache.h"\
+	"..\..\libdjvu++\DjVuGlobal.h"\
+	"..\..\libdjvu++\DjVuImage.h"\
+	"..\..\libdjvu++\DjVuInfo.h"\
+	"..\..\libdjvu++\DjVuNavDir.h"\
+	"..\..\libdjvu++\DjVuPalette.h"\
+	"..\..\libdjvu++\DjVuPort.h"\
+	"..\..\libdjvu++\GBitmap.h"\
+	"..\..\libdjvu++\GContainer.h"\
+	"..\..\libdjvu++\GException.h"\
+	"..\..\libdjvu++\GMapAreas.h"\
+	"..\..\libdjvu++\GOS.h"\
+	"..\..\libdjvu++\GPixmap.h"\
+	"..\..\libdjvu++\GRect.h"\
+	"..\..\libdjvu++\GSmartPointer.h"\
+	"..\..\libdjvu++\GString.h"\
+	"..\..\libdjvu++\GThreads.h"\
+	"..\..\libdjvu++\GURL.h"\
+	"..\..\libdjvu++\IFFByteStream.h"\
+	"..\..\libdjvu++\IWImage.h"\
+	"..\..\libdjvu++\JB2Image.h"\
+	"..\..\libdjvu++\ZPCodec.h"\
+	
+NODEP_CPP_DDJVU=\
+	"..\..\libdjvu++\DjVu.h"\
+	"..\..\libdjvu++\jri.h"\
+	
+
+!ELSEIF  "$(CFG)" == "ddjvuce - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_DDJVU=\
 	"..\..\libdjvu++\Arrays.h"\
