@@ -1,11 +1,11 @@
 <HTML>
 <HEAD>
-   <TITLE>class  DataPool</TITLE>
+   <TITLE> </TITLE>
    <META NAME="GENERATOR" CONTENT="DOC++ 3.4.1">
 </HEAD>
 <BODY BGCOLOR=#fefefe BACKGROUND=back.jpg>
 
-<H2>class  <A HREF="#DOC.DOCU">DjVuPort.h</A></H2>
+<H2> <A HREF="#DOC.DOCU">DjVuPort.h</A></H2>
 <BLOCKQUOTE>DjVu decoder communication mechanism. </BLOCKQUOTE>
 
 <HR>
@@ -13,15 +13,15 @@
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuPort"></A>
-<B>class  DjVuPortclass  DjVuPortcasterclass  DjVuFileclass  </B><A HREF=DjVuPort.html><B>DjVuPort</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.4.4.2">GPEnabled</A></B><DD><I>Base class for notification targets.</I>
+<B>class  DjVuPortclass  DjVuPortcasterclass  </B><A HREF=DjVuPort.html><B>DjVuPort</B></A><B>: public <!1><A HREF="GPEnabled.html#DOC.1.5.4.1.2">GPEnabled</A></B><DD><I>Base class for notification targets.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuSimplePort"></A>
-<B>class  </B><A HREF=DjVuSimplePort.html><B>DjVuSimplePort</B></A><B>: public <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A></B><DD><I>Simple port.</I>
+<B>class  </B><A HREF=DjVuSimplePort.html><B>DjVuSimplePort</B></A><B>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></B><DD><I>Simple port.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuMemoryPort"></A>
-<B>class  </B><A HREF=DjVuMemoryPort.html><B>DjVuMemoryPort</B></A><B>: public <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.2">DjVuPort</A></B><DD><I>Memory based port.</I>
+<B>class  </B><A HREF=DjVuMemoryPort.html><B>DjVuMemoryPort</B></A><B>: public <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.2">DjVuPort</A></B><DD><I>Memory based port.</I>
 <DT>
 
 <IMG ALT="o" BORDER=0 SRC=icon1.gif><A NAME="DjVuPortcaster"></A>
@@ -47,7 +47,7 @@ many different classes.  Maintaining multi-thread safe callback lists is
 very difficult.<P>Finally, we want to provide some default implementation of these
 "callbacks" in the library, which should attempt to process the requests
 themselves if they can, and contact the client only if they're unable to
-do it (like in the case of <!1><A HREF="DjVuPort.html#DOC.1.4.28.1.5.3">request_data</A>() with local URL
+do it (like in the case of <!1><A HREF="DjVuPort.html#DOC.1.5.27.1.5.3">request_data</A>() with local URL
 where <!1><A HREF="DjVuDocument.html">DjVuDocument</A> can get the data from the hard drive itself not
 disturbing the document's creator.<P>Two classes implement a general communication mechanism: <!1><A HREF="DjVuPort.html">DjVuPort</A> and
 <!1><A HREF="DjVuPortcaster.html">DjVuPortcaster</A>. Any sender and recipient of requests should be a
@@ -61,12 +61,12 @@ performed from a single place and are serialized by a global monitor.<P></BLOCKQ
 <DL><DT><DT><B>Author:</B><DD>Andrei Erofeev &lt;eaf@geocities.com&gt;<BR>
 L&eacute;on Bottou &lt;leonb@research.att.com&gt;
 
-<DT><B>Version:</B><DD><TT>$Id: DjVuPort.h.html,v 1.13 2001-08-08 18:17:07 docbill Exp $</TT> 
+<DT><B>Version:</B><DD><TT>$Id: DjVuPort.h.html,v 1.6 2001-08-08 18:01:31 docbill Exp $</TT> 
 <DD></DL><P><I><A HREF="index.html">Alphabetic index</A></I> <I><A HREF="HIER.html">Hierarchy of classes</A></I></P><HR>
 <!-- This is were the DOC++ footer is defined  -->
 
 <font face="arial,helvetica" size="2">
-<a href=http://www.lizardtech.com>DjVu</a> is a trademark of LizardTech, Inc.  
+<a href=http://www.djvu.att.com>DjVu</a> is a trademark of AT&amp;T.  
 <br>All other products mentioned are registered trademarks or trademarks of
 their respective companies.
 </font>
