@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.cpp,v 1.2 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVmDoc.cpp,v 1.3 1999-08-25 22:29:37 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -31,6 +31,16 @@ DjVmDoc::DjVmDoc(void)
 void
 DjVmDoc::insert_file(DjVmDir::File * f, const TArray<char> & d, int pos)
 {
+   GP<DataPool> pool=new DataPool();
+   pool->add_data((const char *) d, d.size());
+   pool->set_eof();
+
+   insert_file(f, new DataRange(pool), pos);
+}
+
+void
+DjVmDoc::insert_file(DjVmDir::File * f, GP<DataRange> data_range, int pos)
+{
    DEBUG_MSG("DjVmDoc::insert_file(): inserting file '" << f->id <<
 	     "' at pos " << pos << "\n");
    DEBUG_MAKE_INDENT(3);
@@ -38,12 +48,13 @@ DjVmDoc::insert_file(DjVmDir::File * f, const TArray<char> & d, int pos)
    if (!f) THROW("Can't insert ZERO file.");
    if (data.contains(f->id)) THROW("Attempt to insert the same file twice.");
 
-   if (d.size()>=4 && !memcmp(d, "AT&T", 4))
-   {
-      TArray<char> d1(d.size()-4);
-      memcpy(d1, (const char *) d+4, d1.size());
-      data[f->id]=d1;
-   } else data[f->id]=d;
+   char buffer[4];
+   if (data_range->get_data(buffer, 0, 4)==4 &&
+       !memcmp(buffer, "AT&T", 4))
+      data_range=new DataRange(data_range->get_pool(),
+			       data_range->get_start()+4,
+			       data_range->get_length()-4);
+   data[f->id]=data_range;
    dir->insert_file(f, pos);
 }
 
@@ -60,7 +71,7 @@ DjVmDoc::delete_file(const char * id)
    dir->delete_file(id);
 }
 
-TArray<char>
+GP<DataRange>
 DjVmDoc::get_data(const char * id)
 {
    GPosition pos;
@@ -105,7 +116,7 @@ DjVmDoc::write(ByteStream & str)
       if (!data.contains(file->id, data_pos))
 	 THROW("Strange: there is no data for file '"+file->id+"'\n");
       file->offset=offset;
-      file->size=data[data_pos].size();
+      file->size=data[data_pos]->get_length();
       offset+=file->size;
    }
 
@@ -120,84 +131,94 @@ DjVmDoc::write(ByteStream & str)
    for(pos=files_list;pos;++pos)
    {
       GP<DjVmDir::File> & file=files_list[pos];
-      TArray<char> & d=data[file->id];
       
-	 // First check that the file is in IFF format
+      ByteStream * str_in=0;
       TRY {
-	 MemoryByteStream str_in((const void*)(const char*)d, d.size()<32 ? d.size() : 32);
-	 IFFByteStream iff_in(str_in);
-	 int size;
-	 GString chkid;
-	 size=iff_in.get_chunk(chkid);
-	 if (size<0 || size>1024*1024)
-	    THROW("File '"+file->id+"' is not in IFF format.");
-      } CATCH(exc) {
-	 THROW("File '"+file->id+"' is not in IFF format.");
-      } ENDCATCH;
+	 str_in=data[file->id]->get_stream();
 
-	 // Now store file contents into the stream
-      if ((iff.tell() & 1)!=0) { char ch=0; iff.write(&ch, 1); }
-      iff.writall((const void*)(const char*)d, d.size());
+	    // First check that the file is in IFF format
+	 TRY {
+	    IFFByteStream iff_in(*str_in);
+	    int size;
+	    GString chkid;
+	    size=iff_in.get_chunk(chkid);
+	    if (size<0 || size>1024*1024)
+	       THROW("File '"+file->id+"' is not in IFF format.");
+	 } CATCH(exc) {
+	    THROW("File '"+file->id+"' is not in IFF format.");
+	 } ENDCATCH;
+
+	    // Now copy the file contents
+	 str_in->seek(0, SEEK_SET);
+	 if ((iff.tell() & 1)!=0) { char ch=0; iff.write(&ch, 1); }
+	 iff.copy(*str_in);
+      } CATCH(exc) {
+	 delete str_in; str_in=0;
+	 RETHROW;
+      } ENDCATCH;
+      delete str_in; str_in=0;
    }
 
    DEBUG_MSG("done storing DjVm file.\n");
 }
 
-static int
-sort_func(const void * ptr1, const void * ptr2)
+void
+DjVmDoc::read(const GP<DataPool> & pool)
 {
-   DjVmDir::File * file1=*(DjVmDir::File **) ptr1;
-   DjVmDir::File * file2=*(DjVmDir::File **) ptr2;
+   DEBUG_MSG("DjVmDoc::read(): reading the BUNDLED doc contents from the pool\n");
+   DEBUG_MAKE_INDENT(3);
+   
+   ByteStream * str=0;
+   TRY {
+      GP<DataRange> range=new DataRange(pool);
+      str=range->get_stream();
+   
+      IFFByteStream iff(*str);
+      GString chkid;
+      iff.get_chunk(chkid);
+      if (chkid!="FORM:DJVM")
+	 THROW("Can't find form DJVM in the input data.");
 
-   return file1->offset<file2->offset ? -1 :
-	  file1->offset>file2->offset ? 1 : 0;
+      iff.get_chunk(chkid);
+      if (chkid!="DIRM")
+	 THROW("The first chunk of a DJVM document must be DIRM: must be an old format.");
+      dir->decode(iff);
+      iff.close_chunk();
+
+      data.empty();
+
+      GPList<DjVmDir::File> files_list=dir->get_files_list();
+      if (files_list[files_list]->offset==0)
+	 THROW("Can't read indirect DjVm documents from DataPools or ByteStreams.");
+      
+      for(GPosition pos=files_list;pos;++pos)
+      {
+	 DjVmDir::File * f=files_list[pos];
+      
+	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
+	 data[f->id]=new DataRange(pool, f->offset, f->size);
+      }
+   } CATCH(exc) {
+      delete str; str=0;
+      RETHROW;
+   } ENDCATCH;
+   delete str; str=0;
 }
 
 void
-DjVmDoc::read(ByteStream & str)
+DjVmDoc::read(ByteStream & str_in)
 {
    DEBUG_MSG("DjVmDoc::read(): reading the BUNDLED doc contents from the stream\n");
    DEBUG_MAKE_INDENT(3);
 
-   IFFByteStream iff(str);
-   GString chkid;
-   iff.get_chunk(chkid);
-   if (chkid!="FORM:DJVM")
-      THROW("Can't find form DJVM in the input stream.");
+   GP<DataPool> pool=new DataPool();
+   char buffer[1024];
+   int length;
+   while((length=str_in.read(buffer, 1024)))
+      pool->add_data(buffer, length);
+   pool->set_eof();
 
-   iff.get_chunk(chkid);
-   if (chkid!="DIRM")
-      THROW("The first chunk of a DJVM document must be DIRM: must be an old format.");
-   dir->decode(iff);
-   iff.close_chunk();
-
-   data.empty();
-
-      // Now the challenge is to read all files not seeking backwards
-      // (because the ByteStream may not support it)
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   if (files_list[files_list]->offset==0)
-      THROW("Can't read indirect DjVm documents.");
-   
-   TArray<void *> files_arr(files_list.size()-1);
-   int file_num=0;
-   for(GPosition pos=files_list;pos;++pos)
-      files_arr[file_num++]=files_list[pos];
-   qsort(files_arr, files_arr.size(), sizeof(void *), sort_func);
-
-      // Now all files should be sorted based on their offsets in the document
-      // Read them
-   for(file_num=0;file_num<files_arr.size();file_num++)
-   {
-      DjVmDir::File * f=(DjVmDir::File *) files_arr[file_num];
-      
-      DEBUG_MSG("reading contents of file '" << f->id << "'\n");
-      
-      TArray<char> d(f->size-1);
-      iff.seek(f->offset, SEEK_SET);
-      iff.readall(d, d.size());
-      data[f->id]=d;
-   }
+   read(pool);
 }
 
 void
@@ -206,43 +227,55 @@ DjVmDoc::read(const char * name)
    DEBUG_MSG("DjVmDoc::read(): reading the doc contents from the HDD\n");
    DEBUG_MAKE_INDENT(3);
 
-   StdioByteStream str(name, "rb");
-   IFFByteStream iff(str);
-   GString chkid;
-   iff.get_chunk(chkid);
-   if (chkid!="FORM:DJVM")
-      THROW("Can't find form DJVM in the input stream.");
+   ByteStream * str=0;
+   TRY {
+      GP<DataPool> pool=new DataPool(name);
+      GP<DataRange> range=new DataRange(pool);
+      str=range->get_stream();
+      IFFByteStream iff(*str);
+      GString chkid;
+      iff.get_chunk(chkid);
+      if (chkid!="FORM:DJVM")
+	 THROW("Can't find form DJVM in the input stream.");
 
-   iff.get_chunk(chkid);
-   if (chkid!="DIRM")
-      THROW("The first chunk of a DJVM document must be DIRM: must be an old format.");
-   dir->decode(iff);
-   iff.close_chunk();
+      iff.get_chunk(chkid);
+      if (chkid!="DIRM")
+	 THROW("The first chunk of a DJVM document must be DIRM: must be an old format.");
+      dir->decode(iff);
+      iff.close_chunk();
 
-   GPList<DjVmDir::File> files_list=dir->get_files_list();
-   if (files_list[files_list]->offset!=0)
-   {
-      str.seek(0, SEEK_SET);
-      read(str);
-   } else
-   {
-      GString full_name=GOS::expand_name(name);
-      GString dir_name=GOS::basename(full_name);
-
-      data.empty();
-      
-      for(GPosition pos=files_list;pos;++pos)
+      GPList<DjVmDir::File> files_list=dir->get_files_list();
+      if (files_list[files_list]->offset!=0) read(pool);
+      else
       {
-	 DjVmDir::File * f=(DjVmDir::File *) files_list[pos];
+	 GString full_name=GOS::expand_name(name);
+	 GString dir_name=GOS::basename(full_name);
+
+	 data.empty();
       
-	 DEBUG_MSG("reading contents of file '" << f->id << "'\n");
+	 for(GPosition pos=files_list;pos;++pos)
+	 {
+	    DjVmDir::File * f=files_list[pos];
       
-	 TArray<char> d(f->size-1);
-	 StdioByteStream str(GOS::expand_name(f->name, dir_name), "rb");
-	 str.readall(d, d.size());
-	 data[f->id]=d;
+	    DEBUG_MSG("reading contents of file '" << f->id << "'\n");
+
+	       // We could have initialized DataPool() with the file_name,
+	       // but this would lead to too many open files
+	    GP<DataPool> pool=new DataPool();
+	    StdioByteStream str(GOS::expand_name(f->name, dir_name), "rb");
+	    char buffer[1024];
+	    int length;
+	    while((length=str.read(buffer, 1024)))
+	       pool->add_data(buffer, length);
+	    pool->set_eof();
+	    data[f->id]=new DataRange(pool);
+	 }
       }
-   }
+   } CATCH(exc) {
+      delete str; str=0;
+      RETHROW;
+   } ENDCATCH;
+   delete str; str=0;
 }
 
 void
@@ -265,11 +298,19 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
 
       GString file_name=GOS::expand_name(file->name, dir_name);
       DEBUG_MSG("storing file '" << file_name << "'\n");
-      
-      StdioByteStream str(file_name, "wb");
-      TArray<char> & d=data[data_pos];
-      str.writall("AT&T", 4);
-      str.writall((const void*)(const char*)d, d.size());
+
+      ByteStream * str_in=0;
+      TRY {
+	 str_in=data[data_pos]->get_stream();
+	 GOS::deletefile(file_name);
+	 StdioByteStream str_out(file_name, "wb");
+	 str_out.writall("AT&T", 4);
+	 str_out.copy(*str_in);
+      } CATCH(exc){
+	 delete str_in; str_in=0;
+	 RETHROW;
+      } ENDCATCH;
+      delete str_in; str_in=0;
    }
 
    GString idx_full_name=GOS::expand_name(idx_name, dir_name);
@@ -282,7 +323,8 @@ DjVmDoc::expand(const char * dir_name, const char * idx_name)
       file->offset=0;
       file->size=0;
    }
-   
+
+   GOS::deletefile(idx_full_name);
    StdioByteStream str(idx_full_name, "wb");
    IFFByteStream iff(str);
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDoc.h,v 1.2 1999-08-17 23:48:04 leonb Exp $
+//C- $Id: DjVmDoc.h,v 1.3 1999-08-25 22:29:37 eaf Exp $
  
 #ifndef _DJVMDOC_H
 #define _DJVMDOC_H
@@ -24,6 +24,7 @@
 #include "Arrays.h"
 #include "GString.h"
 #include "DjVmDir.h"
+#include "DataPool.h"
 
 /** @name DjVmDoc.h
     Files #"DjVmDoc.h"# and #"DjVmDoc.cpp"# contain implementation of the
@@ -31,7 +32,7 @@
 
     @memo DjVu multipage documents reader/writer.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDoc.h,v 1.2 1999-08-17 23:48:04 leonb Exp $#
+    @version #$Id: DjVmDoc.h,v 1.3 1999-08-25 22:29:37 eaf Exp $#
 */
 
 //@{
@@ -65,13 +66,25 @@ class DjVmDoc : public GPEnabled
 {
 private:
    GP<DjVmDir>			dir;
-   GMap<GString, TArray<char> >	data;
+   GMap<GString, GP<DataRange> >	data;
+
+      // Internal function.
+   
 public:
       /** Inserts a file described by \Ref{DjVmDir::File} structure with
 	  data #data# at position #pos#. If #pos# is negative, the file
           will be appended to the document. Otherwise it will be inserted
           at position #pos#. */
    void		insert_file(DjVmDir::File * f, const TArray<char> & data, int pos=-1);
+      /** Inserts a file described by \Ref{DjVmDir::File} structure with
+	  data #data# at position #pos#. If #pos# is negative, the file
+          will be appended to the document. Otherwise it will be inserted
+          at position #pos#.
+
+	  This is the same function as the previous one except for the
+	  way in which data is provided.
+      */
+   void		insert_file(DjVmDir::File * f, GP<DataRange> data, int pos=-1);
    
       /** Removes file with the specified #id# from the document. Every
 	  file inside a new DjVu multipage document has its unique ID
@@ -86,15 +99,22 @@ public:
       /** Returns contents of file with ID #id# from the document.
 	  Please refer to \Ref{DjVmDir} for the explanation of what
           IDs mean. */
-   TArray<char>	get_data(const char * id);
+   GP<DataRange>get_data(const char * id);
 
       /** Reading routines */
       //@{
       /** Reads contents of a {\em bundled} multipage DjVu document from
 	  the stream. */
    void		read(ByteStream & str);
+      /** Reads contents of a {\em bundled} multipage DjVu document from
+	  the \Ref{DataPool}. */
+   void		read(const GP<DataPool> & data_pool);
       /** Reads the DjVu multipage document in either {\em bundled} or
 	  {\em indirect} format.
+
+	  {\bf Note:} For {\em bundled} documents the file is not
+	  read into memory. We just open it and access data directly there.
+	  Thus you should not modify the file contents.
 
 	  @param name For {\em bundled} documents this is the name
 	         of the document. For {\em indirect} documents this is
