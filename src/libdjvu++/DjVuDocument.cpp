@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuDocument.cpp,v 1.52 1999-09-29 17:58:10 eaf Exp $
+//C- $Id: DjVuDocument.cpp,v 1.53 1999-09-29 18:06:58 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -777,11 +777,9 @@ DjVuDocument::request_data(const DjVuPort * source, const GURL & url)
    DEBUG_MSG("DjVuDocument::request_data(): seeing if we can do it\n");
    DEBUG_MAKE_INDENT(3);
 
-   if (source==this) return 0;
-
-   check();
-
    if (url==init_url) return init_data_pool;
+
+   check();	// Don't put it before 'init_data_pool'
 
    {
 	 // See if there is a file in the "UnnamedFiles" list.
