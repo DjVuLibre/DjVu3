@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.h,v 1.3 2001-08-02 23:54:05 bcr Exp $
+// $Id: qt_fix.h,v 1.4 2001-09-25 18:40:15 leonb Exp $
 // $Name:  $
 
 
@@ -76,15 +76,7 @@ public:
       // killWidget() kills the mentioned widget when QApplication is about
       // to block. It will not kill a widget if it has already been deleted
       // by someone.
-   void		killWidget(QWidget * widget)
-   {
-      if (widget)
-      {
-	 DEBUG_MSG("QeApplication::killWidgets(): scheduling " << widget << " for kill\n");
-	 widgetsToKill.append(widget);
-	 if (!kill_timer.isActive()) kill_timer.start(0, TRUE);
-      }
-   }
+   void		killWidget(QWidget * widget);
 
       // Resizes and moved widget in accordance with X11 geometry data.
    void		setWidgetGeometry(QWidget * w);
@@ -92,15 +84,10 @@ public:
 #ifdef UNIX
    bool		x11EventResult;
    virtual bool	x11EventFilter(XEvent * ev);
-   QeApplication(Display * displ) : QApplication(displ) { construct(); }
+   QeApplication(Display * displ);
 #endif
    
-   QeApplication(int & argc, char ** argv) :
-      QApplication(argc, argv)
-   {
-      construct();
-      gamma=2.2;
-   }
+   QeApplication(int & argc, char ** argv);
 };
 #endif
 
@@ -138,12 +125,7 @@ public:
    virtual void	resize(int w, int h);
    virtual void	setGeometry(int x, int y, int w, int h);
    virtual void	show(void);
-   virtual void	done(int rc)
-   {
-      if (rc==Accepted) emit sigClosed();
-      else emit sigCancelled();
-      QDialog::done(rc);
-   }
+   virtual void	done(int rc);
    
    QWidget	* startWidget(void) { return aux_widget ? aux_widget : this; }
 
@@ -164,26 +146,15 @@ class QeLabel : public QLabel
 {
    Q_OBJECT
 private:
-   inline void	setMinSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+   void	setMinSize(void);
    inline bool	isText(void) const { return !pixmap() && !movie(); }
    virtual void	resizeEvent(QResizeEvent * ev);
 public:
-   QeLabel(QWidget * parent=0, const char * name=0, WFlags f=0) :
-	 QLabel(parent, name, f) {}
-   QeLabel(const QString & text, QWidget * parent=0, const char * name=0, WFlags f=0) :
-	 QLabel(text, parent, name, f) {}
-   QeLabel(QWidget * buddy, const QString & text, QWidget * parent, const char * name=0, WFlags f=0) :
-	 QLabel(buddy, text, parent, name, f) {}
+   QeLabel(QWidget * parent=0, const char * name=0, WFlags f=0);
+   QeLabel(const QString & text, QWidget * parent=0, const char * name=0, WFlags f=0);
+   QeLabel(QWidget * buddy, const QString & text, QWidget * parent, const char * name=0, WFlags f=0);
 public slots:
-   virtual void	show(void)
-   {
-      if (!isText() || !(alignment() & WordBreak)) setMinSize();
-      QLabel::show();
-   }
+   virtual void	show(void);
 };
 #endif
 
@@ -196,32 +167,16 @@ class QePushButton : public QPushButton
 {
    Q_OBJECT
 private:
-   int		infl_w, infl_h;
-   inline void	setMinSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+   int infl_w, infl_h;
+   void setMinSize(void);
 public:
-   void		inflateWidth(int _infl_w) { infl_w=_infl_w; }
-   void		inflateHeight(int _infl_h) { infl_h=_infl_h; }
-   virtual QSize	sizeHint(void) const
-   {
-      QSize size=QPushButton::sizeHint();
-      return QSize(size.width()+2*infl_w, size.height()+2*infl_h);
-   }
-   QePushButton(QWidget * parent=0, const char * name=0) :
-	 QPushButton(parent, name), infl_w(0), infl_h(0)
-      { setAutoResize(TRUE); setMinSize(); }
-   QePushButton(const QString & text, QWidget * parent=0, const char * name=0) :
-	 QPushButton(text, parent, name), infl_w(0), infl_h(0)
-      { setAutoResize(TRUE); setMinSize(); }
+   void inflateWidth(int _infl_w) { infl_w=_infl_w; }
+   void inflateHeight(int _infl_h) { infl_h=_infl_h; }
+   virtual QSize sizeHint(void) const;
+   QePushButton(QWidget * parent=0, const char * name=0);
+   QePushButton(const QString & text, QWidget * parent=0, const char * name=0);
 public slots:
-   virtual void	show(void)
-   {
-      setMinSize();
-      QPushButton::show();
-   }
+   virtual void show(void);
 };
 #endif
 
@@ -234,22 +189,12 @@ class QeCheckBox : public QCheckBox
 {
    Q_OBJECT
 private:
-   inline void	setMinSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+   void	setMinSize(void);
 public:
-   QeCheckBox(QWidget * parent=0, const char * name=0) :
-	 QCheckBox(parent, name) { setMinSize(); }
-   QeCheckBox(const QString & text, QWidget * parent, const char * name=0) :
-	 QCheckBox(text, parent, name) { setMinSize(); }
+   QeCheckBox(QWidget * parent=0, const char * name=0);
+   QeCheckBox(const QString & text, QWidget * parent, const char * name=0);
 public slots:
-   virtual void	show(void)
-   {
-      setMinSize();
-      QCheckBox::show();
-   }
+   virtual void show(void);
 };
 #endif
 
@@ -262,22 +207,12 @@ class QeRadioButton : public QRadioButton
 {
    Q_OBJECT
 private:
-   void		setMinSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+   void	setMinSize(void);
 public:
-   QeRadioButton(QWidget * parent=0, const char * name=0) :
-	 QRadioButton(parent, name) { setMinSize(); }
-   QeRadioButton(const QString & text, QWidget * parent, const char * name=0) :
-	 QRadioButton(text, parent, name) { setMinSize(); }
+   QeRadioButton(QWidget * parent=0, const char * name=0);
+   QeRadioButton(const QString & text, QWidget * parent, const char * name=0);
 public slots:
-   virtual void	show(void)
-   {
-      setMinSize();
-      QRadioButton::show();
-   }
+   virtual void show(void);
 };
 #endif
 
@@ -290,21 +225,11 @@ class QeLineEdit : public QLineEdit
 {
    Q_OBJECT
 private:
-   inline void	setMinMaxSize(void)
-   {
-      setMinimumSize(sizeHint());
-      setMaximumHeight(sizeHint().height());
-      ActivateLayouts(this);
-   }
+   void	setMinMaxSize(void);
 public slots:
-   virtual void	show(void)
-   {
-      setMinMaxSize();
-      QLineEdit::show();
-   }
+   virtual void	show(void);
 public:
-   QeLineEdit(QWidget * parent=0, const char * name=0) :
-	 QLineEdit(parent, name) { setMinMaxSize(); }
+   QeLineEdit(QWidget * parent=0, const char * name=0);
 signals:
    void textChanged(const QString & text);
 };
@@ -319,25 +244,14 @@ class QeSlider : public QSlider
 {
    Q_OBJECT
 private:
-   inline void	setMinMaxSize(void)
-   {
-      setMinimumSize(sizeHint());
-      ActivateLayouts(this);
-   }
+   void	setMinMaxSize(void);
 public:
-   QeSlider(QWidget * parent=0, const char * name=0) :
-	 QSlider(parent, name) { setMinMaxSize(); }
-   QeSlider(Orientation ori, QWidget * parent=0, const char * name=0) :
-	 QSlider(ori, parent, name) { setMinMaxSize(); }
+   QeSlider(QWidget * parent=0, const char * name=0);
+   QeSlider(Orientation ori, QWidget * parent=0, const char * name=0);
    QeSlider(int min, int max, int step, int value,
-	    Orientation ori, QWidget * parent=0, const char * name=0) :
-	 QSlider(min, max, step, value, ori, parent, name) { setMinMaxSize(); }
+	    Orientation ori, QWidget * parent=0, const char * name=0);
 public slots:
-   virtual void	show(void)
-   {
-      setMinMaxSize();
-      QSlider::show();
-   }
+   virtual void	show(void);
 };
 #endif
 
@@ -351,33 +265,20 @@ class QeComboBox : public QComboBox
 {
    Q_OBJECT
 private:
-   inline void	setMinMaxSize(void)
-   {
-      setMinimumWidth(sizeHint().width());
-      setMinimumHeight(sizeHint().height());
-      setMaximumHeight(sizeHint().height());
-      ActivateLayouts(this);
-   }
+   void setMinMaxSize(void);
 public:
-   void		setCurrentItem(const QString & text);
-   void		setCurrentItem(int item_num)
-   { QComboBox::setCurrentItem(item_num); }
+   void	setCurrentItem(const QString & text);
+   void setCurrentItem(int item_num);
 
-   QeComboBox(QWidget * parent=0, const char * name=0) :
-   QComboBox(parent, name) { setMinMaxSize(); }
-   QeComboBox(bool rw, QWidget * parent=0, const char * name=0) :
-   QComboBox(rw, parent, name) { setMinMaxSize(); }
+   QeComboBox(QWidget * parent=0, const char * name=0);
+   QeComboBox(bool rw, QWidget * parent=0, const char * name=0);
 signals:
    void activated(const QString & text);
    void highlighted(const QString & text);
    void textChanged(const QString & text);
 
 public slots:
-   virtual void	show(void)
-   {
-      setMinMaxSize();
-      QComboBox::show();
-   }
+   virtual void	show(void);
 };
 #endif
 
@@ -390,27 +291,15 @@ class QeSpinBox : public QSpinBox
 {
    Q_OBJECT
 private:
-   inline void	setMinMaxSize(void)
-   {
-      setMinimumWidth(sizeHint().width());
-      setMinimumHeight(sizeHint().height());
-      setMaximumHeight(sizeHint().height());
-      ActivateLayouts(this);
-   }
+   void setMinMaxSize(void);
 protected:
    virtual bool	eventFilter(QObject *, QEvent *);
 public:
-   QeSpinBox(QWidget * parent=0, const char * name=0) :
-	 QSpinBox(parent, name) { setMinMaxSize(); }
+   QeSpinBox(QWidget * parent=0, const char * name=0);
    QeSpinBox(int min, int max, int step=-1,
-	     QWidget * parent=0, const char * name=0) :
-	 QSpinBox(min, max, step, parent, name) { setMinMaxSize(); }
+	     QWidget * parent=0, const char * name=0);
 public slots:
-   virtual void	show(void)
-   {
-      setMinMaxSize();
-      QSpinBox::show();
-   }
+   virtual void	show(void);
 };
 #endif
 
@@ -426,25 +315,12 @@ private:
    QString	prefix;
    int		prefix_changed;
 protected:
-   bool		setIndicator(QString & string, int progress, int totalSteps)
-   {
-      bool rc=QProgressBar::setIndicator(string, progress, totalSteps) ||
-	      prefix_changed;
-      if (prefix.length()) string=prefix+string;
-      prefix_changed=0;
-      return rc;
-   }
+   bool		setIndicator(QString & string, int progress, int totalSteps);
 public:
-   void		setPrefix(const QString & _prefix)
-   {
-      prefix_changed=(prefix!=_prefix);
-      prefix=_prefix;
-   }
+   void		setPrefix(const QString & _prefix);
    
-   QeProgressBar(QWidget * parent=0, const char * name=0) :
-	 QProgressBar(parent, name), prefix_changed(0) {}
-   QeProgressBar(int totalSteps, QWidget * parent=0, const char * name=0) :
-	 QProgressBar(totalSteps, parent, name), prefix_changed(0) {}
+   QeProgressBar(QWidget * parent=0, const char * name=0);
+   QeProgressBar(int totalSteps, QWidget * parent=0, const char * name=0);
 };
 #endif
 
@@ -457,17 +333,10 @@ class QeGroupBox : public QGroupBox
 {
    Q_OBJECT
 private:
-   void		init(void)
-   {
-      QFont fnt=font();
-      fnt.setBold(TRUE);
-      setFont(fnt);
-   }
+   void	init(void);
 public:
-   QeGroupBox(QWidget * parent=0, const char * name=0) :
-	 QGroupBox(parent, name) { init(); }
-   QeGroupBox(const QString & title, QWidget * parent=0, const char * name=0) :
-	 QGroupBox(title, parent, name) { init(); }
+   QeGroupBox(QWidget * parent=0, const char * name=0);
+   QeGroupBox(const QString & title, QWidget * parent=0, const char * name=0);
 };
 #endif
 
@@ -480,17 +349,10 @@ class QeButtonGroup : public QButtonGroup
 {
    Q_OBJECT
 private:
-   void		init(void)
-   {
-      QFont fnt=font();
-      fnt.setBold(TRUE);
-      setFont(fnt);
-   }
+   void	init(void);
 public:
-   QeButtonGroup(QWidget * parent=0, const char * name=0) :
-	 QButtonGroup(parent, name) { init(); }
-   QeButtonGroup(const QString & title, QWidget * parent=0, const char * name=0) :
-	 QButtonGroup(title, parent, name) { init(); }
+   QeButtonGroup(QWidget * parent=0, const char * name=0);
+   QeButtonGroup(const QString & title, QWidget * parent=0, const char * name=0);
 };
 #endif
 
@@ -503,11 +365,7 @@ class QeMenuBar : public QMenuBar
 {
    Q_OBJECT
 public:
-   QeMenuBar(QWidget * parent=0, const char * name=0) :
-	 QMenuBar(parent, name)
-   {
-      setSeparator(InWindowsStyle);
-   }
+   QeMenuBar(QWidget * parent=0, const char * name=0);
 };
 #endif
 
@@ -528,11 +386,7 @@ public:
    static QString	lastSaveDir;
    static QString	lastLoadDir;
    
-   void		setForWriting(bool fwr)
-   {
-      forWriting=fwr;
-      setMode(fwr ? QFileDialog::AnyFile : QFileDialog::ExistingFile);
-   }
+   void	setForWriting(bool fwr);
    
    QeFileDialog(const QString & dirName, const char * filter=0,
 		QWidget * parent=0, const char * name=0, bool modal=FALSE);

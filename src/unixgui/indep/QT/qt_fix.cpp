@@ -32,7 +32,7 @@
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 //C-
 // 
-// $Id: qt_fix.cpp,v 1.2 2001-07-25 17:10:42 mchen Exp $
+// $Id: qt_fix.cpp,v 1.3 2001-09-25 18:40:15 leonb Exp $
 // $Name:  $
 
 
@@ -43,10 +43,6 @@
 #include "debug.h"
 #include "exc_msg.h"
 
-#define QT_FIX_DO_ALL
-#include "qt_fix.h"
-#include "qlib.h"
-
 #include <qobject.h>
 #include <qobjectlist.h>
 #include <qlayout.h>
@@ -55,6 +51,15 @@
 #include <qwidgetlist.h>
 #include <qpainter.h>
 #include <qkeycode.h>
+#include <qapplication.h>
+#include <qlist.h>
+#include <qtimer.h>
+#include <qwidget.h>
+
+#define QT_FIX_DO_ALL
+#include "qt_fix.h"
+#include "qlib.h"
+
 
 #ifdef UNIX
 #include <sys/stat.h>
@@ -63,14 +68,17 @@
 #include <errno.h>
 #endif
 
+#ifdef UNIX
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#endif
+
 #ifndef QT1
 #include <q1xcompatibility.h>
 #endif
 
 QeApplication * qeApp;
-
-QString	QeFileDialog::lastSaveDir;
-QString QeFileDialog::lastLoadDir;
 
 void
 ActivateLayouts(QWidget * start)
@@ -128,6 +136,8 @@ ActivateLayouts(QWidget * start)
       }
    }
 }
+
+// QEAPPLICATION ----------------------------------------
 
 void
 QeApplication::killTimeout(void)
@@ -229,9 +239,16 @@ QeApplication::slotKillSender(void)
       killWidget((QWidget *) obj);
 }
 
-#ifdef UNIX
-#include <X11/Xlib.h>
-#endif
+void
+QeApplication::killWidget(QWidget * widget)
+{
+  if (widget)
+    {
+      DEBUG_MSG("QeApplication::killWidgets(): scheduling " << widget << " for kill\n");
+      widgetsToKill.append(widget);
+      if (!kill_timer.isActive()) kill_timer.start(0, TRUE);
+    }
+}
 
 bool
 QeApplication::x11EventFilter(XEvent * ev)
@@ -246,6 +263,49 @@ QeApplication::x11EventFilter(XEvent * ev)
    return x11EventResult;
 #endif
 }
+
+QeApplication::QeApplication(Display * displ) 
+  : QApplication(displ) 
+{ 
+  construct(); 
+}
+
+void
+QeApplication::setWidgetGeometry(QWidget * widget)
+{
+   if (widget && geometry.length())
+   {
+      int x, y;
+      int w, h;
+      int m=XParseGeometry(geometry, &x, &y, (u_int *) &w, (u_int *) &h);
+      QSize minSize=widget->minimumSize();
+      QSize maxSize=widget->maximumSize();
+      if ((m & XValue)==0) x=widget->geometry().x();
+      if ((m & YValue)==0) y=widget->geometry().y();
+      if ((m & WidthValue)==0) w=widget->width();
+      if ((m & HeightValue)==0) h=widget->height();
+      w=QMIN(w, maxSize.width());
+      h=QMIN(h, maxSize.height());
+      w=QMAX(w, minSize.width());
+      h=QMAX(h, minSize.height());
+      if ((m & XNegative)) x=desktop()->width()+x-w;
+	    
+      if ((m & YNegative)) y=desktop()->height()+y-h;
+      widget->setGeometry(x, y, w, h);
+   }
+}
+
+QeApplication::QeApplication(int & argc, char ** argv) :
+  QApplication(argc, argv)
+{
+  construct();
+  gamma=2.2;
+}
+
+// QEFILEDIALOG ----------------------------------------
+
+QString	QeFileDialog::lastSaveDir;
+QString QeFileDialog::lastLoadDir;
 
 void
 QeFileDialog::done(int rc)
@@ -319,6 +379,14 @@ QeFileDialog::done(int rc)
    QFileDialog::done(rc);
 }
 
+void	
+QeFileDialog::setForWriting(bool fwr)
+{
+  forWriting=fwr;
+  setMode(fwr ? QFileDialog::AnyFile : QFileDialog::ExistingFile);
+}
+
+
 QeFileDialog::QeFileDialog(const QString & dirName, const char * filter,
 			   QWidget * parent, const char * name, bool modal) :
       QFileDialog(".", filter, parent, name, modal), forWriting(false)
@@ -336,6 +404,16 @@ QeFileDialog::QeFileDialog(QWidget * parent, const char * name, bool modal) :
    setForWriting(true);
    if (modal) QeDialog::makeTransient(this, parent);
    setDir(lastSaveDir);
+}
+
+
+// QELABEL ----------------------------------------
+
+void
+QeLabel::setMinSize(void)
+{
+  setMinimumSize(sizeHint());
+  ActivateLayouts(this);
 }
 
 void
@@ -365,6 +443,216 @@ QeLabel::resizeEvent(QResizeEvent * ev)
    }
 }
 
+QeLabel::QeLabel(QWidget * parent=0, const char * name=0, WFlags f=0) 
+  : QLabel(parent, name, f) 
+{
+}
+
+QeLabel::QeLabel(const QString & text, QWidget * parent=0, const char * name=0, WFlags f=0) 
+  : QLabel(text, parent, name, f) 
+{
+}
+
+QeLabel::QeLabel(QWidget * buddy, const QString & text, 
+        QWidget * parent, const char * name=0, WFlags f=0) 
+  : QLabel(buddy, text, parent, name, f) 
+{
+}
+
+void
+QeLabel::show(void)   
+{
+  if (!isText() || !(alignment() & WordBreak)) setMinSize();
+  QLabel::show();
+}
+
+
+
+// QEPUSHBUTTON ----------------------------------------
+
+void
+QePushButton::setMinSize(void)
+{
+  setMinimumSize(sizeHint());
+  ActivateLayouts(this);
+}
+
+QSize
+QePushButton::sizeHint(void) const
+{
+  QSize size=QPushButton::sizeHint();
+  return QSize(size.width()+2*infl_w, size.height()+2*infl_h);
+}
+
+QePushButton::QePushButton(QWidget * parent=0, const char * name=0) 
+  : QPushButton(parent, name), infl_w(0), infl_h(0)
+{ 
+  setAutoResize(TRUE); 
+  setMinSize(); 
+}
+
+QePushButton::QePushButton(const QString & text, QWidget * parent=0, const char * name=0) 
+  : QPushButton(text, parent, name), infl_w(0), infl_h(0)
+{ 
+  setAutoResize(TRUE); 
+  setMinSize(); 
+}
+
+void
+QePushButton::show(void)
+{
+  setMinSize();
+  QPushButton::show();
+}
+
+// QECHECKBOX ----------------------------------------
+
+void 
+QeCheckBox::setMinSize(void)
+{
+  setMinimumSize(sizeHint());
+  ActivateLayouts(this);
+}
+
+QeCheckBox::QeCheckBox(QWidget * parent=0, const char * name=0) 
+  : QCheckBox(parent, name) 
+{
+  setMinSize(); 
+}
+
+QeCheckBox::QeCheckBox(const QString & text, QWidget * parent, const char * name=0) 
+  : QCheckBox(text, parent, name) 
+{ 
+  setMinSize(); 
+}
+
+void 
+QeCheckBox::show(void)
+{
+  setMinSize();
+  QCheckBox::show();
+}
+
+// QERADIOBUTTON ----------------------------------------
+
+void
+QeRadioButton::setMinSize(void)
+   {
+      setMinimumSize(sizeHint());
+      ActivateLayouts(this);
+   }
+
+QeRadioButton::QeRadioButton(QWidget * parent=0, const char * name=0) 
+  : QRadioButton(parent, name) 
+{ 
+  setMinSize(); 
+}
+
+QeRadioButton::QeRadioButton(const QString & text, QWidget * parent, const char * name=0) 
+  : QRadioButton(text, parent, name) 
+{ 
+  setMinSize(); 
+}
+
+void
+QeRadioButton::show(void)
+{
+  setMinSize();
+  QRadioButton::show();
+}
+
+
+// QESLIDER ----------------------------------------
+
+void
+QeSlider::setMinMaxSize(void)
+{
+  setMinimumSize(sizeHint());
+  ActivateLayouts(this);
+}
+
+QeSlider::QeSlider(QWidget * parent=0, const char * name=0) 
+  : QSlider(parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+QeSlider::QeSlider(Orientation ori, QWidget * parent=0, const char * name=0) 
+  : QSlider(ori, parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+QeSlider::QeSlider(int min, int max, int step, int value,
+                   Orientation ori, QWidget * parent=0, const char * name=0) 
+  : QSlider(min, max, step, value, ori, parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+void
+QeSlider::show(void)
+{
+  setMinMaxSize();
+  QSlider::show();
+}
+
+
+// QELINEEDIT ----------------------------------------
+
+void	
+QeLineEdit::setMinMaxSize(void)
+{
+  setMinimumSize(sizeHint());
+  setMaximumHeight(sizeHint().height());
+  ActivateLayouts(this);
+}
+
+void
+QeLineEdit::show(void)
+{
+  setMinMaxSize();
+  QLineEdit::show();
+}
+
+QeLineEdit::QeLineEdit(QWidget * parent=0, const char * name=0) 
+  : QLineEdit(parent, name) 
+{
+  setMinMaxSize(); 
+}
+
+
+// QESPINBOX ----------------------------------------
+
+void 
+QeSpinBox::setMinMaxSize(void)
+{
+  setMinimumWidth(sizeHint().width());
+  setMinimumHeight(sizeHint().height());
+  setMaximumHeight(sizeHint().height());
+  ActivateLayouts(this);
+}
+
+QeSpinBox::QeSpinBox(QWidget * parent=0, const char * name=0)
+  : QSpinBox(parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+QeSpinBox::QeSpinBox(int min, int max, int step=-1,
+                     QWidget * parent=0, const char * name=0)
+  : QSpinBox(min, max, step, parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+void
+QeSpinBox::show(void)
+{
+  setMinMaxSize();
+  QSpinBox::show();
+}
+
 bool
 QeSpinBox::eventFilter(QObject * obj, QEvent * ev)
 {
@@ -389,9 +677,96 @@ QeSpinBox::eventFilter(QObject * obj, QEvent * ev)
    return QSpinBox::eventFilter(obj, ev);
 }
 
+// QEPROGRESSBAR ----------------------------------------
+
+bool
+QeProgressBar::setIndicator(QString & string, int progress, int totalSteps)
+{
+  bool rc=QProgressBar::setIndicator(string, progress, totalSteps) ||
+    prefix_changed;
+  if (prefix.length()) string=prefix+string;
+  prefix_changed=0;
+  return rc;
+}
+
+void
+QeProgressBar::setPrefix(const QString & _prefix)
+{
+  prefix_changed=(prefix!=_prefix);
+  prefix=_prefix;
+}
+
+QeProgressBar::QeProgressBar(QWidget * parent=0, const char * name=0) 
+  : QProgressBar(parent, name), prefix_changed(0) 
+{
+}
+
+QeProgressBar::QeProgressBar(int totalSteps, QWidget * parent=0, const char * name=0) 
+  : QProgressBar(totalSteps, parent, name), prefix_changed(0) 
+{
+}
+
+// QEGROUPBOX ----------------------------------------
+
+void	
+QeGroupBox::init(void)
+{
+  QFont fnt=font();
+  fnt.setBold(TRUE);
+  setFont(fnt);
+}
+
+QeGroupBox::QeGroupBox(QWidget * parent=0, const char * name=0) 
+  : QGroupBox(parent, name) 
+{ 
+  init(); 
+}
+
+QeGroupBox::QeGroupBox(const QString & title, QWidget * parent=0, const char * name=0) 
+  : QGroupBox(title, parent, name) 
+{ 
+  init(); 
+}
+
+
+// QEBUTTONGROUP ----------------------------------------
+
+void
+QeButtonGroup::init(void)
+{
+  QFont fnt=font();
+  fnt.setBold(TRUE);
+  setFont(fnt);
+}
+
+QeButtonGroup::QeButtonGroup(QWidget * parent=0, const char * name=0) 
+  : QButtonGroup(parent, name) 
+{ 
+  init(); 
+}
+
+QeButtonGroup::QeButtonGroup(const QString & title, QWidget * parent=0, const char * name=0) 
+  : QButtonGroup(title, parent, name) 
+{
+  init(); 
+}
+
+
+// QEMENUBAR ----------------------------------------
+
+QeMenuBar::QeMenuBar(QWidget * parent=0, const char * name=0)
+  : QMenuBar(parent, name)
+{
+  setSeparator(InWindowsStyle);
+}
+
+
+
+// QEDIALOG ----------------------------------------
+
 bool
 QeDialog::event(QEvent * ev)
-	 // Useful only when there is an aux_widget
+  // Useful only when there is an aux_widget
 {
    if (aux_widget)
    {
@@ -549,6 +924,14 @@ QeDialog::show(void)
       // only via a posted (delayed) event.
    resize(width(), height());
    QDialog::show();
+}
+
+void
+QeDialog::done(int rc)
+{
+  if (rc==Accepted) emit sigClosed();
+  else emit sigCancelled();
+  QDialog::done(rc);
 }
 
 void
@@ -769,29 +1152,15 @@ QeDialog::setResizeDecorations(bool enabled)
    }
 }
 
+// QECOMBOBOX ----------------------------------------
+
 void
-QeApplication::setWidgetGeometry(QWidget * widget)
+QeComboBox::setMinMaxSize(void)
 {
-   if (widget && geometry.length())
-   {
-      int x, y;
-      int w, h;
-      int m=XParseGeometry(geometry, &x, &y, (u_int *) &w, (u_int *) &h);
-      QSize minSize=widget->minimumSize();
-      QSize maxSize=widget->maximumSize();
-      if ((m & XValue)==0) x=widget->geometry().x();
-      if ((m & YValue)==0) y=widget->geometry().y();
-      if ((m & WidthValue)==0) w=widget->width();
-      if ((m & HeightValue)==0) h=widget->height();
-      w=QMIN(w, maxSize.width());
-      h=QMIN(h, maxSize.height());
-      w=QMAX(w, minSize.width());
-      h=QMAX(h, minSize.height());
-      if ((m & XNegative)) x=desktop()->width()+x-w;
-	    
-      if ((m & YNegative)) y=desktop()->height()+y-h;
-      widget->setGeometry(x, y, w, h);
-   }
+  setMinimumWidth(sizeHint().width());
+  setMinimumHeight(sizeHint().height());
+  setMaximumHeight(sizeHint().height());
+  ActivateLayouts(this);
 }
 
 void
@@ -799,10 +1168,34 @@ QeComboBox::setCurrentItem(const QString & qtext)
 {
    const char * const txt=qtext;
    for(int i=count()-1;i>=0;i--)
-      if (!strcmp(text(i), txt))
-      {
-	 setCurrentItem(i);
-	 break;
-      }
+     if (!strcmp(text(i), txt))
+       {
+        setCurrentItem(i);
+        break;
+       }
 }
 
+void
+QeComboBox::setCurrentItem(int item_num)
+{ 
+  QComboBox::setCurrentItem(item_num); 
+}
+
+QeComboBox::QeComboBox(QWidget * parent=0, const char * name=0)
+  : QComboBox(parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+QeComboBox::QeComboBox(bool rw, QWidget * parent=0, const char * name=0) 
+  : QComboBox(rw, parent, name) 
+{ 
+  setMinMaxSize(); 
+}
+
+void
+QeComboBox::show(void)
+{
+  setMinMaxSize();
+  QComboBox::show();
+}
