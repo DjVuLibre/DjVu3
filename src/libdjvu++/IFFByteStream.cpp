@@ -7,9 +7,9 @@
 //C-  The copyright notice above does not evidence any
 //C-  actual or intended publication of such source code.
 //C-
-//C-  $Id: IFFByteStream.cpp,v 1.5 1999-02-01 18:32:33 leonb Exp $
+//C-  $Id: IFFByteStream.cpp,v 1.6 1999-02-22 21:54:53 leonb Exp $
 
-// File "$Id: IFFByteStream.cpp,v 1.5 1999-02-01 18:32:33 leonb Exp $"
+// File "$Id: IFFByteStream.cpp,v 1.6 1999-02-22 21:54:53 leonb Exp $"
 // -- Implementation of IFFByteStream
 // - Author: Leon Bottou, 06/1998
 
@@ -147,7 +147,8 @@ IFFByteStream::get_chunk(GString &chkid, int *rawoffsetptr, int *rawsizeptr)
       return 0;
     if (bytes != 4)
       THROW("EOF");
-  } while (! memcmp((void*)buffer, (void*)"AT&T", 4));
+  } while (buffer[0]==0x41 && buffer[1]==0x54 && 
+           buffer[2]==0x26 && buffer[3]==0x54  );
   
   // Read chunk size
   if (ctx && offset+4 > ctx->offEnd)
