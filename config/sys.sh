@@ -17,8 +17,9 @@ if [ -z "$SYS_SET" ] ; then
   DEFS="-DUNIX"
   INCS=" "
   JOBJ=" "
-  WLWHOLEARCHIVE="-Wl,--whole-archive"
-  WLNOWHOLEARCHIVE="-Wl,--no-whole-archive"
+  WHOLEARCHIVESEP=" "
+  WHOLEARCHIVE="-Wl,--whole-archive"
+  NOWHOLEARCHIVE="-Wl,--no-whole-archive"
   if [ "$SYS" = "Linux" ] ; then
     if [ -r /lib/libc.so.6 ] ; then
       SYS=linux-libc6
@@ -29,6 +30,7 @@ if [ -z "$SYS_SET" ] ; then
     fi
   elif [ "$SYS" = "SunOS" ] ; then
     s=`"${uname}" -r|"${sed}" 's,\(5.[4-9]\)[.0-9]*,SOLARIS,'`
+    WHOLEARCHIVESEP=","
     if [ "x$s" = xSOLARIS ] ; then
       SYS=Solaris
       if [ x$PROC = xi386 ]
@@ -41,11 +43,11 @@ if [ -z "$SYS_SET" ] ; then
       fi
     fi
   elif [ "$SYS" = "IRIX64" ] ; then
-    WLWHOLEARCHIVE="-Wl,-all"
-    WLNOWHOLEARCHIVE="-Wl,-notall"
+    WHOLEARCHIVE="-Wl,-all"
+    NOWHOLEARCHIVE="-Wl,-notall"
   fi
   SYS_SET=true
   echo "$SYS"
-  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WLWHOLEARCHIVE WLNOWHOLEARCHIVE $CONFIG_VARS`
+  CONFIG_VARS=`echo SYS SYS_SET DEFS INCS JOBJ WHOLEARCHIVE WHOLEARCHIVESEP NOWHOLEARCHIVE $CONFIG_VARS`
 fi
 
