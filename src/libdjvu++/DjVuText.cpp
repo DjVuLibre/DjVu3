@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuText.cpp,v 1.27 2001-07-06 16:15:57 bcr Exp $
+// $Id: DjVuText.cpp,v 1.28 2001-07-06 18:35:10 mchen Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -449,16 +449,16 @@ DjVuTXT::Zone::get_smallest(
   }else if(zone_parent && zone_parent->ztype >= PARAGRAPH)
   {
     const GRect &xrect=zone_parent->rect;
-    if(xrect.height() <= xrect.width())
+    if(xrect.height() < xrect.width())
     {
-      list.append(GRect(rect.xmin-padding,xrect.ymin-padding,rect.xmax+padding,xrect.ymax+padding));
+      list.append(GRect(rect.xmin-padding,xrect.ymin-padding,rect.width()+2*padding,xrect.height()+2*padding));
     }else
     {
-      list.append(GRect(xrect.xmin-padding,rect.ymin-padding,xrect.xmax+padding,rect.ymax+padding));
+      list.append(GRect(xrect.xmin-padding,rect.ymin-padding,xrect.width()+2*padding,rect.height()+2*padding));
     }
   }else
   {
-    list.append(GRect(rect.xmin-padding,rect.ymin-padding,rect.xmax+padding,rect.ymax+padding));
+    list.append(GRect(rect.xmin-padding,rect.ymin-padding,rect.width()+2*padding,rect.height()+2*padding));
   }
 }
 
