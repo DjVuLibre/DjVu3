@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.100 1999-12-19 07:36:47 bcr Exp $
+//C- $Id: DjVuFile.cpp,v 1.101 1999-12-22 20:59:29 eaf Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1314,7 +1314,9 @@ DjVuFile::static_trigger_cb(void * cl_data)
 {
    DjVuFile * th=(DjVuFile *) cl_data;
    TRY {
-      th->trigger_cb();
+      GP<DjVuPort> port=DjVuPort::get_portcaster()->is_port_alive(th);
+      if (port && port->inherits("DjVuFile"))
+	 ((DjVuFile *) (DjVuPort *) port)->trigger_cb();
    } CATCH(exc) {
       TRY {
 	 get_portcaster()->notify_error(th, exc.get_cause());
