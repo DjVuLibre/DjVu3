@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuText.cpp,v 1.3 1999-09-02 19:21:58 leonb Exp $
+//C- $Id: DjVuText.cpp,v 1.4 1999-09-28 19:56:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -99,7 +99,7 @@ DjVuText::Zone::normtext(const char *instr, GString &outstr)
     }
 }
 
-
+#ifndef NEED_DECODER_ONLY
 void 
 DjVuText::Zone::encode(ByteStream &bs) const
 {
@@ -119,7 +119,7 @@ DjVuText::Zone::encode(ByteStream &bs) const
   for (GPosition i=children; i; ++i)
     children[i].encode(bs);
 }
-
+#endif
 
 void 
 DjVuText::Zone::decode(ByteStream &bs, int maxtext)
@@ -174,6 +174,7 @@ DjVuText::has_valid_zones() const
 }
 
 
+#ifndef NEED_DECODER_ONLY
 void 
 DjVuText::encode_zones(ByteStream &bs) const
 {
@@ -183,6 +184,7 @@ DjVuText::encode_zones(ByteStream &bs) const
   // Encode zones
   main.encode(bsb);
 }
+#endif
 
 
 
@@ -202,6 +204,7 @@ DjVuText::decode_zones(ByteStream &bs)
 
 
 
+#ifndef NEED_DECODER_ONLY
 void 
 DjVuText::encode_text(ByteStream &bs) const
 {
@@ -212,6 +215,7 @@ DjVuText::encode_text(ByteStream &bs) const
   BSByteStream bsb(bs, blocksize);
   bsb.writall( (void*)(const char*)textUTF8, textsize );
 }
+#endif
 
 
 

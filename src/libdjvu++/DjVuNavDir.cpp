@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.cpp,v 1.5 1999-08-04 21:37:31 leonb Exp $
+//C- $Id: DjVuNavDir.cpp,v 1.6 1999-09-28 19:56:18 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -73,6 +73,7 @@ DjVuNavDir::decode(ByteStream & str)
    };
 }
 
+#ifndef NEED_DECODER_ONLY
 void
 DjVuNavDir::encode(ByteStream & str)
 {
@@ -85,6 +86,7 @@ DjVuNavDir::encode(ByteStream & str)
       str.writall("\n", 1);
    };
 }
+#endif NEED_DECODER_ONLY
 
 int
 DjVuNavDir::get_pages_num(void) const
@@ -147,6 +149,7 @@ DjVuNavDir::insert_page(int where, const char * name)
    url2page[baseURL+name]=where;
 }
 
+#ifndef NEED_DECODER_ONLY
 void
 DjVuNavDir::delete_page(int page_num)
 {
@@ -161,3 +164,5 @@ DjVuNavDir::delete_page(int page_num)
       page2name[i]=page2name[i+1];
    page2name.resize(--pages-1);
 }
+#endif
+

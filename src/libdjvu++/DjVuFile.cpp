@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuFile.cpp,v 1.65 1999-09-28 17:33:50 leonb Exp $
+//C- $Id: DjVuFile.cpp,v 1.66 1999-09-28 19:56:18 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -1284,9 +1284,11 @@ DjVuFile::add_djvu_data(IFFByteStream & ostr, GMap<GURL, void *> & map,
 	 ostr.close_chunk();
       } else if (chkid=="NDIR" && dir && !no_ndir)
       {
+#ifndef NEED_DECODER_ONLY   // Decoder should never generate old NDIR chunks
 	 ostr.put_chunk(chkid);
 	 dir->encode(ostr);
 	 ostr.close_chunk();
+#endif
       } else if (!no_ndir || chkid!="NDIR")
       {
 	 ostr.put_chunk(chkid);
@@ -1335,6 +1337,7 @@ DjVuFile::get_djvu_data(bool included_too, bool no_ndir)
 //******************************* Modifying **********************************
 //****************************************************************************
 
+#ifndef NEED_DECODER_ONLY
 void
 DjVuFile::insert_file(const char * id, int chunk_num)
 {
@@ -1386,7 +1389,9 @@ DjVuFile::insert_file(const char * id, int chunk_num)
 
    flags|=MODIFIED;
 }
+#endif
 
+#ifndef NEED_DECODER_ONLY
 void
 DjVuFile::unlink_file(const char * id)
 {
@@ -1456,3 +1461,4 @@ DjVuFile::unlink_file(const char * id)
 
    flags|=MODIFIED;
 }
+#endif

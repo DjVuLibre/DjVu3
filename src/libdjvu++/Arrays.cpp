@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: Arrays.cpp,v 1.5 1999-08-18 20:47:40 leonb Exp $
+//C- $Id: Arrays.cpp,v 1.6 1999-09-28 19:56:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -189,3 +189,28 @@ ArrayRep::ins(int n, const void * what, unsigned int howmany)
    insert(data, hibound+1-minlo, n-minlo, what, howmany);
    hibound=nhi;
 }
+
+
+
+
+// ---------------------------------------
+// BEGIN HACK
+// ---------------------------------------
+// Included here to avoid dependency
+// from ByteStream.o to Arrays.o
+
+#ifndef DO_NOT_MOVE_GET_DATA_TO_ARRAYS_CPP
+#include "ByteStream.h"
+TArray<char>
+MemoryByteStream::get_data(void)
+{
+   TArray<char> data(0, size()-1);
+   readat((char*)data, size(), 0);
+   return data;
+}
+#endif
+
+// ---------------------------------------
+// END HACK
+// ---------------------------------------
+

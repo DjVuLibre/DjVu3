@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: ByteStream.cpp,v 1.15 1999-09-28 17:33:50 leonb Exp $
+//C- $Id: ByteStream.cpp,v 1.16 1999-09-28 19:56:18 leonb Exp $
 
-// File "$Id: ByteStream.cpp,v 1.15 1999-09-28 17:33:50 leonb Exp $"
+// File "$Id: ByteStream.cpp,v 1.16 1999-09-28 19:56:18 leonb Exp $"
 // - Author: Leon Bottou, 04/1997
 
 #ifdef __GNUC__
@@ -467,6 +467,14 @@ MemoryByteStream::seek(long offset, int whence, bool nothrow)
   return 0;
 }
 
+
+
+
+
+/** This function has been moved into Arrays.cpp
+    In order to avoid dependencies from ByteStream.o
+    to Arrays.o */
+#ifdef DO_NOT_MOVE_GET_DATA_TO_ARRAYS_CPP
 TArray<char>
 MemoryByteStream::get_data(void)
 {
@@ -474,6 +482,8 @@ MemoryByteStream::get_data(void)
    readat((char*)data, size(), 0);
    return data;
 }
+#endif
+
 
 ///////// STATICBYTESTREAM
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GHLObjects.h,v 1.3 1999-05-25 19:42:29 eaf Exp $
+//C- $Id: GHLObjects.h,v 1.4 1999-09-28 19:56:18 leonb Exp $
 
 #ifndef _GHLOBJECTS_H
 #define _GHLOBJECTS_H
@@ -19,7 +19,7 @@
 #endif
 
 #include "GRect.h"
-#include "Arrays.h"
+#include "GContainer.h"
 #include "GString.h"
 
 /** @name GHLObjects.h
@@ -41,7 +41,7 @@
     @memo Definition of base hyperlink classes
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: GHLObjects.h,v 1.3 1999-05-25 19:42:29 eaf Exp $# */
+    #$Id: GHLObjects.h,v 1.4 1999-09-28 19:56:18 leonb Exp $# */
 //@{
 
 /****************************************************************************
@@ -387,7 +387,7 @@ protected:
 private:
    bool		open;
    int		points, sides;
-   TArray<int>	xx, yy;
+   GTArray<int>	xx, yy;
    static int	sign(int x);
    static bool	is_projection_on_segment(int x, int y, int x1, int y1, int x2, int y2);
    static bool	do_segments_intersect(int x11, int y11, int x12, int y12,

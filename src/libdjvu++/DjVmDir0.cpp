@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.cpp,v 1.3 1999-08-04 21:45:11 leonb Exp $
+//C- $Id: DjVmDir0.cpp,v 1.4 1999-09-28 19:56:18 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -38,6 +38,7 @@ DjVmDir0::get_size(void) const
    return size;
 }
 
+#ifndef NEED_DECODER_ONLY
 void
 DjVmDir0::encode(ByteStream & bs)
       // WARNING! make sure, that get_size(), encode() and decode() are in sync
@@ -52,6 +53,7 @@ DjVmDir0::encode(ByteStream & bs)
       bs.write32(file.size);
    }
 }
+#endif
 
 void
 DjVmDir0::decode(ByteStream & bs)

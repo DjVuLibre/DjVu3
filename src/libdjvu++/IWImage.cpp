@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWImage.cpp,v 1.21 1999-09-27 15:25:32 leonb Exp $
+//C- $Id: IWImage.cpp,v 1.22 1999-09-28 19:56:18 leonb Exp $
 
-// File "$Id: IWImage.cpp,v 1.21 1999-09-27 15:25:32 leonb Exp $"
+// File "$Id: IWImage.cpp,v 1.22 1999-09-28 19:56:18 leonb Exp $"
 // - Author: Leon Bottou, 08/1998
 
 #ifdef __GNUC__
@@ -74,6 +74,7 @@ static const int iw_round  = (1<<(iw_shift-1));
 // MASKING DECOMPOSITION
 //////////////////////////////////////////////////////
 
+#ifndef NEED_DECODER_ONLY
 
 //----------------------------------------------------
 // Function for applying bidimensional IW44 between 
@@ -280,7 +281,7 @@ forward_mask(short *data16, int w, int h, int rowsize, int begin, int end,
   delete [] smask;
 }
 
-
+#endif
 
 
 //////////////////////////////////////////////////////
@@ -602,6 +603,8 @@ _IWMap::get_memory_usage() const
   return usage;
 }
 
+
+#ifndef NEED_DECODER_ONLY
 void 
 _IWMap::create(const signed char *img8, int imgrowsize, 
                const signed char *msk8, int mskrowsize )
@@ -665,7 +668,9 @@ _IWMap::create(const signed char *img8, int imgrowsize,
   // Free decomposition buffer
   delete [] data16;
 }
+#endif // NEED_DECODER_ONLY
 
+#ifndef NEED_DECODER_ONLY
 void 
 _IWMap::slashres(int res)
 {
@@ -680,6 +685,7 @@ _IWMap::slashres(int res)
     for (int buckno=minbucket; buckno<64; buckno++)
       blocks[blockno].zero(buckno);
 }
+#endif // NEED_DECODER_ONLY
 
 
 void 
@@ -1018,7 +1024,13 @@ _IWCodec::_IWCodec(_IWMap &map, int encoding)
   ctxRoot = 0;
   // The encoder uses emap to track the decoder state
   if (encoding)
+  {
+#ifdef NEED_DECODER_ONLY
+    THROW("Compiled with NEED_DECODER_ONLY");
+#else
     emap = new _IWMap(map.iw, map.ih);
+#endif
+  }
 }
 
 
@@ -1076,11 +1088,13 @@ _IWCodec::code_slice(_ZPCodecBias &zp)
         {
           int fbucket = bandbuckets[curband].start;
           int nbucket = bandbuckets[curband].size;
+#ifndef NEED_DECODER_ONLY
           if (encoding)
             encode_buckets(zp, curbit, curband, 
                            map.blocks[blockno], emap->blocks[blockno], 
                            fbucket, nbucket);
           else
+#endif
             decode_buckets(zp, curbit, curband, 
                            map.blocks[blockno], 
                            fbucket, nbucket);
@@ -1110,7 +1124,7 @@ _IWCodec::code_slice(_ZPCodecBias &zp)
 
 // encode_prepare
 // -- compute the states prior to encoding the buckets
-
+#ifndef NEED_DECODER_ONLY
 int
 _IWCodec::encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWBlock &eblk)
 {
@@ -1184,11 +1198,11 @@ _IWCodec::encode_prepare(int band, int fbucket, int nbucket, _IWBlock &blk, _IWB
     }
   return bbstate;
 }
-
+#endif
 
 // encode_buckets
 // -- code a sequence of buckets in a given block
-
+#ifndef NEED_DECODER_ONLY
 void
 _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band, 
                          _IWBlock &blk, _IWBlock &eblk,
@@ -1348,7 +1362,7 @@ _IWCodec::encode_buckets(_ZPCodecBias &zp, int bit, int band,
           }
     }
 }
-
+#endif // NEED_DECODER_ONLY
 
 
 
@@ -1612,7 +1626,7 @@ _IWCodec::decode_buckets(_ZPCodecBias &zp, int bit, int band,
 
 // _IWCodec::estimate_decibel
 // -- estimate encoding error (after code_slice) in decibels.
-
+#ifndef NEED_DECODER_ONLY
 float
 _IWCodec::estimate_decibel(float frac)
 {
@@ -1724,7 +1738,7 @@ _IWCodec::estimate_decibel(float frac)
   float decibel = (float)(10.0 * log ( factor * factor / mse ) / 2.302585125);
   return decibel;
 }
-
+#endif // NEED_DECODER_ONLY
 
 
 //////////////////////////////////////////////////////
@@ -1788,6 +1802,7 @@ IWBitmap::IWBitmap()
 }
 
 
+#ifndef NEED_DECODER_ONLY
 IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask)
   : db_frac(1.0),
     ymap(0), ycodec(0),
@@ -1795,7 +1810,9 @@ IWBitmap::IWBitmap(const GBitmap *bm, const GBitmap *mask)
 {
   init(bm, mask);
 }
+#endif
 
+#ifndef NEED_DECODER_ONLY
 void
 IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
 {
@@ -1846,6 +1863,7 @@ IWBitmap::init(const GBitmap *bm, const GBitmap *mask)
   delete [] buffer;
   buffer = 0;
 }
+#endif
 
 
 IWBitmap::~IWBitmap()
@@ -2005,6 +2023,7 @@ IWBitmap::decode_chunk(ByteStream &bs)
 }
 
 
+#ifndef NEED_DECODER_ONLY
 int  
 IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
@@ -2078,7 +2097,7 @@ IWBitmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   cserial += 1;
   return flag;
 }
-
+#endif // NEED_DECODER_ONLY
 
 void 
 IWBitmap::close_codec()
@@ -2105,6 +2124,7 @@ IWBitmap::get_serial()
 }
 
 
+#ifndef NEED_DECODER_ONLY
 void 
 IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
@@ -2123,7 +2143,7 @@ IWBitmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
   iff.close_chunk();
   close_codec();
 }
-
+#endif
 
 void 
 IWBitmap::decode_iff(IFFByteStream &iff, int maxchunks)
@@ -2176,6 +2196,7 @@ IWPixmap::IWPixmap()
 }
 
 
+#ifndef NEED_DECODER_ONLY
 IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   : crcb_delay(10), crcb_half(0), db_frac(1.0),
     ymap(0), cbmap(0), crmap(0),
@@ -2184,7 +2205,9 @@ IWPixmap::IWPixmap(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
 {
   init(pm, mask, crcbmode);
 }
+#endif
 
+#ifndef NEED_DECODER_ONLY
 void
 IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
 {
@@ -2261,6 +2284,7 @@ IWPixmap::init(const GPixmap *pm, const GBitmap *mask, CRCBMode crcbmode)
   delete [] buffer;
   buffer = 0;
 }
+#endif // NEED_DECODER_ONLY
 
 
 IWPixmap::~IWPixmap()
@@ -2491,6 +2515,7 @@ IWPixmap::decode_chunk(ByteStream &bs)
 }
 
 
+#ifndef NEED_DECODER_ONLY
 int  
 IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
 {
@@ -2577,6 +2602,7 @@ IWPixmap::encode_chunk(ByteStream &bs, const IWEncoderParms &parm)
   cserial += 1;
   return flag;
 }
+#endif // NEED_DECODER_ONLY
 
 void 
 IWPixmap::close_codec()
@@ -2611,6 +2637,7 @@ IWPixmap::get_serial()
   return cserial;
 }
 
+#ifndef NEED_DECODER_ONLY
 void 
 IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parms)
 {
@@ -2629,6 +2656,7 @@ IWPixmap::encode_iff(IFFByteStream &iff, int nchunks, const IWEncoderParms *parm
   iff.close_chunk();
   close_codec();
 }
+#endif
 
 void 
 IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
@@ -2648,7 +2676,6 @@ IWPixmap::decode_iff(IFFByteStream &iff, int maxchunks)
   iff.close_chunk();
   close_codec();
 }
-
 
 
 

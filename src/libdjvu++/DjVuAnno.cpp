@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuAnno.cpp,v 1.13 1999-09-28 16:19:13 eaf Exp $
+//C- $Id: DjVuAnno.cpp,v 1.14 1999-09-28 19:56:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -148,7 +148,7 @@ GLObject::print(ByteStream & str, int compact, int indent, int * cur_pos) const
    if (!cur_pos) { cur_pos=new int; *cur_pos=0; aldel_cur_pos=1; };
    
    char buffer[256];
-   TArray<char> buffer_str;
+   GTArray<char> buffer_str;
    const char * to_print=0;
    switch(type)
    {
@@ -550,7 +550,6 @@ void
 DjVuAnno::encode(ByteStream &bs)
 {
   GCriticalSectionLock lock(&class_lock);
-  
   raw=encode_raw();
   bs.writall((const char*)raw, raw.length());
 }
@@ -806,7 +805,7 @@ DjVuAnno::get_hlinks(GLParser & parser, GPList<GHLRect> & rect_hlinks,
 	       {
 		  DEBUG_MSG("it's a polygojn.\n");
 		  int points=shape->get_list().size()/2;
-		  TArray<int> xx(points-1), yy(points-1);
+		  GTArray<int> xx(points-1), yy(points-1);
 		  for(int i=0;i<points;i++)
 		  {
 		     xx[i]=(*shape)[2*i]->get_number();
@@ -931,8 +930,11 @@ DjVuAnno::encode_raw(void) const
 
    MemoryByteStream str;
    parser.print(str, 1);
-   TArray<char> data=str.get_data();
-   return GString(data, data.size());
+   GString ans;
+   int size = str.size();
+   str.seek(0);
+   str.write(ans.getbuf(size), size);
+   return ans;
 }
 
 bool

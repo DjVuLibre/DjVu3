@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir0.h,v 1.4 1999-08-18 15:36:03 eaf Exp $
+//C- $Id: DjVmDir0.h,v 1.5 1999-09-28 19:56:18 leonb Exp $
  
 #ifndef _DJVMDIR0_H
 #define _DJVMDIR0_H
@@ -37,7 +37,7 @@
 
     @memo Directory of DjVu all-in-one-file DjVu documents.
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVmDir0.h,v 1.4 1999-08-18 15:36:03 eaf Exp $# */
+    @version #$Id: DjVmDir0.h,v 1.5 1999-09-28 19:56:18 leonb Exp $# */
 
 //@{
 
@@ -81,7 +81,7 @@ public:
    };
 private:
    GMap<GString, GP<FileRec> >	name2file;
-   DPArray<FileRec>		num2file;
+   GPArray<FileRec>		num2file;
 protected:
 public:
       /// Returns the number of files in the DjVm archive

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.h,v 1.7 1999-09-23 19:05:24 eaf Exp $
+//C- $Id: DjVmDir.h,v 1.8 1999-09-28 19:56:18 leonb Exp $
 
 #ifndef _DJVMDIR_H
 #define _DJVMDIR_H
@@ -22,7 +22,7 @@
     @memo Implements DjVu multipage document directory
     @author Andrei Erofeev <eaf@geocities.com>
     @version
-    #$Id: DjVmDir.h,v 1.7 1999-09-23 19:05:24 eaf Exp $# */
+    #$Id: DjVmDir.h,v 1.8 1999-09-28 19:56:18 leonb Exp $# */
 //@{
 
 
@@ -32,7 +32,7 @@
 
 #include "DjVuGlobal.h"
 #include "GString.h"
-#include "Arrays.h"
+#include "GContainer.h"
 #include "GContainer.h"
 #include "ByteStream.h"
 #include "GThreads.h"
@@ -157,7 +157,7 @@ public:
 private:
    GCriticalSection 	class_lock;
    GPList<File>		files_list;
-   DPArray<File>	page2file;
+   GPArray<File>	page2file;
    GPMap<GString, File>	name2file;
    GPMap<GString, File>	id2file;
    GPMap<GString, File>	title2file;

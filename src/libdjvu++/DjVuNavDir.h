@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuNavDir.h,v 1.3 1999-05-26 18:05:23 eaf Exp $
+//C- $Id: DjVuNavDir.h,v 1.4 1999-09-28 19:56:18 leonb Exp $
 
 #ifndef _DJVUNAVDIR_H
 #define _DJVUNAVDIR_H
@@ -36,7 +36,7 @@
 
     @memo DjVu Navigation Directory
     @author Andrei Erofeev <eaf@geocities.com>
-    @version #$Id: DjVuNavDir.h,v 1.3 1999-05-26 18:05:23 eaf Exp $#
+    @version #$Id: DjVuNavDir.h,v 1.4 1999-09-28 19:56:18 leonb Exp $#
 */
 
 //@{
@@ -69,7 +69,7 @@ class DjVuNavDir : public GPEnabled
 private:
    GCriticalSection		lock;
    GURL				baseURL;
-   DArray<GString>		page2name;
+   GArray<GString>		page2name;
    GMap<GString, int>		name2page;
    GMap<GURL, int>		url2page;
 public:

@@ -9,9 +9,9 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: BSByteStream.cpp,v 1.11 1999-09-02 02:17:22 leonb Exp $
+//C- $Id: BSByteStream.cpp,v 1.12 1999-09-28 19:56:18 leonb Exp $
 
-// "$Id: BSByteStream.cpp,v 1.11 1999-09-02 02:17:22 leonb Exp $"
+// "$Id: BSByteStream.cpp,v 1.12 1999-09-28 19:56:18 leonb Exp $"
 // - Author: Leon Bottou, 07/1998
 
 
@@ -61,6 +61,7 @@
 // -- Sorting Routines
 
   
+#ifndef NEED_DECODER_ONLY
 
 class _BSort  // DJVU_CLASS
 {
@@ -697,17 +698,18 @@ _BSort::run(int &markerpos)
 }
 
 
+#endif // NEED_DECODER_ONLY
 
 
 // ========================================
 // -- Encoding
-
 
 #define FREQMAX   4
 #define FREQS0    100000
 #define FREQS1    1000000
 #define CTXIDS    3
 
+#ifndef NEED_DECODER_ONLY
 static void
 encode_raw(ZPCodec &zp, int bits, int x)
 {
@@ -721,7 +723,9 @@ encode_raw(ZPCodec &zp, int bits, int x)
       n = (n<<1) | b;
     }
 }
+#endif
 
+#ifndef NEED_DECODER_ONLY
 static inline void
 encode_binary(ZPCodec &zp, BitContext *ctx, int bits, int x)
 {
@@ -737,8 +741,9 @@ encode_binary(ZPCodec &zp, BitContext *ctx, int bits, int x)
       n = (n<<1) | b;
     }
 }
+#endif
 
-
+#ifndef NEED_DECODER_ONLY
 unsigned int
 BSByteStream::encode()
 { 
@@ -861,6 +866,8 @@ BSByteStream::encode()
   // Terminate
   return 0;
 }
+
+#endif // NEED_DECODER_ONLY
 
 
 // ========================================
@@ -1071,12 +1078,16 @@ BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
 {
   if (encoding)
     {
+#ifdef NEED_DECODER_ONLY
+      THROW("Compiled with NEED_DECODER_ONLY");
+#else
       if (encoding < MINBLOCK)
         encoding = MINBLOCK;
       if (encoding > MAXBLOCK)
         THROW("Requested block size must be less than " STR(MAXBLOCK) "Kbytes.");
       // Record block size
       blocksize = encoding * 1024;
+#endif
     }
   // Initialize context array
   memset(ctx, 0, sizeof(ctx));
@@ -1086,12 +1097,14 @@ BSByteStream::BSByteStream(ByteStream &xbs, int encoding)
 
 BSByteStream::~BSByteStream()
 {
+#ifndef NEED_DECODER_ONLY
   // Flush
   if (encoding) 
     flush();
   // Encode EOF marker
   if (encoding)
     encode_raw(zp, 24, 0);
+#endif
   // Free allocated memory
   if (data)
     delete [] data; 
@@ -1115,6 +1128,7 @@ BSByteStream::tell()
 void 
 BSByteStream::flush()
 {
+#ifndef NEED_DECODER_ONLY
   if (encoding && bptr>0)
     {
       ASSERT(bptr<(int)blocksize);
@@ -1122,6 +1136,7 @@ BSByteStream::flush()
       size = bptr+1;
       encode();
     }
+#endif
   size = bptr = 0;
 }
 
@@ -1167,6 +1182,9 @@ BSByteStream::read(void *buffer, size_t sz)
 size_t 
 BSByteStream::write(const void *buffer, size_t sz)
 {
+#ifdef NEED_ENCODER_ONLY
+  THROW("Cannot write to BSByteStream created for decoding");
+#else
   // Trivial checks
   if (! encoding)
     THROW("Cannot write to BSByteStream created for decoding");
@@ -1199,5 +1217,6 @@ BSByteStream::write(const void *buffer, size_t sz)
     }
   // return
   return copied;
+#endif // NEED_DECODER_ONLY
 }
 

@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVmDir.cpp,v 1.5 1999-09-23 19:05:24 eaf Exp $
+//C- $Id: DjVmDir.cpp,v 1.6 1999-09-28 19:56:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -90,7 +90,7 @@ DjVmDir::decode(ByteStream & str)
 	 files_list[pos]->flags=bs_str.read8();
    
       DEBUG_MSG("reading and decompressing names...\n");
-      TArray<char> strings;
+      GTArray<char> strings;
       char buffer[1024];
       int length;
       while((length=bs_str.read(buffer, 1024)))

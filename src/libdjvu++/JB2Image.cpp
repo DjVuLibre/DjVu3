@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: JB2Image.cpp,v 1.22 1999-09-27 15:25:32 leonb Exp $
+//C- $Id: JB2Image.cpp,v 1.23 1999-09-28 19:56:18 leonb Exp $
 
 
 #ifdef __GNUC__
@@ -197,12 +197,14 @@ JB2Dict::add_shape(const JB2Shape &shape)
   return index + inherited_shapes;
 }
 
+#ifndef NEED_DECODER_ONLY
 void 
 JB2Dict::encode(ByteStream &bs) const
 {
   _JB2Codec codec(bs, 1);
   codec.code((JB2Dict*)this);
 }
+#endif
 
 void 
 JB2Dict::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
@@ -303,12 +305,14 @@ JB2Image::get_bitmap(const GRect &rect, int subsample, int align, int dispy) con
 }
 
 
+#ifndef NEED_DECODER_ONLY
 void 
 JB2Image::encode(ByteStream &bs) const
 {
   _JB2Codec codec(bs, 1);
   codec.code((JB2Image*)this);
 }
+#endif
 
 void 
 JB2Image::decode(ByteStream &bs, JB2DecoderCallback *cb, void *arg)
@@ -1247,6 +1251,9 @@ _JB2Codec::code(JB2Dict *jim)
 {
   if (encoding)
     {
+#ifdef NEED_DECODER_ONLY
+      THROW("Compiled with NEED_DECODER_ONLY");
+#else
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1287,6 +1294,7 @@ _JB2Codec::code(JB2Dict *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL); 
       zp.ZPCodec::~ZPCodec();
+#endif
     }
   else
     {
@@ -1509,6 +1517,9 @@ _JB2Codec::code(JB2Image *jim)
   // Test case
   if (encoding)
     {
+#ifdef NEED_DECODER_ONLY
+      THROW("Compiled with NEED_DECODER_ONLY");
+#else
       // -------------------------
       // THIS IS THE ENCODING PART
       // -------------------------
@@ -1616,6 +1627,7 @@ _JB2Codec::code(JB2Image *jim)
       rectype = END_OF_DATA;
       code_record(rectype, jim, NULL, NULL); 
       zp.ZPCodec::~ZPCodec();
+#endif
     }
   else
     {
@@ -1643,7 +1655,7 @@ _JB2Codec::code(JB2Image *jim)
 //// HELPERS
 ////////////////////////////////////////
 
-
+#ifndef NEED_DECODER_ONLY
 void 
 _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 {
@@ -1669,7 +1681,7 @@ _JB2Codec::encode_libonly_shape(JB2Image *jim, int shapeno )
 	}
     }
 }
-
+#endif
 
 void 
 _JB2Codec::compute_bounding_box(GBitmap *bm, LibRect *lib)

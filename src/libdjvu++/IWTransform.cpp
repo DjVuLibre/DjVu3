@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: IWTransform.cpp,v 1.12 1999-09-21 20:51:27 leonb Exp $
+//C- $Id: IWTransform.cpp,v 1.13 1999-09-28 19:56:18 leonb Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -48,7 +48,7 @@ static short w1[]  = {1,1,1,1};
 static int   d8[]  = {8,8};
 static int   d16[] = {16,16};
 
-
+#ifndef NEED_DECODER_ONLY
 static inline void
 mmx_fv_1 ( short* &q, short* e, int s, int s3 )
 {
@@ -91,7 +91,9 @@ mmx_fv_1 ( short* &q, short* e, int s, int s3 )
       q += 4;
     }
 }
+#endif // NEED_DECODER_ONLY
 
+#ifndef NEED_DECODER_ONLY
 static inline void
 mmx_fv_2 ( short* &q, short* e, int s, int s3 )
 {
@@ -134,7 +136,7 @@ mmx_fv_2 ( short* &q, short* e, int s, int s3 )
       q += 4;
     }
 }
-
+#endif // NEED_DECODER_ONLY
 
 inline void
 mmx_bv_1 ( short* &q, short* e, int s, int s3 )
@@ -247,6 +249,7 @@ filter_end()
 }
 
 
+#ifndef NEED_DECODER_ONLY
 static void 
 filter_fv(short *p, int w, int h, int rowsize, int scale)
 {
@@ -356,7 +359,7 @@ filter_fv(short *p, int w, int h, int rowsize, int scale)
       p += s+s;
     }
 }
-
+#endif // NEED_DECODER_ONLY
 
 static void 
 filter_bv(short *p, int w, int h, int rowsize, int scale)
@@ -467,6 +470,7 @@ filter_bv(short *p, int w, int h, int rowsize, int scale)
 }
 
 
+#ifndef NEED_DECODER_ONLY
 static void 
 filter_fh(short *p, int w, int h, int rowsize, int scale)
 {
@@ -534,7 +538,7 @@ filter_fh(short *p, int w, int h, int rowsize, int scale)
       p += rowsize;
     }
 }
-
+#endif // NEED_DECODER_ONLY
 
 static void 
 filter_bh(short *p, int w, int h, int rowsize, int scale)
@@ -643,7 +647,7 @@ filter_bh(short *p, int w, int h, int rowsize, int scale)
 // Function for applying bidimensional IW44 between 
 // scale intervals begin(inclusive) and end(exclusive)
 
-
+#ifndef NEED_DECODER_ONLY
 void
 IWTransform::forward(short *p, int w, int h, int rowsize, int begin, int end)
 { 
@@ -670,6 +674,7 @@ IWTransform::forward(short *p, int w, int h, int rowsize, int begin, int end)
   // TERMINATE
   filter_end();
 }
+#endif
 
 void
 IWTransform::backward(short *p, int w, int h, int rowsize, int begin, int end)
@@ -755,7 +760,9 @@ IWTransform::YCbCr_to_RGB(GPixel *p, int w, int h, int rowsize)
 }
 
 
+
 /* Extracts Y */
+#ifndef NEED_DECODER_ONLY
 void 
 IWTransform::RGB_to_Y(const GPixel *p, int w, int h, int rowsize, 
                       signed char *out, int outrowsize)
@@ -778,9 +785,10 @@ IWTransform::RGB_to_Y(const GPixel *p, int w, int h, int rowsize,
         }
     }
 }
-
+#endif // NEED_DECODER_ONLY
 
 /* Extracts Cb */
+#ifndef NEED_DECODER_ONLY
 void 
 IWTransform::RGB_to_Cb(const GPixel *p, int w, int h, int rowsize, 
                        signed char *out, int outrowsize)
@@ -803,9 +811,10 @@ IWTransform::RGB_to_Cb(const GPixel *p, int w, int h, int rowsize,
         }
     }
 }
-
+#endif  // NEED_DECODER_ONLY
 
 /* Extracts Cr */
+#ifndef NEED_DECODER_ONLY
 void 
 IWTransform::RGB_to_Cr(const GPixel *p, int w, int h, int rowsize, 
                        signed char *out, int outrowsize)
@@ -828,5 +837,4 @@ IWTransform::RGB_to_Cr(const GPixel *p, int w, int h, int rowsize,
         }
     }
 }
-
-
+#endif // NEED_DECODER_ONLY
