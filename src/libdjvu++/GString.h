@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.h,v 1.30 2001-04-02 22:04:07 bcr Exp $
+// $Id: GString.h,v 1.31 2001-04-03 21:45:52 bcr Exp $
 // $Name:  $
 
 #ifndef _GSTRING_H_
@@ -57,7 +57,7 @@
     @author
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.
     @version
-    #$Id: GString.h,v 1.30 2001-04-02 22:04:07 bcr Exp $# */
+    #$Id: GString.h,v 1.31 2001-04-03 21:45:52 bcr Exp $# */
 //@{
 
 #ifdef __GNUC__
@@ -262,14 +262,14 @@ public:
       function #printf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  void format(const char *fmt, ... );
+  GString &format(const char *fmt, ... );
   /** Initializes a string with a formatted string (as in #vprintf#).  The
       string is re-initialized with the characters generated according to the
       specified format #fmt# and using the optional arguments.  See the ANSI-C
       function #vprintf()# for more information. The current implementation
       will cause a segmentation violation if the resulting string is longer
       than 32768 characters. */
-  void format(const char *fmt, va_list args);
+  GString &format(const char *fmt, va_list args);
   // -- SEARCHING
   /** Searches character #c# in the string, starting at position #from# and
       scanning forward until reaching the end of the string.  This function
@@ -291,6 +291,10 @@ public:
       function returns the position of the first matching character of the
       sub-string. It returns #-1# if string #str# cannot be found. */
   int rsearch(const char *str, int from=-1) const;
+  /** Searches for any of the specified characters in the accept string.
+      It returns #-1# if the none of the characters and be found, otherwise
+      the position of the first match. */
+  int contains(const char accept[], const int from=-1) const;
 
   // -- CONCATENATION
   /// Appends character #ch# to the string.

@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: GString.cpp,v 1.41 2001-04-02 22:53:30 bcr Exp $
+// $Id: GString.cpp,v 1.42 2001-04-03 21:45:52 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -116,16 +116,19 @@ GString::GString(const unsigned char *str)
 
 GString::GString(const char *str, unsigned int len)
 {
-  if (!str) return;
-  unsigned int nlen = 0;
-  while (nlen<len && str[nlen]) 
-    nlen++;
-  if (nlen <= 0) 
-    return;
-  GStringRep *rep = GStringRep::xnew(nlen);
-  memcpy(rep->data,str,nlen);
-  rep->data[nlen] = 0;
-  (*this) = rep;
+  if (str)
+  {
+    unsigned int nlen = 0;
+    while (nlen<len && str[nlen]) 
+      nlen++;
+    if (nlen > 0)
+    {
+      GStringRep *rep = GStringRep::xnew(nlen);
+      memcpy(rep->data,str,nlen);
+      rep->data[nlen] = 0;
+      (*this) = rep;
+    }
+  }
 }
 
 GString::GString(const GString& gs, int from, unsigned int len)
@@ -418,15 +421,15 @@ GString::setat(int n, char ch)
 #endif
 #endif
 
-void
+GString &
 GString::format(const char *fmt, ... )
 {
   va_list args;
   va_start(args, fmt);
-  format(fmt, args);
+  return format(fmt, args);
 }
 
-void
+GString &
 GString::format(const char *fmt, va_list args)
 {
   int buflen=32768;
@@ -454,6 +457,7 @@ GString::format(const char *fmt, va_list args)
 #endif
   // Go altering the string
   (*this) = (const char *)buffer;
+  return *this;
 }
 
 int 
@@ -469,7 +473,7 @@ GString::search(char c, int from) const
   char *s = strchr(&str[from], c);
   return (s ? s - str : -1);
 }
-  
+
 int 
 GString::search(const char *str, int from) const
 {
@@ -482,7 +486,6 @@ GString::search(const char *str, int from) const
   char *s = strstr(&src[from], str);
   return (s ? s - src : -1);
 }
-
 
 int 
 GString::rsearch(char c, int from) const
@@ -522,6 +525,21 @@ GString::rsearch(const char *str, int from) const
   return ans;
 }
 
+int
+GString::contains(const char accept[],const int from) const
+{
+  int retval=(-1);
+  if(accept && strlen(accept) && (from < (int)length()))
+  {
+    const char *src = (const char*)(*this)+((from<0)?0:from);
+    const char *ptr;
+    if((ptr=strpbrk(src,accept)))
+    {
+      retval=(int)(ptr-src);
+    }
+  }
+  return retval;
+}
 
 GString& 
 GString::operator+= (char ch)

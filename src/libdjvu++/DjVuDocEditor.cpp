@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuDocEditor.cpp,v 1.69 2001-03-30 23:31:28 bcr Exp $
+// $Id: DjVuDocEditor.cpp,v 1.70 2001-04-03 21:45:52 bcr Exp $
 // $Name:  $
 
 #ifdef __GNUC__
@@ -420,7 +420,6 @@ DjVuDocEditor::insert_file(const GURL &file_url, const char * parent_id,
    GP<DataPool> file_pool=DataPool::create(file_url);
    if(file_pool && file_url && DjVuDocument::djvu_import_codec)
    {
-//     const GString file_name=GOS::url_to_filename(file_url).getUTF82Native();
      (*DjVuDocument::djvu_import_codec)(file_pool,file_url,needs_compression_flag,can_compress_flag);
    }
 
@@ -497,7 +496,6 @@ DjVuDocEditor::insert_file(const GURL &file_url, bool is_page,
          // Create DataPool and see if the file exists
       if(file_pool && file_url && DjVuDocument::djvu_import_codec)
       {
-//        const GString file_name=GOS::url_to_filename(file_url).getUTF82Native();
         (*DjVuDocument::djvu_import_codec)(file_pool,file_url,needs_compression_flag,can_compress_flag);
       }
 
@@ -681,7 +679,6 @@ DjVuDocEditor::insert_group(const GList<GURL> & file_urls, int page_num,
             GP<DataPool> xdata_pool=DataPool::create(furl);
             if(xdata_pool && furl.is_valid() && furl.is_local_file_url() && DjVuDocument::djvu_import_codec)
             {
-//              const GString fname=GOS::url_to_filename(furl).getUTF82Native();
               (*DjVuDocument::djvu_import_codec)(xdata_pool,furl,needs_compression_flag,can_compress_flag);
             }
             GString chkid;

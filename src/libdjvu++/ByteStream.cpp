@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: ByteStream.cpp,v 1.56 2001-03-30 23:31:28 bcr Exp $
+// $Id: ByteStream.cpp,v 1.57 2001-04-03 21:45:51 bcr Exp $
 // $Name:  $
 
 // - Author: Leon Bottou, 04/1997
@@ -355,6 +355,12 @@ ByteStream::readall(void *buffer, size_t size)
   return total;
 }
 
+size_t
+ByteStream::writestring(const GString &s)
+{
+  return writall((const char *)s,s.length());
+}
+
 size_t 
 ByteStream::writall(const void *buffer, size_t size)
 {
@@ -552,11 +558,13 @@ urlfopen(const GURL &url,const char mode[])
   return fopen((const char *)url.NativeFilename(),mode);
 }
 
+#ifdef UNIX
 static int
 urlopen(const GURL &url, const int mode, const int perm)
 {
   return open((const char *)url.NativeFilename(),mode,perm);
 }
+#endif /* UNIX */
 
 GString
 ByteStream::Stdio::init(const GURL &url, const char mode[])

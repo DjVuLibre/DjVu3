@@ -30,7 +30,7 @@
 //C- TO ANY WARRANTY OF NON-INFRINGEMENT, OR ANY IMPLIED WARRANTY OF
 //C- MERCHANTIBILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 // 
-// $Id: DjVuMessage.cpp,v 1.26 2001-04-02 22:53:24 fcrary Exp $
+// $Id: DjVuMessage.cpp,v 1.27 2001-04-03 21:45:52 bcr Exp $
 // $Name:  $
 
 
@@ -100,7 +100,7 @@ RegOpenReadConfig ( HKEY hParentKey )
     TCHAR path[1024];
     // Success
     LPSTR szPathValue = path;
-    LPCTSTR lpszEntry = TEXT("");
+    LPCTSTR lpszEntry = (LPCTSTR &)TEXT("");
     DWORD dwCount = (sizeof(path)/sizeof(TCHAR))-1;
     DWORD dwType;
 
