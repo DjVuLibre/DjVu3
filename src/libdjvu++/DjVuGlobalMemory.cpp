@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobalMemory.cpp,v 1.3 2000-02-29 19:44:44 praveen Exp $
+//C- $Id: DjVuGlobalMemory.cpp,v 1.4 2000-03-01 04:39:39 praveen Exp $
 
 
 #ifdef NEED_DJVU_MEMORY
@@ -118,7 +118,7 @@ djvu_set_memory_callbacks
   }
 }
 
-void *
+DJVUAPI void *
 _djvu_new(size_t siz)
 {
   void *ptr;
@@ -133,7 +133,7 @@ _djvu_new(size_t siz)
 #ifndef UNIX
   }else
   {
-    ptr=operator new(siz?siz:1);
+      ptr=::operator new(siz?siz:1);
   }
 #endif
   return ptr;
@@ -169,7 +169,7 @@ _djvu_newArray(size_t siz)
 #ifndef UNIX
   }else
   {
-    ptr=operator new unsigned char[siz?siz:1];
+      ptr=::new unsigned char[siz?siz:1];
   }
 #endif
   return ptr;

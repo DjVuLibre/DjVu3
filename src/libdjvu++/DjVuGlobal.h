@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuGlobal.h,v 1.32 2000-02-29 19:44:44 praveen Exp $
+//C- $Id: DjVuGlobal.h,v 1.33 2000-03-01 04:39:39 praveen Exp $
 
 
 #ifndef _DJVUGLOBAL_H
@@ -40,7 +40,7 @@
     @memo
     Global definitions.
     @version
-    #$Id: DjVuGlobal.h,v 1.32 2000-02-29 19:44:44 praveen Exp $#
+    #$Id: DjVuGlobal.h,v 1.33 2000-03-01 04:39:39 praveen Exp $#
     @author
     L\'eon Bottou <leonb@research.att.com> -- empty file.\\
     Bill Riemers <bcr@sanskrit.lz.att.com> -- real work.  */
@@ -78,7 +78,7 @@ int djvu_memoryArray_callback ( djvu_delete_callback*, djvu_new_callback*);
 #ifdef __GNUC__
 #define STATIC_INLINE extern inline
 #else /* !__GNUC__ */
-#define STATIC_INLINE inline
+#define STATIC_INLINE static inline
 #endif /* __GNUC__ */
 #endif /* STATIC_INLINE */
 

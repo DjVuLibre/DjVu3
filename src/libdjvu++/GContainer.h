@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: GContainer.h,v 1.30 2000-02-27 23:19:50 eaf Exp $
+//C- $Id: GContainer.h,v 1.31 2000-03-01 04:39:39 praveen Exp $
 
 
 #ifndef _GCONTAINER_H_
@@ -73,7 +73,7 @@
     L\'eon Bottou <leonb@research.att.com> -- initial implementation.\\
     Andrei Erofeev <eaf@geocities.com> -- bug fixes.
     @version 
-    #$Id: GContainer.h,v 1.30 2000-02-27 23:19:50 eaf Exp $# */
+    #$Id: GContainer.h,v 1.31 2000-03-01 04:39:39 praveen Exp $# */
 //@{
 
 
@@ -88,6 +88,15 @@
    namespace for global identifiers related to the implementation of
    containers.  It is inherited by all container objects.  This is disabled by
    defining compilation symbol #GCONTAINER_NO_MEMBER_TEMPATES# to 1. */
+
+
+#ifdef _MSC_VER
+// Language lawyer say MS is wrong on that one. 
+// Cf section 5.4.7 in november 1997 draft.
+#pragma warning( disable : 4243 )
+#endif
+
+
 
 class GCont
 #if GCONTAINER_NO_MEMBER_TEMPLATES
