@@ -9,7 +9,7 @@
 //C- AT&T, you have an infringing copy of this software and cannot use it
 //C- without violating AT&T's intellectual property rights.
 //C-
-//C- $Id: DjVuPort.cpp,v 1.24 1999-11-19 23:44:18 bcr Exp $
+//C- $Id: DjVuPort.cpp,v 1.25 1999-11-20 07:55:32 bcr Exp $
 
 #ifdef __GNUC__
 #pragma implementation
@@ -184,12 +184,22 @@ DjVuPortcaster::del_port(const DjVuPort * port)
    }
    for(pos=route_map;pos;)
    {
+//bcr: Mapping GMap to GList at the binary level.  This is CRAZY.
+
       GList<void *> & list=*(GList<void *> *) route_map[pos];
       GPosition list_pos;
       if (list.search((void *) port, list_pos)) list.del(list_pos);
       if (!list.size())
       {
+
+//bcr: This is probably were the error really occures.  But this
+//bcr: is so cryptic, since all the operators are overloaded both
+//bcr: here and on the declaration line above.  The value is being
+//bcr: deleted, while the list itself still exists.  So later when
+//bcr: we try to access it, BOOM!  
 	 delete &list;
+//bcr: Assuming that is the problem, something like:	&list=0;
+//bcr: will fix the problem.
 	 GPosition tmp_pos=pos;
 	 ++pos;
 	 route_map.del(tmp_pos);
